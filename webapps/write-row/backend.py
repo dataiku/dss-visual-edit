@@ -6,22 +6,25 @@ from dataiku.core.sql import SQLExecutor2
 from dataiku.customwebapp import *
 
 # Access parameters that end-users filled in using webapp config
+
 DATASET_NAME = get_webapp_config()['input_dataset']
 
-# Initialize the SQL executor
-original_ds = dataiku.Dataset(DATASET_NAME)
-original_df = original_ds.get_dataframe()
-table_name = original_ds.get_config()['params']['table'] # nom de la table correspondant à ce dataset
-connection_name = original_ds.get_config()['params']['connection'] # nom de la connexion SQL dataiku où aller récupérer la table
-executor = SQLExecutor2(connection=connection_name)
 
 # Create change log dataset and editable dataset, if they don't already exist
+
 client = dataiku.api_client()
 project = client.get_default_project()
+
+original_ds = dataiku.Dataset(DATASET_NAME)
+original_df = original_ds.get_dataframe()
+connection_name = original_ds.get_config()['params']['connection'] # nom de la connexion SQL dataiku où aller récupérer la table
+
 changes_ds_name = DATASET_NAME + "_changes"
 editable_ds_name = DATASET_NAME + "_editable"
+
 changes_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, changes_ds_name)
 editable_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, editable_ds_name)
+
 if (not changes_ds_creator.already_exists()):
     changes_ds_creator.with_store_into(connection="filesystem_managed")
     changes_ds_creator.create()
@@ -35,6 +38,13 @@ if (not changes_ds_creator.already_exists()):
 else:
     changes_ds = dataiku.Dataset(changes_ds_name)
     editable_ds = dataiku.Dataset(editable_ds_name)
+    
+    
+# Initialize the SQL executor and name of table to edit
+
+executor = SQLExecutor2(connection=connection_name)
+table_name = editable_ds.get_config()['params']['table']
+    
     
 @app.route('/get_dataset_schema')
 def get_dataset_schema():
