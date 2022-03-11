@@ -4,7 +4,10 @@
         // label: name of the webapp as displayed, should be short
         "label": "Write row",
         // description: longer string to help end users understand what this webapp does
-        "description": "",
+        "description": "Webapp to edit records of an INPUT dataset, via a copy. It creates 3 objects in the Flow upon initialization: \
+        1. a copy of the input dataset, named INPUT_editable \
+        2. a dataset that stores the list of changes made by the webapp user, named INPUT_changes \
+        3. a recipe that links INPUT and INPUT_changes to INPUT_editable and allows to replay changes",
         // icon: must be one of the FontAwesome 3.2.1 icons, complete list here at https://fontawesome.com/v3.2.1/icons/
         "icon": "icon-puzzle-piece"
     },
@@ -29,29 +32,11 @@
             "label": "Dataset",
             "description": "",
             "mandatory": true
-        },
-        {
-            "name": "input_column",
-            "type": "DATASET_COLUMN",
-            "datasetParamName": "input_dataset",
-            "label": "Column",
-            "description": "",
-            "mandatory": true
-        },
-        {
-            "name": "input_int",
-            "type": "INT",
-            "label": "Int",
-            "description": "",
-            "mandatory": true
-        },
-        {
-            "name": "input_string",
-            "type": "STRING",
-            "label": "String",
-            "description": "",
-            "mandatory": false
         }
+        /*
+        TODO: ask for SQL connection
+        TODO: show info on what is going to be created (change log dataset with name INPUT_DATASET_NAME_changes, editable dataset with name INPUT_DATASET_NAME_editable, recipe)
+        */
     ],
 
     /* roles define where this webapp will appear in DSS GUI. They are used to pre-fill a macro parameter with context.
@@ -65,3 +50,4 @@
         /* {"type": "DATASET", "targetParamsKey": "input_dataset"} */
     ]
 }
+
