@@ -1,4 +1,5 @@
 import dataiku
+import dataikuapi
 import pandas as pd
 from flask import request
 from dataiku.core.sql import SQLExecutor2
@@ -13,9 +14,9 @@ table_name = ds.get_config()['params']['table'] # nom de la table correspondant 
 connection_name = ds.get_config()['params']['connection'] # nom de la connexion SQL dataiku où aller récupérer la table
 executor = SQLExecutor2(connection=connection_name)
 
+# Create change log dataset if it doesn't already exist
 client = dataiku.api_client()
 project = client.get_default_project()
-import dataikuapi
 dscreator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, DATASET_NAME + "_changes")
 if (not dscreator.already_exists()):
     dscreator.with_store_into(connection="filesystem_managed")
