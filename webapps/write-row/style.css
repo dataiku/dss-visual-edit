@@ -1,0 +1,17 @@
+.table-field {
+    margin-bottom:2%;
+}
+
+.form-control-feedback { right: 10px !important}
+
+#main {
+    margin-top:3%
+}
+
+#write {
+    margin-bottom:2%
+}
+
+label {overflow: hidden !important}
+
+.line{display: inline-block}
