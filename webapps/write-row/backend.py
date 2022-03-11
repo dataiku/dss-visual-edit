@@ -28,7 +28,7 @@ if (not changes_ds_creator.already_exists()):
     changes_ds = dataiku.Dataset(changes_ds_name)
     changes_ds.write_schema_from_dataframe(df=original_df)
     
-    editable_ds_creator.with_store_into(connection="filesystem_managed") # TODO: change!
+    editable_ds_creator.with_store_into(connection=connection_name) # TODO: make this configurable
     editable_ds_creator.create()
     editable_ds = dataiku.Dataset(editable_ds_name)
     editable_ds.write_with_schema(original_df)
