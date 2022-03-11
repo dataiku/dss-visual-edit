@@ -1,20 +1,25 @@
-from dataiku.customwebapp import *
-
-# Access the parameters that end-users filled in using webapp config
-# For example, for a parameter called "input_dataset"
-# input_dataset = get_webapp_config()["input_dataset"]
-
 import dataiku
 import pandas as pd
 from flask import request
 from dataiku.core.sql import SQLExecutor2
+from dataiku.customwebapp import *
 
+# Access parameters that end-users filled in using webapp config
+DATASET_NAME = get_webapp_config()['input_dataset']
 
+# Initialize the SQL executor
+ds = dataiku.Dataset(DATASET_NAME)
+table_name = ds.get_config()['params']['table'] # nom de la table correspondant à ce dataset
+connection_name = ds.get_config()['params']['connection'] # nom de la connexion SQL dataiku où aller récupérer la table
+executor = SQLExecutor2(connection=connection_name)
 
-DATASET_NAME = "iris"
-TABLE_NAME = """ "public"."iris" """ # nom de la table correspondant à ce dataset
-CONNECTION_NAME = "local-louisdorard" # nom de la connexion SQL dataiku où aller récupérer la table
-executor = SQLExecutor2(connection=CONNECTION_NAME)
+client = dataiku.api_client()
+project = client.get_default_project()
+import dataikuapi
+dscreator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, DATASET_NAME + "_changes")
+if (not dscreator.already_exists()):
+    dscreator.with_store_into(connection="filesystem_managed")
+    dscreator.create()
 
 @app.route('/get_dataset_schema')
 def get_dataset_schema():
@@ -33,18 +38,18 @@ def get_dataset_schema():
         ]
         
     """
-    columns = dataiku.Dataset(DATASET_NAME).get_config().get('schema').get('columns')
+    columns = ds.get_config().get('schema').get('columns')
     query = """SELECT"""
     for col in columns:
         col_name = col['name']
         query = query + ' count(distinct "%s") as "%s",'% (col_name, col_name)
 
-    query = query[:-1] + """ FROM %s""" % TABLE_NAME
+    query = query[:-1] + """ FROM %s""" % table_name
     distinct_dict = executor.query_to_df(query).to_dict(orient="records")[0]
     for col in columns:
         # si la colonne a moins de 10 valeurs uniques et est de type string, on crée une liste déroulante
         if distinct_dict[col['name']] <= 10 and col['type']=='string':
-            sub_query = """SELECT DISTINCT "{0}" as "{0}" FROM {1} """.format(col['name'], TABLE_NAME)
+            sub_query = """SELECT DISTINCT "{0}" as "{0}" FROM {1} """.format(col['name'], table_name)
             df = executor.query_to_df(sub_query)
             uniques = df[col['name']].tolist()
             col['uniques'] = uniques
@@ -76,7 +81,7 @@ def get_dropdown_values(params):
     query = """ SELECT DISTINCT "{0}" as "a"
     FROM {1}
     WHERE "{2}" = '{3}'
-    """.format(child, TABLE_NAME, parent, value)
+    """.format(child, table_name, parent, value)
     print(query)
     df = executor.query_to_df(query)
     data = df['a'].tolist()
@@ -95,15 +100,15 @@ def write_row():
         col_list = ['"%s"' % col for col in row_dict.keys()]
         cols = ', '.join(col_list)
         vals = ', '.join([repr(str(value)) for value in row_dict.values()])
-        executor = SQLExecutor2(connection=CONNECTION_NAME)
+        executor = SQLExecutor2(connection=connection_name)
         pre_query="""INSERT INTO %s (%s)
             VALUES (%s);
             COMMIT;
-            """ %(TABLE_NAME, cols, vals)
+            """ %(table_name, cols, vals)
         df = executor.query_to_df( """select * from %s
             limit 1
-            """ % TABLE_NAME, pre_queries=[pre_query])
-
+            """ % table_name, pre_queries=[pre_query])
+        df.to_csv("changes.csv", mode="a", header=False, index=False) # TODO: use Dataiku API and Dataset to write change log
         return json.dumps({'status':'ok'})
     except Exception as e:
         print(e)
