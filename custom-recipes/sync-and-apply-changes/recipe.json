@@ -34,7 +34,7 @@
             "name": "changes",
             "label": "Log of changes made on the webapp",
             "description": "Used by the recipe to replay changes made via the webapp when rebuilding the flow",
-            "arity": "NARY",
+            "arity": "UNARY",
             "required": true,
             "acceptsDataset": true
         }
