@@ -42,7 +42,7 @@
 
     "outputRoles": [
         {
-            "name": "output",
+            "name": "editable",
             "label": "Table that the webapp presents to external users and allows to edit",
             "description": "",
             "arity": "UNARY",
