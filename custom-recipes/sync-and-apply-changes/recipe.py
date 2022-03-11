@@ -1,4 +1,4 @@
-# Code for custom code recipe synd-and-apply-changes (imported from a Python recipe)
+# Code for custom code recipe sync-and-apply-changes (imported from a Python recipe)
 
 # To finish creating your custom recipe from your original PySpark recipe, you need to:
 #  - Declare the input and output roles in recipe.json
