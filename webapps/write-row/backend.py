@@ -9,19 +9,33 @@ from dataiku.customwebapp import *
 DATASET_NAME = get_webapp_config()['input_dataset']
 
 # Initialize the SQL executor
-ds = dataiku.Dataset(DATASET_NAME)
-table_name = ds.get_config()['params']['table'] # nom de la table correspondant à ce dataset
-connection_name = ds.get_config()['params']['connection'] # nom de la connexion SQL dataiku où aller récupérer la table
+original_ds = dataiku.Dataset(DATASET_NAME)
+original_df = original_ds.get_dataframe()
+table_name = original_ds.get_config()['params']['table'] # nom de la table correspondant à ce dataset
+connection_name = original_ds.get_config()['params']['connection'] # nom de la connexion SQL dataiku où aller récupérer la table
 executor = SQLExecutor2(connection=connection_name)
 
-# Create change log dataset if it doesn't already exist
+# Create change log dataset and editable dataset, if they don't already exist
 client = dataiku.api_client()
 project = client.get_default_project()
-dscreator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, DATASET_NAME + "_changes")
-if (not dscreator.already_exists()):
-    dscreator.with_store_into(connection="filesystem_managed")
-    dscreator.create()
-
+changes_ds_name = DATASET_NAME + "_changes"
+editable_ds_name = DATASET_NAME + "_editable"
+changes_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, changes_ds_name)
+editable_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, editable_ds_name)
+if (not changes_ds_creator.already_exists()):
+    changes_ds_creator.with_store_into(connection="filesystem_managed")
+    changes_ds_creator.create()
+    changes_ds = dataiku.Dataset(changes_ds_name)
+    changes_ds.write_schema_from_dataframe(df=original_df)
+    
+    editable_ds_creator.with_store_into(connection="filesystem_managed") # TODO: change!
+    editable_ds_creator.create()
+    editable_ds = dataiku.Dataset(editable_ds_name)
+    editable_ds.write_with_schema(original_df)
+else:
+    changes_ds = dataiku.Dataset(changes_ds_name)
+    editable_ds = dataiku.Dataset(editable_ds_name)
+    
 @app.route('/get_dataset_schema')
 def get_dataset_schema():
     """
@@ -106,10 +120,10 @@ def write_row():
             VALUES (%s);
             COMMIT;
             """ %(table_name, cols, vals)
-        df = executor.query_to_df( """select * from %s
+        change_df = executor.query_to_df( """select * from %s
             limit 1
             """ % table_name, pre_queries=[pre_query])
-        df.to_csv("changes.csv", mode="a", header=False, index=False) # TODO: use Dataiku API and Dataset to write change log
+        changes_ds.write_dataframe(change_df)
         return json.dumps({'status':'ok'})
     except Exception as e:
         print(e)
