@@ -1,7 +1,7 @@
 import dataiku
 import dataikuapi
 import pandas as pd
-from flask import request
+from flask import Flask, request
 from dataiku.core.sql import SQLExecutor2
 from dataiku.customwebapp import *
 
@@ -75,7 +75,7 @@ def get_dataset_schema():
         ]
         
     """
-    columns = ds.get_config().get('schema').get('columns')
+    columns = original_ds.get_config().get('schema').get('columns')
     query = """SELECT"""
     for col in columns:
         col_name = col['name']
