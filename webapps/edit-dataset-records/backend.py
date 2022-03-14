@@ -6,6 +6,11 @@ from dataiku.core.sql import SQLExecutor2
 from dataiku.customwebapp import *
 
 
+# Initialize app variable (Flask)
+
+app = Flask(__name__)
+
+
 # Access parameters that end-users filled in using webapp config
 
 DATASET_NAME = get_webapp_config()['input_dataset']
