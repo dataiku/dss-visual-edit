@@ -1,8 +1,8 @@
-// This file is the descriptor for webapp write-row
+// This file is the descriptor for webapp edit-dataset-records
 {
     "meta": {
         // label: name of the webapp as displayed, should be short
-        "label": "Write row",
+        "label": "Edit dataset records",
         // description: longer string to help end users understand what this webapp does
         "description": "Webapp to edit records of an INPUT dataset, via a copy. It creates 3 objects in the Flow upon initialization: \
         1. a copy of the input dataset, named INPUT_editable \
