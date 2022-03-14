@@ -11,7 +11,7 @@
         "label": "Editable via webapp",
 
         // description: longer string to help end users understand what this plugin does
-        "description": "",
+        "description": "This plugin provides a Webapp to edit records in a dataset, and a Recipe to replay changes when building the flow. The recipe is automatically created upon webapp initialization.",
 
         "author": "admin",
 
