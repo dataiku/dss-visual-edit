@@ -5,7 +5,7 @@
         // label: name of the recipe as displayed, should be short
         "label": "Sync and apply changes",
         // description: longer string to help end users understand what this recipe does
-        "description": "",
+        "description": "Copy original dataset and replay changes recorded via the webapp",
         // icon: must be one of the FontAwesome 3.2.1 icons, complete list here at https://fontawesome.com/v3.2.1/icons/
         "icon": "icon-puzzle-piece"
     },
@@ -33,7 +33,7 @@
         {
             "name": "changes",
             "label": "Change log",
-            "description": "Used by the recipe to replay changes made via the webapp when rebuilding the flow",
+            "description": "Managed by webapp",
             "arity": "UNARY",
             "required": true,
             "acceptsDataset": true
