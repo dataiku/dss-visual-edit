@@ -65,6 +65,7 @@
         {
             "name": "key",
             "label": "Unique key",
+            "description": "Select a column to use as a unique identifier for rows",
             "type": "COLUMN",
             "columnRole": "input"
         }
