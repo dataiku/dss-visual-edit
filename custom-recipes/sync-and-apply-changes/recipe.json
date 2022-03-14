@@ -23,7 +23,7 @@
     "inputRoles": [
         {
             "name": "input",
-            "label": "Input dataset",
+            "label": "Original dataset",
             "description": "Contains the data to be made editable via webapp",
             "arity": "UNARY",
             "required": true,
@@ -32,7 +32,7 @@
         },
         {
             "name": "changes",
-            "label": "Log of changes made on the webapp",
+            "label": "Change log",
             "description": "Used by the recipe to replay changes made via the webapp when rebuilding the flow",
             "arity": "UNARY",
             "required": true,
@@ -43,7 +43,7 @@
     "outputRoles": [
         {
             "name": "editable",
-            "label": "Table that the webapp presents to external users and allows to edit",
+            "label": "Editable dataset via the webapp",
             "description": "",
             "arity": "UNARY",
             "required": true,
