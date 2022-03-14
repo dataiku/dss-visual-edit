@@ -61,7 +61,14 @@
        For the full list and for more details, see the documentation: https://doc.dataiku.com/dss/latest/plugins/reference/params.html
     */
 
-    "params": [],
+    "params": [
+        {
+            "name": "key",
+            "label": "Unique key",
+            "type": "COLUMN",
+            "columnRole": "input"
+        }
+    ],
 
     // The field "resourceKeys" holds a list of keys that allows to limit the number
     // of concurrent executions and activities triggered by this recipe.
