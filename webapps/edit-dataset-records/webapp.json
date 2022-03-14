@@ -32,7 +32,7 @@
         */
     ],
     "roles": [
-        /* {"type": "DATASET", "targetParamsKey": "input_dataset"} */
+        {"type": "DATASET", "targetParamsKey": "input_dataset"}
     ]
 }
 
