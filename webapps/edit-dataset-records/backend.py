@@ -46,6 +46,7 @@ if (not changes_ds_creator.already_exists()):
     recipe_creator.with_input(DATASET_NAME, role="input")
     recipe_creator.with_input(changes_ds_name, role="changes")
     recipe_creator.with_output(editable_ds_name, role="editable")
+    recipe_creator. # TODO: set param of recipe: key column (based on get_webapp_config()['key'])
     recipe = recipe_creator.create()
 else:
     changes_ds = dataiku.Dataset(changes_ds_name)
