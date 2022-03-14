@@ -61,15 +61,7 @@
        For the full list and for more details, see the documentation: https://doc.dataiku.com/dss/latest/plugins/reference/params.html
     */
 
-    "params": [
-        {
-            "name": "key",
-            "label": "Unique key",
-            "description": "Select a column to use as a unique identifier for rows",
-            "type": "COLUMN",
-            "columnRole": "input"
-        }
-    ],
+    "params": [ ],
 
     // The field "resourceKeys" holds a list of keys that allows to limit the number
     // of concurrent executions and activities triggered by this recipe.

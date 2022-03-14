@@ -30,6 +30,9 @@
             "label": "Dataset",
             "description": "",
             "mandatory": true
+        },
+        {
+            
         }
         /*
         TODO: ask for SQL connection
