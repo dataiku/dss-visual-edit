@@ -8,7 +8,7 @@ from dataiku.customwebapp import *
 
 # Initialize app variable (Flask)
 
-# app = Flask(__name__)
+app = Flask(__name__)
 
 
 # Access parameters that end-users filled in using webapp config
