@@ -23,7 +23,7 @@ project = client.get_default_project()
 
 original_ds = dataiku.Dataset(DATASET_NAME)
 original_df = original_ds.get_dataframe()
-connection_name = original_ds.get_config()['params']['connection'] # nom de la connexion SQL dataiku où aller récupérer la table
+connection_name = original_ds.get_config()['params']['connection'] # nom de la connexion SQL où aller récupérer la table
 
 changes_ds_name = DATASET_NAME + "_changes"
 editable_ds_name = DATASET_NAME + "_editable"
@@ -37,17 +37,19 @@ if (not changes_ds_creator.already_exists()):
     changes_ds = dataiku.Dataset(changes_ds_name)
     changes_ds.write_schema_from_dataframe(df=original_df)
     
-    editable_ds_creator.with_store_into(connection=connection_name) # TODO: make this configurable
+    editable_ds_creator.with_store_into(connection=connection_name)
     editable_ds_creator.create()
     editable_ds = dataiku.Dataset(editable_ds_name)
     editable_ds.write_with_schema(original_df)
     
     recipe_creator = dataikuapi.dss.recipe.DSSRecipeCreator("CustomCode_sync-and-apply-changes", "compute_" + editable_ds_name, project)
-    recipe_creator.with_input(DATASET_NAME, role="input")
-    recipe_creator.with_input(changes_ds_name, role="changes")
-    recipe_creator.with_output(editable_ds_name, role="editable")
-    recipe_creator. # TODO: set param of recipe: key column (based on get_webapp_config()['key'])
     recipe = recipe_creator.create()
+    settings = recipe.get_settings()
+    settings.add_input("input", DATASET_NAME)
+    settings.add_input("changes", changes_ds_name)
+    settings.add_output("editable", editable_ds_name)
+    settings.raw_params["customConfig"] = {"key": get_webapp_config()['key']}
+    settings.save()
 else:
     changes_ds = dataiku.Dataset(changes_ds_name)
     editable_ds = dataiku.Dataset(editable_ds_name)
