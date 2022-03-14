@@ -36,6 +36,12 @@ if (not changes_ds_creator.already_exists()):
     editable_ds_creator.create()
     editable_ds = dataiku.Dataset(editable_ds_name)
     editable_ds.write_with_schema(original_df)
+    
+    recipe_creator = dataikuapi.dss.recipe.DSSRecipeCreator("CustomCode_sync-and-apply-changes", "compute_" + editable_ds_name, project)
+    recipe_creator.with_input(DATASET_NAME, role="input")
+    recipe_creator.with_input(changes_ds_name, role="changes")
+    recipe_creator.with_output(editable_ds_name, role="editable")
+    recipe = recipe_creator.create()
 else:
     changes_ds = dataiku.Dataset(changes_ds_name)
     editable_ds = dataiku.Dataset(editable_ds_name)
