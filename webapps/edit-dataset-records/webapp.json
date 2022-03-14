@@ -28,14 +28,19 @@
             "name": "input_dataset",
             "type": "DATASET",
             "label": "Dataset",
-            "description": "",
+            "description": "Original dataset to be copied and made editable by the webapp",
             "mandatory": true
-        },
+        },  
         {
-            
+            "name": "key",
+            "type": "DATASET_COLUMN",
+            "datasetParamName": "input_dataset",
+            "label": "Unique key",
+            "description": "Select a column to use as a unique identifier for rows",
+            "columnRole": "input",
+            "mandatory": true
         }
         /*
-        TODO: ask for SQL connection
         TODO: show info on what is going to be created (change log dataset with name INPUT_DATASET_NAME_changes, editable dataset with name INPUT_DATASET_NAME_editable, recipe)
         */
     ],
