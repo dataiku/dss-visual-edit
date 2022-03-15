@@ -8,6 +8,8 @@ What the backend creates:
 
 ## TODO:
 
+* Add timestamp to change log
+* Implement recipe to replay changes
 * What happens to the change log when a row has been edited and gets edited again?
 * Configure connection for change log dataset?
 * Update recipe when unique key is changed via webapp settings
