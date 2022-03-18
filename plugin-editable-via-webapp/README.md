@@ -14,3 +14,4 @@ What the backend creates:
 * Configure connection for change log dataset?
 * Update recipe when unique key is changed via webapp settings
 * Unique key can be changed via recipe settings? What happens if so?
+* Show info on what is going to be created (change log dataset with name INPUT_DATASET_NAME_changes, editable dataset with name INPUT_DATASET_NAME_editable, recipe)
