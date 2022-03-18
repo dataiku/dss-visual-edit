@@ -82,7 +82,18 @@ app.layout = html.Div([
               Input('editable-table', 'data')], prevent_initial_call=True)
 def update_db(cell_coordinates, table_data):
     cell_coordinates["row"] = cell_coordinates["row"]-1
-    str_return = "This cell was updated: " + str(cell_coordinates) + "\n"
-    db_response = "New value: " + str(table_data[cell_coordinates["row"]][cell_coordinates["column_id"]])
-    return str_return, db_response
+    row_id = cell_coordinates["row"]
+    col_id = cell_coordinates["column_id"]
+    val = table_data[row_id][col_id]
+    
+    cell_update_info = "This cell was updated: " + str(cell_coordinates) + "\n" + "New value: " + str(val) + "\n\n"
+
+    # run update query
+    query = "UPDATE " + table_name + " SET " + col_id + "='" + str(val) + "' WHERE index='" + str(row_id) + "' RETURNING index, " + col_id + ";"
+    db_response = executor.query_to_df(query) # TODO: make sure I can display the response as a dataframe in the webapp
+
+    # add to list of changes
+    # pd.DataFrame(rows).to_csv("changes.csv", mode="a", header=False, index=False) # TODO: use Dataiku API and Dataset to write change log
+
+    return cell_update_info, db_response
 
