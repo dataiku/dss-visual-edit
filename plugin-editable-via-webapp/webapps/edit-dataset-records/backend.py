@@ -5,18 +5,34 @@ from dataiku.customwebapp import *
 from dash import dash_table, html
 from dash.dependencies import Input, Output, State
 
+# TODO: remove this
+from dash import Dash
+app = Dash(__name__)
 
 # Access parameters that end-users filled in using webapp config
 
-DATASET_NAME = get_webapp_config()['input_dataset']
+# TODO: change back
+# DATASET_NAME = get_webapp_config()['input_dataset']
+# UNIQUE_KEY = get_webapp_config()['key']
+DATASET_NAME = "iris"
+UNIQUE_KEY = "index"
 
 
 # Create change log dataset and editable dataset, if they don't already exist
 
+# TODO: change back
+# client = dataiku.api_client()
+# project = client.get_default_project()
+HOST = "http://localhost:11200/"
+APIKEY = "7TDhU6vLOHA3dAY7EONeLDHpd0JGQAtd"
+dataiku.set_remote_dss(HOST, APIKEY)
 client = dataiku.api_client()
-project = client.get_default_project()
+project = client.get_project("EDITABLE")
+project_key = project.project_key
+import os
+os.environ["DKU_CURRENT_PROJECT_KEY"] = project_key
 
-original_ds = dataiku.Dataset(DATASET_NAME)
+original_ds = dataiku.Dataset(DATASET_NAME, project_key)
 original_df = original_ds.get_dataframe()
 connection_name = original_ds.get_config()['params']['connection'] # name of the connection to the original dataset, to use for the editable dataset too
 
@@ -46,38 +62,43 @@ if (not changes_ds_creator.already_exists()):
     settings.raw_params["customConfig"] = {"key": get_webapp_config()['key']}
     settings.save()
 else:
-    changes_ds = dataiku.Dataset(changes_ds_name)
-    editable_ds = dataiku.Dataset(editable_ds_name)
+    changes_ds = dataiku.Dataset(changes_ds_name, project_key)
+    editable_ds = dataiku.Dataset(editable_ds_name, project_key)
 
 editable_df = editable_ds.get_dataframe()
+cols = ([{"name": i, "id": i} for i in editable_df.columns])
 
 
 # Initialize the SQL executor and name of table to edit
 
 executor = SQLExecutor2(connection=connection_name)
-table_name = editable_ds.get_config()['params']['table']
-    
+# table_name = editable_ds.get_config()['params']['table']
+table_name = project_key + "_" + editable_ds_name
+
 
 # Define the layout of the webapp
 
 app.layout = html.Div([
-    html.H4("Edit " + DATASET_NAME),
+    html.H3("Edit " + DATASET_NAME),
     html.Div([
         html.Div("Select a cell, type a new value, and press Enter to save."),
         html.Br(),
         html.Div(
             children=dash_table.DataTable(
                 id='editable-table',
-                columns=([{"name": i, "id": i} for i in editable_df.columns]),
+                columns=cols,
                 data=editable_df.to_dict('records'),
                 editable=True
             ),
         ),
         html.Pre(id='output')
-    ])
+    ]),
+    html.H4("Change df"),
+    dash_table.DataTable(id="change_df", columns=cols, editable=False)
 ])
 
-@app.callback(Output('output', 'children'),
+@app.callback([Output('output', 'children'),
+              Output('change_df', 'data')], # TODO: test having a 2nd output is ok
               [State('editable-table', 'active_cell'),
               Input('editable-table', 'data')], prevent_initial_call=True)
 def update_db(cell_coordinates, table_data):
@@ -89,11 +110,27 @@ def update_db(cell_coordinates, table_data):
     cell_update_info = "This cell was updated: " + str(cell_coordinates) + "\n" + "New value: " + str(val) + "\n\n"
 
     # run update query
-    query = "UPDATE " + table_name + " SET " + col_id + "='" + str(val) + "' WHERE index='" + str(row_id) + "' RETURNING index, " + col_id + ";"
-    db_response = executor.query_to_df(query) # TODO: make sure I can display the response as a dataframe in the webapp
+    query = """UPDATE \"%s\" SET %s=%s
+            WHERE %s=%s
+            RETURNING %s, %s;
+            """ % (table_name, col_id, val, UNIQUE_KEY, row_id, UNIQUE_KEY, col_id)
+    change_df = executor.query_to_df("""SELECT * FROM \"%s\"
+                                    LIMIT 1
+                                    """ % table_name, pre_queries=[query])
+    
+    changes_ds.write_dataframe(change_df) # TODO: fix this
 
-    # add to list of changes
-    # pd.DataFrame(rows).to_csv("changes.csv", mode="a", header=False, index=False) # TODO: use Dataiku API and Dataset to write change log
+    # TODO: WORK IN PROGRESS, based on https://doc.dataiku.com/dss/latest/code_recipes/python.html#writing
+    from collections import Counter
+    origin_count = Counter()
+    row = change_df.iloc[0].to_dict()
+    origin_count[row["origin"]] += 1
+    with changes_ds.get_writer() as writer:
+        for (origin,count) in origin_count.items():
+                writer.write_row_array((origin,count))
 
-    return cell_update_info, db_response
+    return cell_update_info, change_df.to_dict('records')
 
+# TODO: remove this
+if __name__ == "__main__":
+    app.run_server(debug=True)
