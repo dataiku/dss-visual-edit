@@ -1,32 +1,55 @@
 import dataiku
 import dataikuapi
-import pandas as pd
-from flask import Flask, request
 from dataiku.core.sql import SQLExecutor2
 from dataiku.customwebapp import *
+from dash import dash_table, html
+from dash.dependencies import Input, Output, State
+
+# Dash webapp to edit dataset records
+# This code is structured as follows:
+# 1. Access parameters that end-users filled in using webapp config
+# 2. Initialize Dataiku client and project
+# 3. Create change log dataset and editable dataset, if they don't already exist
+# 4. Initialize the SQL executor and name of table to edit
+# 5. Define the layout of the webapp
+# 6. Define the callback function that updates the editable and change log when cell values get edited
+
+# Uncomment the following when running the Dash app in debug mode outside of Dataiku
+# from dash import Dash
+# app = Dash(__name__)
+# HOST = "http://localhost:11200/"
+# APIKEY = ""
+# dataiku.set_remote_dss(HOST, APIKEY)
 
 
-# Initialize app variable (Flask)
+# 1. Access parameters that end-users filled in using webapp config
 
-app = Flask(__name__)
+import os
+if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
+    dataset_name = get_webapp_config()['input_dataset']
+    unique_key = get_webapp_config()['key']
+else:
+    dataset_name = "iris"
+    unique_key = "index"
+project_key = os.environ["DKU_CURRENT_PROJECT_KEY"]
+if (~project_key):
+    project_key = "EDITABLE"
 
 
-# Access parameters that end-users filled in using webapp config
-
-DATASET_NAME = get_webapp_config()['input_dataset']
-
-
-# Create change log dataset and editable dataset, if they don't already exist
+# 2. Initialize Dataiku client and project
 
 client = dataiku.api_client()
-project = client.get_default_project()
+project = client.get_project(project_key)
 
-original_ds = dataiku.Dataset(DATASET_NAME)
+
+# 3. Create change log dataset and editable dataset, if they don't already exist
+
+original_ds = dataiku.Dataset(dataset_name, project_key)
 original_df = original_ds.get_dataframe()
-connection_name = original_ds.get_config()['params']['connection'] # nom de la connexion SQL où aller récupérer la table
+connection_name = original_ds.get_config()['params']['connection'] # name of the connection to the original dataset, to use for the editable dataset too
 
-changes_ds_name = DATASET_NAME + "_changes"
-editable_ds_name = DATASET_NAME + "_editable"
+changes_ds_name = dataset_name + "_changes"
+editable_ds_name = dataset_name + "_editable"
 
 changes_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, changes_ds_name)
 editable_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, editable_ds_name)
@@ -45,112 +68,71 @@ if (not changes_ds_creator.already_exists()):
     recipe_creator = dataikuapi.dss.recipe.DSSRecipeCreator("CustomCode_sync-and-apply-changes", "compute_" + editable_ds_name, project)
     recipe = recipe_creator.create()
     settings = recipe.get_settings()
-    settings.add_input("input", DATASET_NAME)
+    settings.add_input("input", dataset_name)
     settings.add_input("changes", changes_ds_name)
     settings.add_output("editable", editable_ds_name)
     settings.raw_params["customConfig"] = {"key": get_webapp_config()['key']}
     settings.save()
 else:
-    changes_ds = dataiku.Dataset(changes_ds_name)
-    editable_ds = dataiku.Dataset(editable_ds_name)
-    
-    
-# Initialize the SQL executor and name of table to edit
+    changes_ds = dataiku.Dataset(changes_ds_name, project_key)
+    editable_ds = dataiku.Dataset(editable_ds_name, project_key)
+
+editable_df = editable_ds.get_dataframe()
+cols = ([{"name": i, "id": i} for i in editable_df.columns])
+
+
+# 4. Initialize the SQL executor and name of table to edit
 
 executor = SQLExecutor2(connection=connection_name)
-table_name = editable_ds.get_config()['params']['table']
-    
-    
-@app.route('/get_dataset_schema')
-def get_dataset_schema():
-    """
-        Ici on récupère le schema de la table et on 
-        exécute une requête SQL sur la table source et on renvoie un objet type dictionnaire pour paramétrer le formulaire :
-        [
-            {
-                "name" : "nom_de_colonne",
-                "type" : "categorical",
-                "uniques" : ["val_1","val_2"],
-                "child" : "child_column", # si la valeur de ce champ conditionne la valeur d'un autre champ, il a un élément child 
-                "parent" : "parent_column" # si la colonne dépend d'une autre colonne de la table, elle a un élément parent
-            }, 
-            ...
-        ]
-        
-    """
-    columns = original_ds.get_config().get('schema').get('columns')
-    query = """SELECT"""
-    for col in columns:
-        col_name = col['name']
-        query = query + ' count(distinct "%s") as "%s",'% (col_name, col_name)
-
-    query = query[:-1] + """ FROM %s""" % table_name
-    distinct_dict = executor.query_to_df(query).to_dict(orient="records")[0]
-    for col in columns:
-        # si la colonne a moins de 10 valeurs uniques et est de type string, on crée une liste déroulante
-        if distinct_dict[col['name']] <= 10 and col['type']=='string':
-            sub_query = """SELECT DISTINCT "{0}" as "{0}" FROM {1} """.format(col['name'], table_name)
-            df = executor.query_to_df(sub_query)
-            uniques = df[col['name']].tolist()
-            col['uniques'] = uniques
-            col['type'] = 'categorical'
-        
-        
-        
-        # Ici je définis à la main des colonnes qui ont des relations parent / child 
-        if col['name']=='Outlet_Location_Type':
-            col['child'] = 'Outlet_Identifier'
-        
-        if col['name']=='Outlet_Identifier':
-            col['parent'] = 'Outlet_Location_Type'
-    
-    return json.dumps({'columns':columns})
+# table_name = editable_ds.get_config()['params']['table']
+table_name = project_key + "_" + editable_ds_name
 
 
-@app.route('/get_dropdown_values/<path:params>')
-def get_dropdown_values(params):
-    """
-        Cette fonction récupère les valeurs uniques d'une colonne child à partir de la valeur sélectionnée dans la colonne parent
-        pour ensuite les ajouter à la liste déroulante
-    """
-    variables = json.loads(params)
-    parent = variables['parent']
-    child = variables['child']
-    value = variables['selected']
-    
-    query = """ SELECT DISTINCT "{0}" as "a"
-    FROM {1}
-    WHERE "{2}" = '{3}'
-    """.format(child, table_name, parent, value)
-    print(query)
-    df = executor.query_to_df(query)
-    data = df['a'].tolist()
-    
-    return json.dumps({'data':data})
+# 5. Define the layout of the webapp
+
+app.layout = html.Div([
+    html.H3("Edit " + dataset_name),
+    html.Div([
+        html.Div("Select a cell, type a new value, and press Enter to save."),
+        html.Br(),
+        html.Div(
+            children=dash_table.DataTable(
+                id='editable-table',
+                columns=cols,
+                data=editable_df.to_dict('records'),
+                editable=True
+            ),
+        ),
+        html.Pre(id='output')
+    ])
+])
 
 
-@app.route('/write_row', methods = ['POST'])
-def write_row():
-    """
-        Cette fonction récupère les données entrées dans le formulaire et les écrit dans la table
-    """
-    row_dict = json.loads(request.get_data()).get('row')
-    
-    try :
-        col_list = ['"%s"' % col for col in row_dict.keys()]
-        cols = ', '.join(col_list)
-        vals = ', '.join([repr(str(value)) for value in row_dict.values()])
-        executor = SQLExecutor2(connection=connection_name)
-        pre_query="""INSERT INTO %s (%s)
-            VALUES (%s);
-            COMMIT;
-            """ %(table_name, cols, vals)
-        change_df = executor.query_to_df( """select * from %s
-            limit 1
-            """ % table_name, pre_queries=[pre_query])
-        changes_ds.write_dataframe(change_df)
-        return json.dumps({'status':'ok'})
-    except Exception as e:
-        print(e)
-        return json.dumps({'status':'error'})
+# 6. Define the callback function that updates the editable and change log when cell values get edited
 
+@app.callback(Output('output', 'children'),
+              [State('editable-table', 'active_cell'),
+              Input('editable-table', 'data')], prevent_initial_call=True)
+def update(cell_coordinates, table_data):
+    row_id = cell_coordinates["row"]-1
+    col_id = cell_coordinates["column_id"]
+    val = table_data[row_id][col_id]
+
+    # TODO: surround the following with try/catch?
+    # Run update query on the editable
+    query = """UPDATE \"%s\" SET %s=%s
+            WHERE %s=%s
+            RETURNING *;
+            """ % (table_name, col_id, val, unique_key, row_id)
+    change_df = executor.query_to_df(query)
+    
+    # Append the change to the log
+    changes_ds.spec_item["appendMode"] = True
+    changes_ds.write_dataframe(change_df)
+
+    return "Value at row " + str(row_id) + ", column " + str(col_id) + " was updated. \n" + "New value: " + str(val) + "\n\n"
+
+
+# Uncomment the following when running the Dash app in debug mode outside of Dataiku
+# if __name__ == "__main__":
+#   app.run_server(debug=True)

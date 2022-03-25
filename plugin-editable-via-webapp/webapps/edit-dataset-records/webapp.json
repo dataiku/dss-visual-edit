@@ -2,13 +2,13 @@
     "meta": {
         "label": "Edit dataset records",
         "description": "Webapp to edit records of a dataset and maintain a change log dataset. A copy of the original dataset is created. A recipe connects all 3 datasets; it allows to replay changes when building the flow.",
-        // icon: must be one of the FontAwesome 3.2.1 icons, complete list here at https://fontawesome.com/v3.2.1/icons/
-        "icon": "icon-th-large"
+        "icon": "icon-th-large",
+        "comments": "icon must be one of the FontAwesome 3.2.1 icons, complete list here at https://fontawesome.com/v3.2.1/icons/"
     },
-    "baseType": "STANDARD", // WARNING: do not change
+    "baseType": "DASH",
     "hasBackend": "true",
-    "noJSSecurity": "false",
-    "standardWebAppLibraries": ["jquery","dataiku"],
+    "noJSSecurity": "true",
+    "standardWebAppLibraries": null,
     "params": [
         {
             "name": "input_dataset",
@@ -26,12 +26,7 @@
             "columnRole": "input",
             "mandatory": true
         }
-        /*
-        TODO: show info on what is going to be created (change log dataset with name INPUT_DATASET_NAME_changes, editable dataset with name INPUT_DATASET_NAME_editable, recipe)
-        */
     ],
-    "roles": [
-        // {"type": "DATASET", "targetParamsKey": "input_dataset"}
-    ]
+    "roles": []
 }
 
