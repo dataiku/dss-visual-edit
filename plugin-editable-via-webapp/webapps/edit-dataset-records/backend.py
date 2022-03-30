@@ -4,6 +4,8 @@ from dataiku.core.sql import SQLExecutor2
 from dataiku.customwebapp import *
 from dash import dash_table, html
 from dash.dependencies import Input, Output, State
+import datetime
+
 
 # Dash webapp to edit dataset records
 # This code is structured as follows:
@@ -13,6 +15,7 @@ from dash.dependencies import Input, Output, State
 # 4. Initialize the SQL executor and name of table to edit
 # 5. Define the layout of the webapp
 # 6. Define the callback function that updates the editable and change log when cell values get edited
+
 
 # Uncomment the following when running the Dash app in debug mode outside of Dataiku
 # from dash import Dash
@@ -28,12 +31,14 @@ import os
 if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     dataset_name = get_webapp_config()['input_dataset']
     unique_key = get_webapp_config()['key']
+    # user_name = get_webapp_config()['user'] TODO: does this exist? or can we get it from an environment variable (DKU_CURRENT_USER?)
 else:
     dataset_name = "iris"
     unique_key = "index"
-project_key = os.environ["DKU_CURRENT_PROJECT_KEY"]
-if (~project_key):
+project_key = os.getenv("DKU_CURRENT_PROJECT_KEY")
+if (not project_key or project_key==""):
     project_key = "EDITABLE"
+    os.environ["DKU_CURRENT_PROJECT_KEY"] = project_key
 
 
 # 2. Initialize Dataiku client and project
@@ -118,14 +123,17 @@ def update(cell_coordinates, table_data):
     col_id = cell_coordinates["column_id"]
     val = table_data[row_id][col_id]
 
-    # TODO: surround the following with try/catch?
+    # IDEA: surround the following with try/catch?
     # Run update query on the editable
     query = """UPDATE \"%s\" SET %s=%s
             WHERE %s=%s
             RETURNING *;
+            COMMIT;
             """ % (table_name, col_id, val, unique_key, row_id)
     change_df = executor.query_to_df(query)
-    
+    # change_df["date"] = datetime.date.today().strftime("%Y-%m-%d") TODO: first add the date field to the changes_ds schema
+    # change_df["user"] = "anonymous"
+
     # Append the change to the log
     changes_ds.spec_item["appendMode"] = True
     changes_ds.write_dataframe(change_df)
