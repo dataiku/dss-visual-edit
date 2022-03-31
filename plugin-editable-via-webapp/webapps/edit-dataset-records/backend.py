@@ -20,9 +20,6 @@ import datetime
 # Uncomment the following when running the Dash app in debug mode outside of Dataiku
 # from dash import Dash
 # app = Dash(__name__)
-# HOST = "http://localhost:11200/"
-# APIKEY = ""
-# dataiku.set_remote_dss(HOST, APIKEY)
 
 
 # 1. Access parameters that end-users filled in using webapp config
@@ -120,6 +117,7 @@ app.layout = html.Div([
               Input('editable-table', 'data')], prevent_initial_call=True)
 def update(cell_coordinates, table_data):
     row_id = cell_coordinates["row"]-1
+    idx = table_data[row_id][unique_key]
     col_id = cell_coordinates["column_id"]
     val = table_data[row_id][col_id]
 
@@ -129,7 +127,7 @@ def update(cell_coordinates, table_data):
             WHERE %s=%s
             RETURNING *;
             COMMIT;
-            """ % (table_name, col_id, val, unique_key, row_id)
+            """ % (table_name, col_id, val, unique_key, idx)
     change_df = executor.query_to_df(query)
     # change_df["date"] = datetime.date.today().strftime("%Y-%m-%d") TODO: first add the date field to the changes_ds schema
     # change_df["user"] = "anonymous"
