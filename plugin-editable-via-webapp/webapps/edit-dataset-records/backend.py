@@ -26,8 +26,11 @@ import datetime
 
 import os
 if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
-    dataset_name = get_webapp_config()['input_dataset']
-    unique_key = get_webapp_config()['key']
+    ref_dataset = get_webapp_config()['ref_dataset']
+    ref_key = get_webapp_config()['ref_key']
+    ext_dataset = get_webapp_config()['ext_dataset']
+    ext_key = get_webapp_config()['ext_key']
+    # TODO: use these in the rest of the code
     # user_name = get_webapp_config()['user'] TODO: does this exist? or can we get it from an environment variable (DKU_CURRENT_USER?)
 else:
     dataset_name = "iris"

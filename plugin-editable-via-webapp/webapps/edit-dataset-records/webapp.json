@@ -1,7 +1,7 @@
 {
     "meta": {
-        "label": "Edit dataset records",
-        "description": "Webapp to edit records of a dataset and maintain a change log dataset. A copy of the original dataset is created. A recipe connects all 3 datasets; it allows to replay changes when building the flow.",
+        "label": "Edit fuzzy join matches",
+        "description": "Webapp to edit matches of a fuzzy join between a reference and an external dataset.",
         "icon": "icon-th-large",
         "comments": "icon must be one of the FontAwesome 3.2.1 icons, complete list here at https://fontawesome.com/v3.2.1/icons/"
     },
@@ -11,22 +11,38 @@
     "standardWebAppLibraries": null,
     "params": [
         {
-            "name": "input_dataset",
+            "name": "ref_dataset",
             "type": "DATASET",
-            "label": "Dataset",
-            "description": "Original dataset to be copied and made editable by the webapp",
+            "label": "Reference dataset",
+            "description": "",
             "mandatory": true
         },  
         {
-            "name": "key",
+            "name": "ref_key",
             "type": "DATASET_COLUMN",
             "datasetParamName": "input_dataset",
-            "label": "Unique key",
+            "label": "Unique key for reference dataset",
+            "description": "Select a column to use as a unique identifier for rows",
+            "columnRole": "input",
+            "mandatory": true
+        },
+        {
+            "name": "ext_dataset",
+            "type": "DATASET",
+            "label": "External dataset",
+            "description": "",
+            "mandatory": true
+        },  
+        {
+            "name": "ext_key",
+            "type": "DATASET_COLUMN",
+            "datasetParamName": "ext_dataset",
+            "label": "Unique key for external dataset",
             "description": "Select a column to use as a unique identifier for rows",
             "columnRole": "input",
             "mandatory": true
         }
+        // TODO: add list of columns to retrieve from the ref and ext datasets
     ],
     "roles": []
 }
-
