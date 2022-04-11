@@ -1,7 +1,7 @@
 {
     "meta": {
         "label": "Edit dataset records",
-        "description": "Webapp to edit records of a dataset and maintain a change log dataset. A copy of the original dataset is created. A recipe connects all 3 datasets; it allows to replay changes when building the flow.",
+        "description": "Webapp to edit records of a dataset (via a copy) and maintain an edit log. Two edit modes are provided: simple and join (for editing matches of a fuzzy join between a reference and an external dataset).",
         "icon": "icon-th-large",
         "comments": "icon must be one of the FontAwesome 3.2.1 icons, complete list here at https://fontawesome.com/v3.2.1/icons/"
     },
