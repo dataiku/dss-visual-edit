@@ -1,7 +1,7 @@
 {
     "meta": {
-        "label": "Edit fuzzy join matches",
-        "description": "Webapp to edit matches of a fuzzy join between a reference and an external dataset.",
+        "label": "Edit dataset records",
+        "description": "Webapp to edit records of a dataset and maintain a change log dataset. A copy of the original dataset is created. A recipe connects all 3 datasets; it allows to replay changes when building the flow.",
         "icon": "icon-th-large",
         "comments": "icon must be one of the FontAwesome 3.2.1 icons, complete list here at https://fontawesome.com/v3.2.1/icons/"
     },
@@ -11,38 +11,74 @@
     "standardWebAppLibraries": null,
     "params": [
         {
+            "name": "edit_type",
+            "label": "Edit Type",
+            "type": "SELECT",
+            "selectChoices" : [
+                { "value" : "simple", "label" : "Simple Edit"},
+                { "value" : "join", "label" : "Join Edit"}
+            ],
+            "mandatory": true
+        },
+        {
+            "name": "input_dataset",
+            "type": "DATASET",
+            "label": "Dataset",
+            "description": "Dataset made editable by the webapp (via a copy)",
+            "visibilityCondition": "model.edit_type == 'simple'"
+        },
+        {
+            "name": "input_key",
+            "type": "DATASET_COLUMN",
+            "datasetParamName": "ref_dataset",
+            "label": "Key column",
+            "description": "Uniquely identifies rows of the dataset",
+            "visibilityCondition": "model.edit_type == 'simple'"
+        },
+        {
             "name": "ref_dataset",
             "type": "DATASET",
             "label": "Reference dataset",
             "description": "",
-            "mandatory": true
-        },  
+            "visibilityCondition": "model.edit_type == 'join'"
+        },
         {
             "name": "ref_key",
             "type": "DATASET_COLUMN",
-            "datasetParamName": "input_dataset",
-            "label": "Unique key for reference dataset",
-            "description": "Select a column to use as a unique identifier for rows",
-            "columnRole": "input",
-            "mandatory": true
+            "datasetParamName": "ref_dataset",
+            "label": "Key",
+            "visibilityCondition" : "model.edit_type == 'join'"
+        },
+        {
+            "name": "ref_lookup_columns",
+            "type": "DATASET_COLUMNS",
+            "datasetParamName": "ref_dataset",
+            "label": "Lookup columns",
+            "description": "",
+            "visibilityCondition" : "model.edit_type == 'join'"
         },
         {
             "name": "ext_dataset",
             "type": "DATASET",
             "label": "External dataset",
-            "description": "",
-            "mandatory": true
-        },  
+            "description": "Used to enrich the reference dataset",
+            "visibilityCondition" : "model.edit_type == 'join'"
+        },
         {
             "name": "ext_key",
             "type": "DATASET_COLUMN",
             "datasetParamName": "ext_dataset",
-            "label": "Unique key for external dataset",
-            "description": "Select a column to use as a unique identifier for rows",
-            "columnRole": "input",
-            "mandatory": true
+            "label": "Key",
+            "visibilityCondition" : "model.edit_type == 'join'"
+        },
+        {
+            "name": "ext_lookup_columns",
+            "type": "DATASET_COLUMNS",
+            "datasetParamName": "ext_dataset",
+            "label": "Lookup columns",
+            "description": "",
+            "visibilityCondition" : "model.edit_type == 'join'"
         }
-        // TODO: add list of columns to retrieve from the ref and ext datasets
     ],
     "roles": []
 }
