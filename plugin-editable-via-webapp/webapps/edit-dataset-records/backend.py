@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import dataiku
 import dataikuapi
 from dataiku.core.sql import SQLExecutor2
@@ -19,8 +21,11 @@ import datetime
 
 
 # Uncomment the following when running the Dash app in debug mode outside of Dataiku
-# from dash import Dash
-# app = Dash(__name__)
+from dash import Dash
+from flask import Flask
+f_app = Flask(__name__)
+app = Dash(__name__, server=f_app)
+application = app.server
 
 
 # 1. Access parameters that end-users filled in using webapp config
@@ -201,5 +206,5 @@ def update(cell_coordinates, table_data):
 
 
 # Uncomment the following when running the Dash app in debug mode outside of Dataiku
-# if __name__ == "__main__":
-#   app.run_server(debug=True)
+if __name__ == "__main__":
+  app.run_server(debug=True)
