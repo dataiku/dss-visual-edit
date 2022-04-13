@@ -43,7 +43,6 @@ if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
         ext_dataset = get_webapp_config()['ext_dataset']
         ext_key = get_webapp_config()['ext_key']
         ext_lookup_columns = get_webapp_config()['ext_lookup_columns']
-    # user_name = get_webapp_config()['user'] IDEA: does this exist? or can we get it from an environment variable (DKU_CURRENT_USER?)
 else:
     edit_type = "join"
     if (edit_type=="simple"):
@@ -58,7 +57,7 @@ else:
         ext_lookup_columns = ["name", "city", "country"]
 project_key = os.getenv("DKU_CURRENT_PROJECT_KEY")
 if (not project_key or project_key==""):
-    project_key = "EDITABLE"
+    project_key = "JOIN_COMPANIES"
     os.environ["DKU_CURRENT_PROJECT_KEY"] = project_key
 
 
@@ -104,16 +103,33 @@ if (edit_type=="simple"):
         changes_ds = dataiku.Dataset(changes_ds_name, project_key)
         editable_ds = dataiku.Dataset(editable_ds_name, project_key)
 elif (edit_type=="join"):
+    ref_ds = dataiku.Dataset(ref_dataset, project_key)
+    connection_name = ref_ds.get_config()['params']['connection']
     # IDEA: write code to create these datasets if they don't already exist, and the recipes to connect them
     changes_ds = dataiku.Dataset(ref_dataset + "_" + ext_dataset + "_editlog", project_key)
+    ext_key_column_name = "ext_" + ext_key
+    ext_key_original_column_name = ext_key_column_name + "_original"
+    ext_key_edited_column_name = ext_key_column_name + "_edited"
     editable_ds = dataiku.Dataset(ref_dataset + "_" + ext_dataset + "_editable", project_key)
     ext_ds = dataiku.Dataset(ext_dataset, project_key)
     ext_tablename = ext_ds.get_config()['params']['table'].replace("${projectKey}", project_key)
 
-changes_ds.spec_item["appendMode"] = True # make sure that we append to that dataset (and not write over it)
+changes_ds.spec_item["appendMode"] = True # make sure that we append to that dataset (and don't write over it)
 editable_df = editable_ds.get_dataframe()
-cols = ([{"name": i, "id": i} for i in editable_df.columns])
+# create new column ext_key in editable_df whose value is the same as column ext_key_edited when not empty, and the same as ext_key_original when empty
+editable_df.loc[:, ext_key_column_name] = editable_df[ext_key_edited_column_name].where(editable_df[ext_key_edited_column_name].notnull(), editable_df[ext_key_original_column_name])
 
+if (edit_type=="simple"):
+    dash_cols = ([{"name": i, "id": i} for i in editable_df.columns])
+elif (edit_type=="join"):
+    pd_cols = [ref_key] # columns for pandas
+    for col in ref_lookup_columns: pd_cols.append(col)
+    pd_cols.append(ext_key_column_name)
+    for col in ext_lookup_columns: pd_cols.append("ext_" + col)
+    pd_cols.append("reviewed")
+    pd_cols.append("date")
+    pd_cols.append("user")
+    dash_cols = ([{"name": i, "id": i} for i in pd_cols]) # columns for dash
 
 # 4. Initialize the SQL executor and name of table to edit
 
@@ -124,15 +140,15 @@ editable_tablename = editable_ds.get_config()['params']['table'].replace("${proj
 # 5. Define the layout of the webapp
 
 app.layout = html.Div([
-    html.H3("Edit " + input_dataset),
+    html.H3(edit_type),
     html.Div([
         html.Div("Select a cell, type a new value, and press Enter to save."),
         html.Br(),
         html.Div(
             children=dash_table.DataTable(
                 id='editable-table',
-                columns=cols,
-                data=editable_df.to_dict('records'),
+                columns=dash_cols,
+                data=editable_df[pd_cols].to_dict('records'),
                 editable=True
             ),
         ),
@@ -148,9 +164,15 @@ app.layout = html.Div([
               [State('editable-table', 'active_cell'),
                Input('editable-table', 'data')], prevent_initial_call=True)
 def update(cell_coordinates, table_data):
+    # Set the date of the change and the user behind it
+    d = datetime.date.today()
+    current_user_settings = client.get_own_user().get_settings().get_raw()
+    u = """{0} <{1}>""".format(current_user_settings["displayName"], current_user_settings["email"])
+
+    # Determine the row and column of the cell that was edited
     row_id = cell_coordinates["row"]-1
     col_id = cell_coordinates["column_id"]
-    
+
     if (edit_type=="simple"):
         idx = table_data[row_id][input_key]
         val = table_data[row_id][col_id]
@@ -170,30 +192,65 @@ def update(cell_coordinates, table_data):
         changes_ds.write_dataframe(change_df)
 
     elif (edit_type=="join"):
-        ref_key_value = table_data[row_id][ref_key]
-        ext_key_original_column_name = "ext_" + ext_key + "_original"
-        ext_key_reviewed_column_name = "ext_" + ext_key + "_reviewed"
-        ext_key_original_value = table_data[row_id][ext_key_original_column_name]
-        ext_key_reviewed_value = table_data[row_id][ext_key_reviewed_column_name]
+        # Update table data
+        table_data[row_id]["date"] = d.strftime("%Y-%m-%d")
+        table_data[row_id]["user"] = u
 
-        if (col_id=="reviewed" & table_data[row_id]["reviewed"]=="True"):
-            message("Row is marked as reviewed, so it will be added to the edit log.")
+        ref_key_value = table_data[row_id][ref_key]
+        ext_key_original_value = int(editable_df[editable_df[ref_key]==ref_key_value][ext_key_original_column_name]) # TODO: this fails when there are several rows with the same ref_key_value -> fix
+        ext_key_edited_value = table_data[row_id][ext_key_column_name]
+        editable_df.where(editable_df[ref_key]==ref_key_value)
+
+        if (col_id=="reviewed" and table_data[row_id]["reviewed"]=="true"):
+            # Update the editable dataset
+            if (ext_key_original_value==None):
+                update_query = """UPDATE "{0}" SET "date"='{1}', "user"='{2}', "reviewed"=TRUE
+                                  WHERE "{3}"={4};
+                                  COMMIT;""".format(
+                                      editable_tablename,
+                                      d.strftime("%Y-%m-%d"),
+                                      u,
+                                      ref_key,
+                                      str(ref_key_value))
+            else:
+                update_query = """UPDATE "{0}" SET "date"='{1}', "user"='{2}', "reviewed"=TRUE
+                                  WHERE "{3}"={4} AND "{5}"={6};
+                                  COMMIT;""".format(
+                                      editable_tablename,
+                                      d.strftime("%Y-%m-%d"),
+                                      u,
+                                      ext_key_original_column_name,
+                                      str(ext_key_original_value),
+                                      ref_key,
+                                      str(ref_key_value))
+            executor.query_to_df(update_query)
+
+            message = "Row is marked as reviewed, so it will be added to the edit log."
             
             # We only write to the change log when the reviewed column was just set to true
-            changes_ds.write_dataframe(
-                DataFrame({ref_key: [ref_key_value], ext_key_original_column_name: [ext_key_original_value], ext_key_reviewed_column_name: [ext_key_reviewed_value]})
-                )
+            change_df = DataFrame({ref_key: [ref_key_value], ext_key_original_column_name: [ext_key_original_value], ext_key_edited_column_name: [ext_key_edited_value], 'date': [d], 'user': [u]})
+            changes_ds.write_dataframe(change_df)
 
-        if (col_id==ext_key_reviewed_column_name):
-            # Retrieve values of the lookup columns from the external dataset, for this ext_idx
-            select_query = "SELECT " + ", ".join(ext_lookup_columns) + " FROM \"" + ext_tablename + "\" WHERE " + ext_key + "=" + ext_key_reviewed_value
+        if (col_id==ext_key_column_name):
+            # Retrieve values of the lookup columns from the external dataset, for this ext_key_edited value
+            select_query = "SELECT " + ", ".join(ext_lookup_columns) + " FROM \"" + ext_tablename + "\" WHERE " + ext_key + "=" + str(ext_key_edited_value)
             select_df = executor.query_to_df(select_query)
 
             # Update table_data with these values — note that colum names in this dataset are prefixed by "ext_"
             for col in ext_lookup_columns: table_data[row_id]["ext_" + col] = select_df[col].iloc[0]
 
             # Update the editable dataset with these values
-            update_query = "UPDATE \"" + editable_tablename + "\" SET " + ", ".join(["ext_" + col + "=" + str(select_df[col].iloc[0]) for col in ext_lookup_columns]) + " WHERE " + ext_key_reviewed_column_name + "=" + ext_key_reviewed_value + "; COMMIT;"
+            sets = ", ".join(
+                [ """"ext_{0}"='{1}'""".format(col, str(select_df[col].iloc[0]))
+                for col in ext_lookup_columns ]
+            )
+            update_query = """UPDATE "{0}" SET {1}, "date"='{2}', "user"='{3}' WHERE "{4}"={5}; COMMIT;""".format(
+                editable_tablename,
+                sets,
+                d.strftime("%Y-%m-%d"),
+                u,
+                ref_key,
+                ref_key_value)
             executor.query_to_df(update_query)
 
             message = "Changed values of lookup columns"
