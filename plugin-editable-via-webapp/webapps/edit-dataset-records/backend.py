@@ -8,6 +8,7 @@ from dash import dash_table, html
 from dash.dependencies import Input, Output, State
 from pandas import DataFrame
 import datetime
+import os
 
 
 # Dash webapp to edit dataset records
@@ -30,9 +31,23 @@ application = app.server
 
 # 1. Access parameters that end-users filled in using webapp config
 
-import os
+# Define edit type
 if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     edit_type = get_webapp_config()['edit_type']
+else:
+    edit_type = "simple" # default edit type when running the Dash app in debug mode outside of Dataiku
+
+# Define project key
+project_key = os.getenv("DKU_CURRENT_PROJECT_KEY")
+if (not project_key or project_key==""):
+    if (edit_type=="simple"):
+        project_key = "EDITABLE"
+    elif (edit_type=="join"):
+        project_key = "JOIN_COMPANIES"
+os.environ["DKU_CURRENT_PROJECT_KEY"] = project_key
+
+# Define dataset names
+if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     if (edit_type=="simple"):
         input_dataset = get_webapp_config()['input_dataset']
         input_key = get_webapp_config()['input_key']
@@ -44,7 +59,6 @@ if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
         ext_key = get_webapp_config()['ext_key']
         ext_lookup_columns = get_webapp_config()['ext_lookup_columns']
 else:
-    edit_type = "join"
     if (edit_type=="simple"):
         input_dataset = "iris"
         input_key = "index"
@@ -55,10 +69,6 @@ else:
         ext_dataset = "companies_ext"
         ext_key = "id"
         ext_lookup_columns = ["name", "city", "country"]
-project_key = os.getenv("DKU_CURRENT_PROJECT_KEY")
-if (not project_key or project_key==""):
-    project_key = "JOIN_COMPANIES"
-    os.environ["DKU_CURRENT_PROJECT_KEY"] = project_key
 
 
 # 2. Initialize Dataiku client and project
@@ -84,7 +94,7 @@ if (edit_type=="simple"):
         changes_ds_creator.with_store_into(connection="filesystem_managed")
         changes_ds_creator.create()
         changes_ds = dataiku.Dataset(changes_ds_name)
-        changes_ds.write_schema_from_dataframe(df=original_df)
+        changes_ds.write_schema_from_dataframe(df=original_df) # TODO: add suffix "_edited" to each column name
         
         editable_ds_creator.with_store_into(connection=connection_name)
         editable_ds_creator.create()
@@ -105,7 +115,7 @@ if (edit_type=="simple"):
 elif (edit_type=="join"):
     ref_ds = dataiku.Dataset(ref_dataset, project_key)
     connection_name = ref_ds.get_config()['params']['connection']
-    # IDEA: write code to create these datasets if they don't already exist, and the recipes to connect them
+    # TODO: write code to create these datasets if they don't already exist, and the recipes to connect them
     changes_ds = dataiku.Dataset(ref_dataset + "_" + ext_dataset + "_editlog", project_key)
     ext_key_column_name = "ext_" + ext_key
     ext_key_original_column_name = ext_key_column_name + "_original"
@@ -120,12 +130,15 @@ editable_df = editable_ds.get_dataframe()
 editable_df.loc[:, ext_key_column_name] = editable_df[ext_key_edited_column_name].where(editable_df[ext_key_edited_column_name].notnull(), editable_df[ext_key_original_column_name])
 
 if (edit_type=="simple"):
+    # TODO: define pd_cols and also add reviewed, date, and user columns
     dash_cols = ([{"name": i, "id": i} for i in editable_df.columns])
 elif (edit_type=="join"):
+    # IDEA: loop over columns identified as keys, and lookup columns for each key
     pd_cols = [ref_key] # columns for pandas
     for col in ref_lookup_columns: pd_cols.append(col)
     pd_cols.append(ext_key_column_name)
     for col in ext_lookup_columns: pd_cols.append("ext_" + col)
+
     pd_cols.append("reviewed")
     pd_cols.append("date")
     pd_cols.append("user")
@@ -177,12 +190,13 @@ def update(cell_coordinates, table_data):
         idx = table_data[row_id][input_key]
         val = table_data[row_id][col_id]
 
+        # TODO: review queries: quotation marks, and storing of date and user to add to the edit log
         query = """UPDATE \"{0}\" SET {1}={2}
             WHERE {3}={4}
             COMMIT;
             """.format(editable_tablename, col_id, val, input_key, idx)
         executor.query_to_df(query)
-        select_change_query = """SELECT {0} FROM \"{1}\" WHERE {2}={3}""".format(col_id, editable_tablename, input_key, idx)
+        select_change_query = """SELECT {0} FROM "{1}" WHERE "{2}"={3}""".format(col_id, editable_tablename, input_key, idx)
 
         message = "Updated column " + str(col_id) \
                     + " where " + input_key + " is " + idx + ". \n" \
@@ -192,7 +206,7 @@ def update(cell_coordinates, table_data):
         changes_ds.write_dataframe(change_df)
 
     elif (edit_type=="join"):
-        # Update table data
+        # Update table data TODO: this should also be used with simple edit type
         table_data[row_id]["date"] = d.strftime("%Y-%m-%d")
         table_data[row_id]["user"] = u
 
@@ -254,10 +268,6 @@ def update(cell_coordinates, table_data):
             executor.query_to_df(update_query)
 
             message = "Changed values of lookup columns"
-
-    
-    # change_df["date"] = datetime.date.today().strftime("%Y-%m-%d") IDEA: first add the date field to the changes_ds schema
-    # change_df["user"] = "anonymous"
 
     return message, table_data
 
