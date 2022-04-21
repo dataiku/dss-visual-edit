@@ -17,7 +17,7 @@ import os
 # 2. Initialize Dataiku client and project
 # 3. Create change log dataset and editable dataset, if they don't already exist
 # 4. Initialize the SQL executor and name of table to edit
-# 5. Define the layout of the webapp
+# 5. Define the layout of the webapp and the DataTable component
 # 6. Define the callback function that updates the editable and change log when cell values get edited
 
 
@@ -77,7 +77,7 @@ client = dataiku.api_client()
 project = client.get_project(project_key)
 
 
-# 3. Create change log dataset and editable dataset, if they don't already exist
+# 3.1. Create change log dataset and editable dataset, if they don't already exist
 
 if (edit_type=="simple"):
     original_ds = dataiku.Dataset(input_dataset, project_key)
@@ -114,25 +114,30 @@ if (edit_type=="simple"):
         editable_ds = dataiku.Dataset(editable_ds_name, project_key)
 elif (edit_type=="join"):
     ref_ds = dataiku.Dataset(ref_dataset, project_key)
+    ext_ds = dataiku.Dataset(ext_dataset, project_key)
     connection_name = ref_ds.get_config()['params']['connection']
     # TODO: write code to create these datasets if they don't already exist, and the recipes to connect them
     changes_ds = dataiku.Dataset(ref_dataset + "_" + ext_dataset + "_editlog", project_key)
-    ext_key_column_name = "ext_" + ext_key
-    ext_key_original_column_name = ext_key_column_name + "_original"
-    ext_key_edited_column_name = ext_key_column_name + "_edited"
     editable_ds = dataiku.Dataset(ref_dataset + "_" + ext_dataset + "_editable", project_key)
-    ext_ds = dataiku.Dataset(ext_dataset, project_key)
     ext_tablename = ext_ds.get_config()['params']['table'].replace("${projectKey}", project_key)
 
 changes_ds.spec_item["appendMode"] = True # make sure that we append to that dataset (and don't write over it)
 editable_df = editable_ds.get_dataframe()
-# create new column ext_key in editable_df whose value is the same as column ext_key_edited when not empty, and the same as ext_key_original when empty
-editable_df.loc[:, ext_key_column_name] = editable_df[ext_key_edited_column_name].where(editable_df[ext_key_edited_column_name].notnull(), editable_df[ext_key_original_column_name])
+
+
+# 3.2. Define columns to use in the DataTable component later on
 
 if (edit_type=="simple"):
     # TODO: define pd_cols and also add reviewed, date, and user columns
     dash_cols = ([{"name": i, "id": i} for i in editable_df.columns])
+
 elif (edit_type=="join"):
+    # create new column ext_key in editable_df whose value is the same as column ext_key_edited when not empty, and the same as ext_key_original when empty
+    ext_key_column_name = "ext_" + ext_key
+    ext_key_original_column_name = ext_key_column_name + "_original"
+    ext_key_edited_column_name = ext_key_column_name + "_edited"
+    editable_df.loc[:, ext_key_column_name] = editable_df[ext_key_edited_column_name].where(editable_df[ext_key_edited_column_name].notnull(), editable_df[ext_key_original_column_name])
+
     # IDEA: loop over columns identified as keys, and lookup columns for each key
     pd_cols = [ref_key] # columns for pandas
     for col in ref_lookup_columns: pd_cols.append(col)
