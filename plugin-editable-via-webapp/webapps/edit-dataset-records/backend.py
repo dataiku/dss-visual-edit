@@ -50,8 +50,8 @@ original_ds = dataiku.Dataset(dataset_name, project_key)
 original_df = original_ds.get_dataframe()
 connection_name = original_ds.get_config()['params']['connection'] # name of the connection to the original dataset, to use for the editable dataset too
 
-changes_ds_name = dataset_name + "_changes"
-editable_ds_name = dataset_name + "_editable"
+changes_ds_name = dataset_name + "_editlog"
+editable_ds_name = dataset_name + "_webapp"
 
 changes_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, changes_ds_name)
 editable_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, editable_ds_name)
@@ -67,7 +67,7 @@ if (not changes_ds_creator.already_exists()):
     editable_ds = dataiku.Dataset(editable_ds_name)
     editable_ds.write_with_schema(original_df)
     
-    recipe_creator = dataikuapi.dss.recipe.DSSRecipeCreator("CustomCode_sync-and-apply-changes", "compute_" + editable_ds_name, project)
+    recipe_creator = dataikuapi.dss.recipe.DSSRecipeCreator("CustomCode_sync-and-apply-edits", "compute_" + editable_ds_name, project)
     recipe = recipe_creator.create()
     settings = recipe.get_settings()
     settings.add_input("input", dataset_name)
