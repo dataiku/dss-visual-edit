@@ -86,8 +86,7 @@ cols = ([{"name": i, "id": i} for i in editable_df.columns])
 # 4. Initialize the SQL executor and name of table to edit
 
 executor = SQLExecutor2(connection=connection_name)
-# table_name = editable_ds.get_config()['params']['table']
-table_name = project_key + "_" + editable_ds_name
+table_name = editable_ds.get_config()['params']['table'].replace("${projectKey}", project_key)
 
 
 # 5. Define the layout of the webapp
