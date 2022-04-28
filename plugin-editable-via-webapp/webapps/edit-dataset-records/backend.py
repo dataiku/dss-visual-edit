@@ -123,14 +123,12 @@ def update(cell_coordinates, table_data):
 
     # IDEA: surround the following with try/catch?
     # Run update query on the editable
-    query = """UPDATE \"%s\" SET %s=%s
-            WHERE %s=%s
-            RETURNING *;
-            COMMIT;
-            """ % (table_name, col_id, val, unique_key, idx)
-    change_df = executor.query_to_df(query)
-    # change_df["date"] = datetime.date.today().strftime("%Y-%m-%d") TODO: first add the date field to the changes_ds schema
-    # change_df["user"] = "anonymous"
+    query = """UPDATE \"{0}\" SET {1}={2}
+            WHERE {3}={4}
+            """.format(table_name, col_id, val, unique_key, idx)
+    executor.query_to_df(query)
+    select_change_query = """SELECT {0} FROM "{1}" WHERE "{2}"={3}""".format(col_id, table_name, unique_key, idx)
+    change_df = executor.query_to_df(select_change_query)
 
     # Append the change to the log
     changes_ds.spec_item["appendMode"] = True
