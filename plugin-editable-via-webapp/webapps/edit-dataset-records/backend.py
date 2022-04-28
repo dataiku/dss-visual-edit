@@ -30,8 +30,8 @@ if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     unique_key = get_webapp_config()['key']
     # user_name = get_webapp_config()['user'] TODO: does this exist? or can we get it from an environment variable (DKU_CURRENT_USER?)
 else:
-    dataset_name = "iris"
-    unique_key = "index"
+    dataset_name = "transactions_categorized"
+    unique_key = "id"
 project_key = os.getenv("DKU_CURRENT_PROJECT_KEY")
 if (not project_key or project_key==""):
     project_key = "EDITABLE"
