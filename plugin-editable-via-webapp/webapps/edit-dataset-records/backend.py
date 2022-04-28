@@ -2,7 +2,7 @@ import dataiku
 import dataikuapi
 from dataiku.core.sql import SQLExecutor2
 from dataiku.customwebapp import *
-from dash import dash_table, html
+from dash import dash_table, html, Dash
 from dash.dependencies import Input, Output, State
 import datetime
 
@@ -17,11 +17,6 @@ import datetime
 # 6. Define the callback function that updates the editable and change log when cell values get edited
 
 
-# Uncomment the following when running the Dash app in debug mode outside of Dataiku
-# from dash import Dash
-# app = Dash(__name__)
-
-
 # 1. Access parameters that end-users filled in using webapp config
 
 import os
@@ -30,6 +25,7 @@ if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     unique_key = get_webapp_config()['key']
     # user_name = get_webapp_config()['user'] TODO: does this exist? or can we get it from an environment variable (DKU_CURRENT_USER?)
 else:
+    app = Dash(__name__)
     dataset_name = "transactions_categorized"
     unique_key = "id"
 project_key = os.getenv("DKU_CURRENT_PROJECT_KEY")
@@ -135,6 +131,6 @@ def update(cell_coordinates, table_data):
     return "Value at row " + str(row_id) + ", column " + str(col_id) + " was updated. \n" + "New value: " + str(val) + "\n\n"
 
 
-# Uncomment the following when running the Dash app in debug mode outside of Dataiku
-# if __name__ == "__main__":
-#   app.run_server(debug=True)
+# Run Dash app in debug mode when outside of Dataiku
+if __name__ == "__main__":
+    if app: app.run_server(debug=True)
