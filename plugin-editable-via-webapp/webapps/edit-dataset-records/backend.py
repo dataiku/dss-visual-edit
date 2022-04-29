@@ -185,7 +185,7 @@ def update(cell_coordinates, table_data):
     # Set the date of the change and the user behind it
     d = datetime.date.today()
     current_user_settings = client.get_own_user().get_settings().get_raw()
-    u = """{0} <{1}>""".format(current_user_settings["displayName"], current_user_settings["email"])
+    u = f"""{current_user_settings["displayName"]} <{current_user_settings["email"]}>"""
 
     # Determine the row and column of the cell that was edited
     row_id = cell_coordinates["row"]-1
@@ -196,12 +196,15 @@ def update(cell_coordinates, table_data):
         val = table_data[row_id][col_id]
 
         # TODO: review queries: quotation marks, and storing of date and user to add to the edit log
-        query = """UPDATE \"{0}\" SET {1}={2}
-            WHERE {3}={4}
-            COMMIT;
-            """.format(editable_tablename, col_id, val, input_key, idx)
+        # IDEA: add input_key as an INDEX to speed up the query (WHERE clause)
+        query = f"""UPDATE \"{editable_tablename}\"
+                    SET "{col_id}"='{val}'
+                    WHERE "{input_key}"={idx};
+                    COMMIT;"""
         executor.query_to_df(query)
-        select_change_query = """SELECT {0} FROM "{1}" WHERE "{2}"={3}""".format(col_id, editable_tablename, input_key, idx)
+        select_change_query = f"""SELECT {col_id}
+                                  FROM "{editable_tablename}"
+                                  WHERE "{input_key}"={idx}"""
 
         message = "Updated column " + str(col_id) \
                     + " where " + input_key + " is " + idx + ". \n" \
@@ -223,25 +226,18 @@ def update(cell_coordinates, table_data):
         if (col_id=="reviewed" and table_data[row_id]["reviewed"]=="true"):
             # Update the editable dataset
             if (ext_key_original_value==None):
-                update_query = """UPDATE "{0}" SET "date"='{1}', "user"='{2}', "reviewed"=TRUE
-                                  WHERE "{3}"={4};
-                                  COMMIT;""".format(
-                                      editable_tablename,
-                                      d.strftime("%Y-%m-%d"),
-                                      u,
-                                      ref_key,
-                                      str(ref_key_value))
+                # IDEA: add ref_key as an INDEX to speed up the query
+                update_query = f"""UPDATE "{editable_tablename}"
+                                   SET "date"='{d.strftime("%Y-%m-%d")}', "user"='{u}', "reviewed"=TRUE
+                                   WHERE "{ref_key}"={str(ref_key_value)};
+                                   COMMIT;"""
             else:
-                update_query = """UPDATE "{0}" SET "date"='{1}', "user"='{2}', "reviewed"=TRUE
-                                  WHERE "{3}"={4} AND "{5}"={6};
-                                  COMMIT;""".format(
-                                      editable_tablename,
-                                      d.strftime("%Y-%m-%d"),
-                                      u,
-                                      ext_key_original_column_name,
-                                      str(ext_key_original_value),
-                                      ref_key,
-                                      str(ref_key_value))
+                # IDEA: add ext_key as an INDEX to speed up the query
+                update_query = f"""UPDATE "{editable_tablename}"
+                                   SET "date"='{d.strftime("%Y-%m-%d")}', "user"='{u}', "reviewed"=TRUE
+                                   WHERE "ext_key_original_column_name"={str(ext_key_original_value)}
+                                   AND "{ref_key}"={str(ref_key_value)};
+                                   COMMIT;"""
             executor.query_to_df(update_query)
 
             message = "Row is marked as reviewed, so it will be added to the edit log."
@@ -252,7 +248,9 @@ def update(cell_coordinates, table_data):
 
         if (col_id==ext_key_column_name):
             # Retrieve values of the lookup columns from the external dataset, for this ext_key_edited value
-            select_query = "SELECT " + ", ".join(ext_lookup_columns) + " FROM \"" + ext_tablename + "\" WHERE " + ext_key + "=" + str(ext_key_edited_value)
+            select_query = f"""SELECT {", ".join(ext_lookup_columns)}
+                               FROM "{ext_tablename}"
+                               WHERE "{ext_key}"={ext_key_edited_value}"""
             select_df = executor.query_to_df(select_query)
 
             # Update table_data with these values — note that colum names in this dataset are prefixed by "ext_"
@@ -260,16 +258,13 @@ def update(cell_coordinates, table_data):
 
             # Update the editable dataset with these values
             sets = ", ".join(
-                [ """"ext_{0}"='{1}'""".format(col, str(select_df[col].iloc[0]))
+                [ f""""ext_{col}"='{str(select_df[col].iloc[0])}'"""
                 for col in ext_lookup_columns ]
             )
-            update_query = """UPDATE "{0}" SET {1}, "date"='{2}', "user"='{3}' WHERE "{4}"={5}; COMMIT;""".format(
-                editable_tablename,
-                sets,
-                d.strftime("%Y-%m-%d"),
-                u,
-                ref_key,
-                ref_key_value)
+            update_query = f"""UPDATE "{editable_tablename}"
+                               SET {sets}, "date"='{d.strftime("%Y-%m-%d")}', "user"='{u}'
+                               WHERE "{ref_key}"={ref_key_value};
+                               COMMIT;"""
             executor.query_to_df(update_query)
 
             message = "Changed values of lookup columns"
