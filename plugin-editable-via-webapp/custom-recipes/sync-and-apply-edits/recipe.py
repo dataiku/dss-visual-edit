@@ -6,7 +6,7 @@ from dataiku.customrecipe import *
 input_names = get_input_names_for_role('input')
 input_datasets = [dataiku.Dataset(name) for name in input_names]
 
-changes_names = get_input_names_for_role('changes')
+changes_names = get_input_names_for_role('editlog')
 changes_datasets = [dataiku.Dataset(name) for name in changes_names]
 
 editable_names = get_output_names_for_role('editable')

@@ -3,7 +3,7 @@
     "version": "0.0.1",
     "meta": {
         "label": "Editable via webapp",
-        "description": "Provide a Webapp to edit records in a dataset, and a Recipe to replay changes when building the flow (Recipe automatically created upon webapp initialization).",
+        "description": "Provide a Webapp to edit records in a dataset, and a Recipe to replay edits when building the flow.",
         "author": "Dataiku (Louis Dorard)",
         "icon": "icon-puzzle-piece",
         "tags": [],

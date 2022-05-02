@@ -4,8 +4,9 @@ import dataiku
 import dataikuapi
 from dataiku.core.sql import SQLExecutor2
 from dataiku.customwebapp import *
-from dash import dash_table, html
+from dash import dash_table, html, Dash
 from dash.dependencies import Input, Output, State
+from flask import Flask
 from pandas import DataFrame
 import datetime
 import os
@@ -19,14 +20,6 @@ import os
 # 4. Initialize the SQL executor and name of table to edit
 # 5. Define the layout of the webapp and the DataTable component
 # 6. Define the callback function that updates the editable and change log when cell values get edited
-
-
-# Uncomment the following when running the Dash app in debug mode outside of Dataiku
-from dash import Dash
-from flask import Flask
-f_app = Flask(__name__)
-app = Dash(__name__, server=f_app)
-application = app.server
 
 
 # 1. Access parameters that end-users filled in using webapp config
@@ -59,9 +52,12 @@ if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
         ext_key = get_webapp_config()['ext_key']
         ext_lookup_columns = get_webapp_config()['ext_lookup_columns']
 else:
+    f_app = Flask(__name__)
+    app = Dash(__name__, server=f_app)
+    application = app.server
     if (edit_type=="simple"):
-        input_dataset = "iris"
-        input_key = "index"
+        input_dataset = "transactions_categorized"
+        input_key = "id"
     elif (edit_type=="join"):
         ref_dataset = "companies_ref"
         ref_key = "id"
@@ -84,7 +80,7 @@ if (edit_type=="simple"):
     original_df = original_ds.get_dataframe()
     connection_name = original_ds.get_config()['params']['connection'] # name of the connection to the original dataset, to use for the editable dataset too
 
-    changes_ds_name = input_dataset + "_changes"
+    changes_ds_name = input_dataset + "_editlog"
     editable_ds_name = input_dataset + "_editable"
 
     changes_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, changes_ds_name)
@@ -152,8 +148,7 @@ elif (edit_type=="join"):
 # 4. Initialize the SQL executor and name of table to edit
 
 executor = SQLExecutor2(connection=connection_name)
-editable_tablename = editable_ds.get_config()['params']['table'].replace("${projectKey}", project_key)
-
+editable_tablename = editable_ds.get_config()["params"]["table"].replace("${projectKey}", project_key).replace("${NODE}", dataiku.get_custom_variables()["NODE"])
 
 # 5. Define the layout of the webapp
 
@@ -272,6 +267,6 @@ def update(cell_coordinates, table_data):
     return message, table_data
 
 
-# Uncomment the following when running the Dash app in debug mode outside of Dataiku
+# Run Dash app in debug mode when outside of Dataiku
 if __name__ == "__main__":
-  app.run_server(debug=True)
+    if app: app.run_server(debug=True)

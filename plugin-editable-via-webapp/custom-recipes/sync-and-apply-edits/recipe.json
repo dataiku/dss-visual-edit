@@ -1,11 +1,11 @@
-// This file is the descriptor for the Custom code recipe sync-and-apply-changes
+// This file is the descriptor for the Custom code recipe sync-and-apply-edits
 {
     // Meta data for display purposes
     "meta": {
         // label: name of the recipe as displayed, should be short
-        "label": "Sync and apply changes",
+        "label": "Sync and apply edits",
         // description: longer string to help end users understand what this recipe does
-        "description": "Copy original dataset and replay changes recorded via the webapp",
+        "description": "Copy original dataset and replay edits recorded via the webapp",
         // icon: must be one of the FontAwesome 3.2.1 icons, complete list here at https://fontawesome.com/v3.2.1/icons/
         "icon": "icon-puzzle-piece"
     },
@@ -31,8 +31,8 @@
             "mustBeSQL": true
         },
         {
-            "name": "changes",
-            "label": "Change log",
+            "name": "editlog",
+            "label": "Edit log",
             "description": "Managed by webapp",
             "arity": "UNARY",
             "required": true,
