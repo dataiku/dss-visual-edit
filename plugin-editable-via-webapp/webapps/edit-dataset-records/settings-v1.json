@@ -1,29 +1,13 @@
-// To be read by the webapp
-// This is similar in spirit to the settings of a visual webapp as they are stored in a Dataiku project (see EDITABLE > web_apps > IJvCkG8.json)
 {
-    "config": {
-        "input_dataset": "transactions_categorized",
-        "schema": {
-            "id": {
-                "type": "key",
-                "editable": false
-            },
-            "date": {
-                "type": "default",
-                "editable": false
-            },
-            "text": {
-                "type": "default",
-                "editable": false
-            },
-            "amount": {
-                "type": "default",
-                "editable": false
-            },
-            "category": {
-                "type": "default",
-                "editable": true
-            }
-        }
+    "comments": "To be read by the webapp. This is similar in spirit to the settings of a visual webapp as they are stored in a Dataiku project (see EDITABLE > web_apps > IJvCkG8.json)",
+    "input_dataset": "transactions_categorized",
+    "schema": {
+        "columns": [
+            {"name": "id", "type": "int", "editable_type": "key", "editable": false},
+            {"name": "date", "type": "date", "editable": false},
+            {"name": "text", "type": "string", "editable": false},
+            {"name": "amount", "type": "double", "editable": false},
+            {"name": "category", "type": "string", "editable": true}
+        ]
     }
 }

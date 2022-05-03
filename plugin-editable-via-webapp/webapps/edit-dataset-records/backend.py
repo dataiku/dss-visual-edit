@@ -7,9 +7,10 @@ from dataiku.customwebapp import *
 from dash import dash_table, html, Dash
 from dash.dependencies import Input, Output, State
 from flask import Flask
-from pandas import DataFrame
+from pandas import DataFrame, pivot_table
 import datetime
 import os
+import json
 
 
 # Dash webapp to edit dataset records
@@ -24,48 +25,52 @@ import os
 
 # 1. Access parameters that end-users filled in using webapp config
 
-# Define edit type
-if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
-    edit_type = get_webapp_config()['edit_type'] # TODO: delete edit_type
-else:
-    edit_type = "simple" # default edit type when running the Dash app in debug mode outside of Dataiku
-
 # Define project key
 project_key = os.getenv("DKU_CURRENT_PROJECT_KEY")
 if (not project_key or project_key==""):
-    if (edit_type=="simple"):
-        project_key = "EDITABLE"
-    elif (edit_type=="join"):
-        project_key = "JOIN_COMPANIES"
+    project_key = "CATEGORIZE_TRANSACTIONS"
 os.environ["DKU_CURRENT_PROJECT_KEY"] = project_key
 
 # Define dataset names
 if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
-    if (edit_type=="simple"):
-        input_dataset = get_webapp_config()['input_dataset']
-        input_key = get_webapp_config()['input_key']
-    elif (edit_type=="join"):
-        ref_dataset_DELETE = get_webapp_config()['ref_dataset']
-        ref_key_DELETE = get_webapp_config()['ref_key']
-        ref_lookup_columns_DELETE = get_webapp_config()['ref_lookup_columns']
-        ext_dataset = get_webapp_config()['ext_dataset']
-        ext_key = get_webapp_config()['ext_key']
-        ext_lookup_columns = get_webapp_config()['ext_lookup_columns']
+    settings = get_webapp_config()["settings"] # TODO: create "settings" text parameter in webapp.json
 else:
     f_app = Flask(__name__)
     app = Dash(__name__, server=f_app)
     application = app.server
-    if (edit_type=="simple"):
-        input_dataset = "transactions_categorized"
-        input_key = "id"
-    elif (edit_type=="join"):
-        ref_dataset_DELETE = "companies_ref"
-        ref_key_DELETE = "id"
-        ref_lookup_columns_DELETE = ["name", "city", "country"]
-        ext_dataset = "companies_ext"
-        ext_key = "id"
-        ext_lookup_columns = ["name", "city", "country"]
+    settings = json.load(open("settings-v1.json"))
 
+input_dataset_name = settings["input_dataset"]
+# Parse schema
+# - 1st pass
+def parse_schema(schema):
+    editable_column_names = []
+    linked_records = []
+    for col in schema["columns"]:
+        if col.get("editable"):
+            editable_column_names.append(col.get("name"))
+            if col.get("editable_type")=="linked_record":
+                linked_records.append(
+                    {
+                        "name": col.get("name"),
+                        "linked_table_name": dataiku.Dataset(col.get("linked_ds"), project_key).get_config()["params"]["table"].replace("${projectKey}", project_key).replace("${NODE}", dataiku.get_custom_variables().get("NODE")),
+                        "linked_key": col.get("linked_ds_key_col"),
+                        "lookup_columns": []
+                    }
+                )
+        else:
+            if col.get("editable_type")=="key":
+                primary_key = col.get("name")
+                primary_key_type = col.get("type")
+    # - 2nd pass
+    for col in schema["columns"]:
+        if col.get("editable_type")=="lookup_column":
+            for linked_record in linked_records:
+                if linked_record["name"]==col.get("linked_record_col"):
+                    linked_record["lookup_columns"].append({"name": col.get("name"),
+                    "linked_ds_name": col.get("linked_ds_name")})
+    return editable_column_names, linked_records, primary_key, primary_key_type
+editable_column_names, linked_records, primary_key, primary_key_type = parse_schema(settings["schema"])
 
 # 2. Initialize Dataiku client and project
 
@@ -73,76 +78,64 @@ client = dataiku.api_client()
 project = client.get_project(project_key)
 
 
-# 3.1. Create change log dataset and editable dataset, if they don't already exist
+original_ds = dataiku.Dataset(input_dataset_name, project_key)
+original_df = original_ds.get_dataframe(limit=100).set_index(primary_key)
+connection_name = original_ds.get_config()['params']['connection'] # name of the connection to the original dataset, to use for the editlog too
+executor = SQLExecutor2(connection=connection_name)
 
-if (edit_type=="simple"):
-    original_ds = dataiku.Dataset(input_dataset, project_key)
-    original_df = original_ds.get_dataframe()
-    connection_name = original_ds.get_config()['params']['connection'] # name of the connection to the original dataset, to use for the editable dataset too
 
-    changes_ds_name = input_dataset + "_editlog"
-    editable_ds_name = input_dataset + "_editable"
+# 3.1. Create editlog, if it doesn't already exist
 
-    changes_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, changes_ds_name)
-    editable_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, editable_ds_name)
+editlog_ds_name = input_dataset_name + "_editlog_new"
+editlog_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, editlog_ds_name)
+if (editlog_ds_creator.already_exists()):
+    editlog_ds = dataiku.Dataset(editlog_ds_name, project_key)
+    editlog_df = editlog_ds.get_dataframe().set_index(primary_key)
+    editlog_pivoted_df = pivot_table(editlog_df, index=primary_key, columns="column_name", values="value", aggfunc="last")
+    # Create editable_df:
+    # - Join
+    editable_df = original_df.join(editlog_pivoted_df, rsuffix="_value_last")
+    # - Merge
+    for col in editable_column_names:
+        # copy col to a new column whose name is suffixed by "_original"
+        editable_df[col + "_original"] = editable_df[col]
+        # merge original and last edited values
+        editable_df.loc[:, col] = editable_df[col + "_value_last"].where(editable_df[col + "_value_last"].notnull(), editable_df[col + "_original"])
+    # TODO: V2: lookup columns to retrieve
+    # for this we create a new table with our original_df sample and execute a join query between it and each linked dataset
+else:
+    editlog_schema = [
+        {"name": primary_key, "type": primary_key_type},
+        {"name": "column_name", "type": "string"},
+        {"name": "value", "type": "string"},
+        {"name": "date", "type": "date"},
+        {"name": "user", "type": "string"}
+    ]
+    editlog_ds_creator.with_store_into(connection=connection_name)
+    editlog_ds_creator.create()
+    editlog_ds = dataiku.Dataset(editlog_ds_name)
+    editlog_ds.write_schema(editlog_schema)
+editlog_ds.spec_item["appendMode"] = True # make sure that we append to that dataset (and don't write over it)
 
-    if (not changes_ds_creator.already_exists()):
-        changes_ds_creator.with_store_into(connection="filesystem_managed")
-        changes_ds_creator.create()
-        changes_ds = dataiku.Dataset(changes_ds_name)
-        changes_ds.write_schema_from_dataframe(df=original_df) # TODO: add suffix "_edited" to each column name
-        
-        editable_ds_creator.with_store_into(connection=connection_name)
-        editable_ds_creator.create()
-        editable_ds = dataiku.Dataset(editable_ds_name)
-        editable_ds.write_with_schema(original_df)
-        
-        recipe_creator = dataikuapi.dss.recipe.DSSRecipeCreator("CustomCode_replay-edits", "compute_" + editable_ds_name, project)
-        recipe = recipe_creator.create()
-        settings = recipe.get_settings()
-        settings.add_input("input", input_dataset)
-        settings.add_input("changes", changes_ds_name)
-        settings.add_output("editable", editable_ds_name)
-        settings.raw_params["customConfig"] = {"key": input_key}
-        settings.save()
-    else:
-        changes_ds = dataiku.Dataset(changes_ds_name, project_key)
-        editable_ds = dataiku.Dataset(editable_ds_name, project_key)
-elif (edit_type=="join"):
-    ext_ds = dataiku.Dataset(ext_dataset, project_key)
-    # TODO: write code to create these datasets if they don't already exist, and the recipes to connect them
-    ext_tablename = ext_ds.get_config()['params']['table'].replace("${projectKey}", project_key)
+# TODO: V2: Implement linked records
+# ext_ds = dataiku.Dataset(ext_dataset, project_key)
+# ext_tablename = ext_ds.get_config()['params']['table'].replace("${projectKey}", project_key)
 
-changes_ds.spec_item["appendMode"] = True # make sure that we append to that dataset (and don't write over it)
-editable_df = editable_ds.get_dataframe()
 
 
 # 3.2. Define columns to use in the DataTable component later on
 
-# create new column ext_key in editable_df whose value is the same as column ext_key_edited when not empty, and the same as ext_key_original when empty
-ext_key_column_name = "ext_" + ext_key
-ext_key_original_column_name = ext_key_column_name + "_original"
-ext_key_edited_column_name = ext_key_column_name + "_edited"
-editable_df.loc[:, ext_key_column_name] = editable_df[ext_key_edited_column_name].where(editable_df[ext_key_edited_column_name].notnull(), editable_df[ext_key_original_column_name])
-
-# IDEA: loop over columns identified as keys, and lookup columns for each key
-pd_cols = editable_df.columns
-for col in ext_lookup_columns: pd_cols.append("ext_" + col) # TODO: how is ext_lookup_columns defined?
-pd_cols.append("reviewed")
-pd_cols.append("date")
-pd_cols.append("user")
+# IDEA: loop over columns identified as linked records, and lookup columns for each
+pd_cols = editable_df.columns[:-2*len(editable_column_names)-2].tolist()
+pd_cols.insert(0, primary_key)
+# for col in ext_lookup_columns: pd_cols.append("ext_" + col) # TODO: V2: how is ext_lookup_columns defined?
 dash_cols = ([{"name": i, "id": i} for i in pd_cols]) # columns for dash
 
-
-# 4. Initialize the SQL executor and name of table to edit
-
-executor = SQLExecutor2(connection=connection_name)
-editable_tablename = editable_ds.get_config()["params"]["table"].replace("${projectKey}", project_key).replace("${NODE}", dataiku.get_custom_variables()["NODE"])
 
 # 5. Define the layout of the webapp
 
 app.layout = html.Div([
-    html.H3(edit_type),
+    html.H3("Edit"),
     html.Div([
         html.Div("Select a cell, type a new value, and press Enter to save."),
         html.Br(),
@@ -150,6 +143,13 @@ app.layout = html.Div([
             children=dash_table.DataTable(
                 id='editable-table',
                 columns=dash_cols,
+                style_cell_conditional=[
+                    {
+                        'if': {'column_id': c},
+                        'backgroundColor': 'rgb(30, 30, 30)' # TODO: test this works
+                    } for c in editable_column_names
+                ],
+                style_as_list_view=True,
                 data=editable_df[pd_cols].to_dict('records'),
                 editable=True
             ),
@@ -159,99 +159,51 @@ app.layout = html.Div([
 ])
 
 
-# 6. Define the callback function that updates the editable and change log when cell values get edited
+# 6. Define the callback function that updates the editlog when cell values get edited
 
 @app.callback([Output('output', 'children'),
                Output('editable-table', 'data')],
               [State('editable-table', 'active_cell'),
                Input('editable-table', 'data')], prevent_initial_call=True)
 def update(cell_coordinates, table_data):
+    # Determine the row and column of the cell that was edited
+    row_id = cell_coordinates["row"]-1
+    column_name = cell_coordinates["column_id"]
+    primary_key_value = table_data[row_id][primary_key]
+    value = table_data[row_id][column_name]
+    
     # Set the date of the change and the user behind it
     d = datetime.date.today()
     current_user_settings = client.get_own_user().get_settings().get_raw()
     u = f"""{current_user_settings["displayName"]} <{current_user_settings["email"]}>"""
 
-    # Determine the row and column of the cell that was edited
-    row_id = cell_coordinates["row"]-1
-    col_id = cell_coordinates["column_id"]
+    # Update table data
+    table_data[row_id]["date"] = d.strftime("%Y-%m-%d")
+    table_data[row_id]["user"] = u
+    message = "Updated column " + str(column_name) \
+                + " where " + primary_key + " is " + primary_key_value + ". \n" \
+                + "New value: " + str(value) + "\n\n"
+    # TODO: V2: implement lookup columns
 
-    if (edit_type=="simple"):
-        idx = table_data[row_id][input_key]
-        val = table_data[row_id][col_id]
+    # Add to editlog
+    edit_df = DataFrame(data={primary_key: [primary_key_value], "column_name": [column_name], "value": [value], "date": [d], "user": [u]})
+    editlog_ds.write_dataframe(edit_df)
 
-        # TODO: review queries: quotation marks, and storing of date and user to add to the edit log
-        # IDEA: add input_key as an INDEX to speed up the query (WHERE clause)
-        query = f"""UPDATE \"{editable_tablename}\"
-                    SET "{col_id}"='{val}'
-                    WHERE "{input_key}"={idx};
-                    COMMIT;"""
-        executor.query_to_df(query)
-        select_change_query = f"""SELECT {col_id}
-                                  FROM "{editable_tablename}"
-                                  WHERE "{input_key}"={idx}"""
-
-        message = "Updated column " + str(col_id) \
-                    + " where " + input_key + " is " + idx + ". \n" \
-                    + "New value: " + str(val) + "\n\n"
-
-        change_df = executor.query_to_df(select_change_query)
-        changes_ds.write_dataframe(change_df)
-
-    elif (edit_type=="join"):
-        # Update table data TODO: this should also be used with simple edit type
-        table_data[row_id]["date"] = d.strftime("%Y-%m-%d")
-        table_data[row_id]["user"] = u
-
-        ref_key_value = table_data[row_id][ref_key_DELETE]
-        ext_key_original_value = int(editable_df[editable_df[ref_key_DELETE]==ref_key_value][ext_key_original_column_name]) # TODO: this fails when there are several rows with the same ref_key_value -> fix
-        ext_key_edited_value = table_data[row_id][ext_key_column_name]
-        editable_df.where(editable_df[ref_key_DELETE]==ref_key_value)
-
-        if (col_id=="reviewed" and table_data[row_id]["reviewed"]=="true"):
-            # Update the editable dataset
-            if (ext_key_original_value==None):
-                # IDEA: add ref_key as an INDEX to speed up the query
-                update_query = f"""UPDATE "{editable_tablename}"
-                                   SET "date"='{d.strftime("%Y-%m-%d")}', "user"='{u}', "reviewed"=TRUE
-                                   WHERE "{ref_key_DELETE}"={str(ref_key_value)};
-                                   COMMIT;"""
-            else:
-                # IDEA: add ext_key as an INDEX to speed up the query
-                update_query = f"""UPDATE "{editable_tablename}"
-                                   SET "date"='{d.strftime("%Y-%m-%d")}', "user"='{u}', "reviewed"=TRUE
-                                   WHERE "ext_key_original_column_name"={str(ext_key_original_value)}
-                                   AND "{ref_key_DELETE}"={str(ref_key_value)};
-                                   COMMIT;"""
-            executor.query_to_df(update_query)
-
-            message = "Row is marked as reviewed, so it will be added to the edit log."
-            
-            # We only write to the change log when the reviewed column was just set to true
-            change_df = DataFrame({ref_key_DELETE: [ref_key_value], ext_key_original_column_name: [ext_key_original_value], ext_key_edited_column_name: [ext_key_edited_value], 'date': [d], 'user': [u]})
-            changes_ds.write_dataframe(change_df)
-
-        if (col_id==ext_key_column_name):
-            # Retrieve values of the lookup columns from the external dataset, for this ext_key_edited value
-            select_query = f"""SELECT {", ".join(ext_lookup_columns)}
-                               FROM "{ext_tablename}"
-                               WHERE "{ext_key}"={ext_key_edited_value}"""
+    # Loop over editable linked records
+    for linked_record in linked_records:
+        if (column_name==linked_record["name"]):
+            # Retrieve values of the lookup columns from the external dataset, corresponding to the edited value
+            # IDEA: add linked_record["linked_key"] as an INDEX to speed up the query
+            lookup_columns_linked_ds_names = []
+            for lookup_column in linked_record["lookup_columns"]:
+                lookup_columns_linked_ds_names.append(lookup_column["linked_ds_name"])
+            select_query = f"""SELECT {", ".join(lookup_columns_linked_ds_names)}
+                               FROM "{linked_record["linked_table_name"]}"
+                               WHERE "{linked_record["linked_key"]}"={value}"""
             select_df = executor.query_to_df(select_query)
-
-            # Update table_data with these values — note that colum names in this dataset are prefixed by "ext_"
-            for col in ext_lookup_columns: table_data[row_id]["ext_" + col] = select_df[col].iloc[0]
-
-            # Update the editable dataset with these values
-            sets = ", ".join(
-                [ f""""ext_{col}"='{str(select_df[col].iloc[0])}'"""
-                for col in ext_lookup_columns ]
-            )
-            update_query = f"""UPDATE "{editable_tablename}"
-                               SET {sets}, "date"='{d.strftime("%Y-%m-%d")}', "user"='{u}'
-                               WHERE "{ref_key_DELETE}"={ref_key_value};
-                               COMMIT;"""
-            executor.query_to_df(update_query)
-
-            message = "Changed values of lookup columns"
+            # Update table_data with these values — note that column names are different in table_data and in the linked record's table
+            for lookup_column in linked_record["lookup_columns"]:
+                table_data[row_id][lookup_column["name"]] = select_df[lookup_column["linked_ds_name"]].iloc[0]
 
     return message, table_data
 
