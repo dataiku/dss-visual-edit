@@ -26,7 +26,7 @@ import os
 
 # Define edit type
 if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
-    edit_type = get_webapp_config()['edit_type']
+    edit_type = get_webapp_config()['edit_type'] # TODO: delete edit_type
 else:
     edit_type = "simple" # default edit type when running the Dash app in debug mode outside of Dataiku
 
@@ -45,9 +45,9 @@ if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
         input_dataset = get_webapp_config()['input_dataset']
         input_key = get_webapp_config()['input_key']
     elif (edit_type=="join"):
-        ref_dataset = get_webapp_config()['ref_dataset']
-        ref_key = get_webapp_config()['ref_key']
-        ref_lookup_columns = get_webapp_config()['ref_lookup_columns']
+        ref_dataset_DELETE = get_webapp_config()['ref_dataset']
+        ref_key_DELETE = get_webapp_config()['ref_key']
+        ref_lookup_columns_DELETE = get_webapp_config()['ref_lookup_columns']
         ext_dataset = get_webapp_config()['ext_dataset']
         ext_key = get_webapp_config()['ext_key']
         ext_lookup_columns = get_webapp_config()['ext_lookup_columns']
@@ -59,9 +59,9 @@ else:
         input_dataset = "transactions_categorized"
         input_key = "id"
     elif (edit_type=="join"):
-        ref_dataset = "companies_ref"
-        ref_key = "id"
-        ref_lookup_columns = ["name", "city", "country"]
+        ref_dataset_DELETE = "companies_ref"
+        ref_key_DELETE = "id"
+        ref_lookup_columns_DELETE = ["name", "city", "country"]
         ext_dataset = "companies_ext"
         ext_key = "id"
         ext_lookup_columns = ["name", "city", "country"]
@@ -97,7 +97,7 @@ if (edit_type=="simple"):
         editable_ds = dataiku.Dataset(editable_ds_name)
         editable_ds.write_with_schema(original_df)
         
-        recipe_creator = dataikuapi.dss.recipe.DSSRecipeCreator("CustomCode_sync-and-apply-changes", "compute_" + editable_ds_name, project)
+        recipe_creator = dataikuapi.dss.recipe.DSSRecipeCreator("CustomCode_replay-edits", "compute_" + editable_ds_name, project)
         recipe = recipe_creator.create()
         settings = recipe.get_settings()
         settings.add_input("input", input_dataset)
@@ -109,12 +109,8 @@ if (edit_type=="simple"):
         changes_ds = dataiku.Dataset(changes_ds_name, project_key)
         editable_ds = dataiku.Dataset(editable_ds_name, project_key)
 elif (edit_type=="join"):
-    ref_ds = dataiku.Dataset(ref_dataset, project_key)
     ext_ds = dataiku.Dataset(ext_dataset, project_key)
-    connection_name = ref_ds.get_config()['params']['connection']
     # TODO: write code to create these datasets if they don't already exist, and the recipes to connect them
-    changes_ds = dataiku.Dataset(ref_dataset + "_" + ext_dataset + "_editlog", project_key)
-    editable_ds = dataiku.Dataset(ref_dataset + "_" + ext_dataset + "_editable", project_key)
     ext_tablename = ext_ds.get_config()['params']['table'].replace("${projectKey}", project_key)
 
 changes_ds.spec_item["appendMode"] = True # make sure that we append to that dataset (and don't write over it)
@@ -123,27 +119,20 @@ editable_df = editable_ds.get_dataframe()
 
 # 3.2. Define columns to use in the DataTable component later on
 
-if (edit_type=="simple"):
-    # TODO: define pd_cols and also add reviewed, date, and user columns
-    dash_cols = ([{"name": i, "id": i} for i in editable_df.columns])
+# create new column ext_key in editable_df whose value is the same as column ext_key_edited when not empty, and the same as ext_key_original when empty
+ext_key_column_name = "ext_" + ext_key
+ext_key_original_column_name = ext_key_column_name + "_original"
+ext_key_edited_column_name = ext_key_column_name + "_edited"
+editable_df.loc[:, ext_key_column_name] = editable_df[ext_key_edited_column_name].where(editable_df[ext_key_edited_column_name].notnull(), editable_df[ext_key_original_column_name])
 
-elif (edit_type=="join"):
-    # create new column ext_key in editable_df whose value is the same as column ext_key_edited when not empty, and the same as ext_key_original when empty
-    ext_key_column_name = "ext_" + ext_key
-    ext_key_original_column_name = ext_key_column_name + "_original"
-    ext_key_edited_column_name = ext_key_column_name + "_edited"
-    editable_df.loc[:, ext_key_column_name] = editable_df[ext_key_edited_column_name].where(editable_df[ext_key_edited_column_name].notnull(), editable_df[ext_key_original_column_name])
+# IDEA: loop over columns identified as keys, and lookup columns for each key
+pd_cols = editable_df.columns
+for col in ext_lookup_columns: pd_cols.append("ext_" + col) # TODO: how is ext_lookup_columns defined?
+pd_cols.append("reviewed")
+pd_cols.append("date")
+pd_cols.append("user")
+dash_cols = ([{"name": i, "id": i} for i in pd_cols]) # columns for dash
 
-    # IDEA: loop over columns identified as keys, and lookup columns for each key
-    pd_cols = [ref_key] # columns for pandas
-    for col in ref_lookup_columns: pd_cols.append(col)
-    pd_cols.append(ext_key_column_name)
-    for col in ext_lookup_columns: pd_cols.append("ext_" + col)
-
-    pd_cols.append("reviewed")
-    pd_cols.append("date")
-    pd_cols.append("user")
-    dash_cols = ([{"name": i, "id": i} for i in pd_cols]) # columns for dash
 
 # 4. Initialize the SQL executor and name of table to edit
 
@@ -213,10 +202,10 @@ def update(cell_coordinates, table_data):
         table_data[row_id]["date"] = d.strftime("%Y-%m-%d")
         table_data[row_id]["user"] = u
 
-        ref_key_value = table_data[row_id][ref_key]
-        ext_key_original_value = int(editable_df[editable_df[ref_key]==ref_key_value][ext_key_original_column_name]) # TODO: this fails when there are several rows with the same ref_key_value -> fix
+        ref_key_value = table_data[row_id][ref_key_DELETE]
+        ext_key_original_value = int(editable_df[editable_df[ref_key_DELETE]==ref_key_value][ext_key_original_column_name]) # TODO: this fails when there are several rows with the same ref_key_value -> fix
         ext_key_edited_value = table_data[row_id][ext_key_column_name]
-        editable_df.where(editable_df[ref_key]==ref_key_value)
+        editable_df.where(editable_df[ref_key_DELETE]==ref_key_value)
 
         if (col_id=="reviewed" and table_data[row_id]["reviewed"]=="true"):
             # Update the editable dataset
@@ -224,21 +213,21 @@ def update(cell_coordinates, table_data):
                 # IDEA: add ref_key as an INDEX to speed up the query
                 update_query = f"""UPDATE "{editable_tablename}"
                                    SET "date"='{d.strftime("%Y-%m-%d")}', "user"='{u}', "reviewed"=TRUE
-                                   WHERE "{ref_key}"={str(ref_key_value)};
+                                   WHERE "{ref_key_DELETE}"={str(ref_key_value)};
                                    COMMIT;"""
             else:
                 # IDEA: add ext_key as an INDEX to speed up the query
                 update_query = f"""UPDATE "{editable_tablename}"
                                    SET "date"='{d.strftime("%Y-%m-%d")}', "user"='{u}', "reviewed"=TRUE
                                    WHERE "ext_key_original_column_name"={str(ext_key_original_value)}
-                                   AND "{ref_key}"={str(ref_key_value)};
+                                   AND "{ref_key_DELETE}"={str(ref_key_value)};
                                    COMMIT;"""
             executor.query_to_df(update_query)
 
             message = "Row is marked as reviewed, so it will be added to the edit log."
             
             # We only write to the change log when the reviewed column was just set to true
-            change_df = DataFrame({ref_key: [ref_key_value], ext_key_original_column_name: [ext_key_original_value], ext_key_edited_column_name: [ext_key_edited_value], 'date': [d], 'user': [u]})
+            change_df = DataFrame({ref_key_DELETE: [ref_key_value], ext_key_original_column_name: [ext_key_original_value], ext_key_edited_column_name: [ext_key_edited_value], 'date': [d], 'user': [u]})
             changes_ds.write_dataframe(change_df)
 
         if (col_id==ext_key_column_name):
@@ -258,7 +247,7 @@ def update(cell_coordinates, table_data):
             )
             update_query = f"""UPDATE "{editable_tablename}"
                                SET {sets}, "date"='{d.strftime("%Y-%m-%d")}', "user"='{u}'
-                               WHERE "{ref_key}"={ref_key_value};
+                               WHERE "{ref_key_DELETE}"={ref_key_value};
                                COMMIT;"""
             executor.query_to_df(update_query)
 
