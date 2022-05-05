@@ -79,7 +79,7 @@ project = client.get_project(project_key)
 
 
 original_ds = dataiku.Dataset(input_dataset_name, project_key)
-original_df = original_ds.get_dataframe(limit=100).set_index(primary_key)
+original_df = original_ds.get_dataframe(limit=100) # TODO: limit only for webapp
 connection_name = original_ds.get_config()['params']['connection'] # name of the connection to the original dataset, to use for the editlog too
 executor = SQLExecutor2(connection=connection_name)
 
@@ -90,17 +90,7 @@ editlog_ds_name = input_dataset_name + "_editlog_new"
 editlog_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, editlog_ds_name)
 if (editlog_ds_creator.already_exists()):
     editlog_ds = dataiku.Dataset(editlog_ds_name, project_key)
-    editlog_df = editlog_ds.get_dataframe().set_index(primary_key)
-    editlog_pivoted_df = pivot_table(editlog_df, index=primary_key, columns="column_name", values="value", aggfunc="last")
-    # Create editable_df:
-    # - Join
-    editable_df = original_df.join(editlog_pivoted_df, rsuffix="_value_last")
-    # - Merge
-    for col in editable_column_names:
-        # copy col to a new column whose name is suffixed by "_original"
-        editable_df[col + "_original"] = editable_df[col]
-        # merge original and last edited values
-        editable_df.loc[:, col] = editable_df[col + "_value_last"].where(editable_df[col + "_value_last"].notnull(), editable_df[col + "_original"])
+
     # TODO: V2: lookup columns to retrieve
     # for this we create a new table with our original_df sample and execute a join query between it and each linked dataset
 else:
@@ -116,6 +106,9 @@ else:
     editlog_ds = dataiku.Dataset(editlog_ds_name)
     editlog_ds.write_schema(editlog_schema)
 editlog_ds.spec_item["appendMode"] = True # make sure that we append to that dataset (and don't write over it)
+editlog_df = editlog_ds.get_dataframe()
+from commons import replay_edits
+editable_df = replay_edits(original_df, editlog_df, primary_key, editable_column_names)
 
 # TODO: V2: Implement linked records
 # ext_ds = dataiku.Dataset(ext_dataset, project_key)
@@ -126,8 +119,8 @@ editlog_ds.spec_item["appendMode"] = True # make sure that we append to that dat
 # 3.2. Define columns to use in the DataTable component later on
 
 # IDEA: loop over columns identified as linked records, and lookup columns for each
-pd_cols = editable_df.columns[:-2*len(editable_column_names)-2].tolist()
-pd_cols.insert(0, primary_key)
+pd_cols = editable_df.columns.tolist()
+# pd_cols.insert(0, primary_key)
 # for col in ext_lookup_columns: pd_cols.append("ext_" + col) # TODO: V2: how is ext_lookup_columns defined?
 dash_cols = ([{"name": i, "id": i} for i in pd_cols]) # columns for dash
 
@@ -146,7 +139,7 @@ app.layout = html.Div([
                 style_cell_conditional=[
                     {
                         'if': {'column_id': c},
-                        'backgroundColor': 'rgb(30, 30, 30)' # TODO: test this works
+                        'backgroundColor': '#d8e3ed'
                     } for c in editable_column_names
                 ],
                 style_as_list_view=True,
@@ -178,11 +171,8 @@ def update(cell_coordinates, table_data):
     u = f"""{current_user_settings["displayName"]} <{current_user_settings["email"]}>"""
 
     # Update table data
-    table_data[row_id]["date"] = d.strftime("%Y-%m-%d")
-    table_data[row_id]["user"] = u
-    message = "Updated column " + str(column_name) \
-                + " where " + primary_key + " is " + primary_key_value + ". \n" \
-                + "New value: " + str(value) + "\n\n"
+    message = f"""Updated column {column_name} where {primary_key} is {primary_key_value}.
+                  New value: {value}."""
     # TODO: V2: implement lookup columns
 
     # Add to editlog
