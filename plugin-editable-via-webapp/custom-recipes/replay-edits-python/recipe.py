@@ -1,25 +1,29 @@
 import dataiku
-import pandas as pd, numpy as np
-from dataiku import pandasutils as pdu
 from dataiku.customrecipe import *
+from commons import replay_edits
+
+primary_key = get_recipe_config()['primary_key']
+editable_column_names = get_recipe_config()['editable_column_names']
 
 input_names = get_input_names_for_role('input')
 input_datasets = [dataiku.Dataset(name) for name in input_names]
+input_ds = input_datasets[0]
 
 editlog_names = get_input_names_for_role('editlog')
-editlog_datasets = [dataiku.Dataset(name) for name in changes_names]
+editlog_datasets = [dataiku.Dataset(name) for name in editlog_names]
+editlog_ds = editlog_datasets[0]
 
-editable_names = get_output_names_for_role('editable')
-editable_datasets = [dataiku.Dataset(name) for name in editable_names]
+edited_names = get_output_names_for_role('edited')
+edited_datasets = [dataiku.Dataset(name) for name in edited_names]
+edited_ds = edited_datasets[0]
 
-input_ds = input_datasets[0]
+# Read input data
 input_df = input_ds.get_dataframe()
-
-editlog_ds = changes_datasets[0]
 editlog_df = editlog_ds.get_dataframe()
 
-editable_df = input_df
-# TODO: apply edits - see webapp backend for logic to implement, and move it into a lib
+# Write output schema
+edited_ds.write_schema(input_ds.read_schema()) # otherwise column type for columns of missing values might change
 
-editable_dataset = editable_datasets[0]
-editable_dataset.write_with_schema(editable_df)
+# Write output data
+edited_df = replay_edits(input_df, editlog_df, primary_key, editable_column_names)
+edited_ds.write_dataframe(edited_df)

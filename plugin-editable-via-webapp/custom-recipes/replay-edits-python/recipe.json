@@ -7,7 +7,7 @@
         // description: longer string to help end users understand what this recipe does
         "description": "Copy original dataset and replay edits recorded via the webapp",
         // icon: must be one of the FontAwesome 3.2.1 icons, complete list here at https://fontawesome.com/v3.2.1/icons/
-        "icon": "icon-puzzle-piece"
+        "icon": "icon-forward"
     },
 
     "kind": "PYTHON",
@@ -42,8 +42,8 @@
 
     "outputRoles": [
         {
-            "name": "editable",
-            "label": "Editable dataset via the webapp",
+            "name": "edited",
+            "label": "Edited dataset",
             "description": "",
             "arity": "UNARY",
             "required": true,
@@ -63,10 +63,17 @@
 
     "params": [
         {
-            "name": "key",
-            "label": "Unique key",
+            "name": "primary_key",
+            "label": "Primary key",
             "description": "Select a column to use as a unique identifier for rows",
             "type": "COLUMN",
+            "columnRole": "input"
+        },
+        {
+            "name": "editable_column_names",
+            "label": "Editable columns",
+            "description": "Select columns made editable via webapp",
+            "type": "COLUMNS",
             "columnRole": "input"
         }
     ],
