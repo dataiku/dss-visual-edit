@@ -7,10 +7,46 @@ from dataiku.customwebapp import *
 from dash import dash_table, html, Dash
 from dash.dependencies import Input, Output, State
 from flask import Flask
-from pandas import DataFrame, pivot_table
+from pandas import DataFrame
 import datetime
 import os
 import json
+
+
+def parse_schema(schema):
+    """Parse editable schema"""
+
+    # First pass at the list of columns
+    editable_column_names = []
+    linked_records = []
+    for col in schema["columns"]:
+        if col.get("editable"):
+            editable_column_names.append(col.get("name"))
+            if col.get("editable_type")=="linked_record":
+                linked_records.append(
+                    {
+                        "name": col.get("name"),
+                        "ds_name": col.get("linked_ds_name"),
+                        "ds_key": col.get("linked_ds_key"),
+                        "lookup_columns": []
+                    }
+                )
+        else:
+            if col.get("editable_type")=="key":
+                primary_key = col.get("name")
+                primary_key_type = col.get("type")
+
+    # Second pass to create the lookup columns for each linked record
+    for col in schema["columns"]:
+        if col.get("editable_type")=="lookup_column":
+            for linked_record in linked_records:
+                if linked_record["name"]==col.get("linked_record_col"):
+                    linked_record["lookup_columns"].append({
+                        "name": col.get("name"),
+                        "linked_ds_column_name": col.get("linked_ds_column_name")
+                    })
+
+    return editable_column_names, linked_records, primary_key, primary_key_type
 
 
 # Dash webapp to edit dataset records
@@ -23,12 +59,13 @@ import json
 # 6. Define the callback function that updates the editable and change log when cell values get edited
 
 
-# 1. Access parameters that end-users filled in using webapp config
+# 1. Get webapp settings
 
 # Define project key
 project_key = os.getenv("DKU_CURRENT_PROJECT_KEY")
 if (not project_key or project_key==""):
-    project_key = "CATEGORIZE_TRANSACTIONS"
+    # project_key = "CATEGORIZE_TRANSACTIONS"
+    project_key = "JOIN_COMPANIES"
 os.environ["DKU_CURRENT_PROJECT_KEY"] = project_key
 
 # Define dataset names
@@ -38,61 +75,32 @@ else:
     f_app = Flask(__name__)
     app = Dash(__name__, server=f_app)
     application = app.server
-    settings = json.load(open("settings-v1.json"))
+    settings = json.load(open("settings-v2.json"))
 
 input_dataset_name = settings["input_dataset"]
-# Parse schema
-# - 1st pass
-def parse_schema(schema):
-    editable_column_names = []
-    linked_records = []
-    for col in schema["columns"]:
-        if col.get("editable"):
-            editable_column_names.append(col.get("name"))
-            if col.get("editable_type")=="linked_record":
-                linked_records.append(
-                    {
-                        "name": col.get("name"),
-                        "linked_table_name": dataiku.Dataset(col.get("linked_ds"), project_key).get_config()["params"]["table"].replace("${projectKey}", project_key).replace("${NODE}", dataiku.get_custom_variables().get("NODE")),
-                        "linked_key": col.get("linked_ds_key_col"),
-                        "lookup_columns": []
-                    }
-                )
-        else:
-            if col.get("editable_type")=="key":
-                primary_key = col.get("name")
-                primary_key_type = col.get("type")
-    # - 2nd pass
-    for col in schema["columns"]:
-        if col.get("editable_type")=="lookup_column":
-            for linked_record in linked_records:
-                if linked_record["name"]==col.get("linked_record_col"):
-                    linked_record["lookup_columns"].append({"name": col.get("name"),
-                    "linked_ds_name": col.get("linked_ds_name")})
-    return editable_column_names, linked_records, primary_key, primary_key_type
 editable_column_names, linked_records, primary_key, primary_key_type = parse_schema(settings["schema"])
+
 
 # 2. Initialize Dataiku client and project
 
 client = dataiku.api_client()
 project = client.get_project(project_key)
 
-
 original_ds = dataiku.Dataset(input_dataset_name, project_key)
 original_df = original_ds.get_dataframe(limit=100) # TODO: limit only for webapp
 connection_name = original_ds.get_config()['params']['connection'] # name of the connection to the original dataset, to use for the editlog too
 executor = SQLExecutor2(connection=connection_name)
 
+def get_table_name(dataset):
+    return dataset.get_config()["params"]["table"].replace("${projectKey}", project_key).replace("${NODE}", dataiku.get_custom_variables().get("NODE"))
+
 
 # 3.1. Create editlog, if it doesn't already exist
 
-editlog_ds_name = input_dataset_name + "_editlog_new"
+editlog_ds_name = input_dataset_name + "_editlog"
 editlog_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, editlog_ds_name)
 if (editlog_ds_creator.already_exists()):
     editlog_ds = dataiku.Dataset(editlog_ds_name, project_key)
-
-    # TODO: V2: lookup columns to retrieve
-    # for this we create a new table with our original_df sample and execute a join query between it and each linked dataset
 else:
     editlog_schema = [
         {"name": primary_key, "type": primary_key_type},
@@ -107,21 +115,35 @@ else:
     editlog_ds.write_schema(editlog_schema)
 editlog_ds.spec_item["appendMode"] = True # make sure that we append to that dataset (and don't write over it)
 editlog_df = editlog_ds.get_dataframe()
+
+
+# Replay edits
+
+# when using interactive execution: sys.path.append('../../python-lib')
 from commons import replay_edits
 editable_df = replay_edits(original_df, editlog_df, primary_key, editable_column_names)
 
-# TODO: V2: Implement linked records
-# ext_ds = dataiku.Dataset(ext_dataset, project_key)
-# ext_tablename = ext_ds.get_config()['params']['table'].replace("${projectKey}", project_key)
+
+# Get lookup columns
+
+for linked_record in linked_records:
+    lookup_column_names = []
+    lookup_column_names_in_linked_ds = []
+    for lookup_column in linked_record["lookup_columns"]:
+        lookup_column_names.append(lookup_column["name"])
+        lookup_column_names_in_linked_ds.append(lookup_column["linked_ds_column_name"])
+    linked_ds = dataiku.Dataset(linked_record["ds_name"], project_key)
+    linked_df = linked_ds.get_dataframe().set_index(linked_record["ds_key"])[lookup_column_names_in_linked_ds]
+    editable_df = editable_df.set_index(primary_key).join(linked_df)
+    for c in range(0, len(lookup_column_names)):
+        editable_df.rename(columns={lookup_column_names_in_linked_ds[c]: lookup_column_names[c]}, inplace=True)
 
 
 
-# 3.2. Define columns to use in the DataTable component later on
+# 3.2. Define columns to use in the DataTable component
 
-# IDEA: loop over columns identified as linked records, and lookup columns for each
 pd_cols = editable_df.columns.tolist()
 # pd_cols.insert(0, primary_key)
-# for col in ext_lookup_columns: pd_cols.append("ext_" + col) # TODO: V2: how is ext_lookup_columns defined?
 dash_cols = ([{"name": i, "id": i} for i in pd_cols]) # columns for dash
 
 
@@ -170,30 +192,29 @@ def update(cell_coordinates, table_data):
     current_user_settings = client.get_own_user().get_settings().get_raw()
     u = f"""{current_user_settings["displayName"]} <{current_user_settings["email"]}>"""
 
-    # Update table data
     message = f"""Updated column {column_name} where {primary_key} is {primary_key_value}.
                   New value: {value}."""
-    # TODO: V2: implement lookup columns
-
+    
     # Add to editlog
     edit_df = DataFrame(data={primary_key: [primary_key_value], "column_name": [column_name], "value": [value], "date": [d], "user": [u]})
     editlog_ds.write_dataframe(edit_df)
 
-    # Loop over editable linked records
+    # Update table data if a linked record was edited: refresh corresponding lookup columns
     for linked_record in linked_records:
         if (column_name==linked_record["name"]):
-            # Retrieve values of the lookup columns from the external dataset, corresponding to the edited value
+            # Retrieve values of the lookup columns from the linked dataset, for the row corresponding to the edited value (linked_record["ds_key"]==value)
             # IDEA: add linked_record["linked_key"] as an INDEX to speed up the query
-            lookup_columns_linked_ds_names = []
+            lookup_column_names_in_linked_ds = []
             for lookup_column in linked_record["lookup_columns"]:
-                lookup_columns_linked_ds_names.append(lookup_column["linked_ds_name"])
-            select_query = f"""SELECT {", ".join(lookup_columns_linked_ds_names)}
-                               FROM "{linked_record["linked_table_name"]}"
-                               WHERE "{linked_record["linked_key"]}"={value}"""
-            select_df = executor.query_to_df(select_query)
+                lookup_column_names_in_linked_ds.append(lookup_column["linked_ds_column_name"])
+            
+            linked_ds = dataiku.Dataset(linked_record["ds_name"], project_key)
+            linked_df = linked_ds.get_dataframe().set_index(linked_record["ds_key"])[lookup_column_names_in_linked_ds]
+            select_df = linked_df[linked_df.index==value]
+
             # Update table_data with these values — note that column names are different in table_data and in the linked record's table
             for lookup_column in linked_record["lookup_columns"]:
-                table_data[row_id][lookup_column["name"]] = select_df[lookup_column["linked_ds_name"]].iloc[0]
+                table_data[row_id][lookup_column["name"]] = select_df[lookup_column["linked_ds_column_name"]].iloc[0]
 
     return message, table_data
 
