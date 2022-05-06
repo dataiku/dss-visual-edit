@@ -28,8 +28,6 @@ Fields for a lookup column:
 
 ## TODO:
 
-* Implement recipe to replay changes
-* What happens to the change log when a row has been edited and gets edited again?
 * Update recipe when unique key is changed via webapp settings
 * Unique key can be changed via recipe settings? What happens if so?
 * Show info on what is going to be created (change log dataset with name INPUT_DATASET_NAME_changes, editable dataset with name INPUT_DATASET_NAME_editable, recipe)

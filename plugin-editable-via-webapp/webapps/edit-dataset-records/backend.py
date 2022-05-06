@@ -119,7 +119,8 @@ editlog_df = editlog_ds.get_dataframe()
 
 # Replay edits
 
-# when using interactive execution: sys.path.append('../../python-lib')
+# when using interactive execution:
+# sys.path.append('../../python-lib')
 from commons import replay_edits
 editable_df = replay_edits(original_df, editlog_df, primary_key, editable_column_names)
 
@@ -134,7 +135,7 @@ for linked_record in linked_records:
         lookup_column_names_in_linked_ds.append(lookup_column["linked_ds_column_name"])
     linked_ds = dataiku.Dataset(linked_record["ds_name"], project_key)
     linked_df = linked_ds.get_dataframe().set_index(linked_record["ds_key"])[lookup_column_names_in_linked_ds]
-    editable_df = editable_df.set_index(primary_key).join(linked_df)
+    editable_df = editable_df.join(linked_df, on=linked_record["name"])
     for c in range(0, len(lookup_column_names)):
         editable_df.rename(columns={lookup_column_names_in_linked_ds[c]: lookup_column_names[c]}, inplace=True)
 
@@ -186,19 +187,12 @@ def update(cell_coordinates, table_data):
     column_name = cell_coordinates["column_id"]
     primary_key_value = table_data[row_id][primary_key]
     value = table_data[row_id][column_name]
+    # Cast value as appropriate type, based on schema
+    for column in settings["schema"]["columns"]:
+        if (column["name"] == column_name):
+            if (column["type"] == "int"):
+                value = int(value)
     
-    # Set the date of the change and the user behind it
-    d = datetime.date.today()
-    current_user_settings = client.get_own_user().get_settings().get_raw()
-    u = f"""{current_user_settings["displayName"]} <{current_user_settings["email"]}>"""
-
-    message = f"""Updated column {column_name} where {primary_key} is {primary_key_value}.
-                  New value: {value}."""
-    
-    # Add to editlog
-    edit_df = DataFrame(data={primary_key: [primary_key_value], "column_name": [column_name], "value": [value], "date": [d], "user": [u]})
-    editlog_ds.write_dataframe(edit_df)
-
     # Update table data if a linked record was edited: refresh corresponding lookup columns
     for linked_record in linked_records:
         if (column_name==linked_record["name"]):
@@ -210,11 +204,23 @@ def update(cell_coordinates, table_data):
             
             linked_ds = dataiku.Dataset(linked_record["ds_name"], project_key)
             linked_df = linked_ds.get_dataframe().set_index(linked_record["ds_key"])[lookup_column_names_in_linked_ds]
-            select_df = linked_df[linked_df.index==value]
+            select_df = linked_df.loc[linked_df.index==value]
 
             # Update table_data with these values — note that column names are different in table_data and in the linked record's table
             for lookup_column in linked_record["lookup_columns"]:
                 table_data[row_id][lookup_column["name"]] = select_df[lookup_column["linked_ds_column_name"]].iloc[0]
+
+    # Set the date of the change and the user behind it
+    d = datetime.date.today()
+    current_user_settings = client.get_own_user().get_settings().get_raw()
+    u = f"""{current_user_settings["displayName"]} <{current_user_settings["email"]}>"""
+
+    message = f"""Updated column {column_name} where {primary_key} is {primary_key_value}.
+                  New value: {value}."""
+    
+    # Add to editlog
+    edit_df = DataFrame(data={primary_key: [primary_key_value], "column_name": [column_name], "value": [value], "date": [d], "user": [u]})
+    editlog_ds.write_dataframe(edit_df)
 
     return message, table_data
 

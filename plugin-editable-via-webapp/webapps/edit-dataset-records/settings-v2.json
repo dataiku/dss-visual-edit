@@ -1,6 +1,6 @@
 {
     "comments": "To be read by the webapp. This is similar in spirit to the settings of a visual webapp as they are stored in a Dataiku project (see EDITABLE > web_apps > IJvCkG8.json)",
-    "input_dataset": "companies_joined_prepared_sorted",
+    "input_dataset": "matches",
     "schema": {
         "columns": [
             {
@@ -36,7 +36,7 @@
                 "editable_type": "linked_record",
                 "linked_ds_name": "companies_ext",
                 "linked_ds_key": "id"
-                },
+            },
             {
                 "name": "name_companies_ext",
                 "type": "string",
