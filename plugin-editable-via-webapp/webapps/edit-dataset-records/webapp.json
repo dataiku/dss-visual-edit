@@ -11,73 +11,10 @@
     "standardWebAppLibraries": null,
     "params": [
         {
-            "name": "edit_type",
-            "label": "Edit Type",
-            "type": "SELECT",
-            "selectChoices" : [
-                { "value" : "simple", "label" : "Simple Edit"},
-                { "value" : "join", "label" : "Join Edit"}
-            ],
-            "mandatory": true
-        },
-        {
-            "name": "input_dataset",
-            "type": "DATASET",
-            "label": "Dataset",
-            "description": "Dataset made editable by the webapp (via a copy)",
-            "visibilityCondition": "model.edit_type == 'simple'"
-        },
-        {
-            "name": "input_key",
-            "type": "DATASET_COLUMN",
-            "datasetParamName": "ref_dataset",
-            "label": "Key column",
-            "description": "Uniquely identifies rows of the dataset",
-            "visibilityCondition": "model.edit_type == 'simple'"
-        },
-        {
-            "name": "ref_dataset",
-            "type": "DATASET",
-            "label": "Reference dataset",
-            "description": "",
-            "visibilityCondition": "model.edit_type == 'join'"
-        },
-        {
-            "name": "ref_key",
-            "type": "DATASET_COLUMN",
-            "datasetParamName": "ref_dataset",
-            "label": "Key",
-            "visibilityCondition" : "model.edit_type == 'join'"
-        },
-        {
-            "name": "ref_lookup_columns",
-            "type": "DATASET_COLUMNS",
-            "datasetParamName": "ref_dataset",
-            "label": "Lookup columns",
-            "description": "",
-            "visibilityCondition" : "model.edit_type == 'join'"
-        },
-        {
-            "name": "ext_dataset",
-            "type": "DATASET",
-            "label": "External dataset",
-            "description": "Used to enrich the reference dataset",
-            "visibilityCondition" : "model.edit_type == 'join'"
-        },
-        {
-            "name": "ext_key",
-            "type": "DATASET_COLUMN",
-            "datasetParamName": "ext_dataset",
-            "label": "Key",
-            "visibilityCondition" : "model.edit_type == 'join'"
-        },
-        {
-            "name": "ext_lookup_columns",
-            "type": "DATASET_COLUMNS",
-            "datasetParamName": "ext_dataset",
-            "label": "Lookup columns",
-            "description": "",
-            "visibilityCondition" : "model.edit_type == 'join'"
+            "name": "settings",
+            "label": "Settings",
+            "description": "JSON",
+            "type": "TEXT"
         }
     ],
     "roles": []

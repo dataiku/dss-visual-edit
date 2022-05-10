@@ -7,9 +7,11 @@ What the backend creates:
 3. a recipe that links INPUT and INPUT_changes to INPUT_editable and allows to replay changes
 
 
-## Settings
+## Settings: schema
 
-Common fields:
+To be read by the webapp, in JSON format. Similar in spirit to the settings of a visual webapp as they are stored in a Dataiku project (see JSON file in a Dataiku's project's "web_apps" directory).
+
+Here, the settings are mostly about the schema. Common fields:
 
 * name: name of the field, as it appears in the editable table
 * type: type of the field (identical to a type in a dataset schema)

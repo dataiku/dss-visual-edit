@@ -19,7 +19,7 @@ def parse_schema(schema):
     # First pass at the list of columns
     editable_column_names = []
     linked_records = []
-    for col in schema["columns"]:
+    for col in schema:
         if col.get("editable"):
             editable_column_names.append(col.get("name"))
             if col.get("editable_type")=="linked_record":
@@ -37,7 +37,7 @@ def parse_schema(schema):
                 primary_key_type = col.get("type")
 
     # Second pass to create the lookup columns for each linked record
-    for col in schema["columns"]:
+    for col in schema:
         if col.get("editable_type")=="lookup_column":
             for linked_record in linked_records:
                 if linked_record["name"]==col.get("linked_record_col"):
@@ -70,15 +70,18 @@ os.environ["DKU_CURRENT_PROJECT_KEY"] = project_key
 
 # Define dataset names
 if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
-    settings = get_webapp_config()["settings"] # TODO: create "settings" text parameter in webapp.json
+    input_dataset_name = get_webapp_config()["input_dataset"]
+    schema = json.loads(get_webapp_config()["schema"]) # TODO: create "schema" text parameter in webapp.json
 else:
     f_app = Flask(__name__)
     app = Dash(__name__, server=f_app)
     application = app.server
-    settings = json.load(open("settings-v2.json"))
+    input_dataset_name = "matches"
+    schema = json.load(open("schema-v2.json"))
+    # input_dataset_name = "transactions_categorized_missing"
+    # schema = json.load(open("schema-v1.json"))
 
-input_dataset_name = settings["input_dataset"]
-editable_column_names, linked_records, primary_key, primary_key_type = parse_schema(settings["schema"])
+editable_column_names, linked_records, primary_key, primary_key_type = parse_schema(schema)
 
 
 # 2. Initialize Dataiku client and project
@@ -188,7 +191,7 @@ def update(cell_coordinates, table_data):
     primary_key_value = table_data[row_id][primary_key]
     value = table_data[row_id][column_name]
     # Cast value as appropriate type, based on schema
-    for column in settings["schema"]["columns"]:
+    for column in schema:
         if (column["name"] == column_name):
             if (column["type"] == "int"):
                 value = int(value)
@@ -228,3 +231,4 @@ def update(cell_coordinates, table_data):
 # Run Dash app in debug mode when outside of Dataiku
 if __name__ == "__main__":
     if app: app.run_server(debug=True)
+
