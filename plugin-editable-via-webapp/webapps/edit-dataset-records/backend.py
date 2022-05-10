@@ -70,9 +70,13 @@ os.environ["DKU_CURRENT_PROJECT_KEY"] = project_key
 
 # Define dataset names
 if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
+    print("Webapp is being run in Dataiku")
+    run_context = "dataiku"
     input_dataset_name = get_webapp_config()["input_dataset"]
-    schema = json.loads(get_webapp_config()["schema"]) # TODO: create "schema" text parameter in webapp.json
+    schema = json.loads(get_webapp_config()["schema"])
 else:
+    print("Webapp is being run outside of Dataiku")
+    run_context = "local"
     f_app = Flask(__name__)
     app = Dash(__name__, server=f_app)
     application = app.server
@@ -231,6 +235,7 @@ def update(cell_coordinates, table_data):
 
 
 # Run Dash app in debug mode when outside of Dataiku
-if __name__ == "__main__":
-    if app: app.run_server(debug=True)
-
+if __name__=="__main__":
+    if run_context=="local":
+        print("Running in debug mode")
+        app.run_server(debug=True)
