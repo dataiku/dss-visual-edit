@@ -1,7 +1,7 @@
 {
     "meta": {
         "label": "Edit dataset records",
-        "description": "Webapp to edit records of a dataset and maintain an editlog dataset. A copy of the original dataset is created. A recipe connects all 3 datasets; it allows to replay edits when building the flow.",
+        "description": "Webapp to edit records of a dataset and maintain an editlog dataset.",
         "icon": "icon-th-large",
         "comments": "icon must be one of the FontAwesome 3.2.1 icons, complete list here at https://fontawesome.com/v3.2.1/icons/"
     },
@@ -11,22 +11,11 @@
     "standardWebAppLibraries": null,
     "params": [
         {
-            "name": "input_dataset",
-            "type": "DATASET",
-            "label": "Dataset",
-            "description": "Original dataset to be copied and made editable by the webapp",
-            "mandatory": true
-        },  
-        {
-            "name": "key",
-            "type": "DATASET_COLUMN",
-            "datasetParamName": "input_dataset",
-            "label": "Unique key",
-            "description": "Select a column to use as a unique identifier for rows",
-            "columnRole": "input",
-            "mandatory": true
+            "name": "settings",
+            "label": "Settings",
+            "description": "JSON",
+            "type": "TEXT"
         }
     ],
     "roles": []
 }
-

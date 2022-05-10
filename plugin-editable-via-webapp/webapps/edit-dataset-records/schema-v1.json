@@ -1,0 +1,7 @@
+[
+    {"name": "id", "type": "int", "editable_type": "key", "editable": false},
+    {"name": "date", "type": "date", "editable": false},
+    {"name": "text", "type": "string", "editable": false},
+    {"name": "amount", "type": "double", "editable": false},
+    {"name": "category", "type": "string", "editable": true}
+]
