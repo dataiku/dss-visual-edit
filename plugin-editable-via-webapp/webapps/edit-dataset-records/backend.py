@@ -82,7 +82,7 @@ else:
     # schema = json.load(open("schema-v1.json"))
 
 editable_column_names, linked_records, primary_key, primary_key_type = parse_schema(schema)
-
+print("Schema parsed OK")
 
 # 2. Initialize Dataiku client and project
 
@@ -105,6 +105,7 @@ editlog_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(proj
 if (editlog_ds_creator.already_exists()):
     editlog_ds = dataiku.Dataset(editlog_ds_name, project_key)
 else:
+    print("No editlog found, creating one")
     editlog_schema = [
         {"name": primary_key, "type": primary_key_type},
         {"name": "column_name", "type": "string"},
@@ -118,6 +119,7 @@ else:
     editlog_ds.write_schema(editlog_schema)
 editlog_ds.spec_item["appendMode"] = True # make sure that we append to that dataset (and don't write over it)
 editlog_df = editlog_ds.get_dataframe()
+print("Editlog OK")
 
 
 # Replay edits
@@ -126,7 +128,7 @@ editlog_df = editlog_ds.get_dataframe()
 # sys.path.append('../../python-lib')
 from commons import replay_edits
 editable_df = replay_edits(original_df, editlog_df, primary_key, editable_column_names)
-
+print("Edits replayed OK")
 
 # Get lookup columns
 
@@ -141,7 +143,7 @@ for linked_record in linked_records:
     editable_df = editable_df.join(linked_df, on=linked_record["name"])
     for c in range(0, len(lookup_column_names)):
         editable_df.rename(columns={lookup_column_names_in_linked_ds[c]: lookup_column_names[c]}, inplace=True)
-
+print("Lookup columns OK")
 
 
 # 3.2. Define columns to use in the DataTable component
@@ -218,12 +220,12 @@ def update(cell_coordinates, table_data):
     current_user_settings = client.get_own_user().get_settings().get_raw()
     u = f"""{current_user_settings["displayName"]} <{current_user_settings["email"]}>"""
 
-    message = f"""Updated column {column_name} where {primary_key} is {primary_key_value}.
-                  New value: {value}."""
-    
     # Add to editlog
     edit_df = DataFrame(data={primary_key: [primary_key_value], "column_name": [column_name], "value": [value], "date": [d], "user": [u]})
     editlog_ds.write_dataframe(edit_df)
+
+    message = f"""Updated column {column_name} where {primary_key} is {primary_key_value}. New value: {value}."""
+    print(message)
 
     return message, table_data
 
