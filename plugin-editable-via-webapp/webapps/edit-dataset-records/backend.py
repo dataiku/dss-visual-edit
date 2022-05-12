@@ -18,6 +18,7 @@ def parse_schema(schema):
 
     # First pass at the list of columns
     editable_column_names = []
+    display_column_names = []
     linked_records = []
     for col in schema:
         if col.get("editable"):
@@ -35,6 +36,8 @@ def parse_schema(schema):
             if col.get("editable_type")=="key":
                 primary_key = col.get("name")
                 primary_key_type = col.get("type")
+            else:
+                display_column_names.append(col.get("name"))
 
     # Second pass to create the lookup columns for each linked record
     for col in schema:
@@ -46,7 +49,7 @@ def parse_schema(schema):
                         "linked_ds_column_name": col.get("linked_ds_column_name")
                     })
 
-    return editable_column_names, linked_records, primary_key, primary_key_type
+    return editable_column_names, display_column_names, linked_records, primary_key, primary_key_type
 
 
 # Dash webapp to edit dataset records
@@ -85,8 +88,9 @@ else:
     # input_dataset_name = "transactions_categorized_missing"
     # schema = json.load(open("schema-v1.json"))
 
-editable_column_names, linked_records, primary_key, primary_key_type = parse_schema(schema)
+editable_column_names, display_column_names, linked_records, primary_key, primary_key_type = parse_schema(schema)
 print("Schema parsed OK")
+
 
 # 2. Initialize Dataiku client and project
 
