@@ -97,9 +97,10 @@ print("Schema parsed OK")
 client = dataiku.api_client()
 project = client.get_project(project_key)
 
-original_ds = dataiku.Dataset(input_dataset_name, project_key)
-original_df = original_ds.get_dataframe(limit=100) # TODO: limit only for webapp
-connection_name = original_ds.get_config()['params']['connection'] # name of the connection to the original dataset, to use for the editlog too
+input_ds = dataiku.Dataset(input_dataset_name, project_key)
+input_df = input_ds.get_dataframe(limit=100)
+input_df = input_df[[primary_key] + display_column_names + editable_column_names]
+connection_name = input_ds.get_config()['params']['connection'] # name of the connection to the original dataset, to use for the editlog too
 executor = SQLExecutor2(connection=connection_name)
 
 def get_table_name(dataset):
@@ -135,7 +136,7 @@ print("Editlog OK")
 # when using interactive execution:
 # sys.path.append('../../python-lib')
 from commons import replay_edits
-editable_df = replay_edits(original_df, editlog_df, primary_key, editable_column_names)
+editable_df = replay_edits(input_df, editlog_df, primary_key, editable_column_names)
 print("Edits replayed OK")
 
 # Get lookup columns
@@ -172,15 +173,15 @@ app.layout = html.Div([
             children=dash_table.DataTable(
                 id='editable-table',
                 columns=dash_cols,
+                data=editable_df[pd_cols].to_dict('records'),
+                editable=True,
                 style_cell_conditional=[
                     {
                         'if': {'column_id': c},
                         'backgroundColor': '#d8e3ed'
                     } for c in editable_column_names
                 ],
-                style_as_list_view=True,
-                data=editable_df[pd_cols].to_dict('records'),
-                editable=True
+                style_as_list_view=True
             ),
         ),
         html.Pre(id='output')
