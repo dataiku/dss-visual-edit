@@ -9,7 +9,8 @@ def replay_edits(input_df, editlog_df, primary_key, editable_column_names):
         edited_df = input_df
 
     else:
-        editlog_df.set_index(primary_key, inplace=True)
+        editlog_df.set_index("key", inplace=True)
+        editlog_df.index.names = [primary_key]
 
         # Pivot editlog
         editlog_pivoted_df = pivot_table(editlog_df, index=primary_key, columns="column_name", values="value", aggfunc="last")

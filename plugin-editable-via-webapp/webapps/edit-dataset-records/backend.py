@@ -111,7 +111,7 @@ if (editlog_ds_creator.already_exists()):
 else:
     print("No editlog found, creating one")
     editlog_schema = [
-        {"name": primary_key, "type": primary_key_type},
+        {"name": "key", "type": "string"},
         {"name": "column_name", "type": "string"},
         {"name": "value", "type": "string"},
         {"name": "date", "type": "date"},
