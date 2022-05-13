@@ -1,4 +1,4 @@
-from pandas import pivot_table
+from pandas import DataFrame, concat, pivot_table
 
 
 def replay_edits(input_df, editlog_df, primary_key, editable_column_names):
@@ -13,7 +13,16 @@ def replay_edits(input_df, editlog_df, primary_key, editable_column_names):
         editlog_df.index.names = [primary_key]
 
         # Pivot editlog
-        editlog_pivoted_df = pivot_table(editlog_df, index=primary_key, columns="column_name", values="value", aggfunc="last")
+        all_editable_columns_df = DataFrame(columns=editable_column_names)
+        editlog_pivoted_df = pivot_table(editlog_df,
+                                         index=primary_key,
+                                         columns="column_name",
+                                         values="value",
+                                         aggfunc="last").join(editlog_df[["date"]].groupby("Id").last())
+        editlog_pivoted_df = concat([all_editable_columns_df, ])
+        # Change types of columns to match input_df?
+        # for col in editlog_pivoted_df.columns.tolist():
+        #     editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(input_df[col].dtype)
 
         # Join -> this adds _value_last columns
         edited_df = input_df.join(editlog_pivoted_df, rsuffix="_value_last")
