@@ -202,11 +202,6 @@ def update(cell_coordinates, table_data):
     column_name = cell_coordinates["column_id"]
     primary_key_value = table_data[row_id][primary_key]
     value = table_data[row_id][column_name]
-    # Cast value as appropriate type, based on schema
-    for column in schema:
-        if (column["name"] == column_name):
-            if (column["type"] == "int"):
-                value = int(value)
     
     # Update table data if a linked record was edited: refresh corresponding lookup columns
     for linked_record in linked_records:
@@ -234,7 +229,13 @@ def update(cell_coordinates, table_data):
     u = f"""{current_user_settings["displayName"]} <{current_user_settings["email"]}>"""
 
     # Add to editlog
-    edit_df = DataFrame(data={primary_key: [primary_key_value], "column_name": [column_name], "value": [value], "date": [d], "user": [u]})
+    # if the type of column_name is a boolean, make sure we read it correctly
+    for col in schema:
+        if (col["name"]==column_name):
+            if (col["type"]=="bool"):
+                value = str(json.loads(value.lower()))
+            break
+    edit_df = DataFrame(data={"key": [str(primary_key_value)], "column_name": [column_name], "value": [str(value)], "date": [d], "user": [u]})
     editlog_ds.write_dataframe(edit_df)
 
     message = f"""Updated column {column_name} where {primary_key} is {primary_key_value}. New value: {value}."""
