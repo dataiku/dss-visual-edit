@@ -27,6 +27,7 @@ def parse_schema(schema):
                 linked_records.append(
                     {
                         "name": col.get("name"),
+                        "type": col.get("type"),
                         "ds_name": col.get("linked_ds_name"),
                         "ds_key": col.get("linked_ds_key"),
                         "lookup_columns": []
@@ -218,7 +219,10 @@ def update(cell_coordinates, table_data):
             
             linked_ds = dataiku.Dataset(linked_record["ds_name"], project_key)
             linked_df = linked_ds.get_dataframe().set_index(linked_record["ds_key"])[lookup_column_names_in_linked_ds]
-            select_df = linked_df.loc[linked_df.index==value]
+            value_cast = value
+            if (linked_record["type"] == "int"):
+                value_cast = int(value)
+            select_df = linked_df.loc[linked_df.index==value_cast]
 
             # Update table_data with these values — note that column names are different in table_data and in the linked record's table
             for lookup_column in linked_record["lookup_columns"]:
