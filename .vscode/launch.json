@@ -13,7 +13,8 @@
             "env": {
                 "FLASK_APP": "backend.py",
                 "FLASK_ENV": "development",
-                "PYTHONPATH": "../../python-lib"
+                "PYTHONPATH": "../../python-lib",
+                "EDIT_DATASET_RECORDS_SETTINGS": "example-settings/settings-freefloat.json"
             },
             "args": [
                 "run",

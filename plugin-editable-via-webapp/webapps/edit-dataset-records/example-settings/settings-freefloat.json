@@ -1,0 +1,12 @@
+{
+    "project_key": "STAKEHOLDER_OWNERSHIP",
+    "input_dataset": "stakeholders_tbc_prepared",
+    "schema": [
+        {"name": "Id", "type": "int", "editable_type": "key", "editable": false},
+        {"name": "Stakeholder Name", "type": "string", "editable": false},
+        {"name": "Security Name", "type": "string", "editable": false},
+        {"name": "1) Position is Free Float? (TRUE/FALSE)", "type": "bool", "editable": true},
+        {"name": "In case 1) = FALSE then 2) Shares in FS Correct? (TRUE/FALSE)", "type": "bool", "editable": true},
+        {"name": "In case 2) = FALSE then 3) Fill in shares manually", "type": "string", "editable": true}
+    ]
+}

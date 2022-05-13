@@ -65,29 +65,24 @@ def parse_schema(schema):
 
 # 1. Get webapp settings
 
-# Define project key
-project_key = os.getenv("DKU_CURRENT_PROJECT_KEY")
-if (not project_key or project_key==""):
-    # project_key = "CATEGORIZE_TRANSACTIONS"
-    project_key = "JOIN_COMPANIES"
-os.environ["DKU_CURRENT_PROJECT_KEY"] = project_key
-
 # Define dataset names
 if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     print("Webapp is being run in Dataiku")
     run_context = "dataiku"
+    project_key = os.getenv("DKU_CURRENT_PROJECT_KEY")
     input_dataset_name = get_webapp_config()["input_dataset"]
     schema = json.loads(get_webapp_config()["schema"])
 else:
     print("Webapp is being run outside of Dataiku")
     run_context = "local"
+    settings = json.load(open(os.getenv("EDIT_DATASET_RECORDS_SETTINGS")))
+    project_key = settings["project_key"]
+    os.environ["DKU_CURRENT_PROJECT_KEY"] = project_key # just in case
+    input_dataset_name = settings["input_dataset"]
+    schema = settings["schema"]
     f_app = Flask(__name__)
     app = Dash(__name__, server=f_app)
     application = app.server
-    input_dataset_name = "matches"
-    schema = json.load(open("schema-v2.json"))
-    # input_dataset_name = "transactions_categorized_missing"
-    # schema = json.load(open("schema-v1.json"))
 
 editable_column_names, display_column_names, linked_records, primary_key, primary_key_type = parse_schema(schema)
 print("Schema parsed OK")
@@ -202,7 +197,7 @@ def update(cell_coordinates, table_data):
     column_name = cell_coordinates["column_id"]
     primary_key_value = table_data[row_id][primary_key]
     value = table_data[row_id][column_name]
-    
+
     # Update table data if a linked record was edited: refresh corresponding lookup columns
     for linked_record in linked_records:
         if (column_name==linked_record["name"]):
@@ -227,7 +222,7 @@ def update(cell_coordinates, table_data):
     d = datetime.date.today()
     current_user_settings = client.get_own_user().get_settings().get_raw()
     u = f"""{current_user_settings["displayName"]} <{current_user_settings["email"]}>"""
-
+    
     # Add to editlog
     # if the type of column_name is a boolean, make sure we read it correctly
     for col in schema:
