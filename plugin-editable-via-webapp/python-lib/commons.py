@@ -14,7 +14,7 @@ def replay_edits(input_df, editlog_df, primary_key, editable_column_names):
 
         # Pivot editlog
         all_editable_columns_df = DataFrame(columns=editable_column_names)
-        editlog_pivoted_df = pivot_table(editlog_df,
+        editlog_pivoted_df = pivot_table(editlog_df.sort_values("date"),
                                          index=primary_key,
                                          columns="column_name",
                                          values="value",
