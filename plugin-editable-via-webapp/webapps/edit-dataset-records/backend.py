@@ -8,7 +8,7 @@ from dash import dash_table, html, Dash
 from dash.dependencies import Input, Output, State
 from flask import Flask
 from pandas import DataFrame
-import datetime
+import datetime, pytz
 import os
 import json
 
@@ -219,7 +219,9 @@ def update(cell_coordinates, table_data):
                 table_data[row_id][lookup_column["name"]] = select_df[lookup_column["linked_ds_column_name"]].iloc[0]
 
     # Set the date of the change and the user behind it
-    d = datetime.date.today()
+    tz = pytz.timezone("UTC")
+    d = datetime.datetime.now(tz).strftime("%Y-%m-%d %H:%M:%S")
+
     current_user_settings = client.get_own_user().get_settings().get_raw()
     u = f"""{current_user_settings["displayName"]} <{current_user_settings["email"]}>"""
     
