@@ -27,8 +27,7 @@
             "description": "Contains the data to be made editable via webapp",
             "arity": "UNARY",
             "required": true,
-            "acceptsDataset": true,
-            "mustBeSQL": true
+            "acceptsDataset": true
         },
         {
             "name": "editlog",
@@ -47,8 +46,7 @@
             "description": "",
             "arity": "UNARY",
             "required": true,
-            "acceptsDataset": true,
-            "mustBeSQL": true
+            "acceptsDataset": true
         }
     ],
 
