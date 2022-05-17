@@ -229,7 +229,7 @@ def update(cell_coordinates, table_data):
     # if the type of column_name is a boolean, make sure we read it correctly
     for col in schema:
         if (col["name"]==column_name):
-            if (col["type"]=="bool"):
+            if (col["type"]=="bool" or col["type"]=="boolean"):
                 value = str(json.loads(value.lower()))
             break
     edit_df = DataFrame(data={"key": [str(primary_key_value)], "column_name": [column_name], "value": [str(value)], "date": [d], "user": [u]})
