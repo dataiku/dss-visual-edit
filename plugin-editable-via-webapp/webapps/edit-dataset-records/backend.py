@@ -11,6 +11,51 @@ from pandas import DataFrame
 import datetime, pytz
 import os
 import json
+import commons
+
+
+
+
+# Dash webapp to edit dataset records
+# TODO: update this description
+# This code is structured as follows:
+# 1. Access parameters that end-users filled in using webapp config
+# 2. Initialize Dataiku client and project
+# 3. Create change log dataset and editable dataset, if they don't already exist
+# 5. Define the layout of the webapp and the DataTable component
+# 6. Define the callback function that updates the editable and change log when cell values get edited
+
+
+# 0. Init: get webapp settings, Dataiku client and project
+
+if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
+    print("Webapp is being run in Dataiku")
+    run_context = "dataiku"
+    project_key = os.getenv("DKU_CURRENT_PROJECT_KEY")
+
+    # get parameters from webapp config (specific to the current webapp)
+    input_dataset_name = get_webapp_config()["input_dataset"]
+    schema = json.loads(get_webapp_config()["schema"])
+    
+else:
+    print("Webapp is being run outside of Dataiku")
+    run_context = "local"
+    settings = json.load(open(os.getenv("EDIT_DATASET_RECORDS_SETTINGS"))) # define this env variable in VS Code launch config and have it point to a settings file that contains the project key
+    project_key = settings["project_key"]
+    os.environ["DKU_CURRENT_PROJECT_KEY"] = project_key # just in case
+
+    # get parameters from settings file (specific to the current webapp)
+    input_dataset_name = settings["input_dataset"]
+    schema = settings["schema"]
+
+    # instantiate Dash
+    f_app = Flask(__name__)
+    app = Dash(__name__, server=f_app)
+    application = app.server
+
+client = dataiku.api_client()
+project = client.get_project(project_key)
+
 
 
 def parse_schema(schema):
@@ -52,55 +97,12 @@ def parse_schema(schema):
 
     return editable_column_names, display_column_names, linked_records, primary_key, primary_key_type
 
-
-# Dash webapp to edit dataset records
-# This code is structured as follows:
-# 1. Access parameters that end-users filled in using webapp config
-# 2. Initialize Dataiku client and project
-# 3. Create change log dataset and editable dataset, if they don't already exist
-# 4. Initialize the SQL executor and name of table to edit
-# 5. Define the layout of the webapp and the DataTable component
-# 6. Define the callback function that updates the editable and change log when cell values get edited
-
-
-# 1. Get webapp settings
-
-# Define dataset names
-if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
-    print("Webapp is being run in Dataiku")
-    run_context = "dataiku"
-    project_key = os.getenv("DKU_CURRENT_PROJECT_KEY")
-    input_dataset_name = get_webapp_config()["input_dataset"]
-    schema = json.loads(get_webapp_config()["schema"])
-else:
-    print("Webapp is being run outside of Dataiku")
-    run_context = "local"
-    settings = json.load(open(os.getenv("EDIT_DATASET_RECORDS_SETTINGS")))
-    project_key = settings["project_key"]
-    os.environ["DKU_CURRENT_PROJECT_KEY"] = project_key # just in case
-    input_dataset_name = settings["input_dataset"]
-    schema = settings["schema"]
-    f_app = Flask(__name__)
-    app = Dash(__name__, server=f_app)
-    application = app.server
-
 editable_column_names, display_column_names, linked_records, primary_key, primary_key_type = parse_schema(schema)
 print("Schema parsed OK")
-
-
-# 2. Initialize Dataiku client and project
-
-client = dataiku.api_client()
-project = client.get_project(project_key)
-
 input_ds = dataiku.Dataset(input_dataset_name, project_key)
 input_df = input_ds.get_dataframe(limit=100)
 input_df = input_df[[primary_key] + display_column_names + editable_column_names]
 connection_name = input_ds.get_config()['params']['connection'] # name of the connection to the original dataset, to use for the editlog too
-executor = SQLExecutor2(connection=connection_name)
-
-def get_table_name(dataset):
-    return dataset.get_config()["params"]["table"].replace("${projectKey}", project_key).replace("${NODE}", dataiku.get_custom_variables().get("NODE"))
 
 
 # 3.1. Create editlog, if it doesn't already exist
@@ -131,8 +133,7 @@ print("Editlog OK")
 
 # when using interactive execution:
 # sys.path.append('../../python-lib')
-from commons import replay_edits
-editable_df = replay_edits(input_df, editlog_df, primary_key, editable_column_names)
+editable_df = commons.replay_edits(input_df, editlog_df, primary_key, editable_column_names)
 print("Edits replayed OK")
 
 # Get lookup columns
@@ -246,3 +247,5 @@ if __name__=="__main__":
     if run_context=="local":
         print("Running in debug mode")
         app.run_server(debug=True)
+
+print("Webapp OK")

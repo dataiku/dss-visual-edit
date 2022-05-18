@@ -1,24 +1,51 @@
 from pandas import DataFrame, concat, pivot_table
 
+def get_editlog_schema():
+    return [
+        {"name": "date", "type": "string", "meaning": "DateSource"}, # not using date type, in case the editlog is CSV TODO: make sure that it's read as a date in the replay recipe
+        {"name": "user", "type": "string", "meaning": "Text"},
+        {"name": "key", "type": "string"},
+        {"name": "column_name", "type": "string", "meaning": "Text"},
+        {"name": "value", "type": "string"}
+    ]
 
-def replay_edits(input_df, editlog_df, primary_key, editable_column_names):
+def get_editlog_columns():
+    return ["date", "user", "key", "column_name", "value"]
 
-    input_df.set_index(primary_key, inplace=True)
+def get_editlog_df(editlog_ds):
+    # Try to get dataframe from editlog dataset, if it's not empty. Otherwise, create empty dataframe.
+    try:
+        editlog_df = editlog_ds.get_dataframe()
+    except:
+        editlog_df = DataFrame(columns=get_editlog_columns())
+    return editlog_df
 
+def get_table_name(dataset):
+    return dataset.get_config()["params"]["table"].replace("${projectKey}", project_key).replace("${NODE}", dataiku.get_custom_variables().get("NODE"))
+
+def pivot_editlog(editlog_df):
     if (not editlog_df.size): # i.e. if empty editlog
-        edited_df = input_df
-
+        editlog_pivoted_df = editlog_df
     else:
         editlog_df.set_index("key", inplace=True)
+        # For each named column, we only keep the last value
+        editlog_pivoted_df = pivot_table(
+            editlog_df.sort_values("date"), # ordering by edit date
+            index="key",
+            columns="column_name",
+            values="value",
+            aggfunc="last").join(
+                editlog_df[["date"]].groupby("key").last() # join the last edit date for each key
+                )
+    return editlog_pivoted_df.reset_index()
 
-        # Pivot editlog
-        # For each named column (from the edited dataset), we only keep the last value (ordering by edit date)
-        editlog_pivoted_df = pivot_table(editlog_df.sort_values("date"),
-                                         index="key",
-                                         columns="column_name",
-                                         values="value",
-                                         aggfunc="last").join(editlog_df[["date"]].groupby("key").last())
-        
+def replay_edits(input_df, editlog_df, primary_key, editable_column_names):
+    input_df.set_index(primary_key, inplace=True)
+    if (not editlog_df.size): # i.e. if empty editlog
+        edited_df = input_df
+    else:
+        editlog_pivoted_df = pivot_editlog(editlog_df).set_index("key")
+
         # We don't need the date column in the rest
         editlog_pivoted_df = editlog_pivoted_df.drop(columns=["date"])
         

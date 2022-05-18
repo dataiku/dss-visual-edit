@@ -1,6 +1,6 @@
 import dataiku
 from dataiku.customrecipe import *
-from commons import replay_edits
+import commons
 
 # TODO: this recipe should be created by the webapp and given the webapp ID as a parameter, so it can then use the Dataiku API to figure out the webapp's settings, which includes the primary_key
 primary_key = get_recipe_config()['primary_key']
@@ -26,5 +26,5 @@ editlog_df = editlog_ds.get_dataframe()
 edited_ds.write_schema(input_ds.read_schema()) # otherwise column type for columns of missing values might change
 
 # Write output data
-edited_df = replay_edits(input_df, editlog_df, primary_key, editable_column_names)
+edited_df = commons.replay_edits(input_df, editlog_df, primary_key, editable_column_names)
 edited_ds.write_dataframe(edited_df)
