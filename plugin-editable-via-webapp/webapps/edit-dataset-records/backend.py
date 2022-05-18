@@ -14,19 +14,20 @@ import json
 import commons
 
 
-
-
 # Dash webapp to edit dataset records
 # TODO: update this description
 # This code is structured as follows:
-# 1. Access parameters that end-users filled in using webapp config
-# 2. Initialize Dataiku client and project
-# 3. Create change log dataset and editable dataset, if they don't already exist
-# 5. Define the layout of the webapp and the DataTable component
-# 6. Define the callback function that updates the editable and change log when cell values get edited
+# 0. Init: get webapp settings, Dataiku client, and project
+# 1. Parse edit schema
+# 2. Load input dataset
+# 3. Load/create editlog dataset
+# 4. Replay edits
+# 5. Add lookup columns
+# 6. Define the webapp layout and its DataTable
+# 7. Define the callback function that updates the editlog when cell values get edited
 
 
-# 0. Init: get webapp settings, Dataiku client and project
+# 0. Init: get webapp settings, Dataiku client, and project
 
 if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     print("Webapp is being run in Dataiku")
@@ -36,7 +37,7 @@ if (os.getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     # get parameters from webapp config (specific to the current webapp)
     input_dataset_name = get_webapp_config()["input_dataset"]
     schema = json.loads(get_webapp_config()["schema"])
-    
+
 else:
     print("Webapp is being run outside of Dataiku")
     run_context = "local"
@@ -57,6 +58,7 @@ client = dataiku.api_client()
 project = client.get_project(project_key)
 
 
+# 1. Parse edit schema
 
 def parse_schema(schema):
     """Parse editable schema"""
@@ -99,13 +101,17 @@ def parse_schema(schema):
 
 editable_column_names, display_column_names, linked_records, primary_key, primary_key_type = parse_schema(schema)
 print("Schema parsed OK")
+
+
+# 2. Load input dataset
+
 input_ds = dataiku.Dataset(input_dataset_name, project_key)
 input_df = input_ds.get_dataframe(limit=100)
 input_df = input_df[[primary_key] + display_column_names + editable_column_names]
-connection_name = input_ds.get_config()['params']['connection'] # name of the connection to the original dataset, to use for the editlog too
+print("Input dataset OK")
 
 
-# 3.1. Create editlog, if it doesn't already exist
+# 3. Load/create editlog dataset
 
 editlog_ds_name = input_dataset_name + "_editlog"
 editlog_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, editlog_ds_name)
@@ -114,6 +120,7 @@ if (editlog_ds_creator.already_exists()):
     editlog_df = editlog_ds.get_dataframe()
 else:
     print("No editlog found, creating one")
+    connection_name = input_ds.get_config()['params']['connection'] # name of the connection to the original dataset, to use for the editlog too
     editlog_ds_creator.with_store_into(connection=connection_name)
     editlog_ds_creator.create()
     editlog_ds = dataiku.Dataset(editlog_ds_name)
@@ -124,14 +131,15 @@ editlog_ds.spec_item["appendMode"] = True # make sure that we append to that dat
 print("Editlog OK")
 
 
-# Replay edits
+# 4. Replay edits
 
 # when using interactive execution:
 # sys.path.append('../../python-lib')
 editable_df = commons.replay_edits(input_df, editlog_df, primary_key, editable_column_names)
 print("Edits replayed OK")
 
-# Get lookup columns
+
+# 5. Add lookup columns
 
 for linked_record in linked_records:
     lookup_column_names = []
@@ -147,14 +155,11 @@ for linked_record in linked_records:
 print("Lookup columns OK")
 
 
-# 3.2. Define columns to use in the DataTable component
+# 6. Define the webapp layout and its DataTable
 
 pd_cols = editable_df.columns.tolist()
-# pd_cols.insert(0, primary_key)
-dash_cols = ([{"name": i, "id": i} for i in pd_cols]) # columns for dash
-
-
-# 5. Define the layout of the webapp
+dt_cols = ([{"name": i, "id": i} for i in pd_cols]) # columns for DataTable
+dt_data = editable_df[pd_cols].to_dict('records') # data for DataTable
 
 app.layout = html.Div([
     html.H3("Edit"),
@@ -164,8 +169,8 @@ app.layout = html.Div([
         html.Div(
             children=dash_table.DataTable(
                 id='editable-table',
-                columns=dash_cols,
-                data=editable_df[pd_cols].to_dict('records'),
+                columns=dt_cols,
+                data=dt_data,
                 editable=True,
                 style_cell_conditional=[
                     {
@@ -181,7 +186,7 @@ app.layout = html.Div([
 ])
 
 
-# 6. Define the callback function that updates the editlog when cell values get edited
+# 7. Define the callback function that updates the editlog when cell values get edited
 
 @app.callback([Output('output', 'children'),
                Output('editable-table', 'data')],
@@ -238,6 +243,7 @@ def update(cell_coordinates, table_data):
 
 
 # Run Dash app in debug mode when outside of Dataiku
+
 if __name__=="__main__":
     if run_context=="local":
         print("Running in debug mode")
