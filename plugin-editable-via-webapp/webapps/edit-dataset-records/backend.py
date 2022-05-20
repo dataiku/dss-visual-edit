@@ -115,18 +115,18 @@ print("Input dataset OK")
 
 editlog_ds_name = input_dataset_name + "_editlog"
 editlog_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, editlog_ds_name)
+
 if (editlog_ds_creator.already_exists()):
+    print("Found editlog")
     editlog_ds = dataiku.Dataset(editlog_ds_name, project_key)
-    editlog_df = editlog_ds.get_dataframe()
 else:
     print("No editlog found, creating one")
     connection_name = input_ds.get_config()['params']['connection'] # name of the connection to the original dataset, to use for the editlog too
     editlog_ds_creator.with_store_into(connection=connection_name)
     editlog_ds_creator.create()
     editlog_ds = dataiku.Dataset(editlog_ds_name)
-    editlog_df = DataFrame(columns=commons.get_editlog_columns())
-    editlog_ds.write_schema(commons.get_editlog_schema())
-    editlog_ds.write_dataframe(editlog_df)
+
+editlog_df = commons.get_editlog_df(editlog_ds)
 editlog_ds.spec_item["appendMode"] = True # make sure that we append to that dataset (and don't write over it)
 print("Editlog OK")
 

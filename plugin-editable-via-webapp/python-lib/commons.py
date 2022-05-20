@@ -18,6 +18,8 @@ def get_editlog_df(editlog_ds):
         editlog_df = editlog_ds.get_dataframe()
     except:
         editlog_df = DataFrame(columns=get_editlog_columns())
+        editlog_ds.write_schema(get_editlog_schema())
+        editlog_ds.write_dataframe(editlog_df)
     return editlog_df
 
 def get_table_name(dataset):

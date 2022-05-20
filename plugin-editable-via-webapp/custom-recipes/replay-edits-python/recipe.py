@@ -20,7 +20,7 @@ edited_ds = edited_datasets[0]
 
 # Read input data
 input_df = input_ds.get_dataframe()
-editlog_df = editlog_ds.get_dataframe()
+editlog_df = commons.get_editlog_df(editlog_ds)
 
 # Write output schema
 edited_ds.write_schema(input_ds.read_schema()) # otherwise column type for columns of missing values might change
