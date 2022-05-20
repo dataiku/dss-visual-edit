@@ -12,19 +12,18 @@ import datetime, pytz
 import os
 import json
 import commons
+# when using interactive execution:
+# sys.path.append('../../python-lib')
 
 
 # Dash webapp to edit dataset records
 # TODO: update this description
 # This code is structured as follows:
 # 0. Init: get webapp settings, Dataiku client, and project
-# 1. Parse edit schema
-# 2. Load input dataset
-# 3. Load/create editlog dataset
-# 4. Replay edits
-# 5. Add lookup columns
-# 6. Define the webapp layout and its DataTable
-# 7. Define the callback function that updates the editlog when cell values get edited
+# 1. Parse edit schema, load input and editlog dataframes
+# 2. Create editable_df used in the webapp's DataTable
+# 3. Define the webapp layout and its DataTable
+# 4. Define the callback function that updates the editlog when cell values get edited
 
 
 # 0. Init: get webapp settings, Dataiku client, and project
@@ -58,104 +57,30 @@ client = dataiku.api_client()
 project = client.get_project(project_key)
 
 
-# 1. Parse edit schema
+# 1. Parse edit schema, load input and editlog dataframes
 
-def parse_schema(schema):
-    """Parse editable schema"""
-
-    # First pass at the list of columns
-    editable_column_names = []
-    display_column_names = []
-    linked_records = []
-    for col in schema:
-        if col.get("editable"):
-            editable_column_names.append(col.get("name"))
-            if col.get("editable_type")=="linked_record":
-                linked_records.append(
-                    {
-                        "name": col.get("name"),
-                        "type": col.get("type"),
-                        "ds_name": col.get("linked_ds_name"),
-                        "ds_key": col.get("linked_ds_key"),
-                        "lookup_columns": []
-                    }
-                )
-        else:
-            if col.get("editable_type")=="key":
-                primary_key = col.get("name")
-                primary_key_type = col.get("type")
-            else:
-                display_column_names.append(col.get("name"))
-
-    # Second pass to create the lookup columns for each linked record
-    for col in schema:
-        if col.get("editable_type")=="lookup_column":
-            for linked_record in linked_records:
-                if linked_record["name"]==col.get("linked_record_col"):
-                    linked_record["lookup_columns"].append({
-                        "name": col.get("name"),
-                        "linked_ds_column_name": col.get("linked_ds_column_name")
-                    })
-
-    return editable_column_names, display_column_names, linked_records, primary_key, primary_key_type
-
-editable_column_names, display_column_names, linked_records, primary_key, primary_key_type = parse_schema(schema)
-print("Schema parsed OK")
-
-
-# 2. Load input dataset
+editable_column_names, display_column_names, linked_records, primary_key, primary_key_type = commons.parse_schema(schema)
 
 input_ds = dataiku.Dataset(input_dataset_name, project_key)
 input_df = input_ds.get_dataframe(limit=100)
 input_df = input_df[[primary_key] + display_column_names + editable_column_names]
-print("Input dataset OK")
+
+editlog_ds, editlog_df = commons.get_editlog(input_dataset_name)
 
 
-# 3. Load/create editlog dataset
+# 2. Create editable_df used in the webapp's DataTable:
+#    -> Replay edits on input dataset
+#    -> Add lookup columns
 
-editlog_ds_name = input_dataset_name + "_editlog"
-editlog_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, editlog_ds_name)
-
-if (editlog_ds_creator.already_exists()):
-    print("Found editlog")
-    editlog_ds = dataiku.Dataset(editlog_ds_name, project_key)
-else:
-    print("No editlog found, creating one")
-    connection_name = input_ds.get_config()['params']['connection'] # name of the connection to the original dataset, to use for the editlog too
-    editlog_ds_creator.with_store_into(connection=connection_name)
-    editlog_ds_creator.create()
-    editlog_ds = dataiku.Dataset(editlog_ds_name)
-
-editlog_df = commons.get_editlog_df(editlog_ds)
-editlog_ds.spec_item["appendMode"] = True # make sure that we append to that dataset (and don't write over it)
-print("Editlog OK")
-
-
-# 4. Replay edits
-
-# when using interactive execution:
-# sys.path.append('../../python-lib')
 editable_df = commons.replay_edits(input_df, editlog_df, primary_key, editable_column_names)
 print("Edits replayed OK")
+editable_df = commons.add_lookup_columns(editable_df, linked_records)
 
 
-# 5. Add lookup columns
+# 3. Define the webapp layout and its DataTable
 
-for linked_record in linked_records:
-    lookup_column_names = []
-    lookup_column_names_in_linked_ds = []
-    for lookup_column in linked_record["lookup_columns"]:
-        lookup_column_names.append(lookup_column["name"])
-        lookup_column_names_in_linked_ds.append(lookup_column["linked_ds_column_name"])
-    linked_ds = dataiku.Dataset(linked_record["ds_name"], project_key)
-    linked_df = linked_ds.get_dataframe().set_index(linked_record["ds_key"])[lookup_column_names_in_linked_ds]
-    editable_df = editable_df.join(linked_df, on=linked_record["name"])
-    for c in range(0, len(lookup_column_names)):
-        editable_df.rename(columns={lookup_column_names_in_linked_ds[c]: lookup_column_names[c]}, inplace=True)
-print("Lookup columns OK")
-
-
-# 6. Define the webapp layout and its DataTable
+eds = EditableDataset(input_dataset_name, schema)
+editable_df = eds.get_editable_df()
 
 pd_cols = editable_df.columns.tolist()
 dt_cols = ([{"name": i, "id": i} for i in pd_cols]) # columns for DataTable
@@ -186,7 +111,7 @@ app.layout = html.Div([
 ])
 
 
-# 7. Define the callback function that updates the editlog when cell values get edited
+# 4. Define the callback function that updates the editlog when cell values get edited
 
 @app.callback([Output('output', 'children'),
                Output('editable-table', 'data')],
@@ -203,39 +128,13 @@ def update(cell_coordinates, table_data):
     for linked_record in linked_records:
         if (column_name==linked_record["name"]):
             # Retrieve values of the lookup columns from the linked dataset, for the row corresponding to the edited value (linked_record["ds_key"]==value)
-            # IDEA: add linked_record["linked_key"] as an INDEX to speed up the query
-            lookup_column_names_in_linked_ds = []
-            for lookup_column in linked_record["lookup_columns"]:
-                lookup_column_names_in_linked_ds.append(lookup_column["linked_ds_column_name"])
-            
-            linked_ds = dataiku.Dataset(linked_record["ds_name"], project_key)
-            linked_df = linked_ds.get_dataframe().set_index(linked_record["ds_key"])[lookup_column_names_in_linked_ds]
-            value_cast = value
-            if (linked_record["type"] == "int"):
-                value_cast = int(value)
-            select_df = linked_df.loc[linked_df.index==value_cast]
-
+            df = commons.get_lookup_values(linked_record, value)
             # Update table_data with these values — note that column names are different in table_data and in the linked record's table
             for lookup_column in linked_record["lookup_columns"]:
-                table_data[row_id][lookup_column["name"]] = select_df[lookup_column["linked_ds_column_name"]].iloc[0]
-
-    # Set the date of the change and the user behind it
-    tz = pytz.timezone("UTC")
-    d = datetime.datetime.now(tz).strftime("%Y-%m-%d %H:%M:%S")
+                table_data[row_id][lookup_column["name"]] = df[lookup_column["linked_ds_column_name"]].iloc[0]
 
     current_user_settings = client.get_own_user().get_settings().get_raw()
-    u = f"""{current_user_settings["displayName"]} <{current_user_settings["email"]}>"""
-    
-    # Add to editlog
-    # if the type of column_name is a boolean, make sure we read it correctly
-    for col in schema:
-        if (col["name"]==column_name):
-            if (col["type"]=="bool" or col["type"]=="boolean"):
-                value = str(json.loads(value.lower()))
-            break
-    edit_df = DataFrame(data={"key": [str(primary_key_value)], "column_name": [column_name], "value": [str(value)], "date": [d], "user": [u]})
-    editlog_ds.write_dataframe(edit_df)
-
+    eds.append_edit(column_name, value, current_user_settings)
     message = f"""Updated column {column_name} where {primary_key} is {primary_key_value}. New value: {value}."""
     print(message)
 
