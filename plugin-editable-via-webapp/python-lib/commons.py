@@ -55,7 +55,8 @@ def pivot_editlog(editlog_df, editable_column_names):
     # Create empty dataframe that has all editable columns
     # This will help make sure that the pivoted editlog always has the right schema
     # (even if some columns of the input dataset were never edited)
-    all_editable_columns_df = DataFrame(columns=editable_column_names.append("date"))
+    editable_column_names.append("date")
+    all_editable_columns_df = DataFrame(columns=editable_column_names)
 
     if (not editlog_df.size): # i.e. if empty editlog
         editlog_pivoted_df = all_editable_columns_df
