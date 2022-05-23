@@ -100,17 +100,37 @@ def replay_edits(input_df, editlog_df, primary_key, editable_column_names):
 
     return edited_df.reset_index()
 
+def get_editable_column_names(schema):
+    editable_column_names = []
+    for col in schema:
+        if col.get("editable"):
+            editable_column_names.append(col.get("name"))
+    return editable_column_names
+
+def get_primary_key(schema):
+    for col in schema:
+        if col.get("editable_type")=="key":
+            return col.get("name"), col.get("type")
+
+def get_webapp_json(webapp_ID):
+    project_key = getenv("DKU_CURRENT_PROJECT_KEY")
+    return loads(
+        requests.get(
+            url="http://127.0.0.1:" + dataiku.base.remoterun.get_env_var("DKU_BASE_PORT") + "public/api/projects/" + project_key + "/webapps/" + webapp_ID,
+            headers=dataiku.core.intercom.get_auth_headers()
+        ).text
+)
 class EditableEventSourced:
     def _parse_schema(self):
         """Parse editable schema"""
 
         # First pass at the list of columns
-        self.editable_column_names = []
+        self.editable_column_names = get_editable_column_names(self.schema)
+        self.primary_key, self.primary_key_type = get_primary_key(self.schema)
         self.display_column_names = []
         self.linked_records = []
         for col in self.schema:
             if col.get("editable"):
-                self.editable_column_names.append(col.get("name"))
                 if col.get("editable_type")=="linked_record":
                     self.linked_records.append(
                         {
@@ -122,10 +142,7 @@ class EditableEventSourced:
                         }
                     )
             else:
-                if col.get("editable_type")=="key":
-                    self.primary_key = col.get("name")
-                    self.primary_key_type = col.get("type")
-                else:
+                if col.get("editable_type")!="key":
                     self.display_column_names.append(col.get("name"))
 
         # Second pass to create the lookup columns for each linked record

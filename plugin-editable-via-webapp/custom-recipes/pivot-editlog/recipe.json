@@ -25,6 +25,13 @@
             "acceptsDataset": true
         }
     ],
-    "params": [],
+    "params": [
+        {
+            "name": "webapp_ID",
+            "label": "Webapp ID",
+            "description": "Do not edit!",
+            "type": "TEXT"
+        }
+    ],
     "resourceKeys": []
 }

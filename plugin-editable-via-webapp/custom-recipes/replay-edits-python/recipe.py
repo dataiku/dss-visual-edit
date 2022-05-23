@@ -1,10 +1,12 @@
 import dataiku
 from dataiku.customrecipe import *
 import commons
+from json import loads
 
-# TODO: this recipe should be created by the webapp and given the webapp ID as a parameter, so it can then use the Dataiku API to figure out the webapp's settings, which includes the primary_key
-primary_key = get_recipe_config()['primary_key']
-editable_column_names = get_recipe_config()['editable_column_names'] # this can be obtained by grouping the editlog by column_name
+# TODO: this recipe should be created by the webapp
+webapp_json = commons.get_webapp_json(get_recipe_config()['webapp_ID'])
+schema = loads(webapp_json["config"]["schema"])
+primary_key = commons.get_primary_key(schema)
 
 input_names = get_input_names_for_role('input')
 input_datasets = [dataiku.Dataset(name) for name in input_names]
