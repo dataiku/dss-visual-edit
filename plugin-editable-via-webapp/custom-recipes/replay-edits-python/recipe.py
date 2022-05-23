@@ -1,12 +1,19 @@
 import dataiku
 from dataiku.customrecipe import *
-import commons
 from json import loads
+
+# when using interactive execution:
+# import sys
+# sys.path.append('../../python-lib')
+
+import commons
+
 
 # TODO: this recipe should be created by the webapp
 webapp_json = commons.get_webapp_json(get_recipe_config()['webapp_ID'])
+# input_dataset_name = webapp_json["config"]["input_dataset"] # alternative way to get input dataset
 schema = loads(webapp_json["config"]["schema"])
-primary_key = commons.get_primary_key(schema)
+primary_key, _ = commons.get_primary_key(schema)
 
 input_names = get_input_names_for_role('input')
 input_datasets = [dataiku.Dataset(name) for name in input_names]

@@ -190,8 +190,7 @@ class EditableEventSourced:
                                     merge_edits(
                                         self.input_df,
                                         pivot_editlog(self.editlog_df, self.editable_column_names),
-                                        self.primary_key,
-                                        self.editable_column_names
+                                        self.primary_key
                                     )
                             )
 
@@ -247,7 +246,6 @@ class EditableEventSourced:
 
     def get_editlog_ds(self):
         return self.editlog_ds
-
 
 
 ### Other utils
