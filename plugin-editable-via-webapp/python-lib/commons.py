@@ -100,7 +100,7 @@ def replay_edits(input_df, editlog_df, primary_key, editable_column_names):
 
     return edited_df.reset_index()
 
-class EditableDataset:
+class EditableEventSourced:
     def _parse_schema(self):
         """Parse editable schema"""
 

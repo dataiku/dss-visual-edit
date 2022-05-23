@@ -3,7 +3,7 @@
 import dataiku
 from os import environ, getenv
 from json import load, loads
-from commons import EditableDataset
+from commons import EditableEventSourced
 from dataiku.customwebapp import get_webapp_config
 from flask import Flask
 from dash import dash_table, html, Dash
@@ -55,8 +55,8 @@ client = dataiku.api_client()
 
 # 1. Get editable dataset and dataframe
 
-eds = EditableDataset(input_dataset_name, project_key, schema)
-editable_df = eds.get_editable_df()
+ees = EditableEventSourced(input_dataset_name, project_key, schema)
+editable_df = ees.get_editable_df()
 
 
 # 2. Define the webapp layout and its DataTable 
@@ -80,7 +80,7 @@ app.layout = html.Div([
                     {
                         'if': {'column_id': c},
                         'backgroundColor': '#d8e3ed'
-                    } for c in eds.editable_column_names
+                    } for c in ees.editable_column_names
                 ],
                 style_as_list_view=True
             ),
@@ -100,14 +100,14 @@ def update(cell_coordinates, table_data):
     # Determine the row and column of the cell that was edited
     row_id = cell_coordinates["row"]-1
     column_name = cell_coordinates["column_id"]
-    primary_key_value = table_data[row_id][eds.primary_key]
+    primary_key_value = table_data[row_id][ees.primary_key]
     value = table_data[row_id][column_name]
 
     # Update table data if a linked record was edited: refresh corresponding lookup columns
-    for linked_record in eds.linked_records:
+    for linked_record in ees.linked_records:
         if (column_name==linked_record["name"]):
             # Retrieve values of the lookup columns from the linked dataset, for the row corresponding to the edited value (linked_record["ds_key"]==value)
-            lookup_values = eds.get_lookup_values(linked_record, value)
+            lookup_values = ees.get_lookup_values(linked_record, value)
 
             # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
             for lookup_column in linked_record["lookup_columns"]:
@@ -116,9 +116,9 @@ def update(cell_coordinates, table_data):
     current_user_settings = client.get_own_user().get_settings().get_raw()
     user = f"""{current_user_settings["displayName"]} <{current_user_settings["email"]}>"""
 
-    eds.add_edit(primary_key_value, column_name, value, user)
+    ees.add_edit(primary_key_value, column_name, value, user)
 
-    message = f"""Updated column {column_name} where {eds.primary_key} is {primary_key_value}. New value: {value}."""
+    message = f"""Updated column {column_name} where {ees.primary_key} is {primary_key_value}. New value: {value}."""
     print(message)
 
     return message, table_data
