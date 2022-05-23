@@ -2,13 +2,15 @@ import dataiku, dataikuapi
 import datetime, pytz
 from pandas import DataFrame, concat, pivot_table
 from json import loads
+from os import getenv
+import requests
 
 
 ### Editlog utils
 
 def get_editlog_schema():
     return [
-        {"name": "date", "type": "string", "meaning": "DateSource"}, # not using date type, in case the editlog is CSV TODO: make sure that it's read as a date in the replay recipe
+        {"name": "date", "type": "string", "meaning": "DateSource"}, # not using date type, in case the editlog is CSV
         {"name": "user", "type": "string", "meaning": "Text"},
         {"name": "key", "type": "string"},
         {"name": "column_name", "type": "string", "meaning": "Text"},
@@ -49,9 +51,14 @@ def get_editlog(input_dataset_name, project_key):
 
 ### Recipe utils
 
-def pivot_editlog(editlog_df):
+def pivot_editlog(editlog_df, editable_column_names):
+    # Create empty dataframe that has all editable columns
+    # This will help make sure that the pivoted editlog always has the right schema
+    # (even if some columns of the input dataset were never edited)
+    all_editable_columns_df = DataFrame(columns=editable_column_names.append("date"))
+
     if (not editlog_df.size): # i.e. if empty editlog
-        editlog_pivoted_df = editlog_df
+        editlog_pivoted_df = all_editable_columns_df
     else:
         editlog_df.set_index("key", inplace=True)
         # For each named column, we only keep the last value
@@ -60,9 +67,12 @@ def pivot_editlog(editlog_df):
             index="key",
             columns="column_name",
             values="value",
-            aggfunc="last").join(
+            aggfunc="last"
+        ).join(
                 editlog_df[["date"]].groupby("key").last() # join the last edit date for each key
                 )
+        editlog_pivoted_df = concat([all_editable_columns_df, editlog_pivoted_df])
+
     return editlog_pivoted_df.reset_index()
 
 def replay_edits(input_df, editlog_df, primary_key, editable_column_names):

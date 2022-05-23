@@ -27,5 +27,5 @@ pivoted_ds = pivoted_datasets[0]
 editlog_df = commons.get_editlog_df(editlog_ds)
 
 # Write output data
-pivoted_df = commons.pivot_editlog(editlog_df)
+pivoted_df = commons.pivot_editlog(editlog_df, editable_column_names)
 pivoted_ds.write_with_schema(pivoted_df)
