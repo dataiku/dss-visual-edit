@@ -15,9 +15,9 @@
             "acceptsDataset": true
         },
         {
-            "name": "editlog",
-            "label": "Edit log",
-            "description": "Managed by webapp",
+            "name": "editlog_pivoted",
+            "label": "Pivoted edit log",
+            "description": "Created by webapp and associated pivot recipe",
             "arity": "UNARY",
             "required": true,
             "acceptsDataset": true
