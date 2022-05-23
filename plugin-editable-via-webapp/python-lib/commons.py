@@ -69,36 +69,32 @@ def pivot_editlog(editlog_df, editable_column_names):
             values="value",
             aggfunc="last"
         ).join(
-                editlog_df[["date"]].groupby("key").last() # join the last edit date for each key
-                )
+            editlog_df[["date"]].groupby("key").last() # join the last edit date for each key
+        )
         editlog_pivoted_df = concat([all_editable_columns_df, editlog_pivoted_df])
 
     return editlog_pivoted_df.reset_index()
 
-def replay_edits(input_df, editlog_df, primary_key, editable_column_names):
+def merge_edits(input_df, editlog_pivoted_df, primary_key):
     input_df.set_index(primary_key, inplace=True)
-    if (not editlog_df.size): # i.e. if empty editlog
+    if (not editlog_pivoted_df.size): # i.e. if empty editlog
         edited_df = input_df
     else:
-        editlog_pivoted_df = pivot_editlog(editlog_df).set_index("key")
+        editlog_pivoted_df.set_index("key", inplace=True)
 
         # We don't need the date column in the rest
         editlog_pivoted_df = editlog_pivoted_df.drop(columns=["date"])
-        
-        # Make sure we have all editable columns (even those whose names don't appear in the editlog because they were never edited)
-        # For this we just concatenate an empty dataframe with these columns, with the editlog
-        all_editable_columns_df = DataFrame(columns=editable_column_names)
-        editlog_pivoted_df = concat([all_editable_columns_df, editlog_pivoted_df])
 
         # Change types of columns to match input_df?
         # for col in editlog_pivoted_df.columns.tolist():
         #     editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(input_df[col].dtype)
 
         # Join -> this adds _value_last columns
-        editlog_df.index.names = [primary_key]
+        editlog_pivoted_df.index.names = [primary_key]
         edited_df = input_df.join(editlog_pivoted_df, rsuffix="_value_last")
 
         # "Merge" -> this creates _original columns
+        editable_column_names = editlog_pivoted_df.columns.tolist() # "date" column has already been dropped
         for col in editable_column_names:
             # copy col to a new column whose name is suffixed by "_original"
             edited_df[col + "_original"] = edited_df[col]
@@ -192,9 +188,9 @@ class EditableEventSourced:
         self.input_df = self.input_ds.get_dataframe()[[self.primary_key] + self.display_column_names + self.editable_column_names]
         self.editlog_ds, self.editlog_df = get_editlog(input_ds_name, project_key)
         self.editable_df = self._extend_with_lookup_columns(
-                                    replay_edits(
+                                    merge_edits(
                                         self.input_df,
-                                        self.editlog_df,
+                                        pivot_editlog(self.editlog_df, self.editable_column_names),
                                         self.primary_key,
                                         self.editable_column_names
                                     )

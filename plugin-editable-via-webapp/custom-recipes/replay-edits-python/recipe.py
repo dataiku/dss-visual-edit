@@ -28,5 +28,5 @@ editlog_df = commons.get_editlog_df(editlog_ds)
 edited_ds.write_schema(input_ds.read_schema()) # otherwise column type for columns of missing values might change
 
 # Write output data
-edited_df = commons.replay_edits(input_df, editlog_df, primary_key, editable_column_names)
+edited_df = commons.merge_edits(input_df, editlog_df, primary_key)
 edited_ds.write_dataframe(edited_df)
