@@ -1,7 +1,7 @@
 {
     "meta": {
         "label": "Pivot editlog",
-        "description": "Creates a dataset with as many rows as unique keys in the edit log, one column per value of `column_name`, and populates the column with the last edited value.",
+        "description": "Creates a dataset whose columns are the editable columns of the edited dataset, whose rows are unique keys from the editlog, and values are the last edits.",
         "icon": "icon-puzzle-piece"
     },
     "kind": "PYTHON",
@@ -30,7 +30,7 @@
             "name": "webapp_ID",
             "label": "Webapp ID",
             "description": "Do not edit!",
-            "type": "TEXT"
+            "type": "STRING"
         }
     ],
     "resourceKeys": []
