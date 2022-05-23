@@ -1,4 +1,10 @@
+import dataiku, dataikuapi
+import datetime, pytz
 from pandas import DataFrame, concat, pivot_table
+from json import loads
+
+
+### Editlog utils
 
 def get_editlog_schema():
     return [
@@ -22,8 +28,26 @@ def get_editlog_df(editlog_ds):
         editlog_ds.write_dataframe(editlog_df)
     return editlog_df
 
-def get_table_name(dataset):
-    return dataset.get_config()["params"]["table"].replace("${projectKey}", project_key).replace("${NODE}", dataiku.get_custom_variables().get("NODE"))
+def get_editlog(input_dataset_name, project_key):
+    client = dataiku.api_client()
+    project = client.get_project(project_key)
+    editlog_ds_name = input_dataset_name + "_editlog"
+    editlog_ds_creator = dataikuapi.dss.dataset.DSSManagedDatasetCreationHelper(project, editlog_ds_name)
+    if (editlog_ds_creator.already_exists()):
+        print("Found editlog")
+        editlog_ds = dataiku.Dataset(editlog_ds_name, project_key)
+    else:
+        print("No editlog found, creating one")
+        connection_name = dataiku.Dataset(input_dataset_name, project_key).get_config()['params']['connection'] # using the same connection as the input dataset
+        editlog_ds_creator.with_store_into(connection=connection_name)
+        editlog_ds_creator.create()
+        editlog_ds = dataiku.Dataset(editlog_ds_name)
+    editlog_df = get_editlog_df(editlog_ds)
+    editlog_ds.spec_item["appendMode"] = True # make sure that editlog is in append mode
+    return editlog_ds, editlog_df
+
+
+### Recipe utils
 
 def pivot_editlog(editlog_df):
     if (not editlog_df.size): # i.e. if empty editlog
@@ -75,3 +99,136 @@ def replay_edits(input_df, editlog_df, primary_key, editable_column_names):
         edited_df = edited_df[edited_df.columns[:-2*len(editable_column_names)]]
 
     return edited_df.reset_index()
+
+class EditableDataset:
+    def _parse_schema(self):
+        """Parse editable schema"""
+
+        # First pass at the list of columns
+        self.editable_column_names = []
+        self.display_column_names = []
+        self.linked_records = []
+        for col in self.schema:
+            if col.get("editable"):
+                self.editable_column_names.append(col.get("name"))
+                if col.get("editable_type")=="linked_record":
+                    self.linked_records.append(
+                        {
+                            "name": col.get("name"),
+                            "type": col.get("type"),
+                            "ds_name": col.get("linked_ds_name"),
+                            "ds_key": col.get("linked_ds_key"),
+                            "lookup_columns": []
+                        }
+                    )
+            else:
+                if col.get("editable_type")=="key":
+                    self.primary_key = col.get("name")
+                    self.primary_key_type = col.get("type")
+                else:
+                    self.display_column_names.append(col.get("name"))
+
+        # Second pass to create the lookup columns for each linked record
+        for col in self.schema:
+            if col.get("editable_type")=="lookup_column":
+                for linked_record in self.linked_records:
+                    if linked_record["name"]==col.get("linked_record_col"):
+                        linked_record["lookup_columns"].append({
+                            "name": col.get("name"),
+                            "linked_ds_column_name": col.get("linked_ds_column_name")
+                        })
+
+    def _get_lookup_column_names(linked_record):
+        lookup_column_names = []
+        lookup_column_names_in_linked_ds = []
+        for lookup_column in linked_record["lookup_columns"]:
+            lookup_column_names.append(lookup_column["name"])
+            lookup_column_names_in_linked_ds.append(lookup_column["linked_ds_column_name"])
+        return lookup_column_names, lookup_column_names_in_linked_ds
+
+    def _extend_with_lookup_columns(self, df):
+        for linked_record in self.linked_records:
+            lookup_column_names, lookup_column_names_in_linked_ds = self._get_lookup_column_names(linked_record)
+            linked_ds = dataiku.Dataset(linked_record["ds_name"], self.project_key)
+            linked_df = linked_ds.get_dataframe().set_index(linked_record["ds_key"])[lookup_column_names_in_linked_ds]
+            df = df.join(linked_df, on=linked_record["name"])
+            for c in range(0, len(lookup_column_names)):
+                df.rename(columns={lookup_column_names_in_linked_ds[c]: lookup_column_names[c]}, inplace=True)
+        return df
+
+    def __init__(self, input_ds_name, project_key, schema):
+        self.input_ds_name = input_ds_name
+        self.project_key = project_key
+        self.schema = schema
+        self._parse_schema()
+        self.input_ds = dataiku.Dataset(input_ds_name, project_key)
+        self.input_df = self.input_ds.get_dataframe()[[self.primary_key] + self.display_column_names + self.editable_column_names]
+        self.editlog_ds, self.editlog_df = get_editlog(input_ds_name, project_key)
+        self.editable_df = self._extend_with_lookup_columns(
+                                    replay_edits(
+                                        self.input_df,
+                                        self.editlog_df,
+                                        self.primary_key,
+                                        self.editable_column_names
+                                    )
+                            )
+
+    def get_editable_df(self):
+        return self.editable_df
+
+    def add_edit(self, primary_key_value, column_name, value, user):
+        # if the type of column_name is a boolean, make sure we read it correctly
+        for col in self.schema:
+            if (col["name"]==column_name):
+                if (col["type"]=="bool" or col["type"]=="boolean"):
+                    value = str(loads(value.lower()))
+                break
+        
+        self.editlog_ds.write_dataframe(DataFrame(data={
+            "key": [str(primary_key_value)],
+            "column_name": [column_name],
+            "value": [str(value)],
+            "date": [datetime.datetime.now(pytz.timezone("UTC")).isoformat()],
+            "user": [user]
+        }))
+
+    def get_lookup_values(self, linked_record, linked_record_value):
+        _, lookup_column_names_in_linked_ds = self._get_lookup_column_names(linked_record)
+        linked_ds = dataiku.Dataset(linked_record["ds_name"], self.project_key)
+        linked_df = linked_ds.get_dataframe().set_index(linked_record["ds_key"])[lookup_column_names_in_linked_ds]
+        value_cast = linked_record_value
+        if (linked_record["type"] == "int"):
+            value_cast = int(linked_record_value)
+        return linked_df.loc[linked_df.index==value_cast]
+        # IDEA: add linked_record["linked_key"] as an INDEX to speed up the query
+
+    def get_schema(self):
+        return self.schema
+
+    def get_editable_column_names(self):
+        return self.editable_column_names
+
+    def get_display_column_names(self):
+        return self.display_column_names
+
+    def get_linked_records(self):
+        return self.linked_records
+
+    def get_primary_key(self):
+        return self.primary_key
+
+    def get_primary_key_type(self):
+        return self.primary_key_type
+
+    def get_editlog_df(self):
+        return self.editlog_df
+
+    def get_editlog_ds(self):
+        return self.editlog_ds
+
+
+
+### Other utils
+
+def get_table_name(dataset, project_key):
+    return dataset.get_config()["params"]["table"].replace("${projectKey}", project_key).replace("${NODE}", dataiku.get_custom_variables().get("NODE"))
