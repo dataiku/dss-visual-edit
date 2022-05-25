@@ -125,7 +125,8 @@ def get_webapp_json(webapp_ID):
     return loads(
         requests.get(
             url="http://127.0.0.1:" + dataiku.base.remoterun.get_env_var("DKU_BASE_PORT") + "/public/api/projects/" + project_key + "/webapps/" + webapp_ID,
-            headers=dataiku.core.intercom.get_auth_headers()
+            headers=dataiku.core.intercom.get_auth_headers(),
+            verify=False
         ).text)
 class EditableEventSourced:
     def _parse_schema(self):
