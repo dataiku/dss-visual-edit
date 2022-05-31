@@ -65,7 +65,7 @@ editable_df = ees.get_editable_df()
 def schema_to_tabulator(schema):
     # Setup columns to be used by data table
     # Add "editor" to editable columns. Possible values include: "input", "textarea", "number", "tickCross", "list". See all options at options http://tabulator.info/docs/5.2/edit.
-    # TODO: improve this code with a dict to do matching (instead of if/else)?
+    # IDEA: improve this code with a dict to do matching (instead of if/else)?
     t_cols = [] # columns for tabulator
     for col in schema:
         t_col = {"field": col["name"], "headerFilter": True, "resizable": True}
@@ -111,10 +111,10 @@ app.layout = html.Div([
                 theme='bootstrap/tabulator_bootstrap4',
                 options={"selectable": 1, "layout": "fitDataTable"},
                 # see http://tabulator.info/docs/5.2/options#columns for layout options
-                # TODO: groupby option is interesting for Fuzzy Join use case - see https://github.com/preftech/dash-tabulator
+                # IDEA: groupby option is interesting for Fuzzy Join use case - see https://github.com/preftech/dash-tabulator
             ),
         ),
-        # html.Div(id='debug', children='Debug'),
+        html.Div(id='debug', children='Debug'),
         ])
     ])
 
