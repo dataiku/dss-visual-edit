@@ -6,8 +6,9 @@ from json import load, loads
 from commons import EditableEventSourced
 from dataiku.customwebapp import get_webapp_config
 from flask import Flask
-from dash import dash_table, html, Dash
-from dash.dependencies import Input, Output, State
+from dash import html, Dash
+from dash_tabulator import DashTabulator
+from dash.dependencies import Input, Output
 
 # when using interactive execution:
 # import sys
@@ -19,7 +20,7 @@ from dash.dependencies import Input, Output, State
 # This code is structured as follows:
 # 0. Init: get webapp settings, Dataiku client, and project
 # 1. Get editable dataset and dataframe
-# 2. Define the webapp layout and its DataTable
+# 2. Define the webapp layout and its "data table" (here we're using tabulator)
 # 3. Define the callback function that updates the editlog when cell values get edited
 
 
@@ -47,7 +48,7 @@ else:
 
     # instantiate Dash
     f_app = Flask(__name__)
-    app = Dash(__name__, server=f_app)
+    app = Dash(__name__, external_stylesheets=["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"], external_scripts=["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"], server=f_app) # using bootstrap css
     application = app.server
 
 client = dataiku.api_client()
@@ -61,9 +62,41 @@ editable_df = ees.get_editable_df()
 
 # 2. Define the webapp layout and its DataTable 
 
-pd_cols = editable_df.columns.tolist()
-dt_cols = ([{"name": i, "id": i} for i in pd_cols]) # columns for DataTable
-dt_data = editable_df[pd_cols].to_dict('records') # data for DataTable
+def schema_to_tabulator(schema):
+    # Setup columns to be used by data table
+    # Add "editor" to editable columns. Possible values include: "input", "textarea", "number", "tickCross", "list". See all options at options http://tabulator.info/docs/5.2/edit.
+    # TODO: improve this code with a dict to do matching (instead of if/else)?
+    t_cols = [] # columns for tabulator
+    for col in schema:
+        t_col = {"field": col["name"], "headerFilter": True, "resizable": True}
+
+        if col.get("type")=="bool" or col.get("type")=="boolean":
+            t_col["formatter"] = "tickCross"
+            t_col["formatterParams"] = {"allowEmpty": True}
+            t_col["hozAlign"] = "center"
+
+        if col.get("editable"):
+            title = col.get("title")
+            title = title if title else col["name"]
+            t_col["title"] = "🖊 " + title
+            if col.get("type")=="bool" or col.get("type")=="boolean":
+                t_col["editor"] = t_col["formatter"]
+                # t_col["editorParams"] = {"tristate": True}
+            elif col.get("type")=="float" or col.get("type")=="double" or col.get("type")=="int" or col.get("type")=="integer":
+                t_col["editor"] = "number"
+            else:
+                t_col["editor"] = "input"
+        else:
+            t_col["title"] = col["name"]
+            if col.get("editable_type")=="key":
+                t_col["frozen"] = True
+
+        t_cols.append(t_col)
+    return t_cols
+
+t_cols = schema_to_tabulator(schema) # columns for tabulator
+t_data = editable_df.to_dict('records') # data for tabulator
+editable_df.set_index(ees.primary_key, inplace=True) # set index to make it easier to id values in the DataFrame
 
 app.layout = html.Div([
     html.H3("Edit"),
@@ -71,37 +104,35 @@ app.layout = html.Div([
         html.Div("Select a cell, type a new value, and press Enter to save."),
         html.Br(),
         html.Div(
-            children=dash_table.DataTable(
-                id='editable-table',
-                columns=dt_cols,
-                data=dt_data,
-                editable=True,
-                style_cell_conditional=[
-                    {
-                        'if': {'column_id': c},
-                        'backgroundColor': '#d8e3ed'
-                    } for c in ees.editable_column_names
-                ],
-                style_as_list_view=True
+            children=DashTabulator(
+                id='datatable',
+                columns=t_cols,
+                data=t_data,
+                theme='bootstrap/tabulator_bootstrap4',
+                options={"selectable": 1, "layout": "fitDataTable"},
+                # see http://tabulator.info/docs/5.2/options#columns for layout options
+                # TODO: groupby option is interesting for Fuzzy Join use case - see https://github.com/preftech/dash-tabulator
             ),
         ),
-        html.Pre(id='output')
+        # html.Div(id='debug', children='Debug'),
+        ])
     ])
-])
 
 
 # 3. Define the callback function that updates the editlog when cell values get edited
 
-@app.callback([Output('output', 'children'),
-               Output('editable-table', 'data')],
-              [State('editable-table', 'active_cell'),
-               Input('editable-table', 'data')], prevent_initial_call=True)
-def update(cell_coordinates, table_data):
-    # Determine the row and column of the cell that was edited
-    row_id = cell_coordinates["row"]-1
-    column_name = cell_coordinates["column_id"]
-    primary_key_value = table_data[row_id][ees.primary_key]
-    value = table_data[row_id][column_name]
+@app.callback([Output('debug', 'children'),
+               Output('datatable', 'data')],
+               Input('datatable', 'cellEdited'), prevent_initial_call=True)
+def update(cell):
+    primary_key_value = cell["row"][ees.primary_key]
+    column_name = cell["column"]
+    value = cell["value"]
+    current_user_settings = client.get_own_user().get_settings().get_raw()
+    user = f"""{current_user_settings["displayName"]} <{current_user_settings["email"]}>"""
+    ees.add_edit(primary_key_value, column_name, value, user)
+
+    editable_df.loc[primary_key_value, column_name] = value
 
     # Update table data if a linked record was edited: refresh corresponding lookup columns
     for linked_record in ees.linked_records:
@@ -111,17 +142,12 @@ def update(cell_coordinates, table_data):
 
             # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
             for lookup_column in linked_record["lookup_columns"]:
-                table_data[row_id][lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0]
-
-    current_user_settings = client.get_own_user().get_settings().get_raw()
-    user = f"""{current_user_settings["displayName"]} <{current_user_settings["email"]}>"""
-
-    ees.add_edit(primary_key_value, column_name, value, user)
+                editable_df.loc[primary_key_value, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0]
 
     message = f"""Updated column {column_name} where {ees.primary_key} is {primary_key_value}. New value: {value}."""
     print(message)
 
-    return message, table_data
+    return message, editable_df.reset_index().to_dict('records')
 
 
 # Run Dash app in debug mode when outside of Dataiku
