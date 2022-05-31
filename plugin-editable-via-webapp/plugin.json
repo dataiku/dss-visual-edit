@@ -1,9 +1,9 @@
 {
     "id": "editable-via-webapp",
-    "version": "1.2.1",
+    "version": "1.3.0",
     "meta": {
         "label": "Editable via webapp",
-        "description": "Provide a Webapp to edit records in a dataset, and a Recipe to replay edits when building the flow",
+        "description": "Provide a Webapp to edit records in a dataset, and Recipes to replay edits when building the flow",
         "author": "Dataiku (Louis Dorard)",
         "icon": "icon-puzzle-piece",
         "tags": [],
