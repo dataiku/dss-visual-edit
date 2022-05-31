@@ -128,6 +128,9 @@ def get_webapp_json(webapp_ID):
             headers=dataiku.core.intercom.get_auth_headers(),
             verify=False
         ).text)
+
+
+### EditableEventSourced
 class EditableEventSourced:
     def _parse_schema(self):
         """Parse editable schema"""
@@ -204,14 +207,14 @@ class EditableEventSourced:
         # if the type of column_name is a boolean, make sure we read it correctly
         for col in self.schema:
             if (col["name"]==column_name):
-                if (col["type"]=="bool" or col["type"]=="boolean"):
+                if type(value)==str and (col["type"]=="bool" or col["type"]=="boolean"):
                     value = str(loads(value.lower()))
                 break
-        
+        if (value): value = str(value)
         self.editlog_ds.write_dataframe(DataFrame(data={
             "key": [str(primary_key_value)],
             "column_name": [column_name],
-            "value": [str(value)],
+            "value": [value],
             "date": [datetime.datetime.now(pytz.timezone("UTC")).isoformat()],
             "user": [user]
         }))
