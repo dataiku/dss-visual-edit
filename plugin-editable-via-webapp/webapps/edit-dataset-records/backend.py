@@ -63,43 +63,8 @@ ees = EditableEventSourced(input_dataset_name, project_key, schema)
 
 # 2. Define the webapp layout and components
 
-def schema_to_tabulator(schema):
-    # Setup columns to be used by data table
-    # Add "editor" to editable columns. Possible values include: "input", "textarea", "number", "tickCross", "list". See all options at options http://tabulator.info/docs/5.2/edit.
-    # IDEA: improve this code with a dict to do matching (instead of if/else)?
-    t_cols = [] # columns for tabulator
-    for col in schema:
-        t_col = {"field": col["name"], "headerFilter": True, "resizable": True}
-
-        if col.get("type")=="bool" or col.get("type")=="boolean":
-            t_col["formatter"] = "tickCross"
-            t_col["formatterParams"] = {"allowEmpty": True}
-            t_col["hozAlign"] = "center"
-
-        if col.get("editable"):
-            title = col.get("title")
-            title = title if title else col["name"]
-            t_col["title"] = "🖊 " + title
-            if col.get("type")=="bool" or col.get("type")=="boolean":
-                t_col["editor"] = t_col["formatter"]
-                # t_col["editorParams"] = {"tristate": True}
-            elif col.get("type")=="float" or col.get("type")=="double" or col.get("type")=="int" or col.get("type")=="integer":
-                t_col["editor"] = "number"
-            else:
-                t_col["editor"] = "input"
-        else:
-            t_col["title"] = col["name"]
-            if col.get("editable_type")=="key":
-                t_col["frozen"] = True
-
-        t_cols.append(t_col)
-    return t_cols
-
-t_cols = schema_to_tabulator(schema) # columns for tabulator
-t_data = editable_df.to_dict('records') # data for tabulator
-editable_df.set_index(ees.primary_key, inplace=True) # set index to make it easier to id values in the DataFrame
-
-app.layout = html.Div([
+def serve_layout(): # see https://dash.plotly.com/live-updates
+    return html.Div([
     html.H3("Edit"),
     html.Div([
         html.Div("Select a cell, type a new value, and press Enter to save."),
@@ -119,8 +84,7 @@ app.layout = html.Div([
         ])
     ])
 
-
-# 3. Define the callback function that updates the editlog when cell values get edited
+app.layout = serve_layout
 
 @app.callback([Output('datatable', 'data'),
                Output('debug', 'children')],
