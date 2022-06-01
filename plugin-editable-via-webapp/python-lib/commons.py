@@ -192,16 +192,22 @@ class EditableEventSourced:
         self.input_ds = dataiku.Dataset(input_ds_name, project_key)
         self.input_df = self.input_ds.get_dataframe()[[self.primary_key] + self.display_column_names + self.editable_column_names]
         self.editlog_ds, self.editlog_df = get_editlog(input_ds_name, project_key)
-        self.editable_df = self._extend_with_lookup_columns(
+        self._editable_df_indexed = self._extend_with_lookup_columns(
                                     merge_edits(
                                         self.input_df,
                                         pivot_editlog(self.editlog_df, self.editable_column_names),
                                         self.primary_key
                                     )
-                            )
+                                    ).set_index(self.primary_key) # index makes it easier to id values in the DataFrame
 
     def get_editable_df(self):
-        return self.editable_df
+        return self.get_editable_df_indexed().reset_index()
+
+    def get_editable_df_indexed(self):
+        return self._editable_df_indexed
+
+    def get_editable_tabulator(self):
+        return self.get_editable_df().to_dict('records')
 
     def add_edit(self, primary_key_value, column_name, value, user):
         # if the type of column_name is a boolean, make sure we read it correctly
