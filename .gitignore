@@ -9,3 +9,5 @@
 .htmlcov
 .DS_Store
 .idea
+plugin-editable-via-webapp/lca*
+*/*.zip
