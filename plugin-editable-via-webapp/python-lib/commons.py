@@ -216,7 +216,11 @@ class EditableEventSourced:
                 if type(value)==str and (col["type"]=="bool" or col["type"]=="boolean"):
                     value = str(loads(value.lower()))
                 break
-        if (value): value = str(value)
+        
+        # store value as a string, unless it's None
+        if (value!=None): value = str(value)
+
+        # add to the editlog
         self.editlog_ds.write_dataframe(DataFrame(data={
             "key": [str(primary_key_value)],
             "column_name": [column_name],
@@ -224,6 +228,21 @@ class EditableEventSourced:
             "date": [datetime.datetime.now(pytz.timezone("UTC")).isoformat()],
             "user": [user]
         }))
+
+        # update editable_df
+        self._editable_df_indexed.loc[primary_key_value, column_name] = value
+
+        # Update lookup columns if a linked record was edited
+        for linked_record in self.linked_records:
+            if (column_name==linked_record["name"]):
+                # Retrieve values of the lookup columns from the linked dataset, for the row corresponding to the edited value (linked_record["ds_key"]==value)
+                lookup_values = self.get_lookup_values(linked_record, value)
+
+                # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
+                for lookup_column in linked_record["lookup_columns"]:
+                    self._editable_df_indexed.loc[primary_key_value, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0]
+        
+        print(f"""Updated column {column_name} where {self.primary_key} is {primary_key_value}. New value: {value}.""")
 
     def get_lookup_values(self, linked_record, linked_record_value):
         _, lookup_column_names_in_linked_ds = self._get_lookup_column_names(linked_record)
