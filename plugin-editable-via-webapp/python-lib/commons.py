@@ -193,11 +193,11 @@ class EditableEventSourced:
         self.input_df = self.input_ds.get_dataframe()[[self.primary_key] + self.display_column_names + self.editable_column_names]
         self.editlog_ds, self.editlog_df = get_editlog(input_ds_name, project_key)
         self._editable_df_indexed = self._extend_with_lookup_columns(
-                                    merge_edits(
-                                        self.input_df,
-                                        pivot_editlog(self.editlog_df, self.editable_column_names),
-                                        self.primary_key
-                                    )
+                                        merge_edits(
+                                            self.input_df,
+                                            pivot_editlog(self.editlog_df, self.editable_column_names),
+                                            self.primary_key
+                                        )
                                     ).set_index(self.primary_key) # index makes it easier to id values in the DataFrame
 
     def get_editable_df(self):
@@ -256,6 +256,38 @@ class EditableEventSourced:
 
     def get_schema(self):
         return self.schema
+
+    def get_schema_tabulator(self):
+        # Setup columns to be used by data table
+        # Add "editor" to editable columns. Possible values include: "input", "textarea", "number", "tickCross", "list". See all options at options http://tabulator.info/docs/5.2/edit.
+        # IDEA: improve this code with a dict to do matching (instead of if/else)?
+        t_cols = [] # columns for tabulator
+        for col in self.schema:
+            t_col = {"field": col["name"], "headerFilter": True, "resizable": True}
+
+            if col.get("type")=="bool" or col.get("type")=="boolean":
+                t_col["formatter"] = "tickCross"
+                t_col["formatterParams"] = {"allowEmpty": True}
+                t_col["hozAlign"] = "center"
+
+            if col.get("editable"):
+                title = col.get("title")
+                title = title if title else col["name"]
+                t_col["title"] = "🖊 " + title
+                if col.get("type")=="bool" or col.get("type")=="boolean":
+                    t_col["editor"] = t_col["formatter"]
+                    # t_col["editorParams"] = {"tristate": True}
+                elif col.get("type")=="float" or col.get("type")=="double" or col.get("type")=="int" or col.get("type")=="integer":
+                    t_col["editor"] = "number"
+                else:
+                    t_col["editor"] = "input"
+            else:
+                t_col["title"] = col["name"]
+                if col.get("editable_type")=="key":
+                    t_col["frozen"] = True
+
+            t_cols.append(t_col)
+        return t_cols
 
     def get_editable_column_names(self):
         return self.editable_column_names

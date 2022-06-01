@@ -18,13 +18,12 @@ from dash.dependencies import Input, Output
 # Dash webapp to edit dataset records
 
 # This code is structured as follows:
-# 0. Init: get webapp settings, Dataiku client, and project
-# 1. Get editable dataset and dataframe
-# 2. Define the webapp layout and its "data table" (here we're using tabulator)
-# 3. Define the callback function that updates the editlog when cell values get edited
+# 0. Get webapp settings
+# 1. Get editable dataset
+# 2. Define webapp layout and components
 
 
-# 0. Init: get webapp settings and Dataiku client
+# 0. Get webapp settings
 
 if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     print("Webapp is being run in Dataiku")
@@ -49,18 +48,20 @@ else:
     # instantiate Dash
     f_app = Flask(__name__)
     app = Dash(__name__, external_stylesheets=["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"], external_scripts=["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"], server=f_app) # using bootstrap css
+    # TODO: how do we pass external stylesheets when using Dataiku?
     application = app.server
 
+
+# 1. Get editable dataset
+
 client = dataiku.api_client()
-
-
-# 1. Get editable dataset and dataframe
+current_user_settings = client.get_own_user().get_settings().get_raw()
+user = f"""{current_user_settings["displayName"]} <{current_user_settings["email"]}>"""
 
 ees = EditableEventSourced(input_dataset_name, project_key, schema)
-editable_df = ees.get_editable_df()
 
 
-# 2. Define the webapp layout and its DataTable 
+# 2. Define the webapp layout and components
 
 def schema_to_tabulator(schema):
     # Setup columns to be used by data table
@@ -106,8 +107,8 @@ app.layout = html.Div([
         html.Div(
             children=DashTabulator(
                 id='datatable',
-                columns=t_cols,
-                data=t_data,
+                columns=ees.get_schema_tabulator(),
+                data=ees.get_editable_tabulator(),
                 theme='bootstrap/tabulator_bootstrap4',
                 options={"selectable": 1, "layout": "fitDataTable"},
                 # see http://tabulator.info/docs/5.2/options#columns for layout options
@@ -121,36 +122,15 @@ app.layout = html.Div([
 
 # 3. Define the callback function that updates the editlog when cell values get edited
 
-@app.callback([Output('debug', 'children'),
-               Output('datatable', 'data')],
+@app.callback([Output('datatable', 'data'),
+               Output('debug', 'children')],
                Input('datatable', 'cellEdited'), prevent_initial_call=True)
 def update(cell):
     primary_key_value = cell["row"][ees.primary_key]
     column_name = cell["column"]
     value = cell["value"]
-    current_user_settings = client.get_own_user().get_settings().get_raw()
-    user = f"""{current_user_settings["displayName"]} <{current_user_settings["email"]}>"""
     ees.add_edit(primary_key_value, column_name, value, user)
-
-    editable_df.loc[primary_key_value, column_name] = value
-
-    # Update table data if a linked record was edited: refresh corresponding lookup columns
-    for linked_record in ees.linked_records:
-        if (column_name==linked_record["name"]):
-            # Retrieve values of the lookup columns from the linked dataset, for the row corresponding to the edited value (linked_record["ds_key"]==value)
-            lookup_values = ees.get_lookup_values(linked_record, value)
-
-            # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
-            for lookup_column in linked_record["lookup_columns"]:
-                editable_df.loc[primary_key_value, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0]
-
-    message = f"""Updated column {column_name} where {ees.primary_key} is {primary_key_value}. New value: {value}."""
-    print(message)
-
-    return message, editable_df.reset_index().to_dict('records')
-
-
-# Run Dash app in debug mode when outside of Dataiku
+    return ees.get_editable_tabulator()
 
 if __name__=="__main__":
     if run_context=="local":
