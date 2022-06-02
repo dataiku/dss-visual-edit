@@ -1,0 +1,60 @@
+[
+    {
+        "name": "match_id",
+        "type": "int",
+        "editable": false,
+        "editable_type": "key"
+    },
+    {
+        "name": "id_companies_ref",
+        "type": "int",
+        "editable": false
+    },
+    {
+        "name": "name_companies_ref",
+        "type": "string",
+        "editable": false
+    },
+    {
+        "name": "city_companies_ref",
+        "type": "string",
+        "editable": false
+    },
+    {
+        "name": "country_companies_ref",
+        "type": "string",
+        "editable": false
+    },
+    {
+        "name": "id_companies_ext",
+        "type": "int",
+        "editable": "true",
+        "editable_type": "linked_record",
+        "linked_ds_name": "companies_ext",
+        "linked_ds_key": "id"
+    },
+    {
+        "name": "name_companies_ext",
+        "type": "string",
+        "editable": false,
+        "editable_type": "lookup_column",
+        "linked_record_col": "id_companies_ext",
+        "linked_ds_column_name": "name"
+    },
+    {
+        "name": "city_companies_ext",
+        "type": "string",
+        "editable": false,
+        "editable_type": "lookup_column",
+        "linked_record_col": "id_companies_ext",
+        "linked_ds_column_name": "city"
+    },
+    {
+        "name": "country_companies_ext",
+        "type": "string",
+        "editable": false,
+        "editable_type": "lookup_column",
+        "linked_record_col": "id_companies_ext",
+        "linked_ds_column_name": "country"
+    }
+]

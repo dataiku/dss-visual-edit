@@ -1,0 +1,8 @@
+[
+    {"name": "Id", "type": "int", "editable_type": "key", "editable": false},
+    {"name": "Stakeholder Name", "type": "string", "editable": false},
+    {"name": "Security Name", "type": "string", "editable": false},
+    {"name": "1) Position is Free Float? (TRUE/FALSE)", "title": "Free float?", "type": "bool", "editable": true},
+    {"name": "In case 1) = FALSE then 2) Shares in FS Correct? (TRUE/FALSE)", "title": "If not, Shares correct?", "type": "bool", "editable": true},
+    {"name": "In case 2) = FALSE then 3) Fill in shares manually", "title": "If not, give Shares value", "type": "float", "editable": true}
+]
