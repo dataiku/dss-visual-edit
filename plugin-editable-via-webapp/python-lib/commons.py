@@ -24,9 +24,11 @@ def get_editlog_df(editlog_ds):
     try:
         editlog_df = editlog_ds.get_dataframe()
     except:
+        print("Editlog is empty. Writing schema and empty dataframe...")
         editlog_df = DataFrame(columns=get_editlog_columns())
         editlog_ds.write_schema(get_editlog_schema())
         editlog_ds.write_dataframe(editlog_df)
+        print("Done.")
     return editlog_df
 
 ### Recipe utils
@@ -67,7 +69,7 @@ def merge_edits(original_df, editlog_pivoted_df, primary_key):
 
     return edited_df.reset_index()
 
-def pivot_editlog(editlog_df, editable_column_names):
+def pivot_editlog(editlog_ds, editable_column_names):
     # Create empty dataframe that has all editable columns
     # This will help make sure that the pivoted editlog always has the right schema
     # (even if some columns of the input dataset were never edited)
@@ -75,6 +77,7 @@ def pivot_editlog(editlog_df, editable_column_names):
     all_editable_columns_df = DataFrame(columns=cols)
     all_editable_columns_df.set_index("key", inplace=True)
 
+    editlog_df = get_editlog_df(editlog_ds)
     if (not editlog_df.size): # i.e. if empty editlog
         editlog_pivoted_df = all_editable_columns_df
     else:

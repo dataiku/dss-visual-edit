@@ -1,4 +1,4 @@
-from commons import get_primary_key
+from commons import get_editlog_df, get_primary_key
 from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
@@ -24,6 +24,12 @@ def get_lookup_column_names(linked_record):
             lookup_column_names_in_linked_ds.append(lookup_column["linked_ds_column_name"])
         return lookup_column_names, lookup_column_names_in_linked_ds
 
+def recipe_already_exists(recipe_name, project):
+    try:
+        project.get_recipe(recipe_name).get_status()
+        return True
+    except:
+        return False
 class EditableEventSourced:
 
     def __parse_schema__(self):
@@ -80,25 +86,26 @@ class EditableEventSourced:
         return linked_df.loc[linked_df.index==value_cast]
         # IDEA: add linked_record["linked_key"] as an INDEX to speed up the query
 
-    def __get_editlog__(self):
+    def __setup_editlog__(self):
         editlog_ds_creator = DSSManagedDatasetCreationHelper(self.project, self.editlog_ds_name)
         if (editlog_ds_creator.already_exists()):
             print("Found editlog")
             self.editlog_ds = Dataset(self.editlog_ds_name, self.project_key)
         else:
-            print("No editlog found, creating it")
+            print("No editlog found, creating it...")
             editlog_ds_creator.with_store_into(connection=self.connection_name)
             editlog_ds_creator.create()
             self.editlog_ds = Dataset(self.editlog_ds_name, self.project_key)
+            print("Done.")
 
         self.editlog_ds.spec_item["appendMode"] = True # make sure that editlog is in append mode
 
-    def __setup_downstream_editlog__(self):
+    def __setup_editlog_downstream__(self):
         editlog_pivoted_ds_creator = DSSManagedDatasetCreationHelper(self.project, self.editlog_pivoted_ds_name)
         if (editlog_pivoted_ds_creator.already_exists()):
             print("Found editlog pivoted")
         else:
-            print("No editlog pivoted found, creating it")
+            print("No editlog pivoted found, creating it...")
             editlog_pivoted_ds_creator.with_store_into(connection=self.connection_name)
             editlog_pivoted_ds_creator.create()
             self.editlog_pivoted_ds = Dataset(self.editlog_pivoted_ds_name, self.project_key)
@@ -106,39 +113,45 @@ class EditableEventSourced:
             editlog_pivoted_df = DataFrame(columns=cols)
             self.editlog_pivoted_ds.write_schema(get_editlog_schema())
             self.editlog_pivoted_ds.write_dataframe(editlog_pivoted_df)
+            print("Done.")
 
-        recipe_creator = DSSRecipeCreator("CustomCode_pivot-editlog", "compute_" + self.editlog_pivoted_ds_name, self.project)
-        if (recipe_creator.already_exists()):
+        recipe_name = "compute_" + self.editlog_pivoted_ds_name
+        recipe_creator = DSSRecipeCreator("CustomCode_pivot-editlog", recipe_name, self.project)
+        if (recipe_already_exists(recipe_name, self.project)):
             print("Found recipe to create editlog pivoted")
         else:
-            print("No recipe to create editlog pivoted, creating it")
+            print("No recipe to create editlog pivoted, creating it...")
             recipe = recipe_creator.create()
             settings = recipe.get_settings()
             settings.add_input("editlog", self.editlog_ds_name)
             settings.add_output("editlog_pivoted", self.editlog_pivoted_ds_name)
             settings.save()
+            print("Done.")
 
         edited_ds_creator = DSSManagedDatasetCreationHelper(self.project, self.edited_ds_name)
         if (edited_ds_creator.already_exists()):
             print("Found edited dataset")
             self.edited_ds = Dataset(self.edited_ds_name, self.project_key)
         else:
-            print("No edited dataset found, creating it")
+            print("No edited dataset found, creating it...")
             edited_ds_creator.with_store_into(connection=self.connection_name)
             edited_ds_creator.create()
             self.edited_ds = Dataset(self.edited_ds_name, self.project_key)
+            print("Done.")
 
-        recipe_creator = DSSRecipeCreator("CustomCode_merge-edits", "compute_" + self.edited_ds_name, self.project)
-        if (recipe_creator.already_exists()):
+        recipe_name = "compute_" + self.edited_ds_name
+        recipe_creator = DSSRecipeCreator("CustomCode_merge-edits", recipe_name, self.project)
+        if (recipe_already_exists(recipe_name, self.project)):
             print("Found recipe to create edited dataset")
         else:
-            print("No recipe to create edited dataset, creating it")
+            print("No recipe to create edited dataset, creating it...")
             recipe = recipe_creator.create()
             settings = recipe.get_settings()
             settings.add_input("original", self.original_ds_name)
             settings.add_input("editlog_pivoted", self.editlog_pivoted_ds_name)
             settings.add_output("edited", self.edited_ds_name)
             settings.save()
+            print("Done.")
 
     def __init__(self, original_ds_name, project_key=None):
         self.original_ds_name = original_ds_name
@@ -146,23 +159,26 @@ class EditableEventSourced:
         else: self.project_key = project_key
         client = api_client()
         self.project = client.get_project(self.project_key)
+        self.original_ds = Dataset(self.original_ds_name, self.project_key)
 
         self.editlog_ds_name = self.original_ds_name + "_editlog"
         self.editlog_pivoted_ds_name = self.editlog_ds_name + "_pivoted"
         self.edited_ds_name = self.original_ds_name + "_edited"
 
-        self.connection_name = Dataset(self.original_ds_name, self.project_key).get_config()['params']['connection']
-
+        self.connection_name = self.original_ds.get_config()['params']['connection']
         self.schema = loads(self.original_ds.get_config()["customFields"]["schema"])
         self.__parse_schema__() # Sets editable_column_names, display_column_names, primary key, primary_key_type, linked_records
 
-        self.original_ds = Dataset(self.original_ds_name, self.project_key)
         self.original_df = self.original_ds.get_dataframe()[[self.primary_key] + self.display_column_names + self.editable_column_names]
-        self.__get_editlog__()
+        self.__setup_editlog__()
+        self.__setup_editlog_downstream__()
         self.__editable_df_indexed__ = self.__extend_with_lookup_columns__(
                                         merge_edits(
                                             self.original_df,
-                                            pivot_editlog(self.editlog_df, self.editable_column_names),
+                                            pivot_editlog(
+                                                self.editlog_ds,
+                                                self.editable_column_names
+                                            ),
                                             self.primary_key
                                         )
                                     ).set_index(self.primary_key) # index makes it easier to id values in the DataFrame

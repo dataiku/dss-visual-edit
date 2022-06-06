@@ -7,7 +7,7 @@ from flask import Flask
 from dash import html, Dash
 from dash_tabulator import DashTabulator
 from dash.dependencies import Input, Output
-import EditableEventSourced
+from EditableEventSourced import EditableEventSourced
 # when using interactive execution:
 # import sys
 # sys.path.append('../../python-lib')
@@ -66,15 +66,13 @@ def serve_layout(): # see https://dash.plotly.com/live-updates
                 # see http://tabulator.info/docs/5.2/options#columns for layout options
                 # IDEA: groupby option is interesting for Fuzzy Join use case - see https://github.com/preftech/dash-tabulator
             ),
-        ),
-        html.Div(id='debug', children='Debug'),
+        )
         ])
     ])
 
 app.layout = serve_layout
 
-@app.callback([Output('datatable', 'data'),
-               Output('debug', 'children')],
+@app.callback(Output('datatable', 'data'),
                Input('datatable', 'cellEdited'), prevent_initial_call=True)
 def update(cell):
     primary_key_value = cell["row"][ees.get_primary_key()]
