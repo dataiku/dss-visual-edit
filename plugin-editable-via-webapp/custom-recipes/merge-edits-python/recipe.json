@@ -7,7 +7,7 @@
     "kind": "PYTHON",
     "inputRoles": [
         {
-            "name": "input",
+            "name": "original",
             "label": "Original dataset",
             "description": "Contains the data to be made editable via webapp",
             "arity": "UNARY",
@@ -34,13 +34,6 @@
             "acceptsDataset": true
         }
     ],
-    "params": [
-        {
-            "name": "webapp_ID",
-            "label": "Webapp ID",
-            "description": "Do not edit!",
-            "type": "STRING"
-        }
-    ],
+    "params": [],
     "resourceKeys": []
 }
