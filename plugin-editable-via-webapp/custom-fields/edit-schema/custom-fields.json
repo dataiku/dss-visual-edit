@@ -2,7 +2,7 @@
     "meta": {
         "label": "Schema for edition",
         "description": "Used when creating a webapp to edit this dataset",
-        "icon": "icon-list"
+        "icon": "icon-columns"
     },
     "customFields": [
         {

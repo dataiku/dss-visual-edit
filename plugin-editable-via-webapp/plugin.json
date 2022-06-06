@@ -5,7 +5,7 @@
         "label": "Editable via webapp",
         "description": "Provide a Webapp to edit records in a dataset, and Recipes to replay edits when building the flow",
         "author": "Dataiku (Louis Dorard)",
-        "icon": "icon-puzzle-piece",
+        "icon": "icon-edit-sign",
         "tags": [],
         "url": "https://github.com/dataiku/lca",
         "licenseInfo": "Apache Software License",

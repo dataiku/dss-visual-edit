@@ -11,16 +11,10 @@
     "standardWebAppLibraries": null,
     "params": [
         {
-            "name": "input_dataset",
-            "label": "Input dataset",
+            "name": "original_dataset",
+            "label": "Original dataset",
             "description": "",
             "type": "DATASET"
-        },
-        {
-            "name": "schema",
-            "label": "Schema",
-            "description": "JSON",
-            "type": "TEXTAREA"
         }
     ],
     "roles": []
