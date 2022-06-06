@@ -1,0 +1,21 @@
+{
+    "meta": {
+        "label": "Schema for edition",
+        "description": "Used when creating a webapp to edit this dataset",
+        "icon": "icon-list"
+    },
+    "customFields": [
+        {
+            "applyToObjects": {
+                "mode": "SOME",
+                "includedObjectTypes": ["DATASET"]
+            },
+            "field": {
+                "name": "schema",
+                "label": "Schema",
+                "description": "JSON",
+                "type": "TEXTAREA"
+            }
+        }
+    ]
+}
