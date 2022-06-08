@@ -1,4 +1,4 @@
-from commons import get_editlog_df, get_primary_key
+from commons import get_primary_keys
 from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
@@ -37,7 +37,7 @@ class EditableEventSourced:
 
         # First pass at the list of columns
         self.editable_column_names = get_editable_column_names(self.schema)
-        self.primary_key, self.primary_key_type = get_primary_key(self.schema)
+        self.primary_keys = get_primary_keys(self.schema)
         self.display_column_names = []
         self.linked_records = []
         for col in self.schema:
@@ -167,9 +167,9 @@ class EditableEventSourced:
 
         self.connection_name = self.original_ds.get_config()['params']['connection']
         self.schema = loads(self.original_ds.get_config()["customFields"]["schema"])
-        self.__parse_schema__() # Sets editable_column_names, display_column_names, primary key, primary_key_type, linked_records
+        self.__parse_schema__() # Sets editable_column_names, display_column_names, primary key, primary_key_types, linked_records
 
-        self.original_df = self.original_ds.get_dataframe()[[self.primary_key] + self.display_column_names + self.editable_column_names]
+        self.original_df = self.original_ds.get_dataframe()[self.primary_keys + self.display_column_names + self.editable_column_names]
         self.__setup_editlog__()
         self.__setup_editlog_downstream__()
         self.__editable_df_indexed__ = self.__extend_with_lookup_columns__(
@@ -179,9 +179,9 @@ class EditableEventSourced:
                                                 self.editlog_ds,
                                                 self.editable_column_names
                                             ),
-                                            self.primary_key
+                                            self.primary_keys
                                         )
-                                    ).set_index(self.primary_key) # index makes it easier to id values in the DataFrame
+                                    ).set_index(self.primary_keys) # index makes it easier to id values in the DataFrame
 
     def get_editable_df_indexed(self):
         return self.__editable_df_indexed__
@@ -243,12 +243,12 @@ class EditableEventSourced:
             t_cols.append(t_col)
         return t_cols
 
-    def get_primary_key(self):
-        return self.primary_key
+    def get_primary_keys(self):
+        return self.primary_keys
 
     """
-    def get_primary_key_type(self):
-        return self.primary_key_type
+    def get_primary_key_types(self):
+        return self.primary_key_types
 
     def get_editable_column_names(self):
         return self.editable_column_names
@@ -266,7 +266,7 @@ class EditableEventSourced:
         return self.editlog_ds
     """
 
-    def add_edit(self, primary_key_value, column_name, value, user): # TODO: pass values for multiple keys
+    def add_edit(self, primary_key_values, column_name, value, user):
         # if the type of column_name is a boolean, make sure we read it correctly
         for col in self.schema:
             if (col["name"]==column_name):
@@ -279,7 +279,7 @@ class EditableEventSourced:
 
         # add to the editlog
         self.editlog_ds.write_dataframe(DataFrame(data={
-            "key": [str(primary_key_value)], # TODO: add all keys
+            "key": [str(primary_key_values)],
             "column_name": [column_name],
             "value": [value],
             "date": [datetime.now(timezone("UTC")).isoformat()],
@@ -289,7 +289,7 @@ class EditableEventSourced:
         # TODO: do we need ees to maintain a live copy of (and to update) editlog_df? when is edit log accessed?
 
         # update editable_df
-        self.__editable_df_indexed__.loc[primary_key_value, column_name] = value # TODO: multi-indexing?
+        self.__editable_df_indexed__.loc[primary_key_values, column_name] = value # Might need to change primary_key_values from a list to a tuple — see this example: df.loc[('cobra', 'mark i'), 'shield'] from https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.loc.html ?
 
         # Update lookup columns if a linked record was edited
         for linked_record in self.linked_records:
@@ -299,7 +299,7 @@ class EditableEventSourced:
 
                 # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
                 for lookup_column in linked_record["lookup_columns"]:
-                    self.__editable_df_indexed__.loc[primary_key_value, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0] # TODO: multi-indexing?
+                    self.__editable_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0] # TODO: test multi-indexing
         
-        print(f"""Updated column {column_name} where {self.primary_key} is {primary_key_value}. New value: {value}.""") # TODO: multi-indexing?
+        print(f"""Updated column {column_name} where {self.primary_keys} is {primary_key_values}. New value: {value}.""")
 

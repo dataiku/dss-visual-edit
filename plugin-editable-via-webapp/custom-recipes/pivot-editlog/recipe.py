@@ -1,13 +1,12 @@
 import dataiku
-from dataiku.customrecipe import *
-from json import loads
+from dataiku.customrecipe import get_input_names_for_role, get_output_names_for_role
 from pandas import DataFrame
 
 # when using interactive execution:
 # import sys
 # sys.path.append('../../python-lib')
 
-from commons import get_editlog_df, pivot_editlog
+from commons import pivot_editlog
 
 editlog_names = get_input_names_for_role('editlog')
 editlog_datasets = [dataiku.Dataset(name) for name in editlog_names]

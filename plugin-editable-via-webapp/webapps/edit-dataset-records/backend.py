@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 
+#%%
+# when using interactive execution:
+# import sys
+# sys.path.append('../../python-lib')
+# original_ds_name = ...
+# project_key = ...
+
 import dataiku
 from os import getenv
 from dataiku.customwebapp import get_webapp_config
@@ -8,9 +15,7 @@ from dash import html, Dash
 from dash_tabulator import DashTabulator
 from dash.dependencies import Input, Output
 from EditableEventSourced import EditableEventSourced
-# when using interactive execution:
-# import sys
-# sys.path.append('../../python-lib')
+from pandas import DataFrame
 
 
 # Dash webapp to edit dataset records
@@ -44,12 +49,12 @@ user = f"""{current_user_settings["displayName"]} <{current_user_settings["email
 
 
 # 1. Get editable dataset
-
+#%%
 ees = EditableEventSourced(original_ds_name)
 
 
 # 2. Define the webapp layout and components
-
+#%%
 def serve_layout(): # see https://dash.plotly.com/live-updates
     return html.Div([
     html.H3("Edit"),
@@ -75,10 +80,13 @@ app.layout = serve_layout
 @app.callback(Output('datatable', 'data'),
                Input('datatable', 'cellEdited'), prevent_initial_call=True)
 def update(cell):
-    primary_key_value = cell["row"][ees.get_primary_key()]
+    primary_key_values = DataFrame(
+                            data=cell["row"],
+                            index=[0]
+                         ).set_index(ees.get_primary_keys()).index[0]
     column_name = cell["column"]
     value = cell["value"]
-    ees.add_edit(primary_key_value, column_name, value, user)
+    ees.add_edit(primary_key_values, column_name, value, user)
     return ees.get_editable_tabulator()
 
 if __name__=="__main__":

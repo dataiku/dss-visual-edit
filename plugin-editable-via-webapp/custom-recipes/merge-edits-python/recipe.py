@@ -6,7 +6,7 @@ from json import loads
 # import sys
 # sys.path.append('../../python-lib')
 
-from commons import get_primary_key, merge_edits
+from commons import get_primary_keys, merge_edits
 
 
 original_names = get_input_names_for_role('original')
@@ -29,8 +29,8 @@ editlog_pivoted_df = pivoted_ds.get_dataframe()
 edited_ds.write_schema(original_ds.read_schema()) # otherwise column type for columns of missing values might change
 
 schema = loads(original_ds.get_config()["customFields"]["schema"])
-primary_key, _ = get_primary_key(schema)
+primary_keys = get_primary_keys(schema)
 
 # Write output data
-edited_df = merge_edits(original_df, editlog_pivoted_df, primary_key)
+edited_df = merge_edits(original_df, editlog_pivoted_df, primary_keys)
 edited_ds.write_dataframe(edited_df)

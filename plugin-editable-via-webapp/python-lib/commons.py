@@ -33,29 +33,39 @@ def get_editlog_df(editlog_ds):
 
 ### Recipe utils
 
-def get_primary_key(schema):
+def get_primary_keys(schema):
+    keys = []
     for col in schema:
         if col.get("editable_type")=="key":
-            return col.get("name"), col.get("type")
+            keys.append(col["name"])
+    return keys
 
-def merge_edits(original_df, editlog_pivoted_df, primary_key):
-    original_df.set_index(primary_key, inplace=True)
+def merge_edits(original_df, editlog_pivoted_df, primary_keys):
     if (not editlog_pivoted_df.size): # i.e. if empty editlog
         edited_df = original_df
     else:
-        editlog_pivoted_df.set_index("key", inplace=True)
-
         # We don't need the date column in the rest
-        editlog_pivoted_df = editlog_pivoted_df.drop(columns=["date"])
+        editlog_pivoted_df.drop(columns=["date"], inplace=True)
 
-        # Change types of columns to match original_df?
-        # for col in editlog_pivoted_df.columns.tolist():
-        #     editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(input_df[col].dtype)
+        # Unpack keys
+        # primary_keys = ["key1", "key2"]
+        # editlog_pivoted_df = DataFrame(data={"key": ["('one', 'two')", "('three', 'four')"], "col1": [1, 2], "col2": [3, 4]})
+        def unpack(row):
+            return eval(row["key"])
+        keys = editlog_pivoted_df.apply(unpack, axis=1, result_type="expand")
+        keys.columns = primary_keys
+        editlog_pivoted_df[primary_keys] = keys
+        editlog_pivoted_df.drop(columns=["key"], inplace=True)
+
+        # Change types of primary keys to match original_df
+        for col in primary_keys: # or editlog_pivoted_df.columns.tolist() ?
+            editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(original_df[col].dtypes.name)
 
         # Join -> this adds _value_last columns
-        editlog_pivoted_df.index.names = [primary_key]
-        edited_df = original_df.join(editlog_pivoted_df, rsuffix="_value_last")
-
+        original_df.set_index(primary_keys, inplace=True)
+        editlog_pivoted_df.set_index(primary_keys, inplace=True)
+        edited_df = original_df.join(editlog_pivoted_df, on=primary_keys, rsuffix="_value_last")
+        
         # "Merge" -> this creates _original columns
         editable_column_names = editlog_pivoted_df.columns.tolist() # "date" column has already been dropped
         for col in editable_column_names:
@@ -65,9 +75,9 @@ def merge_edits(original_df, editlog_pivoted_df, primary_key):
             edited_df.loc[:, col] = edited_df[col + "_value_last"].where(edited_df[col + "_value_last"].notnull(), edited_df[col + "_original"])
 
         # Drop the _original and _value_last columns -> this gets us back to the original schema
-        edited_df = edited_df[edited_df.columns[:-2*len(editable_column_names)]]
+        edited_df = edited_df[edited_df.columns[:-2*len(editable_column_names)]].reset_index()
 
-    return edited_df.reset_index()
+    return edited_df
 
 def pivot_editlog(editlog_ds, editable_column_names):
     # Create empty dataframe that has all editable columns
@@ -96,7 +106,7 @@ def pivot_editlog(editlog_ds, editable_column_names):
 
     return editlog_pivoted_df.reset_index()
 
-### Other utils
+### Other utils (unused)
 
 def get_table_name(dataset, project_key):
     return dataset.get_config()["params"]["table"].replace("${projectKey}", project_key).replace("${NODE}", dataiku.get_custom_variables().get("NODE"))
