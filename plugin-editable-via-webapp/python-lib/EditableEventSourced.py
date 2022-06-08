@@ -115,17 +115,17 @@ class EditableEventSourced:
             self.editlog_pivoted_ds.write_dataframe(editlog_pivoted_df)
             print("Done.")
 
-        recipe_name = "compute_" + self.editlog_pivoted_ds_name
-        recipe_creator = DSSRecipeCreator("CustomCode_pivot-editlog", recipe_name, self.project)
-        if (recipe_already_exists(recipe_name, self.project)):
+        pivot_recipe_name = "compute_" + self.editlog_pivoted_ds_name
+        pivot_recipe_creator = DSSRecipeCreator("CustomCode_pivot-editlog", pivot_recipe_name, self.project)
+        if (recipe_already_exists(pivot_recipe_name, self.project)):
             print("Found recipe to create editlog pivoted")
         else:
             print("No recipe to create editlog pivoted, creating it...")
-            recipe = recipe_creator.create()
-            settings = recipe.get_settings()
-            settings.add_input("editlog", self.editlog_ds_name)
-            settings.add_output("editlog_pivoted", self.editlog_pivoted_ds_name)
-            settings.save()
+            pivot_recipe = pivot_recipe_creator.create()
+            pivot_settings = pivot_recipe.get_settings()
+            pivot_settings.add_input("editlog", self.editlog_ds_name)
+            pivot_settings.add_output("editlog_pivoted", self.editlog_pivoted_ds_name)
+            pivot_settings.save()
             print("Done.")
 
         edited_ds_creator = DSSManagedDatasetCreationHelper(self.project, self.edited_ds_name)
@@ -139,18 +139,18 @@ class EditableEventSourced:
             self.edited_ds = Dataset(self.edited_ds_name, self.project_key)
             print("Done.")
 
-        recipe_name = "compute_" + self.edited_ds_name
-        recipe_creator = DSSRecipeCreator("CustomCode_merge-edits", recipe_name, self.project)
-        if (recipe_already_exists(recipe_name, self.project)):
+        merge_recipe_name = "compute_" + self.edited_ds_name
+        merge_recipe_creator = DSSRecipeCreator("CustomCode_merge-edits-python", merge_recipe_name, self.project) # TODO: should be CustomCode_merge-edits; reinstall plugin and remove -python suffix and try again
+        if (recipe_already_exists(merge_recipe_name, self.project)):
             print("Found recipe to create edited dataset")
         else:
             print("No recipe to create edited dataset, creating it...")
-            recipe = recipe_creator.create()
-            settings = recipe.get_settings()
-            settings.add_input("original", self.original_ds_name)
-            settings.add_input("editlog_pivoted", self.editlog_pivoted_ds_name)
-            settings.add_output("edited", self.edited_ds_name)
-            settings.save()
+            merge_recipe = merge_recipe_creator.create()
+            merge_settings = merge_recipe.get_settings()
+            merge_settings.add_input("original", self.original_ds_name)
+            merge_settings.add_input("editlog_pivoted", self.editlog_pivoted_ds_name)
+            merge_settings.add_output("edited", self.edited_ds_name)
+            merge_settings.save()
             print("Done.")
 
     def __init__(self, original_ds_name, project_key=None):
