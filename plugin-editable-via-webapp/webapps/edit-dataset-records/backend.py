@@ -64,7 +64,7 @@ def serve_layout(): # see https://dash.plotly.com/live-updates
         html.Div(
             children=DashTabulator(
                 id='datatable',
-                columns=ees.get_schema_tabulator(),
+                columns=ees.get_editschema_tabulator(),
                 data=ees.get_editable_tabulator(),
                 theme='bootstrap/tabulator_bootstrap4',
                 options={"selectable": 1, "layout": "fitDataTable"},

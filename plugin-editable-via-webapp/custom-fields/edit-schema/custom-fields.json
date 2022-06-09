@@ -11,8 +11,8 @@
                 "includedObjectTypes": ["DATASET"]
             },
             "field": {
-                "name": "schema",
-                "label": "Schema",
+                "name": "editschema",
+                "label": "Edit-Schema",
                 "description": "JSON",
                 "type": "TEXTAREA"
             }

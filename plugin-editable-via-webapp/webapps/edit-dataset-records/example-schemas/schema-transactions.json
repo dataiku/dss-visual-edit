@@ -7,6 +7,6 @@
         {"name": "text", "type": "string", "editable": false},
         {"name": "amount", "type": "double", "editable": false},
         {"name": "category", "type": "string", "editable": true},
-        {"name": "as_rule", "type": "bool", "editable": true}
+        {"name": "as_rule", "type": "boolean", "editable": true}
     ]
 }

@@ -28,7 +28,7 @@ editlog_pivoted_df = pivoted_ds.get_dataframe()
 # Write output schema
 edited_ds.write_schema(original_ds.read_schema()) # otherwise column type for columns of missing values might change
 
-schema = loads(original_ds.get_config()["customFields"]["schema"])
+schema = loads(original_ds.get_config()["customFields"]["editschema"])
 primary_keys = get_primary_keys(schema)
 
 # Write output data
