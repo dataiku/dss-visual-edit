@@ -14,13 +14,16 @@
             "name": "original_dataset",
             "label": "Original dataset",
             "description": "",
-            "type": "DATASET"
+            "type": "DATASET",
+            "mandatory": true
         },
         {
             "name": "editschema",
             "label": "Edit-Schema",
             "description": "JSON",
-            "type": "TEXTAREA"
+            "type": "TEXTAREA",
+            "mandatory": true,
+            "defaultValue": "[\n    {\"name\": \"Name\", \"type\": \"string\", \"editable_type\": \"key\", \"editable\": false},\n    {\"name\": \"Some number\", \"type\": \"float\", \"editable\": false},\n    {\"name\": \"Display String\", \"type\": \"string\", \"editable\": false},\n    {\"name\": \"Editable column\", \"type\": \"boolean\", \"editable\": true},\n]"
         }
     ],
     "roles": []
