@@ -83,6 +83,7 @@ class EditableEventSourced:
     def __get_editlog_pivoted_ds_schema__(self):
         # see commons.get_editlog_ds_schema
         editlog_pivoted_ds_schema = []
+        edited_ds_schema = []
         for col in self.editschema:
             new_col = {}
             new_col["name"] = col.get("name")
@@ -90,10 +91,11 @@ class EditableEventSourced:
             meaning = col.get("meaning")
             if (meaning):
                 new_col["meaning"] = meaning
-            if (col.get("edit_type")=="key" or col.get("editable")): # TODO: make a 1st pass on keys only, then 2nd pass on editable columns only
+            edited_ds_schema.append(new_col)
+            if (col.get("editable_type")=="key" or col.get("editable")): # TODO: make a 1st pass on keys only, then 2nd pass on editable columns only
                 editlog_pivoted_ds_schema.append(new_col)
         editlog_pivoted_ds_schema.append({"name": "date", "type": "string", "meaning": "DateSource"})
-        return editlog_pivoted_ds_schema
+        return editlog_pivoted_ds_schema, edited_ds_schema
 
     def __setup_editlog__(self):
         editlog_ds_creator = DSSManagedDatasetCreationHelper(self.project, self.editlog_ds_name)
@@ -116,6 +118,9 @@ class EditableEventSourced:
         settings.save()
 
     def __setup_editlog_downstream__(self):
+        editlog_pivoted_ds_schema, edited_ds_schema = self.__get_editlog_pivoted_ds_schema__()
+        self.edited_df_cols = self.primary_keys + self.display_column_names + self.editable_column_names
+
         editlog_pivoted_ds_creator = DSSManagedDatasetCreationHelper(self.project, self.editlog_pivoted_ds_name)
         if (editlog_pivoted_ds_creator.already_exists()):
             print("Found editlog pivoted")
@@ -126,7 +131,6 @@ class EditableEventSourced:
             self.editlog_pivoted_ds = Dataset(self.editlog_pivoted_ds_name, self.project_key)
             cols = self.primary_keys + self.editable_column_names + ["date"]
             editlog_pivoted_df = DataFrame(columns=cols)
-            editlog_pivoted_ds_schema = self.__get_editlog_pivoted_ds_schema__()
             self.editlog_pivoted_ds.write_schema(editlog_pivoted_ds_schema)
             self.editlog_pivoted_ds.write_dataframe(editlog_pivoted_df)
             print("Done.")
@@ -153,6 +157,9 @@ class EditableEventSourced:
             edited_ds_creator.with_store_into(connection=self.connection_name)
             edited_ds_creator.create()
             self.edited_ds = Dataset(self.edited_ds_name, self.project_key)
+            edited_df = DataFrame(columns=self.edited_df_cols)
+            self.edited_ds.write_schema(edited_ds_schema)
+            self.edited_ds.write_dataframe(edited_df)
             print("Done.")
 
         merge_recipe_name = "compute_" + self.edited_ds_name
@@ -185,11 +192,10 @@ class EditableEventSourced:
         self.editschema = loads(self.original_ds.get_config()["customFields"]["editschema"])
         self.__parse_schema__() # Sets editable_column_names, display_column_names, primary key, primary_key_types, linked_records
 
-        self.editable_df_cols = self.primary_keys + self.display_column_names + self.editable_column_names
-        self.original_df = self.original_ds.get_dataframe()[self.editable_df_cols]
         self.__setup_editlog__()
         self.__setup_editlog_downstream__()
-        self.__editable_df_indexed__ = self.__extend_with_lookup_columns__(
+        self.original_df = self.original_ds.get_dataframe()[self.edited_df_cols]
+        self.__edited_df_indexed__ = self.__extend_with_lookup_columns__(
                                         merge_edits(
                                             self.original_df,
                                             pivot_editlog(
@@ -201,14 +207,14 @@ class EditableEventSourced:
                                         )
                                     ).set_index(self.primary_keys) # index makes it easier to id values in the DataFrame
 
-    def get_editable_df_indexed(self):
-        return self.__editable_df_indexed__
+    def get_edited_df_indexed(self):
+        return self.__edited_df_indexed__
 
-    def get_editable_df(self):
-        return self.get_editable_df_indexed().reset_index()
+    def get_edited_df(self):
+        return self.get_edited_df_indexed().reset_index()
 
     def get_editable_tabulator(self):
-        return self.get_editable_df().to_dict('records')
+        return self.get_edited_df().to_dict('records')
 
     def get_editschema(self):
         return self.editschema
@@ -306,8 +312,8 @@ class EditableEventSourced:
 
         # TODO: do we need ees to maintain a live copy of (and to update) editlog_df? when is edit log accessed?
 
-        # update editable_df
-        self.__editable_df_indexed__.loc[primary_key_values, column_name] = value # Might need to change primary_key_values from a list to a tuple — see this example: df.loc[('cobra', 'mark i'), 'shield'] from https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.loc.html ?
+        # update edited_df
+        self.__edited_df_indexed__.loc[primary_key_values, column_name] = value # Might need to change primary_key_values from a list to a tuple — see this example: df.loc[('cobra', 'mark i'), 'shield'] from https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.loc.html ?
 
         # Update lookup columns if a linked record was edited
         for linked_record in self.linked_records:
@@ -317,7 +323,7 @@ class EditableEventSourced:
 
                 # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
                 for lookup_column in linked_record["lookup_columns"]:
-                    self.__editable_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0] # TODO: test multi-indexing
+                    self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0] # TODO: test multi-indexing
         
         print(f"""Updated column {column_name} where {self.primary_keys} is {primary_key_values}. New value: {value}.""")
 
