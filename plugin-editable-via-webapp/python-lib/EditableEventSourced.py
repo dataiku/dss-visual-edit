@@ -26,7 +26,12 @@ def recipe_already_exists(recipe_name, project):
         return False
 class EditableEventSourced:
 
-    def __parse_schema__(self):
+    def __save_editschema__(self, dataset_name):
+        settings = self.project.get_dataset(dataset_name).get_settings()
+        settings.custom_fields["editschema"] = dumps(self.editschema)
+        settings.save()
+
+    def __parse_editschema__(self):
         """Parse editable schema"""
 
         # First pass at the list of columns
@@ -112,10 +117,8 @@ class EditableEventSourced:
         # make sure that editlog is in append mode
         self.editlog_ds.spec_item["appendMode"] = True
         
-        # make sure that editlog has the right editschema
-        settings = self.project.get_dataset(self.editlog_ds_name).get_settings()
-        settings.custom_fields["editschema"] = dumps(self.editschema)
-        settings.save()
+        # make sure that editlog has the right editschema in its custom field
+        self.__save_editschema__(self.editlog_ds_name)
 
     def __setup_editlog_downstream__(self):
         editlog_pivoted_ds_schema, edited_ds_schema = self.__get_editlog_pivoted_ds_schema__()
@@ -163,7 +166,7 @@ class EditableEventSourced:
             print("Done.")
 
         merge_recipe_name = "compute_" + self.edited_ds_name
-        merge_recipe_creator = DSSRecipeCreator("CustomCode_merge-edits-python", merge_recipe_name, self.project) # TODO: should be CustomCode_merge-edits; reinstall plugin and remove -python suffix and try again
+        merge_recipe_creator = DSSRecipeCreator("CustomCode_merge-edits", merge_recipe_name, self.project)
         if (recipe_already_exists(merge_recipe_name, self.project)):
             print("Found recipe to create edited dataset")
         else:
@@ -176,7 +179,7 @@ class EditableEventSourced:
             merge_settings.save()
             print("Done.")
 
-    def __init__(self, original_ds_name, project_key=None):
+    def __init__(self, original_ds_name, editschema, project_key=None):
         self.original_ds_name = original_ds_name
         if (project_key is None): self.project_key = getenv("DKU_CURRENT_PROJECT_KEY")
         else: self.project_key = project_key
@@ -189,9 +192,10 @@ class EditableEventSourced:
         self.edited_ds_name = self.original_ds_name + "_edited"
 
         self.connection_name = self.original_ds.get_config()['params']['connection']
-        self.editschema = loads(self.original_ds.get_config()["customFields"]["editschema"])
-        self.__parse_schema__() # Sets editable_column_names, display_column_names, primary key, primary_key_types, linked_records
-
+        self.editschema = editschema
+        # make sure that original dataset has the right editschema in its custom field
+        self.__save_editschema__(self.original_ds_name)
+        self.__parse_editschema__() # Sets editable_column_names, display_column_names, primary key, primary_key_types, linked_records
         self.__setup_editlog__()
         self.__setup_editlog_downstream__()
         self.original_df = self.original_ds.get_dataframe()[self.edited_df_cols]

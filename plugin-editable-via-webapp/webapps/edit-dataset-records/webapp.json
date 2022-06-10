@@ -15,6 +15,12 @@
             "label": "Original dataset",
             "description": "",
             "type": "DATASET"
+        },
+        {
+            "name": "editschema",
+            "label": "Edit-Schema",
+            "description": "JSON",
+            "type": "TEXTAREA"
         }
     ],
     "roles": []

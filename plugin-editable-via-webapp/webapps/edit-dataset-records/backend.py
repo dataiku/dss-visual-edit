@@ -7,6 +7,7 @@
 # original_ds_name = ...
 # project_key = ...
 
+from json import load, loads
 import dataiku
 from os import getenv
 from dataiku.customwebapp import get_webapp_config
@@ -29,10 +30,12 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     print("Webapp is being run in Dataiku")
     run_context = "dataiku"
     original_ds_name = get_webapp_config().get("original_dataset")
+    editschema = loads(get_webapp_config().get("editschema"))
 else:
     print("Webapp is being run outside of Dataiku")
     run_context = "local"
     original_ds_name = getenv("ORIGINAL_DATASET")
+    editschema = load(open(getenv("EDITSCHEMA_PATH")))
     f_app = Flask(__name__)
     app = Dash(__name__, external_stylesheets=["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"], external_scripts=["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"], server=f_app)
     # TODO: how do we pass external stylesheets when using Dataiku?
@@ -50,7 +53,7 @@ user = f"""{current_user_settings["displayName"]} <{current_user_settings["email
 
 # 1. Get editable dataset
 #%%
-ees = EditableEventSourced(original_ds_name)
+ees = EditableEventSourced(original_ds_name, editschema)
 
 
 # 2. Define the webapp layout and components
