@@ -2,7 +2,7 @@
     "meta": {
         "label": "Edit dataset records",
         "description": "Webapp to edit records of a dataset and maintain an editlog dataset",
-        "icon": "icon-th-large",
+        "icon": "icon-edit-sign",
         "comments": "icon must be one of the FontAwesome 3.2.1 icons, complete list here at https://fontawesome.com/v3.2.1/icons/"
     },
     "baseType": "DASH",
@@ -23,7 +23,7 @@
             "description": "JSON",
             "type": "TEXTAREA",
             "mandatory": true,
-            "defaultValue": "[\n    {\"name\": \"Name\", \"type\": \"string\", \"editable_type\": \"key\", \"editable\": false},\n    {\"name\": \"Some number\", \"type\": \"float\", \"editable\": false},\n    {\"name\": \"Display String\", \"type\": \"string\", \"editable\": false},\n    {\"name\": \"Editable column\", \"type\": \"boolean\", \"editable\": true},\n]"
+            "defaultValue": "[\n    // The editschema is an array of dictionaries: one per column in the original dataset that should appear in the edited dataset.\n    // It's best to list key columns first, and editable columns last.\n    // Here is an example with 4 columns — REPLACE WITH YOUR OWN:\n    {\"name\": \"Name\", \"type\": \"string\", \"editable_type\": \"key\", \"editable\": false},\n    {\"name\": \"Some number\", \"type\": \"float\", \"editable\": false},\n    {\"name\": \"Display String\", \"type\": \"string\", \"editable\": false},\n    {\"name\": \"Editable column\", \"type\": \"boolean\", \"editable\": true}\n]"
         }
     ],
     "roles": []
