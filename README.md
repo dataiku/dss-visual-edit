@@ -1,3 +1,3 @@
 # README
 
-See [Wiki](/wiki).
+See [Wiki](lca/wiki).
