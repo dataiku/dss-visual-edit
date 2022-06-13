@@ -119,6 +119,16 @@ def merge_edits(original_df, editlog_pivoted_df, primary_keys):
 
     return edited_df
 
+### Other utils
+
+def get_user_details():
+    client = dataiku.api_client()
+    current_user_settings = client.get_own_user().get_settings().get_raw()
+    return f"""{current_user_settings["displayName"]} <{current_user_settings["email"]}>"""
+
+def tabulator_row_key_values(row, primary_keys):
+    return DataFrame(data=row, index=[0]).set_index(primary_keys).index[0]
+
 ### Other utils (unused)
 
 def get_table_name(dataset, project_key):

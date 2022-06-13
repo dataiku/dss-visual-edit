@@ -1,4 +1,4 @@
-from commons import get_primary_keys
+from commons import get_primary_keys, tabulator_row_key_values
 from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
@@ -340,3 +340,11 @@ class EditableEventSourced:
         
         print(f"""Updated column {column_name} where {self.primary_keys} is {primary_key_values}. New value: {value}.""")
 
+def add_edit_tabulator(self, cell, user):
+    self.add_edit(
+        tabulator_row_key_values(cell["row"], self.get_primary_keys()),
+        cell["column"],
+        cell["value"],
+        user
+    )
+    return self.get_editable_tabulator()
