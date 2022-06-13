@@ -40,6 +40,8 @@ class EditableEventSourced:
         self.display_column_names = []
         self.linked_records = []
         for col in self.editschema:
+            if not col.get("type"):
+                col["type"] = "string"
             if col.get("editable"):
                 if col.get("editable_type")=="linked_record":
                     self.linked_records.append(
