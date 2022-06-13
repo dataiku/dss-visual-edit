@@ -9,6 +9,7 @@
 
 
 #%%
+from os import getenv
 from EditableEventSourced import EditableEventSourced
 from dash import html, Dash
 from dash_tabulator import DashTabulator
@@ -32,7 +33,6 @@ else:
     run_context = "local"
 
     from json import load
-    from os import getenv
     original_ds_name = getenv("ORIGINAL_DATASET")
     editschema = load(open(getenv("EDITSCHEMA_PATH")))
     
