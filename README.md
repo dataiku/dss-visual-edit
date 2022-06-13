@@ -1,3 +1,3 @@
 # README
 
-See [Wiki](lca/wiki).
+See [Wiki](https://github.com/dataiku/lca/wiki).
