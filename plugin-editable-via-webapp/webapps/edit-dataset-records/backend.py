@@ -7,19 +7,13 @@
 # 1. Get editable dataset
 # 2. Define webapp layout and components
 
-#%%
-# when using interactive execution:
-# import sys
-# sys.path.append('../../python-lib')
-# original_ds_name = ...
-# project_key = ...
-# editschema = ...
 
+#%%
 from EditableEventSourced import EditableEventSourced
 from dash import html, Dash
 from dash_tabulator import DashTabulator
 from dash.dependencies import Input, Output
-from commons import get_user_details, tabulator_row_key_values
+from commons import get_user_details
 
 
 #%%
@@ -48,8 +42,8 @@ else:
 
 
 #%%
-user = get_user_details()
 ees = EditableEventSourced(original_ds_name, editschema)
+user = get_user_details()
 
 
 #%%
