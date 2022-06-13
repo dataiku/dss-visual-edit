@@ -94,7 +94,14 @@ class EditableEventSourced:
         for col in self.editschema:
             new_col = {}
             new_col["name"] = col.get("name")
-            new_col["type"] = col.get("type")
+            type = col.get("type")
+            if (type): # can be "number", "string" or "boolean"
+                if (type=="number"):
+                    new_col["type"] = "float"
+                else:
+                    new_col["type"] = type
+            else:
+                type = "string"
             meaning = col.get("meaning")
             if (meaning):
                 new_col["meaning"] = meaning
@@ -258,10 +265,10 @@ class EditableEventSourced:
                 title = col.get("title")
                 title = title if title else col["name"]
                 t_col["title"] = "🖊 " + title
-                if col.get("type")=="bool" or col.get("type")=="boolean":
+                if col.get("type")=="boolean":
                     t_col["editor"] = t_col["formatter"]
                     t_col["editorParams"] = {"tristate": True}
-                elif col.get("type")=="float" or col.get("type")=="double" or col.get("type")=="int" or col.get("type")=="integer":
+                elif col.get("type")=="number":
                     t_col["editor"] = "number"
                 else:
                     t_col["editor"] = "input"
@@ -300,7 +307,7 @@ class EditableEventSourced:
         # if the type of column_name is a boolean, make sure we read it correctly
         for col in self.editschema:
             if (col["name"]==column_name):
-                if type(value)==str and (col["type"]=="bool" or col["type"]=="boolean"):
+                if type(value)==str and col.get("type")=="boolean":
                     value = str(loads(value.lower()))
                 break
         
