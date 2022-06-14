@@ -9,9 +9,8 @@
 
 
 #%%
-from os import getenv
 from EditableEventSourced import EditableEventSourced
-from dash import html, Dash
+from dash import html
 from dash_tabulator import DashTabulator
 from dash.dependencies import Input, Output
 from commons import get_user_details
@@ -19,6 +18,8 @@ from commons import get_user_details
 
 #%%
 # Get original dataset name and editschema
+from os import getenv
+
 if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     print("Webapp is being run in Dataiku")
     run_context = "dataiku"
@@ -37,6 +38,7 @@ else:
     editschema = load(open(getenv("EDITSCHEMA_PATH")))
     
     from flask import Flask
+    from dash import Dash
     f_app = Flask(__name__)
     app = Dash(__name__, server=f_app)
 
@@ -49,23 +51,13 @@ user = get_user_details()
 #%%
 # Define the webapp layout and components
 def serve_layout():
-    return html.Div([
-    html.H3("Edit"),
-    html.Div([
-        html.Div("Select a cell, type a new value, and press Enter to save."),
-        html.Br(),
-        html.Div(
-            children=DashTabulator(
+    return html.Div(children=DashTabulator(
                 id='datatable',
                 columns=ees.get_editschema_tabulator(),
                 data=ees.get_editable_tabulator(),
                 theme='bootstrap/tabulator_bootstrap4',
                 options={"selectable": 1, "layout": "fitDataTable"}
-            ),
-        )
-        ])
-    ])
-
+            ))
 app.layout = serve_layout
 
 @app.callback(Output('datatable', 'data'),
