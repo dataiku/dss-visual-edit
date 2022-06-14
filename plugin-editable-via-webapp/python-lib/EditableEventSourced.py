@@ -338,12 +338,14 @@ class EditableEventSourced:
                 for lookup_column in linked_record["lookup_columns"]:
                     self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0] # TODO: update in tabulator too
         
-        print(f"""Updated column {column_name} where {self.primary_keys} is {primary_key_values}. New value: {value}.""")
+        info = f"""Updated column {column_name} where {self.primary_keys} is {primary_key_values}. New value: {value}."""
+        print(info)
+        return info
 
-def add_edit_tabulator(self, cell, user):
-    self.add_edit(
-        tabulator_row_key_values(cell["row"], self.get_primary_keys()),
-        cell["column"],
-        cell["value"],
-        user
-    )
+    def add_edit_tabulator(self, cell, user):
+        return self.add_edit(
+            tabulator_row_key_values(cell["row"], self.get_primary_keys()),
+            cell["column"],
+            cell["value"],
+            user
+        )

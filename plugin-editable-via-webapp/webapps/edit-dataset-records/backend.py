@@ -51,18 +51,24 @@ user = get_user_details()
 #%%
 # Define the webapp layout and components
 def serve_layout():
-    return html.Div(children=DashTabulator(
-                id='datatable',
-                columns=ees.get_editschema_tabulator(),
-                data=ees.get_editable_tabulator(),
-                theme='bootstrap/tabulator_bootstrap4',
-                options={"selectable": 1, "layout": "fitDataTable"}
-            ))
+    return html.Div([
+        DashTabulator(
+            id='datatable',
+            columns=ees.get_editschema_tabulator(),
+            data=ees.get_editable_tabulator(),
+            theme='bootstrap/tabulator_bootstrap4',
+            options={"selectable": 1, "layout": "fitDataTable"}
+        ),
+        html.Div(id='debug', children="")
+    ])
 app.layout = serve_layout
 
-@app.callback(Input('datatable', 'cellEdited'), prevent_initial_call=True)
+@app.callback(
+    Output('debug', 'children'),
+    Input('datatable', 'cellEdited'),
+    prevent_initial_call=True)
 def update(cell):
-    ees.add_edit_tabulator(cell, user)
+    return ees.add_edit_tabulator(cell, user)
 
 if __name__=="__main__":
     if run_context=="local":
