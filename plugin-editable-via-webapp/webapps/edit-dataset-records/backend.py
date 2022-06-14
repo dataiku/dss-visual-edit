@@ -59,7 +59,7 @@ def serve_layout():
             theme='bootstrap/tabulator_bootstrap4',
             options={"selectable": 1, "layout": "fitDataTable"}
         ),
-        html.Div(id='debug', children="")
+        html.Div(id='debug', children="", style={"display": "none"}),
     ])
 app.layout = serve_layout
 
