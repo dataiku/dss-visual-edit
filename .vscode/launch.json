@@ -16,7 +16,7 @@
                 "PYTHONPATH": "../../python-lib",
                 "DKU_CURRENT_PROJECT_KEY": "STAKEHOLDER_OWNERSHIP", // choose from CATEGORIZE_TRANSACTIONS, JOIN_COMPANIES, STAKEHOLDER_OWNERSHIP
                 "ORIGINAL_DATASET": "stakeholders_tbc_filtered", // choose from transactions_missing, matches, stakeholders_tbc_filtered,
-                "EDITSCHEMA_PATH": "example-schemas/schema-freefloat.json"
+                "EDITSCHEMA_PATH": "example-editschemas/editschema-freefloat.json"
             },
             "args": [
                 "run",

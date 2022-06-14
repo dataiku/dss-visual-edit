@@ -1,6 +1,6 @@
 import dataiku
 from dataiku.customrecipe import get_input_names_for_role, get_output_names_for_role
-from json import loads
+from json5 import loads
 
 # when using interactive execution:
 # import sys

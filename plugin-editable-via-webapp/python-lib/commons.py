@@ -1,6 +1,6 @@
 import dataiku
 from pandas import DataFrame, concat, pivot_table
-from json import loads
+from json5 import loads
 from os import getenv
 import requests
 
@@ -118,6 +118,16 @@ def merge_edits(original_df, editlog_pivoted_df, primary_keys):
         edited_df = edited_df[edited_df.columns[:-2*len(editable_column_names)]].reset_index()
 
     return edited_df
+
+### Other utils
+
+def get_user_details():
+    client = dataiku.api_client()
+    current_user_settings = client.get_own_user().get_settings().get_raw()
+    return f"""{current_user_settings.get("displayName")} <{current_user_settings.get("email")}>"""
+
+def tabulator_row_key_values(row, primary_keys):
+    return DataFrame(data=row, index=[0]).set_index(primary_keys).index[0]
 
 ### Other utils (unused)
 

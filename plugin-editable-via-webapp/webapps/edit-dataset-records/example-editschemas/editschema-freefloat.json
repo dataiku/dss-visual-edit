@@ -4,7 +4,11 @@
     {"name": "Report Date", "editable_type": "key"},
     {"name": "Stakeholder Name"},
     {"name": "Security Name"},
+    {"name": "Source"},
+    {"name": "Investor Type"},
+    {"name": "Shares Outstanding", "type": "number"},
+    {"name": "Percentage Shares Outstanding", "type": "number"},
     {"name": "1) Position is Free Float? (TRUE/FALSE)", "title": "Free float?", "type": "boolean", "editable": true},
     {"name": "In case 1) = FALSE then 2) Shares in FS Correct? (TRUE/FALSE)", "title": "If not, Shares correct?", "type": "boolean", "editable": true},
-    {"name": "In case 2) = FALSE then 3) Fill in shares manually", "title": "If not, give Shares value", "type": "number", "editable": true}
+    {"name": "In case 2) = FALSE then 3) Fill in shares manually", "title": "If not, Shares value?", "type": "number", "editable": true}
 ]
