@@ -1,6 +1,6 @@
 import dataiku
 from pandas import DataFrame, concat, pivot_table
-from json import loads
+from json5 import loads
 from os import getenv
 import requests
 

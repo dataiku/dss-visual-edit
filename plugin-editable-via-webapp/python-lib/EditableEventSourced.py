@@ -5,7 +5,7 @@ from dataikuapi.dss.recipe import DSSRecipeCreator
 from pandas import DataFrame
 from commons import get_editable_column_names, merge_edits, pivot_editlog
 from os import getenv
-from json import loads, dumps
+from json5 import loads, dumps
 from datetime import datetime
 from pytz import timezone
 
@@ -336,7 +336,7 @@ class EditableEventSourced:
 
                 # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
                 for lookup_column in linked_record["lookup_columns"]:
-                    self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0] # TODO: test multi-indexing
+                    self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0] # TODO: update in tabulator too
         
         print(f"""Updated column {column_name} where {self.primary_keys} is {primary_key_values}. New value: {value}.""")
 
