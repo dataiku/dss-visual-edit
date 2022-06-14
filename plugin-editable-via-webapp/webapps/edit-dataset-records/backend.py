@@ -60,11 +60,9 @@ def serve_layout():
             ))
 app.layout = serve_layout
 
-@app.callback(Output('datatable', 'data'),
-              Input('datatable', 'cellEdited'),
-              prevent_initial_call=True)
+@app.callback(Input('datatable', 'cellEdited'), prevent_initial_call=True)
 def update(cell):
-    return ees.add_edit_tabulator(cell, user)
+    ees.add_edit_tabulator(cell, user)
 
 if __name__=="__main__":
     if run_context=="local":

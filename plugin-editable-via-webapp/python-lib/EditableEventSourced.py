@@ -347,4 +347,3 @@ def add_edit_tabulator(self, cell, user):
         cell["value"],
         user
     )
-    return self.get_editable_tabulator()
