@@ -226,13 +226,13 @@ class EditableEventSourced:
     def get_edited_df(self):
         return self.get_edited_df_indexed().reset_index()
 
-    def get_editable_tabulator(self):
+    def get_data_tabulator(self):
         return self.get_edited_df().to_dict('records')
 
     def get_editschema(self):
         return self.editschema
 
-    def get_editschema_tabulator(self):
+    def get_columns_tabulator(self):
         # Setup columns to be used by data table
         # Add "editor" to editable columns. Possible values include: "input", "textarea", "number", "tickCross", "list". See all options at options http://tabulator.info/docs/5.2/edit.
         # IDEA: improve this code with a dict to do matching (instead of if/else)?
@@ -265,6 +265,9 @@ class EditableEventSourced:
                 title = col.get("title")
                 title = title if title else col["name"]
                 t_col["title"] = "🖊 " + title
+                if col.get("type")=="list":
+                    t_col["editor"] = "list"
+                    t_col["editorParams"] = {"values": col["values"]}
                 if col.get("type")=="boolean":
                     t_col["editor"] = t_col["formatter"]
                     t_col["editorParams"] = {"tristate": True}

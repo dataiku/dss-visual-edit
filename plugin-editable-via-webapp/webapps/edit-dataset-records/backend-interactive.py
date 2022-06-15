@@ -19,4 +19,4 @@ from EditableEventSourced import EditableEventSourced
 ees = EditableEventSourced(original_ds_name, editschema, project_key)
 user = "test"
 
-# Run Dash cells? (see backend.py starting at Dash layout definition)
+# Dash cells: see backend.py starting at Dash layout definition
