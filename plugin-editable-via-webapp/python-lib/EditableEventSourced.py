@@ -61,13 +61,13 @@ class EditableEventSourced:
         #                 })
 
     def __extend_with_lookup_columns__(self, df):
-        for linked_record in self.linked_records:
-            lookup_column_names, lookup_column_names_in_linked_ds = get_lookup_column_names(linked_record)
-            linked_ds = Dataset(linked_record["ds_name"], self.project_key)
-            linked_df = linked_ds.get_dataframe().set_index(linked_record["ds_key"])[lookup_column_names_in_linked_ds]
-            df = df.join(linked_df, on=linked_record["name"])
-            for c in range(0, len(lookup_column_names)):
-                df.rename(columns={lookup_column_names_in_linked_ds[c]: lookup_column_names[c]}, inplace=True)
+        # for linked_record in self.linked_records:
+        #     lookup_column_names, lookup_column_names_in_linked_ds = get_lookup_column_names(linked_record)
+        #     linked_ds = Dataset(linked_record["ds_name"], self.project_key)
+        #     linked_df = linked_ds.get_dataframe().set_index(linked_record["ds_key"])[lookup_column_names_in_linked_ds]
+        #     df = df.join(linked_df, on=linked_record["name"])
+        #     for c in range(0, len(lookup_column_names)):
+        #         df.rename(columns={lookup_column_names_in_linked_ds[c]: lookup_column_names[c]}, inplace=True)
         return df
 
     def __get_lookup_values__(self, linked_record, linked_record_value):
