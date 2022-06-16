@@ -40,6 +40,13 @@ def get_primary_keys(schema):
             keys.append(col["name"])
     return keys
 
+def get_display_column_names(editschema):
+    display_column_names = []
+    for col in editschema:
+        if not col.get("editable") and col.get("editable_type")!="key":
+            display_column_names.append(col.get("name"))
+    return display_column_names
+
 def get_editable_column_names(schema):
     editable_column_names = []
     for col in schema:

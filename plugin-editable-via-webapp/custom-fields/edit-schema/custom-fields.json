@@ -1,11 +1,33 @@
 {
     "meta": {
-        "label": "Schema for edition",
-        "description": "Used when creating a webapp to edit this dataset",
+        "label": "Data edition",
+        "description": "Used by data edition webapp component",
         "icon": "icon-columns"
     },
     "customFields": [
         {
+            "applyToObjects": {
+                "mode": "SOME",
+                "includedObjectTypes": ["DATASET"]
+            },
+            "field": {
+                "name": "primary_keys",
+                "label": "Primary Keys",
+                "description": "",
+                "type": "COLUMNS"
+            }
+        },{
+            "applyToObjects": {
+                "mode": "SOME",
+                "includedObjectTypes": ["DATASET"]
+            },
+            "field": {
+                "name": "editable_column_names",
+                "label": "Editable Column Names",
+                "description": "",
+                "type": "COLUMNS"
+            }
+        },{
             "applyToObjects": {
                 "mode": "SOME",
                 "includedObjectTypes": ["DATASET"]
