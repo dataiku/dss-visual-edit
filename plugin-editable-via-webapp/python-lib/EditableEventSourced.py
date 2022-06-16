@@ -33,30 +33,30 @@ class EditableEventSourced:
 
     def __setup_linked_records__(self):
         # TODO: create custom interface to let user define linked records https://doc.dataiku.com/dss/latest/plugins/reference/other.html
+        return
+        # self.linked_records = []
+        # for col in self.__schema__:
+        #     if col.get("editable"):
+        #         if col.get("editable_type")=="linked_record": # TODO: "editable_type" isn't defined in the schema, so it needs to be found somewhere else
+        #             self.linked_records.append(
+        #                 {
+        #                     "name": col.get("name"),
+        #                     "type": col.get("type"),
+        #                     "ds_name": col.get("linked_ds_name"),
+        #                     "ds_key": col.get("linked_ds_key"),
+        #                     "lookup_columns": []
+        #                 }
+        #             )
 
-        self.linked_records = []
-        for col in self.__schema__:
-            if col.get("editable"):
-                if col.get("editable_type")=="linked_record": # TODO: "editable_type" isn't defined in the schema, so it needs to be found somewhere else
-                    self.linked_records.append(
-                        {
-                            "name": col.get("name"),
-                            "type": col.get("type"),
-                            "ds_name": col.get("linked_ds_name"),
-                            "ds_key": col.get("linked_ds_key"),
-                            "lookup_columns": []
-                        }
-                    )
-
-        # Second pass to create the lookup columns for each linked record
-        for col in self.__schema__:
-            if col.get("name") in self.lookup_column_names: # TODO: define lookup_column_names
-                for linked_record in self.linked_records:
-                    if linked_record["name"]==col.get("linked_record_col"):
-                        linked_record["lookup_columns"].append({
-                            "name": col.get("name"),
-                            "linked_ds_column_name": col.get("linked_ds_column_name") # TODO: find a way for the user to define a lookup column and its linked dataset column name
-                        })
+        # # Second pass to create the lookup columns for each linked record
+        # for col in self.__schema__:
+        #     if col.get("name") in self.lookup_column_names: # TODO: define lookup_column_names
+        #         for linked_record in self.linked_records:
+        #             if linked_record["name"]==col.get("linked_record_col"):
+        #                 linked_record["lookup_columns"].append({
+        #                     "name": col.get("name"),
+        #                     "linked_ds_column_name": col.get("linked_ds_column_name") # TODO: find a way for the user to define a lookup column and its linked dataset column name
+        #                 })
 
     def __extend_with_lookup_columns__(self, df):
         for linked_record in self.linked_records:
