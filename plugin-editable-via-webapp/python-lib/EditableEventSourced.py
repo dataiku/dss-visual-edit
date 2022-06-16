@@ -122,8 +122,6 @@ class EditableEventSourced:
 
     def __setup_editlog_downstream__(self):
         editlog_pivoted_ds_schema, edited_ds_schema = self.__get_editlog_pivoted_ds_schema__()
-        self.edited_df_cols = self.primary_keys + self.display_column_names + self.editable_column_names
-
         editlog_pivoted_ds_creator = DSSManagedDatasetCreationHelper(self.project, self.editlog_pivoted_ds_name)
         if (editlog_pivoted_ds_creator.already_exists()):
             print("Found editlog pivoted")
@@ -200,6 +198,7 @@ class EditableEventSourced:
             self.primary_keys = get_primary_keys(editschema)
             self.editable_column_names = get_editable_column_names(editschema)
         self.display_column_names = [col for col in self.__schema__ if col not in self.primary_keys + self.editable_column_names]
+        self.edited_df_cols = self.primary_keys + self.display_column_names + self.editable_column_names
 
         # make sure that original dataset has the right editschema in its custom field
         self.__save_custom_fields__(self.original_ds_name)

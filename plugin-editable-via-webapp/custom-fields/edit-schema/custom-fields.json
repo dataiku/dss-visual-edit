@@ -11,10 +11,33 @@
                 "includedObjectTypes": ["DATASET"]
             },
             "field": {
+                "name": "editlog_ds",
+                "label": "Edit Log",
+                "description": "",
+                "type": "DATASET"
+            }
+        },{
+            "applyToObjects": {
+                "mode": "SOME",
+                "includedObjectTypes": ["DATASET"]
+            },
+            "field": {
+                "name": "original_ds",
+                "label": "Original Dataset",
+                "description": "",
+                "type": "DATASET"
+            }
+        },{
+            "applyToObjects": {
+                "mode": "SOME",
+                "includedObjectTypes": ["DATASET"]
+            },
+            "field": {
                 "name": "primary_keys",
                 "label": "Primary Keys",
                 "description": "",
-                "type": "COLUMNS"
+                "type": "COLUMNS",
+                "datasetParamName": "original_ds"
             }
         },{
             "applyToObjects": {
@@ -23,9 +46,10 @@
             },
             "field": {
                 "name": "editable_column_names",
-                "label": "Editable Column Names",
+                "label": "Editable Columns",
                 "description": "",
-                "type": "COLUMNS"
+                "type": "COLUMNS",
+                "datasetParamName": "original_ds"
             }
         }
     ]

@@ -27,7 +27,7 @@
         },
         {
             "name": "editable_columns",
-            "label": "Editable columns",
+            "label": "Editable Columns",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset",
             "mandatory": true
