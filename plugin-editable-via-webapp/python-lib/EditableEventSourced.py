@@ -226,7 +226,7 @@ class EditableEventSourced:
     def get_edited_df(self):
         return self.get_edited_df_indexed().reset_index()
 
-    def get_editable_tabulator(self):
+    def get_data_tabulator(self):
         return self.get_edited_df().to_dict('records')
 
     def get_columns_tabulator(self):

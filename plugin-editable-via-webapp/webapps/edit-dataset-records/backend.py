@@ -54,8 +54,8 @@ def serve_layout():
     return html.Div([
         DashTabulator(
             id='datatable',
-            columns=ees.get_editschema_tabulator(),
-            data=ees.get_editable_tabulator(),
+            columns=ees.get_columns_tabulator(),
+            data=ees.get_data_tabulator(),
             theme='bootstrap/tabulator_bootstrap4',
             options={"selectable": 1, "layout": "fitDataTable"}
         ),
