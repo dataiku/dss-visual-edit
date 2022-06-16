@@ -9,12 +9,12 @@ from datetime import datetime
 from pytz import timezone
 
 def get_lookup_column_names(linked_record):
-        lookup_column_names = []
-        lookup_column_names_in_linked_ds = []
-        for lookup_column in linked_record["lookup_columns"]:
-            lookup_column_names.append(lookup_column["name"])
-            lookup_column_names_in_linked_ds.append(lookup_column["linked_ds_column_name"])
-        return lookup_column_names, lookup_column_names_in_linked_ds
+    lookup_column_names = []
+    lookup_column_names_in_linked_ds = []
+    for lookup_column in linked_record["lookup_columns"]:
+        lookup_column_names.append(lookup_column["name"])
+        lookup_column_names_in_linked_ds.append(lookup_column["linked_ds_column_name"])
+    return lookup_column_names, lookup_column_names_in_linked_ds
 
 def recipe_already_exists(recipe_name, project):
     try:
@@ -33,6 +33,7 @@ class EditableEventSourced:
         settings.custom_fields["editable_column_names"] = self.editable_column_names
         settings.save()
 
+    """
     def __setup_linked_records__(self):
         # TODO: create custom interface to let user define linked records https://doc.dataiku.com/dss/latest/plugins/reference/other.html
         return
@@ -61,13 +62,13 @@ class EditableEventSourced:
         #                 })
 
     def __extend_with_lookup_columns__(self, df):
-        # for linked_record in self.linked_records:
-        #     lookup_column_names, lookup_column_names_in_linked_ds = get_lookup_column_names(linked_record)
-        #     linked_ds = Dataset(linked_record["ds_name"], self.project_key)
-        #     linked_df = linked_ds.get_dataframe().set_index(linked_record["ds_key"])[lookup_column_names_in_linked_ds]
-        #     df = df.join(linked_df, on=linked_record["name"])
-        #     for c in range(0, len(lookup_column_names)):
-        #         df.rename(columns={lookup_column_names_in_linked_ds[c]: lookup_column_names[c]}, inplace=True)
+        for linked_record in self.linked_records:
+            lookup_column_names, lookup_column_names_in_linked_ds = get_lookup_column_names(linked_record)
+            linked_ds = Dataset(linked_record["ds_name"], self.project_key)
+            linked_df = linked_ds.get_dataframe().set_index(linked_record["ds_key"])[lookup_column_names_in_linked_ds]
+            df = df.join(linked_df, on=linked_record["name"])
+            for c in range(0, len(lookup_column_names)):
+                df.rename(columns={lookup_column_names_in_linked_ds[c]: lookup_column_names[c]}, inplace=True)
         return df
 
     def __get_lookup_values__(self, linked_record, linked_record_value):
@@ -79,6 +80,7 @@ class EditableEventSourced:
             value_cast = int(linked_record_value)
         return linked_df.loc[linked_df.index==value_cast]
         # IDEA: add linked_record["linked_key"] as an INDEX to speed up the query
+    """
 
     def __get_editlog_pivoted_ds_schema__(self):
         # see commons.get_editlog_ds_schema
@@ -204,21 +206,21 @@ class EditableEventSourced:
 
         # make sure that original dataset has up-to-date custom fields
         self.__save_custom_fields__(self.original_ds_name)
-        self.__setup_linked_records__()
+        # self.__setup_linked_records__()
         self.__setup_editlog__()
         self.__setup_editlog_downstream__()
         self.original_df = self.original_ds.get_dataframe()[self.edited_df_cols]
-        self.__edited_df_indexed__ = self.__extend_with_lookup_columns__(
-                                        merge_edits(
-                                            self.original_df,
-                                            pivot_editlog(
-                                                self.editlog_ds,
-                                                self.primary_keys,
-                                                self.editable_column_names
-                                            ),
-                                            self.primary_keys
-                                        )
-                                    ).set_index(self.primary_keys) # index makes it easier to id values in the DataFrame
+        self.__edited_df_indexed__ = merge_edits(
+                                        self.original_df,
+                                        pivot_editlog(
+                                            self.editlog_ds,
+                                            self.primary_keys,
+                                            self.editable_column_names
+                                        ),
+                                        self.primary_keys
+                                     )
+        # self.__edited_df_indexed__ = self.__extend_with_lookup_columns__(self.__edited_df_indexed__)
+        self.__edited_df_indexed__.set_index(self.primary_keys, inplace=True) # index makes it easier to id values in the DataFrame
 
     def get_edited_df_indexed(self):
         return self.__edited_df_indexed__
@@ -304,14 +306,14 @@ class EditableEventSourced:
         self.__edited_df_indexed__.loc[primary_key_values, column_name] = value # Might need to change primary_key_values from a list to a tuple — see this example: df.loc[('cobra', 'mark i'), 'shield'] from https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.loc.html ?
 
         # Update lookup columns if a linked record was edited
-        for linked_record in self.linked_records:
-            if (column_name==linked_record["name"]):
-                # Retrieve values of the lookup columns from the linked dataset, for the row corresponding to the edited value (linked_record["ds_key"]==value)
-                lookup_values = self.__get_lookup_values__(linked_record, value)
+        # for linked_record in self.linked_records:
+        #     if (column_name==linked_record["name"]):
+        #         # Retrieve values of the lookup columns from the linked dataset, for the row corresponding to the edited value (linked_record["ds_key"]==value)
+        #         lookup_values = self.__get_lookup_values__(linked_record, value)
 
-                # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
-                for lookup_column in linked_record["lookup_columns"]:
-                    self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0] # TODO: update in tabulator too
+        #         # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
+        #         for lookup_column in linked_record["lookup_columns"]:
+        #             self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0] # TODO: update in tabulator too
         
         info = f"""Updated column {column_name} where {self.primary_keys} is {primary_key_values}. New value: {value}."""
         print(info)
