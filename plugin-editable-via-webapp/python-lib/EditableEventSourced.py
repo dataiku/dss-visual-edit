@@ -27,6 +27,8 @@ class EditableEventSourced:
 
     def __save_custom_fields__(self, dataset_name):
         settings = self.project.get_dataset(dataset_name).get_settings()
+        settings.custom_fields["original_ds"] = self.original_ds_name
+        settings.custom_fields["editlog_ds"] = self.editlog_ds_name
         settings.custom_fields["primary_keys"] = self.primary_keys
         settings.custom_fields["editable_column_names"] = self.editable_column_names
         settings.save()
@@ -197,10 +199,10 @@ class EditableEventSourced:
         if (editschema):
             self.primary_keys = get_primary_keys(editschema)
             self.editable_column_names = get_editable_column_names(editschema)
-        self.display_column_names = [col for col in self.__schema__ if col not in self.primary_keys + self.editable_column_names]
+        self.display_column_names = [col.get("name") for col in self.__schema__ if col.get("name") not in self.primary_keys + self.editable_column_names]
         self.edited_df_cols = self.primary_keys + self.display_column_names + self.editable_column_names
 
-        # make sure that original dataset has the right editschema in its custom field
+        # make sure that original dataset has up-to-date custom fields
         self.__save_custom_fields__(self.original_ds_name)
         self.__setup_linked_records__()
         self.__setup_editlog__()
