@@ -1,7 +1,7 @@
 {
     "meta": {
         "label": "Merge edits",
-        "description": "Copy original dataset and merge edits recorded via the webapp",
+        "description": "Merges edits recorded via the webapp into the original dataset",
         "icon": "icon-plus"
     },
     "kind": "PYTHON",

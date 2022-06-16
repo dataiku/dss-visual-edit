@@ -1,6 +1,6 @@
 {
     "id": "editable-via-webapp",
-    "version": "1.4.2",
+    "version": "1.5.0",
     "meta": {
         "label": "Editable via webapp",
         "description": "Edit dataset records via a webapp and replay edits in the Flow",

@@ -1,7 +1,7 @@
 {
     "meta": {
-        "label": "Data edition",
-        "description": "Used by data edition webapp component",
+        "label": "Data edition properties",
+        "description": "",
         "icon": "icon-columns"
     },
     "customFields": [
@@ -26,17 +26,6 @@
                 "label": "Editable Column Names",
                 "description": "",
                 "type": "COLUMNS"
-            }
-        },{
-            "applyToObjects": {
-                "mode": "SOME",
-                "includedObjectTypes": ["DATASET"]
-            },
-            "field": {
-                "name": "editschema",
-                "label": "Edit-Schema",
-                "description": "JSON",
-                "type": "TEXTAREA"
             }
         }
     ]
