@@ -42,7 +42,7 @@ else:
 
 #%%
 from EditableEventSourced import EditableEventSourced
-ees = EditableEventSourced(original_ds_name, primary_keys=primary_keys, editable_column_names=editable_column_names)
+ees = EditableEventSourced(original_ds_name, primary_keys=["Stakeholder Id"], editable_column_names=editable_column_names)
 
 #%%
 from commons import get_user_details
