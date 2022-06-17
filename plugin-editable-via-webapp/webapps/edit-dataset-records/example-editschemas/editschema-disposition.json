@@ -1,6 +1,3 @@
-original_ds = "demand_stream_prepared_filtered"
-
-
 [
     {"name": "shop", "editable_type": "key"},
     {"name": "part", "editable_type": "key"},
