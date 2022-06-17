@@ -54,8 +54,12 @@ user = get_user_details()
 
 #%%
 # Define the webapp layout and components
+
 from dash_tabulator import DashTabulator
 from dash.dependencies import Input, Output
+
+app.config.external_stylesheets = ["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
+app.config.external_scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"]
 
 def serve_layout():
     return html.Div([
