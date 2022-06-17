@@ -57,7 +57,7 @@ def serve_layout():
             columns=ees.get_columns_tabulator(),
             data=ees.get_data_tabulator(),
             theme='bootstrap/tabulator_bootstrap4',
-            options={"selectable": 1, "layout": "fitDataTable", "pagination": "local", "paginationSize": 100}
+            options={"selectable": 1, "layout": "fitDataTable", "pagination": "local", "paginationSize": 10, "paginationSizeSelector":[10, 25, 50, 100]}
         ),
         html.Div(id='edit-info', children="", style={"display": "none"}),
     ])
