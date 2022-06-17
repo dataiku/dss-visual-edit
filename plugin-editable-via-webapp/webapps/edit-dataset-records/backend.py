@@ -9,8 +9,9 @@
 
 
 #%%
+from os import getenv
+from dash import Dash, html
 from EditableEventSourced import EditableEventSourced
-from dash import html
 from dash_tabulator import DashTabulator
 from dash.dependencies import Input, Output
 from commons import get_user_details
@@ -18,7 +19,6 @@ from commons import get_user_details
 
 #%%
 # Get original dataset name and editschema
-from os import getenv
 
 if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     print("Webapp is being run in Dataiku")
@@ -38,7 +38,6 @@ else:
     editschema = load(open(getenv("EDITSCHEMA_PATH")))
     
     from flask import Flask
-    from dash import Dash
     f_app = Flask(__name__)
     app = Dash(__name__, server=f_app)
 

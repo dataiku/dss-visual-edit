@@ -134,6 +134,7 @@ def get_user_details():
     return f"""{current_user_settings.get("displayName")} <{current_user_settings.get("email")}>"""
 
 def tabulator_row_key_values(row, primary_keys):
+    """Get values for a given row coming from Tabulator and a list of columns that are primary keys"""
     return DataFrame(data=row, index=[0]).set_index(primary_keys).index[0]
 
 ### Other utils (unused)
