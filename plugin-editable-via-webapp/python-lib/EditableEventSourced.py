@@ -195,9 +195,8 @@ class EditableEventSourced:
 
         self.__connection_name__ = self.original_ds.get_config().get("params").get("connection")
         self.__schema__ = self.original_ds.get_config().get("schema").get("columns")
-        if (primary_keys is not None and editable_column_names is not None):
-            self.primary_keys = primary_keys
-            self.editable_column_names = editable_column_names
+        self.primary_keys = primary_keys
+        self.editable_column_names = editable_column_names
         if (editschema):
             self.primary_keys = get_primary_keys(editschema)
             self.editable_column_names = get_editable_column_names(editschema)
