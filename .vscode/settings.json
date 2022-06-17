@@ -1,5 +1,8 @@
 {
     "python.analysis.extraPaths": [
         "./plugin-editable-via-webapp/python-lib"
-    ]
+    ],
+    "python.linting.enabled": false,
+    "python.linting.pylintEnabled": true,
+    "python.linting.flake8Enabled": false
 }
