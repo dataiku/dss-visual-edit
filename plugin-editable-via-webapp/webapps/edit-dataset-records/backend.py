@@ -19,17 +19,20 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     run_context = "dataiku"
 
     from dataiku.customwebapp import get_webapp_config
-    from json5 import loads
     original_ds_name = get_webapp_config().get("original_dataset")
-    editschema = loads(get_webapp_config().get("editschema")) # TODO: new webapp params!!
+    primary_keys = get_webapp_config().get("primary_keys")
+    editable_column_names = get_webapp_config().get("editable_column_names")
 
 else:
     print("Webapp is being run outside of Dataiku")
     run_context = "local"
 
     from json5 import load
+    from commons import get_primary_keys, get_editable_column_names
     original_ds_name = getenv("ORIGINAL_DATASET")
     editschema = load(open(getenv("EDITSCHEMA_PATH")))
+    primary_keys = get_primary_keys(editschema)
+    editable_column_names = get_editable_column_names(editschema)
     
     from flask import Flask
     f_app = Flask(__name__)
@@ -38,7 +41,7 @@ else:
 
 #%%
 from EditableEventSourced import EditableEventSourced
-ees = EditableEventSourced(original_ds_name, editschema)
+ees = EditableEventSourced(original_ds_name, primary_keys, editable_column_names)
 
 #%%
 from commons import get_user_details

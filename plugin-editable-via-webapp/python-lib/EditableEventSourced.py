@@ -181,7 +181,7 @@ class EditableEventSourced:
             merge_settings.save()
             print("Done.")
 
-    def __init__(self, original_ds_name, editschema=None, primary_keys=None, editable_column_names=None, project_key=None):
+    def __init__(self, original_ds_name, primary_keys=None, editable_column_names=None, project_key=None, editschema=None):
         self.original_ds_name = original_ds_name
         if (project_key is None): self.project_key = getenv("DKU_CURRENT_PROJECT_KEY")
         else: self.project_key = project_key
