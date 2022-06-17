@@ -1,9 +1,9 @@
 [
     {"name": "shop", "editable_type": "key"},
     {"name": "part", "editable_type": "key"},
-    {"name": "model", "editable_type": "key"},
-    {"name": "line_number", "editable_type": "key"},
-    {"name": "is_past_erp"},
+    {"name": "model", "editable_type": "key", "type": "number"},
+    {"name": "line_number", "editable_type": "key", "type": "number"},
+    {"name": "is_past_erp", "type": "boolean"},
     {"name": "erp_demand_date"},
     {"name": "ie_override_date", "editable": true, "type": "string"},
     {"name": "delete_demand", "editable": true, "type": "boolean"}
