@@ -9,16 +9,10 @@
 
 
 #%%
+# Get original dataset name and editschema
+
 from os import getenv
 from dash import Dash, html
-from EditableEventSourced import EditableEventSourced
-from dash_tabulator import DashTabulator
-from dash.dependencies import Input, Output
-from commons import get_user_details
-
-
-#%%
-# Get original dataset name and editschema
 
 if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     print("Webapp is being run in Dataiku")
@@ -27,7 +21,7 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     from dataiku.customwebapp import get_webapp_config
     from json5 import loads
     original_ds_name = get_webapp_config().get("original_dataset")
-    editschema = loads(get_webapp_config().get("editschema"))
+    editschema = loads(get_webapp_config().get("editschema")) # TODO: new webapp params!!
 
 else:
     print("Webapp is being run outside of Dataiku")
@@ -43,12 +37,19 @@ else:
 
 
 #%%
+from EditableEventSourced import EditableEventSourced
 ees = EditableEventSourced(original_ds_name, editschema)
+
+#%%
+from commons import get_user_details
 user = get_user_details()
 
 
 #%%
 # Define the webapp layout and components
+from dash_tabulator import DashTabulator
+from dash.dependencies import Input, Output
+
 def serve_layout():
     return html.Div([
         DashTabulator(
@@ -56,14 +57,14 @@ def serve_layout():
             columns=ees.get_columns_tabulator(),
             data=ees.get_data_tabulator(),
             theme='bootstrap/tabulator_bootstrap4',
-            options={"selectable": 1, "layout": "fitDataTable"}
+            options={"selectable": 1, "layout": "fitDataTable", "pagination": "local", "paginationSize": 10, "paginationSizeSelector":[10, 25, 50, 100]}
         ),
-        html.Div(id='debug', children="", style={"display": "none"}),
+        html.Div(id='edit-info', children="", style={"display": "none"}),
     ])
 app.layout = serve_layout
 
 @app.callback(
-    Output('debug', 'children'),
+    Output('edit-info', 'children'),
     Input('datatable', 'cellEdited'),
     prevent_initial_call=True)
 def update(cell):
