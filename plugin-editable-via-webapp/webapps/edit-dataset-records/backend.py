@@ -22,6 +22,9 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     original_ds_name = get_webapp_config().get("original_dataset")
     primary_keys = get_webapp_config().get("primary_keys")
     editable_column_names = get_webapp_config().get("editable_column_names")
+    print("original_ds_name:", original_ds_name)
+    print("primary_keys:", primary_keys)
+    print("editable_column_names:", editable_column_names)
 
 else:
     print("Webapp is being run outside of Dataiku")
