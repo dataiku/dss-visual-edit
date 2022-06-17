@@ -62,7 +62,7 @@ app.config.external_stylesheets = ["https://cdn.jsdelivr.net/npm/semantic-ui@2/d
 app.config.external_scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"]
 
 def serve_layout():
-    return html.Div([
+    return html.Div(children=[
         DashTabulator(
             id='datatable',
             columns=ees.get_columns_tabulator(),
@@ -71,7 +71,7 @@ def serve_layout():
             options={"selectable": 1, "layout": "fitDataTable", "pagination": "local", "paginationSize": 10, "paginationSizeSelector":[10, 25, 50, 100]}
         ),
         html.Div(id='edit-info', children="", style={"display": "none"}),
-    ])
+    ], style={})
 app.layout = serve_layout
 
 @app.callback(
