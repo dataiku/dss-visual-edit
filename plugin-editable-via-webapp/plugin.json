@@ -4,7 +4,7 @@
     "meta": {
         "label": "Editable via webapp",
         "description": "Edit dataset records via a webapp and replay edits in the Flow",
-        "author": "Dataiku (Louis Dorard)",
+        "author": "Dataiku (Louis Dorard, Julien Hobeika)",
         "icon": "icon-edit-sign",
         "tags": [],
         "url": "https://github.com/dataiku/lca/wiki",
