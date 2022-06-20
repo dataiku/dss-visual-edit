@@ -1,22 +1,20 @@
-from commons import get_primary_keys, tabulator_row_key_values
 from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
 from pandas import DataFrame
-from commons import get_editable_column_names, merge_edits, pivot_editlog
+from commons import get_primary_keys, get_editable_column_names, merge_edits, pivot_editlog, tabulator_row_key_values
 from os import getenv
 from json5 import loads, dumps
 from datetime import datetime
 from pytz import timezone
 
-
 def get_lookup_column_names(linked_record):
-        lookup_column_names = []
-        lookup_column_names_in_linked_ds = []
-        for lookup_column in linked_record["lookup_columns"]:
-            lookup_column_names.append(lookup_column["name"])
-            lookup_column_names_in_linked_ds.append(lookup_column["linked_ds_column_name"])
-        return lookup_column_names, lookup_column_names_in_linked_ds
+    lookup_column_names = []
+    lookup_column_names_in_linked_ds = []
+    for lookup_column in linked_record["lookup_columns"]:
+        lookup_column_names.append(lookup_column["name"])
+        lookup_column_names_in_linked_ds.append(lookup_column["linked_ds_column_name"])
+    return lookup_column_names, lookup_column_names_in_linked_ds
 
 def recipe_already_exists(recipe_name, project):
     try:
@@ -24,48 +22,43 @@ def recipe_already_exists(recipe_name, project):
         return True
     except:
         return False
+
 class EditableEventSourced:
 
-    def __save_editschema__(self, dataset_name):
+    def __save_custom_fields__(self, dataset_name):
         settings = self.project.get_dataset(dataset_name).get_settings()
-        settings.custom_fields["editschema"] = dumps(self.editschema)
+        settings.custom_fields["original_ds"] = self.original_ds_name
+        settings.custom_fields["editlog_ds"] = self.editlog_ds_name
+        settings.custom_fields["primary_keys"] = self.primary_keys
+        settings.custom_fields["editable_column_names"] = self.editable_column_names
         settings.save()
 
-    def __parse_editschema__(self):
-        """Parse editable schema"""
+    """
+    def __setup_linked_records__(self):
+        return
+        # self.linked_records = []
+        # for col in self.__schema__:
+        #     if col.get("editable"):
+        #         if col.get("editable_type")=="linked_record":
+        #             self.linked_records.append(
+        #                 {
+        #                     "name": col.get("name"),
+        #                     "type": col.get("type"),
+        #                     "ds_name": col.get("linked_ds_name"),
+        #                     "ds_key": col.get("linked_ds_key"),
+        #                     "lookup_columns": []
+        #                 }
+        #             )
 
-        # First pass at the list of columns
-        self.editable_column_names = get_editable_column_names(self.editschema)
-        self.primary_keys = get_primary_keys(self.editschema)
-        self.display_column_names = []
-        self.linked_records = []
-        for col in self.editschema:
-            if not col.get("type"):
-                col["type"] = "string"
-            if col.get("editable"):
-                if col.get("editable_type")=="linked_record":
-                    self.linked_records.append(
-                        {
-                            "name": col.get("name"),
-                            "type": col.get("type"),
-                            "ds_name": col.get("linked_ds_name"),
-                            "ds_key": col.get("linked_ds_key"),
-                            "lookup_columns": []
-                        }
-                    )
-            else:
-                if col.get("editable_type")!="key":
-                    self.display_column_names.append(col.get("name"))
-
-        # Second pass to create the lookup columns for each linked record
-        for col in self.editschema:
-            if col.get("editable_type")=="lookup_column":
-                for linked_record in self.linked_records:
-                    if linked_record["name"]==col.get("linked_record_col"):
-                        linked_record["lookup_columns"].append({
-                            "name": col.get("name"),
-                            "linked_ds_column_name": col.get("linked_ds_column_name")
-                        })
+        # # Second pass to create the lookup columns for each linked record
+        # for col in self.__schema__:
+        #     if col.get("name") in self.lookup_column_names:
+        #         for linked_record in self.linked_records:
+        #             if linked_record["name"]==col.get("linked_record_col"):
+        #                 linked_record["lookup_columns"].append({
+        #                     "name": col.get("name"),
+        #                     "linked_ds_column_name": col.get("linked_ds_column_name")
+        #                 })
 
     def __extend_with_lookup_columns__(self, df):
         for linked_record in self.linked_records:
@@ -86,12 +79,13 @@ class EditableEventSourced:
             value_cast = int(linked_record_value)
         return linked_df.loc[linked_df.index==value_cast]
         # IDEA: add linked_record["linked_key"] as an INDEX to speed up the query
+    """
 
     def __get_editlog_pivoted_ds_schema__(self):
         # see commons.get_editlog_ds_schema
         editlog_pivoted_ds_schema = []
         edited_ds_schema = []
-        for col in self.editschema:
+        for col in self.__schema__:
             new_col = {}
             new_col["name"] = col.get("name")
             type = col.get("type")
@@ -106,7 +100,7 @@ class EditableEventSourced:
             if (meaning):
                 new_col["meaning"] = meaning
             edited_ds_schema.append(new_col)
-            if (col.get("editable_type")=="key" or col.get("editable")): # TODO: make a 1st pass on keys only, then 2nd pass on editable columns only
+            if (col.get("name") in self.primary_keys + self.editable_column_names):
                 editlog_pivoted_ds_schema.append(new_col)
         editlog_pivoted_ds_schema.append({"name": "date", "type": "string", "meaning": "DateSource"})
         return editlog_pivoted_ds_schema, edited_ds_schema
@@ -118,7 +112,7 @@ class EditableEventSourced:
             self.editlog_ds = Dataset(self.editlog_ds_name, self.project_key)
         else:
             print("No editlog found, creating it...")
-            editlog_ds_creator.with_store_into(connection=self.connection_name)
+            editlog_ds_creator.with_store_into(connection=self.__connection_name__)
             editlog_ds_creator.create()
             self.editlog_ds = Dataset(self.editlog_ds_name, self.project_key)
             print("Done.")
@@ -127,18 +121,16 @@ class EditableEventSourced:
         self.editlog_ds.spec_item["appendMode"] = True
         
         # make sure that editlog has the right editschema in its custom field
-        self.__save_editschema__(self.editlog_ds_name)
+        self.__save_custom_fields__(self.editlog_ds_name)
 
     def __setup_editlog_downstream__(self):
         editlog_pivoted_ds_schema, edited_ds_schema = self.__get_editlog_pivoted_ds_schema__()
-        self.edited_df_cols = self.primary_keys + self.display_column_names + self.editable_column_names
-
         editlog_pivoted_ds_creator = DSSManagedDatasetCreationHelper(self.project, self.editlog_pivoted_ds_name)
         if (editlog_pivoted_ds_creator.already_exists()):
             print("Found editlog pivoted")
         else:
             print("No editlog pivoted found, creating it...")
-            editlog_pivoted_ds_creator.with_store_into(connection=self.connection_name)
+            editlog_pivoted_ds_creator.with_store_into(connection=self.__connection_name__)
             editlog_pivoted_ds_creator.create()
             self.editlog_pivoted_ds = Dataset(self.editlog_pivoted_ds_name, self.project_key)
             cols = self.primary_keys + self.editable_column_names + ["date"]
@@ -166,7 +158,7 @@ class EditableEventSourced:
             self.edited_ds = Dataset(self.edited_ds_name, self.project_key)
         else:
             print("No edited dataset found, creating it...")
-            edited_ds_creator.with_store_into(connection=self.connection_name)
+            edited_ds_creator.with_store_into(connection=self.__connection_name__)
             edited_ds_creator.create()
             self.edited_ds = Dataset(self.edited_ds_name, self.project_key)
             edited_df = DataFrame(columns=self.edited_df_cols)
@@ -188,7 +180,7 @@ class EditableEventSourced:
             merge_settings.save()
             print("Done.")
 
-    def __init__(self, original_ds_name, editschema, project_key=None):
+    def __init__(self, original_ds_name, primary_keys=None, editable_column_names=None, project_key=None, editschema=None):
         self.original_ds_name = original_ds_name
         if (project_key is None): self.project_key = getenv("DKU_CURRENT_PROJECT_KEY")
         else: self.project_key = project_key
@@ -200,25 +192,33 @@ class EditableEventSourced:
         self.editlog_pivoted_ds_name = self.editlog_ds_name + "_pivoted"
         self.edited_ds_name = self.original_ds_name + "_edited"
 
-        self.connection_name = self.original_ds.get_config()['params']['connection']
-        self.editschema = editschema
-        # make sure that original dataset has the right editschema in its custom field
-        self.__save_editschema__(self.original_ds_name)
-        self.__parse_editschema__() # Sets editable_column_names, display_column_names, primary key, primary_key_types, linked_records
+        self.__connection_name__ = self.original_ds.get_config().get("params").get("connection")
+        self.__schema__ = self.original_ds.get_config().get("schema").get("columns")
+        self.primary_keys = primary_keys
+        self.editable_column_names = editable_column_names
+        if (editschema):
+            self.primary_keys = get_primary_keys(editschema)
+            self.editable_column_names = get_editable_column_names(editschema)
+        self.display_column_names = [col.get("name") for col in self.__schema__ if col.get("name") not in self.primary_keys + self.editable_column_names]
+        self.edited_df_cols = self.primary_keys + self.display_column_names + self.editable_column_names
+
+        # make sure that original dataset has up-to-date custom fields
+        self.__save_custom_fields__(self.original_ds_name)
+        # self.__setup_linked_records__()
         self.__setup_editlog__()
         self.__setup_editlog_downstream__()
         self.original_df = self.original_ds.get_dataframe()[self.edited_df_cols]
-        self.__edited_df_indexed__ = self.__extend_with_lookup_columns__(
-                                        merge_edits(
-                                            self.original_df,
-                                            pivot_editlog(
-                                                self.editlog_ds,
-                                                self.primary_keys,
-                                                self.editable_column_names
-                                            ),
-                                            self.primary_keys
-                                        )
-                                    ).set_index(self.primary_keys) # index makes it easier to id values in the DataFrame
+        self.__edited_df_indexed__ = merge_edits(
+                                        self.original_df,
+                                        pivot_editlog(
+                                            self.editlog_ds,
+                                            self.primary_keys,
+                                            self.editable_column_names
+                                        ),
+                                        self.primary_keys
+                                     )
+        # self.__edited_df_indexed__ = self.__extend_with_lookup_columns__(self.__edited_df_indexed__)
+        self.__edited_df_indexed__.set_index(self.primary_keys, inplace=True) # index makes it easier to id values in the DataFrame
 
     def get_edited_df_indexed(self):
         return self.__edited_df_indexed__
@@ -229,18 +229,16 @@ class EditableEventSourced:
     def get_data_tabulator(self):
         return self.get_edited_df().to_dict('records')
 
-    def get_editschema(self):
-        return self.editschema
-
     def get_columns_tabulator(self):
         # Setup columns to be used by data table
-        # Add "editor" to editable columns. Possible values include: "input", "textarea", "number", "tickCross", "list". See all options at options http://tabulator.info/docs/5.2/edit.
+        # Add "editor" to editable columns. Possible values include: "input", "textarea", "number", "tickCross", "list". See all options at options http://tabulator.info/docs/4.8/edit.
         # IDEA: improve this code with a dict to do matching (instead of if/else)?
         t_cols = [] # columns for tabulator
-        for col in self.editschema:
-            t_col = {"field": col["name"], "headerFilter": True, "resizable": True}
-
-            if col.get("type")=="bool" or col.get("type")=="boolean":
+        schema_df = DataFrame(data=self.__schema__).set_index("name") # turn __schema__ into a DataFrame with "name" as index, and thus easily get the type for a given name
+        for col_name in self.edited_df_cols:
+            t_col = {"field": col_name, "headerFilter": True, "resizable": True}
+            col_type = schema_df.loc[col_name, "type"]
+            if col_type=="boolean":
                 t_col["formatter"] = "tickCross"
                 t_col["formatterParams"] = {"allowEmpty": True}
                 t_col["hozAlign"] = "center"
@@ -261,54 +259,29 @@ class EditableEventSourced:
                 ]}
                 # t_col["headerFilterEmptyCheck"] = "function(value){return value === null;}"
 
-            if col.get("editable"):
-                title = col.get("title")
-                title = title if title else col["name"]
-                t_col["title"] = "🖊 " + title
-                if col.get("type")=="list":
-                    t_col["editor"] = "list"
-                    t_col["editorParams"] = {"values": col["values"]}
-                if col.get("type")=="boolean":
+            if col_name in self.editable_column_names:
+                t_col["title"] = "🖊 " + col_name
+                # if col.get("type")=="list": # detect if it's categorical - via the count of unique values?
+                #    t_col["editor"] = "list"
+                #    t_col["editorParams"] = {"values": col["values"]}
+                if col_type=="boolean":
                     t_col["editor"] = t_col["formatter"]
                     t_col["editorParams"] = {"tristate": True}
-                elif col.get("type")=="number":
+                elif col_type in ["tinyint", "smallint", "int", "bigint" "float", "double"]:
                     t_col["editor"] = "number"
                 else:
                     t_col["editor"] = "input"
             else:
-                t_col["title"] = col["name"]
-                if col.get("editable_type")=="key":
+                t_col["title"] = col_name
+                if col_name in self.primary_keys:
                     t_col["frozen"] = True
 
             t_cols.append(t_col)
         return t_cols
 
-    def get_primary_keys(self):
-        return self.primary_keys
-
-    """
-    def get_primary_key_types(self):
-        return self.primary_key_types
-
-    def get_editable_column_names(self):
-        return self.editable_column_names
-
-    def get_display_column_names(self):
-        return self.display_column_names
-
-    def get_linked_records(self):
-        return self.linked_records
-
-    def get_editlog_df(self):
-        return self.editlog_df
-
-    def get_editlog_ds(self):
-        return self.editlog_ds
-    """
-
     def add_edit(self, primary_key_values, column_name, value, user):
         # if the type of column_name is a boolean, make sure we read it correctly
-        for col in self.editschema:
+        for col in self.__schema__:
             if (col["name"]==column_name):
                 if type(value)==str and col.get("type")=="boolean":
                     value = str(loads(value.lower()))
@@ -326,20 +299,20 @@ class EditableEventSourced:
             "user": [user]
         }))
 
-        # TODO: do we need ees to maintain a live copy of (and to update) editlog_df? when is edit log accessed?
+        # Note: do we want ees to maintain a live, up-to-date copy of the editlog, or the editlog pivoted, or the edited dataset? Here we choose the latter, but this may change if the original dataset doesn't fit in memory.
 
-        # update edited_df
+        # Update live copy of the edited dataset
         self.__edited_df_indexed__.loc[primary_key_values, column_name] = value # Might need to change primary_key_values from a list to a tuple — see this example: df.loc[('cobra', 'mark i'), 'shield'] from https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.loc.html ?
 
         # Update lookup columns if a linked record was edited
-        for linked_record in self.linked_records:
-            if (column_name==linked_record["name"]):
-                # Retrieve values of the lookup columns from the linked dataset, for the row corresponding to the edited value (linked_record["ds_key"]==value)
-                lookup_values = self.__get_lookup_values__(linked_record, value)
+        # for linked_record in self.linked_records:
+        #     if (column_name==linked_record["name"]):
+        #         # Retrieve values of the lookup columns from the linked dataset, for the row corresponding to the edited value (linked_record["ds_key"]==value)
+        #         lookup_values = self.__get_lookup_values__(linked_record, value)
 
-                # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
-                for lookup_column in linked_record["lookup_columns"]:
-                    self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0] # TODO: update in tabulator too
+        #         # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
+        #         for lookup_column in linked_record["lookup_columns"]:
+        #             self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0]
         
         info = f"""Updated column {column_name} where {self.primary_keys} is {primary_key_values}. New value: {value}."""
         print(info)
@@ -347,7 +320,7 @@ class EditableEventSourced:
 
     def add_edit_tabulator(self, cell, user):
         return self.add_edit(
-            tabulator_row_key_values(cell["row"], self.get_primary_keys()),
+            tabulator_row_key_values(cell["row"], self.primary_keys),
             cell["column"],
             cell["value"],
             user

@@ -1,7 +1,7 @@
 {
     "meta": {
-        "label": "Schema for edition",
-        "description": "Used when creating a webapp to edit this dataset",
+        "label": "Data Edition",
+        "description": "",
         "icon": "icon-columns"
     },
     "customFields": [
@@ -11,10 +11,45 @@
                 "includedObjectTypes": ["DATASET"]
             },
             "field": {
-                "name": "editschema",
-                "label": "Edit-Schema",
-                "description": "JSON",
-                "type": "TEXTAREA"
+                "name": "original_ds",
+                "label": "Original Dataset",
+                "description": "",
+                "type": "DATASET"
+            }
+        },{
+            "applyToObjects": {
+                "mode": "SOME",
+                "includedObjectTypes": ["DATASET"]
+            },
+            "field": {
+                "name": "editlog_ds",
+                "label": "Edit Log",
+                "description": "",
+                "type": "DATASET"
+            }
+        },{
+            "applyToObjects": {
+                "mode": "SOME",
+                "includedObjectTypes": ["DATASET"]
+            },
+            "field": {
+                "name": "primary_keys",
+                "label": "Primary Keys",
+                "description": "",
+                "type": "COLUMNS",
+                "datasetParamName": "original_ds"
+            }
+        },{
+            "applyToObjects": {
+                "mode": "SOME",
+                "includedObjectTypes": ["DATASET"]
+            },
+            "field": {
+                "name": "editable_column_names",
+                "label": "Editable Columns",
+                "description": "",
+                "type": "COLUMNS",
+                "datasetParamName": "original_ds"
             }
         }
     ]

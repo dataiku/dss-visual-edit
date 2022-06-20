@@ -40,6 +40,13 @@ def get_primary_keys(schema):
             keys.append(col["name"])
     return keys
 
+def get_display_column_names(editschema):
+    display_column_names = []
+    for col in editschema:
+        if not col.get("editable") and col.get("editable_type")!="key":
+            display_column_names.append(col.get("name"))
+    return display_column_names
+
 def get_editable_column_names(schema):
     editable_column_names = []
     for col in schema:
@@ -127,6 +134,7 @@ def get_user_details():
     return f"""{current_user_settings.get("displayName")} <{current_user_settings.get("email")}>"""
 
 def tabulator_row_key_values(row, primary_keys):
+    """Get values for a given row coming from Tabulator and a list of columns that are primary keys"""
     return DataFrame(data=row, index=[0]).set_index(primary_keys).index[0]
 
 ### Other utils (unused)

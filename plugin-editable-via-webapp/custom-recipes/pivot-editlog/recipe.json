@@ -1,7 +1,7 @@
 {
     "meta": {
         "label": "Pivot editlog",
-        "description": "Creates a dataset whose columns are the editable columns of the edited dataset, whose rows are unique keys from the editlog, and values are the last edits",
+        "description": "Create a dataset whose rows correspond to unique keys from the editlog, columns are the original dataset's editable columns, and values are the last edits",
         "icon": "icon-repeat"
     },
     "kind": "PYTHON",
