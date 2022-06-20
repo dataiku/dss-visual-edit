@@ -1,5 +1,25 @@
+@font-face {
+    font-family: SourceSansPro;
+    src: url(/static/dataiku/fonts/SourceSansPro-Bold.woff);
+    font-weight: 600;
+  }
+@font-face {
+    font-family: SourceSansPro;
+    src: url(/static/dataiku/fonts/SourceSansPro-Semibold.woff);
+    font-weight: 500;
+}
+@font-face {
+    font-family: SourceSansPro;
+    src: url(/static/dataiku/fonts/SourceSansPro-Regular.woff);
+    font-weight: 400;
+}
+
 body{
     margin: 50px 100px;
+}
+
+body, button.tabulator-page, select.tabulator-page-size{
+    font-family: 'SourceSansPro';
 }
 
 #debug {
@@ -10,4 +30,22 @@ body{
     bottom: 0;
     width: 100%;
     height: 2em
+}
+
+.tabulator .tabulator-footer .tabulator-page.active {
+    color: #05a89d;
+}
+
+.tabulator-row.tabulator-selectable {
+    background-color: white;
+}
+
+.tabulator-row.tabulator-selectable.tabulator-selected {
+    background-color: #05a89d !important;
+}
+
+input[type=search] {
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(187, 187, 187);
 }
