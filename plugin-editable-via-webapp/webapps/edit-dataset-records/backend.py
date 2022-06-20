@@ -22,7 +22,7 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     primary_keys = get_webapp_config().get("primary_keys")
     editable_column_names = get_webapp_config().get("editable_column_names")
 
-    app.config.external_stylesheets = ["/local/static/dash_tabulator.css"]
+    app.config.external_stylesheets = ["assets/style.css"]
 
 else:
     print("Webapp is being run outside of Dataiku")
@@ -65,7 +65,7 @@ def serve_layout():
             id='datatable',
             columns=ees.get_columns_tabulator(),
             data=ees.get_data_tabulator(),
-            theme='bootstrap/tabulator_bootstrap4',
+            theme='semantic-ui/tabulator_semantic-ui',
             options={"selectable": 1, "layout": "fitDataTable", "pagination": "local", "paginationSize": 10, "paginationSizeSelector":[10, 25, 50, 100]}
         ),
         html.Div(id='edit-info', children="", style={"display": "none"}),
