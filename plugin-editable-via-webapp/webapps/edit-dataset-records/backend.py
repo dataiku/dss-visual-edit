@@ -40,7 +40,7 @@ else:
     f_app = Flask(__name__)
     app = Dash(__name__, server=f_app)
 
-app.config.external_stylesheets = ["http://s3.louisdorard.com.s3.amazonaws.com/dash_tabulator.css", "https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
+app.config.external_stylesheets = ["https://d1cvlw0jb55ks9.cloudfront.net/dash_tabulator.css", "https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
 app.config.external_scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"]
 
 #%%
