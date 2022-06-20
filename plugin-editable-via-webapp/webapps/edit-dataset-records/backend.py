@@ -22,7 +22,7 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     primary_keys = get_webapp_config().get("primary_keys")
     editable_column_names = get_webapp_config().get("editable_column_names")
 
-    app.config.external_stylesheets = ["/static/dataiku/css/style.css"]
+    app.config.external_stylesheets = ["/local/static/dash_tabulator.css"]
 
 else:
     print("Webapp is being run outside of Dataiku")
