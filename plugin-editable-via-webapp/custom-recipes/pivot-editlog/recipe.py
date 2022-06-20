@@ -11,8 +11,7 @@
 
 #%%
 import dataiku
-from commons import get_editable_column_names, get_primary_keys, pivot_editlog
-from json5 import loads
+from commons import pivot_editlog
 
 #%%
 from dataiku.customrecipe import get_input_names_for_role, get_output_names_for_role
@@ -28,11 +27,8 @@ pivoted_datasets = [dataiku.Dataset(name) for name in pivoted_names]
 pivoted_ds = pivoted_datasets[0]
 
 #%%
-editschema = loads(editlog_ds.get_config()["customFields"]["editschema"])
-
-#%%
-primary_keys = get_primary_keys(editschema) # get this from schema
-editable_column_names = get_editable_column_names(editschema)
+primary_keys = editlog_ds.get_config()["customFields"]["primary_keys"]
+editable_column_names = editlog_ds.get_config()["customFields"]["editable_column_names"]
 
 #%%
 pivoted_df = pivot_editlog(editlog_ds, primary_keys, editable_column_names)
