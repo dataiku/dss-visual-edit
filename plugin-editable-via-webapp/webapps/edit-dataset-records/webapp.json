@@ -32,14 +32,6 @@
             "datasetParamName": "original_dataset",
             "mandatory": true
         }
-        // {
-        //     "name": "editschema",
-        //     "label": "Edit-Schema",
-        //     "description": "JSON",
-        //     "type": "TEXTAREA",
-        //     "mandatory": true,
-        //     "defaultValue": "[\n    // The editschema is an array of dictionaries: one per column in the original dataset that should appear in the edited dataset.\n    // It's best to list key columns first, and editable columns last.\n    // Here is an example with 4 columns — REPLACE WITH YOUR OWN:\n    {\"name\": \"Id\", \"editable_type\": \"key\"},\n    {\"name\": \"Display String\"},\n    {\"name\": \"Editable Boolean\", \"type\": \"boolean\", \"editable\": true},\n    {\"name\": \"Editable Number\", \"type\": \"number\", \"editable\": true}\n]"
-        // },
     ],
     "roles": []
 }

@@ -35,12 +35,11 @@ class EditableEventSourced:
 
     """
     def __setup_linked_records__(self):
-        # TODO: create custom interface to let user define linked records https://doc.dataiku.com/dss/latest/plugins/reference/other.html
         return
         # self.linked_records = []
         # for col in self.__schema__:
         #     if col.get("editable"):
-        #         if col.get("editable_type")=="linked_record": # TODO: "editable_type" isn't defined in the schema, so it needs to be found somewhere else
+        #         if col.get("editable_type")=="linked_record":
         #             self.linked_records.append(
         #                 {
         #                     "name": col.get("name"),
@@ -53,12 +52,12 @@ class EditableEventSourced:
 
         # # Second pass to create the lookup columns for each linked record
         # for col in self.__schema__:
-        #     if col.get("name") in self.lookup_column_names: # TODO: define lookup_column_names
+        #     if col.get("name") in self.lookup_column_names:
         #         for linked_record in self.linked_records:
         #             if linked_record["name"]==col.get("linked_record_col"):
         #                 linked_record["lookup_columns"].append({
         #                     "name": col.get("name"),
-        #                     "linked_ds_column_name": col.get("linked_ds_column_name") # TODO: find a way for the user to define a lookup column and its linked dataset column name
+        #                     "linked_ds_column_name": col.get("linked_ds_column_name")
         #                 })
 
     def __extend_with_lookup_columns__(self, df):
@@ -262,13 +261,13 @@ class EditableEventSourced:
 
             if col_name in self.editable_column_names:
                 t_col["title"] = "🖊 " + col_name
-                # if col.get("type")=="list": # TODO: detect if it's categorical - via the meaning or count of unique values?
+                # if col.get("type")=="list": # detect if it's categorical - via the count of unique values?
                 #    t_col["editor"] = "list"
                 #    t_col["editorParams"] = {"values": col["values"]}
                 if col_type=="boolean":
                     t_col["editor"] = t_col["formatter"]
                     t_col["editorParams"] = {"tristate": True}
-                elif col_type in ["tinyint", "smallint", "int", "bigint" "float", "double"]: # TODO: test this
+                elif col_type in ["tinyint", "smallint", "int", "bigint" "float", "double"]:
                     t_col["editor"] = "number"
                 else:
                     t_col["editor"] = "input"
@@ -300,9 +299,9 @@ class EditableEventSourced:
             "user": [user]
         }))
 
-        # TODO: do we want ees to maintain a live, up-to-date copy of the editlog, or the editlog pivoted, or the edited dataset?
+        # Note: do we want ees to maintain a live, up-to-date copy of the editlog, or the editlog pivoted, or the edited dataset? Here we choose the latter, but this may change if the original dataset doesn't fit in memory.
 
-        # update edited_df
+        # Update live copy of the edited dataset
         self.__edited_df_indexed__.loc[primary_key_values, column_name] = value # Might need to change primary_key_values from a list to a tuple — see this example: df.loc[('cobra', 'mark i'), 'shield'] from https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.loc.html ?
 
         # Update lookup columns if a linked record was edited
@@ -313,7 +312,7 @@ class EditableEventSourced:
 
         #         # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
         #         for lookup_column in linked_record["lookup_columns"]:
-        #             self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0] # TODO: update in tabulator too
+        #             self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0]
         
         info = f"""Updated column {column_name} where {self.primary_keys} is {primary_key_values}. New value: {value}."""
         print(info)

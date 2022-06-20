@@ -11,8 +11,8 @@
                 "includedObjectTypes": ["DATASET"]
             },
             "field": {
-                "name": "editlog_ds",
-                "label": "Edit Log",
+                "name": "original_ds",
+                "label": "Original Dataset",
                 "description": "",
                 "type": "DATASET"
             }
@@ -22,8 +22,8 @@
                 "includedObjectTypes": ["DATASET"]
             },
             "field": {
-                "name": "original_ds",
-                "label": "Original Dataset",
+                "name": "editlog_ds",
+                "label": "Edit Log",
                 "description": "",
                 "type": "DATASET"
             }
