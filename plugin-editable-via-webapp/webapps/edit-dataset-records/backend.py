@@ -22,6 +22,8 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     primary_keys = get_webapp_config().get("primary_keys")
     editable_column_names = get_webapp_config().get("editable_column_names")
 
+    app.config.external_stylesheets = ["/static/dataiku/css/style.css"]
+
 else:
     print("Webapp is being run outside of Dataiku")
     run_context = "local"
@@ -40,6 +42,9 @@ else:
     f_app = Flask(__name__)
     app = Dash(__name__, server=f_app)
 
+    app.config.external_stylesheets = ["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
+    app.config.external_scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"]
+
 #%%
 from EditableEventSourced import EditableEventSourced
 ees = EditableEventSourced(original_ds_name, primary_keys, editable_column_names)
@@ -53,9 +58,6 @@ user = get_user_details()
 
 from dash_tabulator import DashTabulator
 from dash.dependencies import Input, Output
-
-app.config.external_stylesheets = ["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
-app.config.external_scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"]
 
 def serve_layout():
     return html.Div(children=[
