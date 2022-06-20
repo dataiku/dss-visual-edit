@@ -14,11 +14,11 @@
     font-weight: 400;
 }
 
-body{
+body {
     margin: 50px 100px;
 }
 
-body, button.tabulator-page, select.tabulator-page-size{
+body, button.tabulator-page, select.tabulator-page-size, input[type=search] {
     font-family: 'SourceSansPro';
 }
 
