@@ -90,7 +90,12 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
         # - new version with insert():
         i = 0
         for primary_key in primary_keys:
-            editlog_pivoted_df.insert(i, primary_key, keys.loc[:, i].to_list())
+            # check that there is an ith column in keys, otherwise insert an empty column
+            if i < len(keys.columns):
+                new_col = keys.loc[:, i].to_list()
+            else:
+                new_col = ""
+            editlog_pivoted_df.insert(i, primary_key, new_col)
             i += 1
 
         editlog_pivoted_df = concat([all_columns_df, editlog_pivoted_df])
