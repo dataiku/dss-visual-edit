@@ -16,10 +16,46 @@
 
 body {
     margin: 50px 100px;
+    background-color: rgb(242, 242, 242);
 }
 
 body, button.tabulator-page, select.tabulator-page-size, input[type=search] {
     font-family: 'SourceSansPro' !important;
+}
+
+.tabulator .tabulator-header {
+    font-weight: 500;
+}
+
+.tabulator .tabulator-footer, .tabulator .tabulator-header .tabulator-col {
+    background-color: white;
+}
+
+.tabulator .tabulator-footer .tabulator-page.active {
+    color: #28a9dd;
+}
+
+.tabulator-row.tabulator-selectable.tabulator-row-odd {
+    background-color: white;
+}
+
+.tabulator-row.tabulator-selectable.tabulator-row-even {
+    background-color: rgb(245, 245, 245) !important;
+}
+
+.tabulator-row.tabulator-selectable:hover {
+    background-color: #a5d6a7 !important;
+}
+
+.tabulator-row.tabulator-selectable.tabulator-selected {
+    background-color: rgb(76, 175, 80) !important;
+    color: white !important;
+}
+
+input[type=search] {
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(187, 187, 187);
 }
 
 #debug {
@@ -30,22 +66,4 @@ body, button.tabulator-page, select.tabulator-page-size, input[type=search] {
     bottom: 0;
     width: 100%;
     height: 2em
-}
-
-.tabulator .tabulator-footer .tabulator-page.active {
-    color: #05a89d;
-}
-
-.tabulator-row.tabulator-selectable {
-    background-color: white;
-}
-
-.tabulator-row.tabulator-selectable.tabulator-selected {
-    background-color: #05a89d !important;
-}
-
-input[type=search] {
-    border-width: 1px;
-    border-style: solid;
-    border-color: rgb(187, 187, 187);
 }

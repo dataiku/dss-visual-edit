@@ -13,9 +13,12 @@
 from os import getenv
 from dash import Dash, html
 
+stylesheets = ["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
+
 if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     print("Webapp is being run in Dataiku")
     run_context = "dataiku"
+    stylesheets += ["https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/style.css"] # ["https://d1cvlw0jb55ks9.cloudfront.net/dash_tabulator.css"] # this points to a copy of assets/style.css (which is ignored by Dataiku's Dash)
 
     from dataiku.customwebapp import get_webapp_config
     original_ds_name = get_webapp_config().get("original_dataset")
@@ -40,7 +43,7 @@ else:
     f_app = Flask(__name__)
     app = Dash(__name__, server=f_app)
 
-app.config.external_stylesheets = ["https://d1cvlw0jb55ks9.cloudfront.net/dash_tabulator.css", "https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
+app.config.external_stylesheets = stylesheets
 app.config.external_scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"]
 
 #%%
