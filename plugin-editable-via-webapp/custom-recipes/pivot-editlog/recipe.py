@@ -34,4 +34,4 @@ editable_column_names = editlog_ds.get_config()["customFields"]["editable_column
 pivoted_df = pivot_editlog(editlog_ds, primary_keys, editable_column_names)
 
 #%%
-pivoted_ds.write_dataframe(pivoted_df)
+pivoted_ds.write_dataframe(pivoted_df, infer_schema=True, dropAndCreate=True)

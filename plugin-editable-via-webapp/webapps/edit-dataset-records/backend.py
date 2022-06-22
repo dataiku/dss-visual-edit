@@ -13,9 +13,12 @@
 from os import getenv
 from dash import Dash, html
 
+stylesheets = ["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
+
 if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     print("Webapp is being run in Dataiku")
     run_context = "dataiku"
+    stylesheets += ["https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/style.css"] # this points to a copy of assets/style.css (which is ignored by Dataiku's Dash)
 
     from dataiku.customwebapp import get_webapp_config
     original_ds_name = get_webapp_config().get("original_dataset")
@@ -40,6 +43,9 @@ else:
     f_app = Flask(__name__)
     app = Dash(__name__, server=f_app)
 
+app.config.external_stylesheets = stylesheets
+app.config.external_scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"]
+
 #%%
 from EditableEventSourced import EditableEventSourced
 ees = EditableEventSourced(original_ds_name, primary_keys, editable_column_names)
@@ -54,17 +60,14 @@ user = get_user_details()
 from dash_tabulator import DashTabulator
 from dash.dependencies import Input, Output
 
-app.config.external_stylesheets = ["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
-app.config.external_scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"]
-
 def serve_layout():
     return html.Div(children=[
         DashTabulator(
             id='datatable',
             columns=ees.get_columns_tabulator(),
             data=ees.get_data_tabulator(),
-            theme='bootstrap/tabulator_bootstrap4',
-            options={"selectable": 1, "layout": "fitDataTable", "pagination": "local", "paginationSize": 10, "paginationSizeSelector":[10, 25, 50, 100]}
+            theme='semantic-ui/tabulator_semantic-ui',
+            options={"layout": "fitDataTable", "pagination": "local", "paginationSize": 20, "paginationSizeSelector":[10, 20, 50, 100]}
         ),
         html.Div(id='edit-info', children="", style={"display": "none"}),
     ], style={})

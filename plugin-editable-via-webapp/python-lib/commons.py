@@ -77,23 +77,34 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
         )
 
         # Unpack keys
-        # primary_keys = ["key1", "key2"]
-        # editlog_pivoted_df = DataFrame(data={"key": ["('one', 'two')", "('three', 'four')"], "col1": [1, 2], "col2": [3, 4]})
+
+        # 1. Convert key values from strings to tuples
         def unpack(row):
-            return eval(row["key"]) # convert string to tuple
+            return eval(row["key"])
         editlog_pivoted_df.reset_index(inplace=True)
-        keys = editlog_pivoted_df.apply(unpack, axis=1, result_type="expand")
+        keys_series = editlog_pivoted_df.apply(unpack, axis=1)
         editlog_pivoted_df.drop(columns=["key"], inplace=True)
+        
+        # 2. Expand tuples found in keys_series into a dataframe
+        #    (Previously we were using result_type="expand", but this fails when
+        #     the results of the unpack function are arrays of different lengths)
+        keys_df = DataFrame(columns=primary_keys)
+        i1 = 0
+        for t in keys_series:
+            # create a dict `d` that holds the values for each of the primary keys found in tuple t
+            d = {}
+            i2 = 0
+            for k in primary_keys:
+                if i2 < len(t):
+                    d[k] = t[i2] # this assumes that keys are in the same order in the tuples coming from the editlog and in primary_keys
+                i2 += 1
+            keys_df = concat([keys_df, DataFrame(data=d, index=[i1])])
+            i1 += 1
 
-        # add keys to editlog_pivoted
-        # - old version: editlog_pivoted_df[primary_keys] = keys
-        # - new version with insert():
-        i = 0
-        for primary_key in primary_keys:
-            editlog_pivoted_df.insert(i, primary_key, keys.loc[:, i].to_list())
-            i += 1
+        # 3. Add a column to editlog_pivoted for each key listed in primary_keys
+        editlog_pivoted_df[primary_keys] = keys_df
 
-        editlog_pivoted_df = concat([all_columns_df, editlog_pivoted_df])
+        editlog_pivoted_df = concat([all_columns_df, editlog_pivoted_df]) # this makes sure that all (editable) columns are here and in the right order
 
     return editlog_pivoted_df
 
