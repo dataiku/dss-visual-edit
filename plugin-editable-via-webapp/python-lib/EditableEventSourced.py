@@ -89,16 +89,9 @@ class EditableEventSourced:
             new_col = {}
             new_col["name"] = col.get("name")
             type = col.get("type")
-            if (type): # can be "number", "string" or "boolean"
-                if (type=="number"):
-                    new_col["type"] = "float"
-                else:
-                    new_col["type"] = type
-            else:
-                type = "string"
+            if (type): new_col["type"] = type
             meaning = col.get("meaning")
-            if (meaning):
-                new_col["meaning"] = meaning
+            if (meaning): new_col["meaning"] = meaning
             edited_ds_schema.append(new_col)
             if (col.get("name") in self.primary_keys + self.editable_column_names):
                 editlog_pivoted_ds_schema.append(new_col)
@@ -237,8 +230,16 @@ class EditableEventSourced:
         schema_df = DataFrame(data=self.__schema__).set_index("name") # turn __schema__ into a DataFrame with "name" as index, and thus easily get the type for a given name
         for col_name in self.edited_df_cols:
             t_col = {"field": col_name, "headerFilter": True, "resizable": True}
+            t_type = "string"
             col_type = schema_df.loc[col_name, "type"]
-            if col_type=="boolean":
+            col_meaning = schema_df.loc[col_name, "meaning"]
+            if col_meaning:
+                if col_meaning=="Boolean": t_type = "boolean"
+                if col_meaning=="DoubleMeaning" or col_meaning=="Integer": t_type = "number"
+            else:
+                if col_type=="boolean": t_type = "boolean"
+                if col_type in ["tinyint", "smallint", "int", "bigint" "float", "double"]: t_type = "number"
+            if t_type=="boolean":
                 t_col["formatter"] = "tickCross"
                 t_col["formatterParams"] = {"allowEmpty": True}
                 t_col["hozAlign"] = "center"
@@ -264,10 +265,10 @@ class EditableEventSourced:
                 # if col.get("type")=="list": # detect if it's categorical - via the count of unique values?
                 #    t_col["editor"] = "list"
                 #    t_col["editorParams"] = {"values": col["values"]}
-                if col_type=="boolean":
+                if t_type=="boolean":
                     t_col["editor"] = t_col["formatter"]
                     t_col["editorParams"] = {"tristate": True}
-                elif col_type in ["tinyint", "smallint", "int", "bigint" "float", "double"]:
+                elif t_type=="number":
                     t_col["editor"] = "number"
                 else:
                     t_col["editor"] = "input"
