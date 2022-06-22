@@ -232,8 +232,11 @@ class EditableEventSourced:
             t_col = {"field": col_name, "headerFilter": True, "resizable": True}
             t_type = "string"
             col_type = schema_df.loc[col_name, "type"]
+            if "meaning" in schema_df.columns.to_list():
             col_meaning = schema_df.loc[col_name, "meaning"]
-            if col_meaning:
+            else:
+                col_meaning = None
+            if col_meaning and col_meaning==col_meaning: # this tests that col_meaning isn't None and that it isn't a nan
                 if col_meaning=="Boolean": t_type = "boolean"
                 if col_meaning=="DoubleMeaning" or col_meaning=="Integer": t_type = "number"
             else:
