@@ -27,7 +27,8 @@
         },
         {
             "name": "editable_column_names",
-            "label": "Columns that the webapp user will be able to edit.\n\nIMPORTANT: make sure that the type and meaning of these columns is set correctly before starting the webapp.",
+            "label": "Editable Columns",
+            "description": "Columns that the webapp user will be able to edit.\n\nIMPORTANT: make sure that the type and meaning of these columns is set correctly before starting the webapp.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset",
             "mandatory": true
