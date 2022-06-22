@@ -15,12 +15,28 @@
 }
 
 body {
-    margin: 50px 100px;
+    padding: 20px 0px 0px 20px;
     background-color: rgb(242, 242, 242);
 }
 
 body, button.tabulator-page, select.tabulator-page-size, input[type=search] {
     font-family: 'SourceSansPro' !important;
+}
+
+.tabulator {
+    font-size: 13px !important;
+    line-height: 25px !important;
+    margin: 0;
+}
+
+.tabulator-row {
+    border: none;
+}
+
+.tabulator-row .tabulator-cell {
+    padding-top: 1px;
+    padding-bottom: 1px;
+    margin: 0;
 }
 
 .tabulator .tabulator-header {
@@ -29,6 +45,10 @@ body, button.tabulator-page, select.tabulator-page-size, input[type=search] {
 
 .tabulator .tabulator-footer, .tabulator .tabulator-header .tabulator-col {
     background-color: white;
+}
+
+.tabulator .tabulator-footer, .tabulator .tabulator-header .tabulator-col:hover {
+    background-color: rgb(245, 245, 245) !important;
 }
 
 .tabulator .tabulator-footer .tabulator-page.active {
@@ -48,8 +68,9 @@ body, button.tabulator-page, select.tabulator-page-size, input[type=search] {
 }
 
 .tabulator-row.tabulator-selectable.tabulator-selected {
-    background-color: rgb(76, 175, 80) !important;
-    color: white !important;
+    background-color: #a5d6a7 !important;
+    /* background-color: rgb(76, 175, 80) !important;
+    color: white !important; */
 }
 
 input[type=search] {
