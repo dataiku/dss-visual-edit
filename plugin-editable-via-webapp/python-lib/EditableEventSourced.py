@@ -258,6 +258,8 @@ class EditableEventSourced:
                 if t_type=="boolean":
                     t_col["editor"] = t_col["formatter"]
                     t_col["editorParams"] = {"tristate": True}
+                    t_col["headerFilter"] = "input"
+                    t_col["headerFilterParams"] = {}
                 elif t_type=="number":
                     t_col["editor"] = "number"
                 else:
