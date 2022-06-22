@@ -233,7 +233,7 @@ class EditableEventSourced:
             t_type = "string"
             col_type = schema_df.loc[col_name, "type"]
             if "meaning" in schema_df.columns.to_list():
-            col_meaning = schema_df.loc[col_name, "meaning"]
+                col_meaning = schema_df.loc[col_name, "meaning"]
             else:
                 col_meaning = None
             if col_meaning and col_meaning==col_meaning: # this tests that col_meaning isn't None and that it isn't a nan
