@@ -246,21 +246,8 @@ class EditableEventSourced:
                 t_col["formatter"] = "tickCross"
                 t_col["formatterParams"] = {"allowEmpty": True}
                 t_col["hozAlign"] = "center"
-                t_col["headerFilter"] = "autocomplete"
-                t_col["headerFilterParams"] = {"values": [
-                    {
-                        "label":"True",
-                        "value":"True",
-                    },
-                    {
-                        "label":"False",
-                        "value":"False",
-                    },
-                    {
-                        "label":"All",
-                        "value":"",
-                    },
-                ]}
+                t_col["headerFilterParams"] = {"tristate": True}
+                
                 # t_col["headerFilterEmptyCheck"] = "function(value){return value === null;}"
 
             if col_name in self.editable_column_names:
