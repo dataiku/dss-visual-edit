@@ -101,8 +101,10 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
             keys_df = concat([keys_df, DataFrame(data=d, index=[i1])])
             i1 += 1
 
-        # 3. Add a column to editlog_pivoted for each key listed in primary_keys
-        editlog_pivoted_df[primary_keys] = keys_df
+        # Drop any columns from the pivot that may not be one of the editable_column_names
+        for col in editlog_pivoted_df.columns:
+            if not col in cols:
+                editlog_pivoted_df.drop(columns=[col], inplace=True)
 
         editlog_pivoted_df = concat([all_columns_df, editlog_pivoted_df]) # this makes sure that all (editable) columns are here and in the right order
 
