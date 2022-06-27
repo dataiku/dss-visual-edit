@@ -58,13 +58,14 @@ def unpack_keys(df, new_key_names, old_key_name="key"):
     # 1. Convert key values from strings to tuples
     keys_series = df.apply(lambda row: eval(row[old_key_name]), axis=1)
     
-    # 2. Expand tuples found in keys_series into a dataframe
+    # 2. Expand tuples found in keys_series into a dataframe with new_key_names as columns
+    #    If no key value was found in the tuple, the dataframe will have a missing value
     #    (Previously we were using result_type="expand", but this fails when
     #     the results of the unpack function are arrays of different lengths)
     keys_df = DataFrame(columns=new_key_names)
     i1 = 0
     for t in keys_series:
-        # create a dict `d` that holds the values for each of the primary keys found in tuple `t``
+        # create a dict `d` that holds, for each of the new keys, the value found in tuple `t` (and nothing if no value is found)
         d = {}
         i2 = 0
         for k in new_key_names:
@@ -83,6 +84,7 @@ def unpack_keys(df, new_key_names, old_key_name="key"):
     return df
 
 def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
+
     # Create empty dataframe with the proper editlog pivoted schema: all primary keys, all editable columns, and "date" column
     # This helps ensure that the dataframe we return always has the right schema
     # (even if some columns of the input dataset were never edited)
@@ -93,24 +95,23 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
     if (not editlog_df.size): # i.e. if empty editlog
         editlog_pivoted_df = all_columns_df
     else:
+        editlog_df = unpack_keys(editlog_df, primary_keys)
         editlog_pivoted_df = pivot_table(
             editlog_df.sort_values("date"), # ordering by edit date
-            index="key",
+            index=primary_keys,
             columns="column_name",
             values="value",
             aggfunc="last" # for each named column, we only keep the last value
         ).join(
-            editlog_df[["key", "date"]].groupby("key").last(), # join the last edit date for each key
-            on="key"
+            editlog_df[primary_keys + ["date"]].groupby(primary_keys).last(), # join the last edit date for each key
+            on=primary_keys
         )
-        editlog_pivoted_df.reset_index(inplace=True)
-        editlog_pivoted_df = unpack_keys(editlog_pivoted_df, primary_keys)
-
         # Drop any columns from the pivot that may not be one of the editable_column_names
         for col in editlog_pivoted_df.columns:
             if not col in cols:
                 editlog_pivoted_df.drop(columns=[col], inplace=True)
 
+        editlog_pivoted_df.reset_index(inplace=True)
         editlog_pivoted_df = concat([all_columns_df, editlog_pivoted_df]) # this makes sure that all (editable) columns are here and in the right order
 
     return editlog_pivoted_df
