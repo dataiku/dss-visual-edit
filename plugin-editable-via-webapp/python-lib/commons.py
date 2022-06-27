@@ -54,6 +54,34 @@ def get_editable_column_names(schema):
             editable_column_names.append(col.get("name"))
     return editable_column_names
 
+def unpack_keys(df, new_key_names, old_key_name="key"):
+    # 1. Convert key values from strings to tuples
+    keys_series = df.apply(lambda row: eval(row[old_key_name]), axis=1)
+    
+    # 2. Expand tuples found in keys_series into a dataframe
+    #    (Previously we were using result_type="expand", but this fails when
+    #     the results of the unpack function are arrays of different lengths)
+    keys_df = DataFrame(columns=new_key_names)
+    i1 = 0
+    for t in keys_series:
+        # create a dict `d` that holds the values for each of the primary keys found in tuple `t``
+        d = {}
+        i2 = 0
+        for k in new_key_names:
+            if i2 < len(t):
+                d[k] = t[i2] # this assumes that keys are in the same order in the tuples coming from the editlog and in new_key_names
+            i2 += 1
+        keys_df = concat([keys_df, DataFrame(data=d, index=[i1])])
+        i1 += 1
+
+    # 3. Add a column to editlog_pivoted for each key listed in primary_keys
+    df[new_key_names] = keys_df
+
+    # 4. Remove the old key column
+    df.drop(columns=[old_key_name], inplace=True)
+
+    return df
+
 def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
     # Create empty dataframe with the proper editlog pivoted schema: all primary keys, all editable columns, and "date" column
     # This helps ensure that the dataframe we return always has the right schema
@@ -75,31 +103,8 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
             editlog_df[["key", "date"]].groupby("key").last(), # join the last edit date for each key
             on="key"
         )
-
-        # Unpack keys
-
-        # 1. Convert key values from strings to tuples
-        def unpack(row):
-            return eval(row["key"])
         editlog_pivoted_df.reset_index(inplace=True)
-        keys_series = editlog_pivoted_df.apply(unpack, axis=1)
-        editlog_pivoted_df.drop(columns=["key"], inplace=True)
-        
-        # 2. Expand tuples found in keys_series into a dataframe
-        #    (Previously we were using result_type="expand", but this fails when
-        #     the results of the unpack function are arrays of different lengths)
-        keys_df = DataFrame(columns=primary_keys)
-        i1 = 0
-        for t in keys_series:
-            # create a dict `d` that holds the values for each of the primary keys found in tuple t
-            d = {}
-            i2 = 0
-            for k in primary_keys:
-                if i2 < len(t):
-                    d[k] = t[i2] # this assumes that keys are in the same order in the tuples coming from the editlog and in primary_keys
-                i2 += 1
-            keys_df = concat([keys_df, DataFrame(data=d, index=[i1])])
-            i1 += 1
+        editlog_pivoted_df = unpack_keys(editlog_pivoted_df, primary_keys)
 
         # Drop any columns from the pivot that may not be one of the editable_column_names
         for col in editlog_pivoted_df.columns:
