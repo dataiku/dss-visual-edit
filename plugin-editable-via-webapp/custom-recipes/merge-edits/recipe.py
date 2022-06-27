@@ -24,11 +24,12 @@ edited_ds = edited_datasets[0]
 original_df = original_ds.get_dataframe()
 editlog_pivoted_df = pivoted_ds.get_dataframe()
 
-# Write output schema
-edited_ds.write_schema(original_ds.read_schema()) # otherwise column type for columns of missing values might change
+# Write output schema, instead of inferring it when writing the dataframe:
+# This schema should always be the same as that of the original dataset
+edited_ds.write_schema(original_ds.read_schema())
 
 primary_keys = original_ds.get_config()["customFields"]["primary_keys"]
 
 # Write output data
 edited_df = merge_edits(original_df, editlog_pivoted_df, primary_keys)
-edited_ds.write_dataframe(edited_df)
+edited_ds.write_dataframe(edited_df, infer_schema=False)
