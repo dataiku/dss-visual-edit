@@ -283,6 +283,9 @@ class EditableEventSourced:
         # store value as a string, unless it's None
         if (value!=None): value = str(value)
 
+        for k in self.primary_keys:
+            d[k] = primary_key_values
+
         # add to the editlog
         self.editlog_ds.write_dataframe(DataFrame(data={
             "key": [str(primary_key_values)],

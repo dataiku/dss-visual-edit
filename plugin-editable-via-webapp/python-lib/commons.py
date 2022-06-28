@@ -54,6 +54,19 @@ def get_editable_column_names(schema):
             editable_column_names.append(col.get("name"))
     return editable_column_names
 
+def unpack_keys_dict(df, new_key_names, old_key_name="key"):
+    keys_df = DataFrame(columns=new_key_names)
+    i = 0
+    for row in df:
+        row_keys = eval(row[old_key_name])
+        d = {}
+        for k in new_key_names:
+            d[k] = row_keys.get(k)
+        keys_df = concat([keys_df, DataFrame(data=d, index=[i])])
+        i += 1
+    df[new_key_names] = keys_df
+    df.drop(columns=[old_key_name], inplace=True)
+
 def unpack_keys(df, new_key_names, old_key_name="key"):
     # 1. Convert key values from strings to tuples
     keys_series = df.apply(lambda row: eval(row[old_key_name]), axis=1)
