@@ -95,7 +95,7 @@ class EditableEventSourced:
             edited_ds_schema.append(new_col)
             if (col.get("name") in self.primary_keys + self.editable_column_names):
                 editlog_pivoted_ds_schema.append(new_col)
-        editlog_pivoted_ds_schema.append({"name": "date", "type": "string", "meaning": "DateSource"})
+        editlog_pivoted_ds_schema.append({"name": "last_edit_date", "type": "string", "meaning": "DateSource"})
         return editlog_pivoted_ds_schema, edited_ds_schema
 
     def __setup_editlog__(self):
@@ -126,7 +126,7 @@ class EditableEventSourced:
             editlog_pivoted_ds_creator.with_store_into(connection=self.__connection_name__)
             editlog_pivoted_ds_creator.create()
             self.editlog_pivoted_ds = Dataset(self.editlog_pivoted_ds_name, self.project_key)
-            cols = self.primary_keys + self.editable_column_names + ["date"]
+            cols = self.primary_keys + self.editable_column_names + ["last_edit_date"]
             editlog_pivoted_df = DataFrame(columns=cols)
             self.editlog_pivoted_ds.write_schema(editlog_pivoted_ds_schema)
             self.editlog_pivoted_ds.write_dataframe(editlog_pivoted_df)
