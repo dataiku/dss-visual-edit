@@ -74,7 +74,7 @@ def serve_layout():
             columns=ees.get_columns_tabulator(),
             data=ees.get_data_tabulator(),
             theme='semantic-ui/tabulator_semantic-ui',
-            options={"layout": "fitDataTable", "pagination": "local", "paginationSize": 20, "paginationSizeSelector":[10, 20, 50, 100]}
+            options={"selectable": 1, "layout": "fitDataTable", "pagination": "local", "paginationSize": 20, "paginationSizeSelector":[10, 20, 50, 100], "movableColumns": True}
         ),
         html.Div(id='edit-info', children="", style={"display": "none"}),
     ], style={})
