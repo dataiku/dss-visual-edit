@@ -1,0 +1,7 @@
+[
+    {
+        "name": "part_number",
+        "editable_type": "linked_record",
+        "linked_ds_name": "valid_part_numbers"
+    }
+]
