@@ -32,6 +32,17 @@
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset",
             "mandatory": true
+        },
+        {
+            "name": "sep1",
+            "label": "Advanced",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "editschema",
+            "label": "Editschema (optional)",
+            "description": "JSON",
+            "type": "TEXTAREA"
         }
     ],
     "roles": []
