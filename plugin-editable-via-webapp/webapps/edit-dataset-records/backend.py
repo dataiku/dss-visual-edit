@@ -21,9 +21,11 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     stylesheets += ["https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/style.css"] # this points to a copy of assets/style.css (which is ignored by Dataiku's Dash)
 
     from dataiku.customwebapp import get_webapp_config
+    from json5 import loads
     original_ds_name = get_webapp_config().get("original_dataset")
     primary_keys = get_webapp_config().get("primary_keys")
     editable_column_names = get_webapp_config().get("editable_column_names")
+    editschema_manual = loads(get_webapp_config().get("editschema"))
 
 else:
     print("Webapp is being run outside of Dataiku")
@@ -32,12 +34,17 @@ else:
     # Get original dataset name as an environment variable
     # Get primary keys and editable column names from the custom fields of that dataset
     import dataiku
+    from json5 import load
     original_ds_name = getenv("ORIGINAL_DATASET")
     client = dataiku.api_client()
     project = client.get_project(getenv("DKU_CURRENT_PROJECT_KEY"))
     settings = project.get_dataset(original_ds_name).get_settings()
     primary_keys = settings.custom_fields["primary_keys"]
     editable_column_names = settings.custom_fields["editable_column_names"]
+    try:
+        editschema_manual = load(open("example-editschemas/" + original_ds_name + ".json"))
+    except:
+        editschema_manual = {}
     
     from flask import Flask
     f_app = Flask(__name__)
@@ -48,7 +55,7 @@ app.config.external_scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/d
 
 #%%
 from EditableEventSourced import EditableEventSourced
-ees = EditableEventSourced(original_ds_name, primary_keys, editable_column_names)
+ees = EditableEventSourced(original_ds_name, primary_keys, editable_column_names, editschema_manual)
 
 #%%
 from commons import get_user_details
