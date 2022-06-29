@@ -229,6 +229,7 @@ class EditableEventSourced:
         # IDEA: improve this code with a dict to do matching (instead of if/else)?
         t_cols = [] # columns for tabulator
         schema_df = DataFrame(data=self.__schema__).set_index("name") # turn __schema__ into a DataFrame with "name" as index, and thus easily get the type for a given name
+        linked_records_df = DataFrame(data=self.linked_records).set_index("name")
         for col_name in self.edited_df_cols:
             t_col = {"field": col_name, "headerFilter": True, "resizable": True}
             t_type = "string"
@@ -253,18 +254,31 @@ class EditableEventSourced:
 
             if col_name in self.editable_column_names:
                 t_col["title"] = "🖊 " + col_name
+                # t_col["frozen"] = True
+                
                 # if col.get("type")=="list": # detect if it's categorical - via the count of unique values?
                 #    t_col["editor"] = "list"
                 #    t_col["editorParams"] = {"values": col["values"]}
-                if t_type=="boolean":
-                    t_col["editor"] = t_col["formatter"]
-                    t_col["editorParams"] = {"tristate": True}
-                    t_col["headerFilter"] = "input"
-                    t_col["headerFilterParams"] = {}
-                elif t_type=="number":
-                    t_col["editor"] = "number"
+
+                if col_name in self.linked_record_names:
+                    t_col["editor"] = "autocomplete"
+                    linked_ds_name = linked_records_df.loc[col_name, "ds_name"]
+                    linked_ds_key = linked_records_df.loc[col_name, "ds_key"]
+                    values = Dataset(linked_ds_name).get_dataframe()[linked_ds_key].to_list()
+                    t_col["editorParams"] = {
+                        "values": values,
+                        "freetext": True
+                    }
                 else:
-                    t_col["editor"] = "input"
+                    if t_type=="boolean":
+                        t_col["editor"] = t_col["formatter"]
+                        t_col["editorParams"] = {"tristate": True}
+                        t_col["headerFilter"] = "input"
+                        t_col["headerFilterParams"] = {}
+                    elif t_type=="number":
+                        t_col["editor"] = "number"
+                    else:
+                        t_col["editor"] = "input"
             else:
                 t_col["title"] = col_name
                 if col_name in self.primary_keys:
