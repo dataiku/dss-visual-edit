@@ -229,7 +229,8 @@ class EditableEventSourced:
         # IDEA: improve this code with a dict to do matching (instead of if/else)?
         t_cols = [] # columns for tabulator
         schema_df = DataFrame(data=self.__schema__).set_index("name") # turn __schema__ into a DataFrame with "name" as index, and thus easily get the type for a given name
-        linked_records_df = DataFrame(data=self.linked_records).set_index("name")
+        if (len(self.linked_records) > 0):
+            linked_records_df = DataFrame(data=self.linked_records).set_index("name")
         for col_name in self.edited_df_cols:
             t_col = {"field": col_name, "headerFilter": True, "resizable": True}
             t_type = "string"
