@@ -11,6 +11,11 @@
     "standardWebAppLibraries": null,
     "params": [
         {
+            "name": "sep1",
+            "label": "Main",
+            "type": "SEPARATOR"
+        },
+        {
             "name": "original_dataset",
             "label": "Original dataset",
             "description": "",
@@ -34,7 +39,7 @@
             "mandatory": true
         },
         {
-            "name": "sep1",
+            "name": "sep2",
             "label": "Advanced",
             "type": "SEPARATOR"
         },
