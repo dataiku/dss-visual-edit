@@ -7,6 +7,7 @@ from os import getenv
 from json5 import loads
 from datetime import datetime
 from pytz import timezone
+from dash_extensions.javascript import Namespace
 
 def get_lookup_column_names(linked_record):
     lookup_column_names = []
@@ -255,7 +256,7 @@ class EditableEventSourced:
 
             if col_name in self.editable_column_names:
                 t_col["title"] = "🖊 " + col_name
-                if (len(self.edited_df_cols) >= 10): t_col["frozen"] = True # freeze editable columns to the right when there are many of them (e.g. more than 10 - which is arbitrary)
+                if (len(self.edited_df_cols) >= 10): t_col["frozen"] = True # freeze editable columns to the right when there are many of them (e.g. more than 10 - which is arbitrary) TODO: make this an option in the webapp settings
                 
                 # if col.get("type")=="list": # detect if it's categorical - via the count of unique values?
                 #    t_col["editor"] = "list"
@@ -266,9 +267,11 @@ class EditableEventSourced:
                     linked_ds_name = linked_records_df.loc[col_name, "ds_name"]
                     linked_ds_key = linked_records_df.loc[col_name, "ds_key"]
                     values = Dataset(linked_ds_name).get_dataframe()[linked_ds_key].to_list()
+                    ns = Namespace("myNamespace", "tabulator")
                     t_col["editorParams"] = {
                         "values": values,
-                        "freetext": True
+                        "freetext": True,
+                        "searchFunc": ns("searchFunc")
                     }
                 else:
                     if t_type=="boolean":
