@@ -24,7 +24,10 @@
   "author": "Louis Dorard <louis.dorard@dataiku.com>",
   "license": "",
   "dependencies": {
-    "ramda": "^0.26.1"
+    "ramda": "^0.26.1",
+    "dash-extensions": "^0.1.3",
+    "react-tabulator": "^0.18.1",
+    "set-blocking": "^2.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",
