@@ -1,0 +1,670 @@
+{
+  "src/lib/components/DashTabulator.react.js": {
+    "description": "DashTabulator is an implementation of the React Tabulator from \nhttps://github.com/ngduc/react-tabulator/ and https://github.com/olifolkerd/tabulator.\nIt takes a property, `column`, and `data`\ndisplays it in tabulator.\nThe `options` property is passed to Tabulator to perform regular options\ndownloading as xlsx is enabled by default.",
+    "displayName": "DashTabulator",
+    "methods": [
+      {
+        "name": "rowClick",
+        "docblock": null,
+        "modifiers": [],
+        "params": [
+          {
+            "name": "e",
+            "type": null
+          },
+          {
+            "name": "row",
+            "type": null
+          }
+        ],
+        "returns": null
+      },
+      {
+        "name": "rowSelected",
+        "docblock": null,
+        "modifiers": [],
+        "params": [
+          {
+            "name": "data",
+            "type": null
+          },
+          {
+            "name": "row",
+            "type": null
+          }
+        ],
+        "returns": null
+      },
+      {
+        "name": "downloadData",
+        "docblock": null,
+        "modifiers": [],
+        "params": [],
+        "returns": null
+      },
+      {
+        "name": "clearFilters",
+        "docblock": null,
+        "modifiers": [],
+        "params": [],
+        "returns": null
+      }
+    ],
+    "props": {
+      "id": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "The ID used to identify this component in Dash callbacks."
+      },
+      "theme": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "theme",
+        "defaultValue": {
+          "value": "null",
+          "computed": false
+        }
+      },
+      "columns": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "A label that will be printed when this component is rendered.",
+        "defaultValue": {
+          "value": "[]",
+          "computed": false
+        }
+      },
+      "data": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "The value displayed in the input.",
+        "defaultValue": {
+          "value": "[]",
+          "computed": false
+        }
+      },
+      "setProps": {
+        "type": {
+          "name": "func"
+        },
+        "required": false,
+        "description": "Dash-assigned callback that should be called to report property changes\nto Dash, to make them available for callbacks."
+      },
+      "options": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": "Tabulator Options"
+      },
+      "rowClicked": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": "rowClick captures the row that was clicked on"
+      },
+      "multiRowsClicked": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "multiRowsClicked, when multiple rows are clicked"
+      },
+      "cellEdited": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": "cellEdited captures the cell that was clicked on"
+      },
+      "dataChanged": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "dataChanged captures the cell that was clicked on"
+      },
+      "downloadButtonType": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": "downloadButtonType, takes a css style, text to display on button, type is file type to download\ne.g.\n downloadButtonType = {\"css\": \"btn btn-primary\", \"text\":\"Export\", \"type\":\"xlsx\"}"
+      },
+      "clearFilterButtonType": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": "clearFilterButtonType, takes a css style, text to display on button\ne.g.\n clearFilterButtonType = {\"css\": \"btn btn-primary\", \"text\":\"Export\"}"
+      },
+      "initialHeaderFilter": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "initialHeaderFilter based on http://tabulator.info/docs/4.8/filter#header\ncan take array of filters"
+      },
+      "dataFiltering": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "dataFiltering based on http://tabulator.info/docs/4.8/callbacks#filter\nThe dataFiltering callback is triggered whenever a filter event occurs, before the filter happens."
+      },
+      "dataFiltered": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": "dataFiltered based on http://tabulator.info/docs/4.8/callbacks#filter\nThe dataFiltered callback is triggered after the table dataset is filtered"
+      },
+      "rowClick": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": "standard props not used by dash-tabulator directly\ncan be used as part of custom javascript implementations"
+      },
+      "tableBuilding": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "tableBuilt": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "rowDblClick": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "rowContext": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "rowTap": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "rowDblTap": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "rowTapHold": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "rowAdded": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "rowDeleted": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "rowMoved": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "rowUpdated": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "rowSelectionChanged": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "rowSelected": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "rowDeselected": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "rowResized": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "cellClick": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "cellDblClick": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "cellContext": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "cellTap": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "cellDblTap": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "cellTapHold": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "cellEditing": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "cellEditCancelled": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "columnMoved": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "columnResized": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "columnTitleChanged": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "columnVisibilityChanged": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "headerClick": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "headerDblClick": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "headerContext": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "headerTap": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "headerDblTap": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "headerTapHold": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "htmlImporting": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "htmlImported": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "dataLoading": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "dataLoaded": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "ajaxRequesting": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "ajaxResponse": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "ajaxError": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "dataSorting": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "dataSorted": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "renderStarted": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "renderComplete": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "pageLoaded": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "localized": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "dataGrouping": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "dataGrouped": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "groupVisibilityChanged": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "groupClick": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "groupDblClick": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "groupContext": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "groupTap": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "groupDblTap": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "groupTapHold": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "movableRowsSendingStart": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "movableRowsSent": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "movableRowsSentFailed": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "movableRowsSendingStop": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "movableRowsReceivingStart": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "movableRowsReceived": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "movableRowsReceivedFailed": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "movableRowsReceivingStop": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "validationFailed": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "clipboardCopied": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "clipboardPasted": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "clipboardPasteError": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "downloadReady": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "downloadComplete": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "selectableCheck": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      }
+    }
+  }
+}
