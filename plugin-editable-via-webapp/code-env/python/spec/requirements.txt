@@ -1,3 +1,2 @@
 dash>=2.0.0
-dash_tabulator==0.4.2
 json5
