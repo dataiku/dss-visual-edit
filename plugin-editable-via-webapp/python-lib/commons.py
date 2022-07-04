@@ -88,22 +88,23 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
     # Create empty dataframe with the proper editlog pivoted schema: all primary keys, all editable columns, and "date" column
     # This helps ensure that the dataframe we return always has the right schema
     # (even if some columns of the input dataset were never edited)
-    cols = primary_keys + editable_column_names + ["date"]
+    cols = primary_keys + editable_column_names + ["last_edit_date"]
     all_columns_df = DataFrame(columns=cols)
 
     editlog_df = get_editlog_df(editlog_ds)
     if (not editlog_df.size): # i.e. if empty editlog
         editlog_pivoted_df = all_columns_df
     else:
+        editlog_df.rename(columns={"date": "last_edit_date"}, inplace=True)
         editlog_df = unpack_keys(editlog_df, primary_keys)
         editlog_pivoted_df = pivot_table(
-            editlog_df.sort_values("date"), # ordering by edit date
+            editlog_df.sort_values("last_edit_date"), # ordering by edit date
             index=primary_keys,
             columns="column_name",
             values="value",
             aggfunc="last" # for each named column, we only keep the last value
         ).join(
-            editlog_df[primary_keys + ["date"]].groupby(primary_keys).last(), # join the last edit date for each key
+            editlog_df[primary_keys + ["last_edit_date"]].groupby(primary_keys).last(), # join the last edit date for each key
             on=primary_keys
         )
         # Drop any columns from the pivot that may not be one of the editable_column_names
@@ -121,7 +122,7 @@ def merge_edits(original_df, editlog_pivoted_df, primary_keys):
         edited_df = original_df
     else:
         # We don't need the date column in the rest
-        editlog_pivoted_df.drop(columns=["date"], inplace=True)
+        editlog_pivoted_df.drop(columns=["last_edit_date"], inplace=True)
 
         # Change types of primary keys to match original_df
         for col in primary_keys: # or editlog_pivoted_df.columns.tolist() ?
@@ -133,7 +134,7 @@ def merge_edits(original_df, editlog_pivoted_df, primary_keys):
         edited_df = original_df.join(editlog_pivoted_df, on=primary_keys, rsuffix="_value_last")
         
         # "Merge" -> this creates _original columns
-        editable_column_names = editlog_pivoted_df.columns.tolist() # "date" column has already been dropped
+        editable_column_names = editlog_pivoted_df.columns.tolist() # "last_edit_date" column has already been dropped
         for col in editable_column_names:
             # copy col to a new column whose name is suffixed by "_original"
             edited_df[col + "_original"] = edited_df[col]

@@ -11,6 +11,11 @@
     "standardWebAppLibraries": null,
     "params": [
         {
+            "name": "sep1",
+            "label": "Data",
+            "type": "SEPARATOR"
+        },
+        {
             "name": "original_dataset",
             "label": "Original dataset",
             "description": "",
@@ -32,6 +37,29 @@
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset",
             "mandatory": true
+        },
+        {
+            "name": "sep2",
+            "label": "Layout",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "freeze_editable_columns",
+            "label": "Freeze editable columns?",
+            "description": "Freezing to the right-hand side",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "name": "sep3",
+            "label": "Advanced",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "editschema",
+            "label": "Editschema (optional)",
+            "description": "JSON",
+            "type": "TEXTAREA"
         }
     ],
     "roles": []
