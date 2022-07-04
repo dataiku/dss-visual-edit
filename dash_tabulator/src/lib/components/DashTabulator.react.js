@@ -110,6 +110,14 @@ export default class DashTabulator extends Component {
                 console.log(o);
                 if (o instanceof Object) { 
                     header[key] = resolveProp(o, this);
+                    if (o.variable) {
+                        for (let key2 in o){
+                            let o2 = o[key2]
+                            if (o2 instanceof Object) { 
+                                o[key2] = resolveProp(o2, this);
+                            }
+                        }
+                    }
                 }
             }
         }
