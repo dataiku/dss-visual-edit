@@ -24,35 +24,68 @@ styles = {
 # declared, a reference can be passed using Namespace that then gets mapped client side
 # see https://github.com/preftech/dash-tabulator/pull/11
 # The namespace here must match the name space of the JavaScript asset.
-# ns = Namespace("myNamespace", "tabulator")
+ns = Namespace("myNamespace", "tabulator")
 
 columns = [
-                {"formatter":"rowSelection", "titleFormatter":"rowSelection", 
-                    "titleFormatterParams": {
-                                        "rowRange": "active" # only toggle the values of the active filtered rows
-                                },
-                    "hozAlign":"center", "headerSort":"false"},
-                { "title": "Name", "field": "name", "width": 150, "headerFilter":True, "editor":"input"},
-                { "title": "Age", "field": "age", "hozAlign": "left", "formatter": "progress"},
-                { "title": "Favourite Color", "field": "col", "headerFilter":True, "editor":"list" },
-                { "title": "Date Of Birth", "field": "dob", "hozAlign": "center" },
-                { "title": "Rating", "field": "rating", "hozAlign": "center", "formatter": "star" },
-                { "title": "Passed?", "field": "passed", "hozAlign": "center", "formatter": "tickCross" },
-                {"title": "Print", "field": "print", "hozAlign": "center"}
-              ]
+    {
+        "title": "Name",
+        "field": "name",
+        "width": 150,
+        "headerFilter":True,
+        "editor":"input"
+    },
+    {
+        "title": "Age",
+        "field": "age",
+        "hozAlign": "left",
+        "formatter": "progress"
+    },
+    {
+        "title": "Favourite Color",
+        "field": "col",
+        "headerFilter":True,
+        "editor":"autocomplete",
+        "editorParams": {
+            "values": ["red", "green", "blue"],
+            "searchFunc": ns("searchFunc")
+        }
+    },
+    {
+        "title": "Date Of Birth",
+        "field": "dob",
+        "hozAlign": "center"
+    },
+    {
+        "title": "Rating",
+        "field": "rating",
+        "hozAlign": "center",
+        "formatter": "star"
+    },
+    {
+        "title": "Passed?",
+        "field": "passed",
+        "hozAlign": "center",
+        "formatter": "tickCross"
+    },
+    {
+        "title": "Print",
+        "field": "print",
+        "hozAlign": "center"
+    }
+]
 
 data = [
-                {"id":1, "name":"Oli Bob", "age":"12", "col":"red", "dob":"", "print" :"foo"},
-                {"id":2, "name":"Mary May", "age":"1", "col":"blue", "dob":"14/05/1982", "print" :"foo"},
-                {"id":3, "name":"Christine Lobowski", "age":"42", "col":"green", "dob":"22/05/1982", "print" :"foo"},
-                {"id":4, "name":"Brendon Philips", "age":"125", "col":"orange", "dob":"01/08/1980", "print" :"foo"},
-                {"id":5, "name":"Margret Marmajuke", "age":"16", "col":"yellow", "dob":"31/01/1999", "print" :"foo"},
-                {"id":6, "name":"Fred Savage", "age":"16", "col":"yellow", "rating":"1", "dob":"31/01/1999", "print" :"foo"},
-                {"id":7, "name":"Brie Larson", "age":"30", "col":"blue", "rating":"1", "dob":"31/01/1999", "print" :"foo"},
-              ]
+    {"id":1, "name":"Oli Bob", "age":"12", "col":"red", "dob":"", "print" :"foo"},
+    {"id":2, "name":"Mary May", "age":"1", "col":"blue", "dob":"14/05/1982", "print" :"foo"},
+    {"id":3, "name":"Christine Lobowski", "age":"42", "col":"green", "dob":"22/05/1982", "print" :"foo"},
+    {"id":4, "name":"Brendon Philips", "age":"125", "col":"orange", "dob":"01/08/1980", "print" :"foo"},
+    {"id":5, "name":"Margret Marmajuke", "age":"16", "col":"yellow", "dob":"31/01/1999", "print" :"foo"},
+    {"id":6, "name":"Fred Savage", "age":"16", "col":"yellow", "rating":"1", "dob":"31/01/1999", "print" :"foo"},
+    {"id":7, "name":"Brie Larson", "age":"30", "col":"blue", "rating":"1", "dob":"31/01/1999", "print" :"foo"},
+]
 
 options = {
-    "groupBy": "col",
+#    "groupBy": "col",
     "selectable":"true",
 #    "columnResized" : ns("columnResized")
 }
@@ -64,8 +97,8 @@ app.layout = html.Div([
     dash_tabulator.DashTabulator(
         id='tabulator',
         columns=columns,
-        data=data
-        # theme="tabulator",
+        data=data,
+        theme='semantic-ui/tabulator_semantic-ui'
         # options=options,
         # downloadButtonType=downloadButtonType,
         # clearFilterButtonType=clearFilterButtonType,
