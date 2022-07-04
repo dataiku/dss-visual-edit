@@ -228,6 +228,7 @@ class EditableEventSourced:
         # Setup columns to be used by data table
         # Add "editor" to editable columns. Possible values include: "input", "textarea", "number", "tickCross", "list". See all options at options http://tabulator.info/docs/5.2/edit.
         # IDEA: improve this code with a dict to do matching (instead of if/else)?
+        ns = Namespace("myNamespace", "tabulator")
         t_cols = [] # columns for tabulator
         schema_df = DataFrame(data=self.__schema__).set_index("name") # turn __schema__ into a DataFrame with "name" as index, and thus easily get the type for a given name
         if (len(self.linked_records) > 0):
@@ -251,8 +252,11 @@ class EditableEventSourced:
                 t_col["formatterParams"] = {"allowEmpty": True}
                 t_col["hozAlign"] = "center"
                 t_col["headerFilterParams"] = {"tristate": True}
-                
                 # t_col["headerFilterEmptyCheck"] = "function(value){return value === null;}"
+            if t_type=="number":
+                t_col["headerFilter"] = ns("minMaxFilterEditor")
+                t_col["headerFilterFunc"] = ns("minMaxFilterFunction")
+                t_col["headerFilterLiveFilter"] = False
 
             if col_name in self.editable_column_names:
                 t_col["title"] = "🖊 " + col_name
@@ -267,7 +271,6 @@ class EditableEventSourced:
                     linked_ds_name = linked_records_df.loc[col_name, "ds_name"]
                     linked_ds_key = linked_records_df.loc[col_name, "ds_key"]
                     values = Dataset(linked_ds_name).get_dataframe()[linked_ds_key].to_list()
-                    ns = Namespace("myNamespace", "tabulator")
                     t_col["editorParams"] = {
                         "values": values,
                         "freetext": True,
