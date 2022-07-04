@@ -15,14 +15,14 @@ function __init__()
             version = version,
             [
                 DashBase.Resource(
-    relative_package_path = "dash_tabulator.min.js",
+    relative_package_path = "dash_tabulator.dev.js",
     external_url = nothing,
     dynamic = nothing,
     async = nothing,
     type = :js
 ),
 DashBase.Resource(
-    relative_package_path = "dash_tabulator.min.js.map",
+    relative_package_path = "dash_tabulator.dev.js.map",
     external_url = nothing,
     dynamic = true,
     async = nothing,
