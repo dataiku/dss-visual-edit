@@ -256,7 +256,7 @@ class EditableEventSourced:
 
             if col_name in self.editable_column_names:
                 t_col["title"] = "🖊 " + col_name
-                if (len(self.edited_df_cols) >= 10): t_col["frozen"] = True # freeze editable columns to the right when there are many of them (e.g. more than 10 - which is arbitrary) TODO: make this an option in the webapp settings
+                # if (len(self.edited_df_cols) >= 10): t_col["frozen"] = True # freeze editable columns to the right when there are many of them (e.g. more than 10 - which is arbitrary) TODO: make this an option in the webapp settings
                 
                 # if col.get("type")=="list": # detect if it's categorical - via the count of unique values?
                 #    t_col["editor"] = "list"
