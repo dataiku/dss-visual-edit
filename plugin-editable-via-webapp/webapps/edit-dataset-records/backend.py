@@ -68,12 +68,12 @@ user = get_user_details()
 #%%
 # Define the webapp layout and components
 
-from dash_tabulator import DashTabulator
+import dash_tabulator
 from dash.dependencies import Input, Output
 
 def serve_layout():
     return html.Div(children=[
-        DashTabulator(
+        dash_tabulator.DashTabulator(
             id='datatable',
             columns=ees.get_columns_tabulator(),
             data=ees.get_data_tabulator(),
