@@ -74,10 +74,10 @@ from dash.dependencies import Input, Output
 def serve_layout():
     return html.Div(children=[
         dash_tabulator.DashTabulator(
-            id='datatable',
+            id="datatable",
             columns=ees.get_columns_tabulator(),
             data=ees.get_data_tabulator(),
-            theme='semantic-ui/tabulator_semantic-ui',
+            theme="semantic-ui/tabulator_semantic-ui",
             options={
                 "selectable": 1,
                 "layout": "fitDataTable",
@@ -87,7 +87,7 @@ def serve_layout():
                 "movableColumns": True
             }
         ),
-        html.Div(id='edit-info', children="", style={"display": "none"}),
+        html.Div(id="edit-info", children="", style={"display": "none"}),
     ], style={})
 app.layout = serve_layout
 
