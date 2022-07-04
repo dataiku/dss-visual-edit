@@ -1,25 +1,46 @@
 import dash_tabulator
 import dash
 from dash.dependencies import Input, Output
-import dash_html_components as html
-import dash_core_components as dcc
+from dash import html
+from dash import dcc
 from dash_extensions.javascript import Namespace
 #from textwrap import dedent as d
 #import json
 
-app = dash.Dash(__name__)
 
-ns = Namespace("myNamespace", "tabulator")
+external_scripts = ['https://oss.sheetjs.com/sheetjs/xlsx.full.min.js']
+external_stylesheets = ['https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css',
+                        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css']
+app = dash.Dash(__name__, external_scripts=external_scripts, external_stylesheets=external_stylesheets)
+
+styles = {
+            'pre': {
+                'border': 'thin lightgrey solid',
+                'overflowX': 'scroll'
+            }
+        }
+
+# in the asset folder there is a JS method in assets/buttons.js with a window.myNamespace
+# declared, a reference can be passed using Namespace that then gets mapped client side
+# see https://github.com/preftech/dash-tabulator/pull/11
+# The namespace here must match the name space of the JavaScript asset.
+# ns = Namespace("myNamespace", "tabulator")
 
 columns = [
-                { "title": "Name", "field": "name"},
-                { "title": "Age", "field": "age"},
-                { "title": "Favourite Color", "field": "col"},
-                { "title": "Date Of Birth", "field": "dob"},
-                { "title": "Rating", "field": "rating"},
-                { "title": "Passed?", "field": "passed"},
-                {"title": "Print", "field": "print"}
+                {"formatter":"rowSelection", "titleFormatter":"rowSelection", 
+                    "titleFormatterParams": {
+                                        "rowRange": "active" # only toggle the values of the active filtered rows
+                                },
+                    "hozAlign":"center", "headerSort":"false"},
+                { "title": "Name", "field": "name", "width": 150, "headerFilter":True, "editor":"input"},
+                { "title": "Age", "field": "age", "hozAlign": "left", "formatter": "progress"},
+                { "title": "Favourite Color", "field": "col", "headerFilter":True, "editor":"list" },
+                { "title": "Date Of Birth", "field": "dob", "hozAlign": "center" },
+                { "title": "Rating", "field": "rating", "hozAlign": "center", "formatter": "star" },
+                { "title": "Passed?", "field": "passed", "hozAlign": "center", "formatter": "tickCross" },
+                {"title": "Print", "field": "print", "hozAlign": "center"}
               ]
+
 data = [
                 {"id":1, "name":"Oli Bob", "age":"12", "col":"red", "dob":"", "print" :"foo"},
                 {"id":2, "name":"Mary May", "age":"1", "col":"blue", "dob":"14/05/1982", "print" :"foo"},
@@ -30,7 +51,11 @@ data = [
                 {"id":7, "name":"Brie Larson", "age":"30", "col":"blue", "rating":"1", "dob":"31/01/1999", "print" :"foo"},
               ]
 
-options = { "groupBy": "col", "selectable":"true", "columnResized" : ns("columnResized")}
+options = {
+    "groupBy": "col",
+    "selectable":"true",
+#    "columnResized" : ns("columnResized")
+}
 downloadButtonType = {"css": "btn btn-primary", "text":"Export", "type":"xlsx"}
 clearFilterButtonType = {"css": "btn btn-outline-dark", "text":"Clear Filters"}
 initialHeaderFilter = [{"field":"col", "value":"blue"}]
@@ -54,6 +79,14 @@ app.layout = html.Div([
             )
 
 ])
+
+@app.callback([ Output('tabulator', 'columns'),
+                Output('tabulator', 'data'),
+                Output('tabulator', 'initialHeaderFilter')],
+                [Input('interval-component-iu', 'n_intervals')])
+def initialize(val):
+
+    return columns, data, initialHeaderFilter
 
 @app.callback(Output('output', 'children'),
     [Input('tabulator', 'rowClicked'),
