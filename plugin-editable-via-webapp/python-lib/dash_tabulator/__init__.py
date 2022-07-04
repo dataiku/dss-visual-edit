@@ -66,12 +66,12 @@ _js_dist.extend(
 _js_dist.extend(
     [
         {
-            'relative_package_path': 'dash_tabulator.min.js',
+            'relative_package_path': 'dash_tabulator.dev.js',
     
             'namespace': package_name
         },
         {
-            'relative_package_path': 'dash_tabulator.min.js.map',
+            'relative_package_path': 'dash_tabulator.dev.js.map',
     
             'namespace': package_name,
             'dynamic': True
