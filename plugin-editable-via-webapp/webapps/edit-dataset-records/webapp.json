@@ -45,7 +45,8 @@
         },
         {
             "name": "freeze_editable_columns",
-            "label": "Freeze editable columns to the right?",
+            "label": "Freeze editable columns?",
+            "description": "Freezing to the right-hand side",
             "type": "BOOLEAN",
             "defaultValue": false
         },
