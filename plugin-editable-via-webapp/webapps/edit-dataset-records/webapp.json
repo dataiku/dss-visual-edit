@@ -12,7 +12,7 @@
     "params": [
         {
             "name": "sep1",
-            "label": "Main",
+            "label": "Data",
             "type": "SEPARATOR"
         },
         {
@@ -40,6 +40,17 @@
         },
         {
             "name": "sep2",
+            "label": "Layout",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "freeze_editable_columns",
+            "label": "Freeze editable columns to the right?",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "name": "sep3",
             "label": "Advanced",
             "type": "SEPARATOR"
         },

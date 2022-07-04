@@ -224,7 +224,7 @@ class EditableEventSourced:
     def get_data_tabulator(self):
         return self.get_edited_df().to_dict('records')
 
-    def get_columns_tabulator(self):
+    def get_columns_tabulator(self, freeze_editable_columns=False):
         # Setup columns to be used by data table
         # Add "editor" to editable columns. Possible values include: "input", "textarea", "number", "tickCross", "list". See all options at options http://tabulator.info/docs/5.2/edit.
         # IDEA: improve this code with a dict to do matching (instead of if/else)?
@@ -260,7 +260,7 @@ class EditableEventSourced:
 
             if col_name in self.editable_column_names:
                 t_col["title"] = "🖊 " + col_name
-                # if (len(self.edited_df_cols) >= 10): t_col["frozen"] = True # freeze editable columns to the right when there are many of them (e.g. more than 10 - which is arbitrary) TODO: make this an option in the webapp settings
+                if (freeze_editable_columns): t_col["frozen"] = True # freeze editable columns to the right
                 
                 # if col.get("type")=="list": # detect if it's categorical - via the count of unique values?
                 #    t_col["editor"] = "list"
