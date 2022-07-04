@@ -96,10 +96,10 @@ e.g.
 
 \item{dataChanged}{Unnamed list. dataChanged captures the cell that was clicked on}
 
-\item{dataFiltered}{Named list. dataFiltered based on http://tabulator.info/docs/4.8/callbacks#filter
+\item{dataFiltered}{Named list. dataFiltered based on http://tabulator.info/docs/5.2/callbacks#filter
 The dataFiltered callback is triggered after the table dataset is filtered}
 
-\item{dataFiltering}{Unnamed list. dataFiltering based on http://tabulator.info/docs/4.8/callbacks#filter
+\item{dataFiltering}{Unnamed list. dataFiltering based on http://tabulator.info/docs/5.2/callbacks#filter
 The dataFiltering callback is triggered whenever a filter event occurs, before the filter happens.}
 
 \item{dataGrouped}{Logical | numeric | character | named list | unnamed list. }
@@ -152,7 +152,7 @@ e.g.
 
 \item{htmlImporting}{Logical | numeric | character | named list | unnamed list. }
 
-\item{initialHeaderFilter}{Unnamed list. initialHeaderFilter based on http://tabulator.info/docs/4.8/filter#header
+\item{initialHeaderFilter}{Unnamed list. initialHeaderFilter based on http://tabulator.info/docs/5.2/filter#header
 can take array of filters}
 
 \item{localized}{Logical | numeric | character | named list | unnamed list. }

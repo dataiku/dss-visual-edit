@@ -39,9 +39,9 @@ e.g.
 - `columns` (Array; optional): A label that will be printed when this component is rendered.
 - `data` (Array; optional): The value displayed in the input.
 - `dataChanged` (Array; optional): dataChanged captures the cell that was clicked on
-- `dataFiltered` (Dict; optional): dataFiltered based on http://tabulator.info/docs/4.8/callbacks#filter
+- `dataFiltered` (Dict; optional): dataFiltered based on http://tabulator.info/docs/5.2/callbacks#filter
 The dataFiltered callback is triggered after the table dataset is filtered
-- `dataFiltering` (Array; optional): dataFiltering based on http://tabulator.info/docs/4.8/callbacks#filter
+- `dataFiltering` (Array; optional): dataFiltering based on http://tabulator.info/docs/5.2/callbacks#filter
 The dataFiltering callback is triggered whenever a filter event occurs, before the filter happens.
 - `dataGrouped` (Bool | Real | String | Dict | Array; optional)
 - `dataGrouping` (Bool | Real | String | Dict | Array; optional)
@@ -69,7 +69,7 @@ e.g.
 - `headerTapHold` (Bool | Real | String | Dict | Array; optional)
 - `htmlImported` (Bool | Real | String | Dict | Array; optional)
 - `htmlImporting` (Bool | Real | String | Dict | Array; optional)
-- `initialHeaderFilter` (Array; optional): initialHeaderFilter based on http://tabulator.info/docs/4.8/filter#header
+- `initialHeaderFilter` (Array; optional): initialHeaderFilter based on http://tabulator.info/docs/5.2/filter#header
 can take array of filters
 - `localized` (Bool | Real | String | Dict | Array; optional)
 - `movableRowsReceived` (Bool | Real | String | Dict | Array; optional)

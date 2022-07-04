@@ -129,7 +129,7 @@ window["dash_tabulator"] =
 /******/ 	        var srcFragments = src.split('/');
 /******/ 	        var fileFragments = srcFragments.slice(-1)[0].split('.');
 /******/
-/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1656875557");
+/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1656922652");
 /******/ 	        srcFragments.splice(-1, 1, fileFragments.join('.'))
 /******/
 /******/ 	        return srcFragments.join('/');
@@ -2826,7 +2826,7 @@ var pick_react_known_prop_1 = __webpack_require__(/*! pick-react-known-prop */ "
 var ConfigUtils_1 = __webpack_require__(/*! ./ConfigUtils */ "./node_modules/react-tabulator/lib/ConfigUtils.js");
 var Utils_1 = __webpack_require__(/*! ./Utils */ "./node_modules/react-tabulator/lib/Utils.js");
 /* tslint:disable-next-line */
-var tabulator_tables_1 = __webpack_require__(/*! tabulator-tables */ "./node_modules/tabulator-tables/dist/js/tabulator_esm.js");
+var tabulator_tables_1 = __webpack_require__(/*! tabulator-tables */ "./node_modules/react-tabulator/node_modules/tabulator-tables/dist/js/tabulator_esm.js");
 var default_1 = /** @class */ (function (_super) {
     __extends(default_1, _super);
     function default_1() {
@@ -2973,7 +2973,7 @@ var ReactDOM = __webpack_require__(/*! react-dom */ "react-dom");
 var pick_react_known_prop_1 = __webpack_require__(/*! pick-react-known-prop */ "./node_modules/pick-react-known-prop/dist/index.js");
 var ConfigUtils_1 = __webpack_require__(/*! ./ConfigUtils */ "./node_modules/react-tabulator/lib/ConfigUtils.js");
 /* tslint:disable-next-line */
-var tabulator_tables_1 = __webpack_require__(/*! tabulator-tables */ "./node_modules/tabulator-tables/dist/js/tabulator_esm.js");
+var tabulator_tables_1 = __webpack_require__(/*! tabulator-tables */ "./node_modules/react-tabulator/node_modules/tabulator-tables/dist/js/tabulator_esm.js");
 var ReactTabulator = function (props) {
     var ref = React.useRef();
     var instanceRef = React.useRef();
@@ -4297,1071 +4297,10 @@ if(false) {}
 
 /***/ }),
 
-/***/ "./node_modules/react-tag-autocomplete/dist-es5/Input.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/react-tag-autocomplete/dist-es5/Input.js ***!
-  \***************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var React = __webpack_require__(/*! react */ "react")
-
-var SIZER_STYLES = {
-  position: 'absolute',
-  width: 0,
-  height: 0,
-  visibility: 'hidden',
-  overflow: 'scroll',
-  whiteSpace: 'pre'
-}
-
-var STYLE_PROPS = [
-  'fontSize',
-  'fontFamily',
-  'fontWeight',
-  'fontStyle',
-  'letterSpacing',
-  'textTransform'
-]
-
-var Input = /*@__PURE__*/(function (superclass) {
-  function Input (props) {
-    superclass.call(this, props)
-    this.state = { inputWidth: null }
-  }
-
-  if ( superclass ) Input.__proto__ = superclass;
-  Input.prototype = Object.create( superclass && superclass.prototype );
-  Input.prototype.constructor = Input;
-
-  Input.prototype.componentDidMount = function componentDidMount () {
-    if (this.props.autoresize) {
-      this.copyInputStyles()
-      this.updateInputWidth()
-    }
-
-    if (this.props.autofocus) {
-      this.input.focus()
-    }
-  };
-
-  Input.prototype.componentDidUpdate = function componentDidUpdate (ref) {
-    var query = ref.query;
-    var placeholder = ref.placeholder;
-
-    if (query !== this.props.query || placeholder !== this.props.placeholder) {
-      this.updateInputWidth()
-    }
-  };
-
-  Input.prototype.copyInputStyles = function copyInputStyles () {
-    var this$1 = this;
-
-    var inputStyle = window.getComputedStyle(this.input)
-
-    STYLE_PROPS.forEach(function (prop) {
-      this$1.sizer.style[prop] = inputStyle[prop]
-    })
-  };
-
-  Input.prototype.updateInputWidth = function updateInputWidth () {
-    var inputWidth
-
-    if (this.props.autoresize) {
-      // scrollWidth is designed to be fast not accurate.
-      // +2 is completely arbitrary but does the job.
-      inputWidth = Math.ceil(this.sizer.scrollWidth) + 2
-    }
-
-    if (inputWidth !== this.state.inputWidth) {
-      this.setState({ inputWidth: inputWidth })
-    }
-  };
-
-  Input.prototype.render = function render () {
-    var this$1 = this;
-
-    var ref = this.props;
-    var inputAttributes = ref.inputAttributes;
-    var inputEventHandlers = ref.inputEventHandlers;
-    var query = ref.query;
-    var placeholder = ref.placeholder;
-    var expandable = ref.expandable;
-    var listboxId = ref.listboxId;
-    var selectedIndex = ref.selectedIndex;
-    var ariaLabel = ref.ariaLabel;
-
-    return (
-      React.createElement( 'div', { className: this.props.classNames.searchInput },
-        React.createElement( 'input', Object.assign({},
-          inputAttributes, inputEventHandlers, { ref: function (c) { this$1.input = c }, value: query, placeholder: placeholder, role: 'combobox', 'aria-autocomplete': 'list', 'aria-label': ariaLabel || placeholder, 'aria-owns': listboxId, 'aria-activedescendant': selectedIndex > -1 ? (listboxId + "-" + selectedIndex) : null, 'aria-expanded': expandable, style: { width: this.state.inputWidth } })),
-        React.createElement( 'div', { ref: function (c) { this$1.sizer = c }, style: SIZER_STYLES }, query || placeholder)
-      )
-    )
-  };
-
-  return Input;
-}(React.Component));
-
-module.exports = Input
-
-
-/***/ }),
-
-/***/ "./node_modules/react-tag-autocomplete/dist-es5/ReactTags.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/react-tag-autocomplete/dist-es5/ReactTags.js ***!
-  \*******************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var React = __webpack_require__(/*! react */ "react")
-var PropTypes = __webpack_require__(/*! prop-types */ "prop-types")
-var Tag = __webpack_require__(/*! ./Tag */ "./node_modules/react-tag-autocomplete/dist-es5/Tag.js")
-var Input = __webpack_require__(/*! ./Input */ "./node_modules/react-tag-autocomplete/dist-es5/Input.js")
-var Suggestions = __webpack_require__(/*! ./Suggestions */ "./node_modules/react-tag-autocomplete/dist-es5/Suggestions.js")
-
-var KEYS = {
-  ENTER: 13,
-  TAB: 9,
-  BACKSPACE: 8,
-  UP_ARROW: 38,
-  DOWN_ARROW: 40
-}
-
-var CLASS_NAMES = {
-  root: 'react-tags',
-  rootFocused: 'is-focused',
-  selected: 'react-tags__selected',
-  selectedTag: 'react-tags__selected-tag',
-  selectedTagName: 'react-tags__selected-tag-name',
-  search: 'react-tags__search',
-  searchInput: 'react-tags__search-input',
-  suggestions: 'react-tags__suggestions',
-  suggestionActive: 'is-active',
-  suggestionDisabled: 'is-disabled'
-}
-
-var ReactTags = /*@__PURE__*/(function (superclass) {
-  function ReactTags (props) {
-    superclass.call(this, props)
-
-    this.state = {
-      query: '',
-      focused: false,
-      expandable: false,
-      selectedIndex: -1,
-      classNames: Object.assign({}, CLASS_NAMES, this.props.classNames)
-    }
-
-    this.inputEventHandlers = {
-      // Provide a no-op function to the input component to avoid warnings
-      // <https://github.com/i-like-robots/react-tags/issues/135>
-      // <https://github.com/facebook/react/issues/13835>
-      onChange: function () { },
-      onBlur: this.handleBlur.bind(this),
-      onFocus: this.handleFocus.bind(this),
-      onInput: this.handleInput.bind(this),
-      onKeyDown: this.handleKeyDown.bind(this)
-    }
-
-    this.container = React.createRef()
-  }
-
-  if ( superclass ) ReactTags.__proto__ = superclass;
-  ReactTags.prototype = Object.create( superclass && superclass.prototype );
-  ReactTags.prototype.constructor = ReactTags;
-
-  ReactTags.prototype.componentWillReceiveProps = function componentWillReceiveProps (newProps) {
-    this.setState({
-      classNames: Object.assign({}, CLASS_NAMES, newProps.classNames)
-    })
-  };
-
-  ReactTags.prototype.handleInput = function handleInput (e) {
-    var query = e.target.value
-
-    if (this.props.handleInputChange) {
-      this.props.handleInputChange(query)
-    }
-
-    this.setState({ query: query })
-  };
-
-  ReactTags.prototype.handleKeyDown = function handleKeyDown (e) {
-    var ref = this.state;
-    var query = ref.query;
-    var selectedIndex = ref.selectedIndex;
-    var ref$1 = this.props;
-    var delimiters = ref$1.delimiters;
-    var delimiterChars = ref$1.delimiterChars;
-
-    // when one of the terminating keys is pressed, add current query to the tags.
-    if (delimiters.indexOf(e.keyCode) > -1 || delimiterChars.indexOf(e.key) > -1) {
-      if (query || selectedIndex > -1) {
-        e.preventDefault()
-      }
-
-      this.handleDelimiter()
-    }
-
-    // when backspace key is pressed and query is blank, delete the last tag
-    if (e.keyCode === KEYS.BACKSPACE && query.length === 0 && this.props.allowBackspace) {
-      this.deleteTag(this.props.tags.length - 1)
-    }
-
-    if (e.keyCode === KEYS.UP_ARROW) {
-      e.preventDefault()
-
-      // if last item, cycle to the bottom
-      if (selectedIndex <= 0) {
-        this.setState({ selectedIndex: this.suggestions.state.options.length - 1 })
-      } else {
-        this.setState({ selectedIndex: selectedIndex - 1 })
-      }
-    }
-
-    if (e.keyCode === KEYS.DOWN_ARROW) {
-      e.preventDefault()
-
-      this.setState({ selectedIndex: (selectedIndex + 1) % this.suggestions.state.options.length })
-    }
-  };
-
-  ReactTags.prototype.handleDelimiter = function handleDelimiter () {
-    var ref = this.state;
-    var query = ref.query;
-    var selectedIndex = ref.selectedIndex;
-
-    if (query.length >= this.props.minQueryLength) {
-      // Check if the user typed in an existing suggestion.
-      var match = this.suggestions.state.options.findIndex(function (suggestion) {
-        return suggestion.name.search(new RegExp(("^" + query + "$"), 'i')) === 0
-      })
-
-      var index = selectedIndex === -1 ? match : selectedIndex
-
-      if (index > -1 && this.suggestions.state.options[index]) {
-        this.addTag(this.suggestions.state.options[index])
-      } else if (this.props.allowNew) {
-        this.addTag({ name: query })
-      }
-    }
-  };
-
-  ReactTags.prototype.handleClick = function handleClick (e) {
-    if (document.activeElement !== e.target) {
-      this.input.input.focus()
-    }
-  };
-
-  ReactTags.prototype.handleBlur = function handleBlur () {
-    this.setState({ focused: false, selectedIndex: -1 })
-
-    if (this.props.handleBlur) {
-      this.props.handleBlur()
-    }
-
-    if (this.props.addOnBlur) {
-      this.handleDelimiter()
-    }
-  };
-
-  ReactTags.prototype.handleFocus = function handleFocus () {
-    this.setState({ focused: true })
-
-    if (this.props.handleFocus) {
-      this.props.handleFocus()
-    }
-  };
-
-  ReactTags.prototype.handleDeleteTag = function handleDeleteTag (index, event) {
-    // Because we'll destroy the element with cursor focus we need to ensure
-    // it does not get lost and move it to the next interactive element
-    if (this.container.current) {
-      var interactiveEls = this.container.current.querySelectorAll('a,button,input')
-
-      var currentEl = Array.prototype.findIndex.call(interactiveEls, function (element) {
-        return element === event.currentTarget
-      })
-
-      var nextEl = interactiveEls[currentEl - 1] || interactiveEls[currentEl + 1]
-
-      if (nextEl) {
-        nextEl.focus()
-      }
-    }
-
-    this.deleteTag(index)
-  };
-
-  ReactTags.prototype.addTag = function addTag (tag) {
-    if (tag.disabled) {
-      return
-    }
-
-    if (typeof this.props.handleValidate === 'function' && !this.props.handleValidate(tag)) {
-      return
-    }
-
-    this.props.handleAddition(tag)
-
-    // reset the state
-    this.setState({
-      query: '',
-      selectedIndex: -1
-    })
-  };
-
-  ReactTags.prototype.deleteTag = function deleteTag (i) {
-    this.props.handleDelete(i)
-
-    if (this.props.clearInputOnDelete && this.state.query !== '') {
-      this.setState({ query: '' })
-    }
-  };
-
-  ReactTags.prototype.render = function render () {
-    var this$1 = this;
-
-    var listboxId = 'ReactTags-listbox'
-
-    var TagComponent = this.props.tagComponent || Tag
-
-    var tags = this.props.tags.map(function (tag, i) { return (
-      React.createElement( TagComponent, {
-        key: i, tag: tag, classNames: this$1.state.classNames, onDelete: this$1.handleDeleteTag.bind(this$1, i) })
-    ); })
-
-    var expandable = this.state.focused && this.state.query.length >= this.props.minQueryLength
-    var classNames = [this.state.classNames.root]
-
-    this.state.focused && classNames.push(this.state.classNames.rootFocused)
-
-    return (
-      React.createElement( 'div', { ref: this.container, className: classNames.join(' '), onClick: this.handleClick.bind(this) },
-        React.createElement( 'div', { className: this.state.classNames.selected, 'aria-live': 'polite', 'aria-relevant': 'additions removals' },
-          tags
-        ),
-        React.createElement( 'div', { className: this.state.classNames.search },
-          React.createElement( Input, Object.assign({},
-            this.state, { inputAttributes: this.props.inputAttributes, inputEventHandlers: this.inputEventHandlers, ref: function (c) { this$1.input = c }, listboxId: listboxId, autofocus: this.props.autofocus, autoresize: this.props.autoresize, expandable: expandable, placeholder: this.props.placeholder, ariaLabel: this.props.ariaLabel })),
-          React.createElement( Suggestions, Object.assign({},
-            this.state, { ref: function (c) { this$1.suggestions = c }, listboxId: listboxId, expandable: expandable, noSuggestionsText: this.props.noSuggestionsText, suggestions: this.props.suggestions, suggestionsFilter: this.props.suggestionsFilter, addTag: this.addTag.bind(this), maxSuggestionsLength: this.props.maxSuggestionsLength }))
-        )
-      )
-    )
-  };
-
-  return ReactTags;
-}(React.Component));
-
-ReactTags.defaultProps = {
-  tags: [],
-  placeholder: 'Add new tag',
-  noSuggestionsText: null,
-  suggestions: [],
-  suggestionsFilter: null,
-  autofocus: true,
-  autoresize: true,
-  delimiters: [KEYS.TAB, KEYS.ENTER],
-  delimiterChars: [],
-  minQueryLength: 2,
-  maxSuggestionsLength: 6,
-  allowNew: false,
-  allowBackspace: true,
-  tagComponent: null,
-  inputAttributes: {},
-  addOnBlur: false,
-  clearInputOnDelete: true
-}
-
-ReactTags.propTypes = {
-  tags: PropTypes.arrayOf(PropTypes.object),
-  placeholder: PropTypes.string,
-  ariaLabel: PropTypes.string,
-  noSuggestionsText: PropTypes.string,
-  suggestions: PropTypes.arrayOf(PropTypes.object),
-  suggestionsFilter: PropTypes.func,
-  autofocus: PropTypes.bool,
-  autoresize: PropTypes.bool,
-  delimiters: PropTypes.arrayOf(PropTypes.number),
-  delimiterChars: PropTypes.arrayOf(PropTypes.string),
-  handleDelete: PropTypes.func.isRequired,
-  handleAddition: PropTypes.func.isRequired,
-  handleInputChange: PropTypes.func,
-  handleFocus: PropTypes.func,
-  handleBlur: PropTypes.func,
-  handleValidate: PropTypes.func,
-  minQueryLength: PropTypes.number,
-  maxSuggestionsLength: PropTypes.number,
-  classNames: PropTypes.object,
-  allowNew: PropTypes.bool,
-  allowBackspace: PropTypes.bool,
-  tagComponent: PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.element
-  ]),
-  inputAttributes: PropTypes.object,
-  addOnBlur: PropTypes.bool,
-  clearInputOnDelete: PropTypes.bool
-}
-
-module.exports = ReactTags
-
-
-/***/ }),
-
-/***/ "./node_modules/react-tag-autocomplete/dist-es5/Suggestions.js":
-/*!*********************************************************************!*\
-  !*** ./node_modules/react-tag-autocomplete/dist-es5/Suggestions.js ***!
-  \*********************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var React = __webpack_require__(/*! react */ "react")
-
-function escapeForRegExp (query) {
-  return query.replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&')
-}
-
-function markIt (input, query) {
-  if (query) {
-    var regex = RegExp(escapeForRegExp(query), 'gi')
-    input = input.replace(regex, '<mark>$&</mark>')
-  }
-
-  return {
-    __html: input
-  }
-}
-
-function filterSuggestions (query, suggestions, length, suggestionsFilter, noSuggestionsText) {
-  if (!suggestionsFilter) {
-    var regex = new RegExp(("(?:^|\\s)" + (escapeForRegExp(query))), 'i')
-    suggestionsFilter = function (item) { return regex.test(item.name); }
-  }
-
-  var filtered = suggestions.filter(function (item) { return suggestionsFilter(item, query); }).slice(0, length)
-
-  if (filtered.length === 0 && noSuggestionsText) {
-    filtered.push({ id: 0, name: noSuggestionsText, disabled: true, disableMarkIt: true })
-  }
-
-  return filtered
-}
-
-var Suggestions = /*@__PURE__*/(function (superclass) {
-  function Suggestions (props) {
-    superclass.call(this, props)
-
-    this.state = {
-      options: filterSuggestions(this.props.query, this.props.suggestions, this.props.maxSuggestionsLength, this.props.suggestionsFilter, this.props.noSuggestionsText)
-    }
-  }
-
-  if ( superclass ) Suggestions.__proto__ = superclass;
-  Suggestions.prototype = Object.create( superclass && superclass.prototype );
-  Suggestions.prototype.constructor = Suggestions;
-
-  Suggestions.prototype.componentWillReceiveProps = function componentWillReceiveProps (newProps) {
-    this.setState({
-      options: filterSuggestions(newProps.query, newProps.suggestions, newProps.maxSuggestionsLength, newProps.suggestionsFilter, newProps.noSuggestionsText)
-    })
-  };
-
-  Suggestions.prototype.handleMouseDown = function handleMouseDown (item, e) {
-    // focus is shifted on mouse down but calling preventDefault prevents this
-    e.preventDefault()
-    this.props.addTag(item)
-  };
-
-  Suggestions.prototype.render = function render () {
-    var this$1 = this;
-
-    if (!this.props.expandable || !this.state.options.length) {
-      return null
-    }
-
-    var options = this.state.options.map(function (item, i) {
-      var key = (this$1.props.listboxId) + "-" + i
-      var classNames = []
-
-      if (this$1.props.selectedIndex === i) {
-        classNames.push(this$1.props.classNames.suggestionActive)
-      }
-
-      if (item.disabled) {
-        classNames.push(this$1.props.classNames.suggestionDisabled)
-      }
-
-      return (
-        React.createElement( 'li', {
-          id: key, key: key, role: 'option', className: classNames.join(' '), 'aria-disabled': item.disabled === true, onMouseDown: this$1.handleMouseDown.bind(this$1, item) },
-          item.disableMarkIt ? item.name
-            : React.createElement( 'span', { dangerouslySetInnerHTML: markIt(item.name, this$1.props.query, item.markInput) })
-        )
-      )
-    })
-
-    return (
-      React.createElement( 'div', { className: this.props.classNames.suggestions },
-        React.createElement( 'ul', { role: 'listbox', id: this.props.listboxId }, options)
-      )
-    )
-  };
-
-  return Suggestions;
-}(React.Component));
-
-module.exports = Suggestions
-
-
-/***/ }),
-
-/***/ "./node_modules/react-tag-autocomplete/dist-es5/Tag.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/react-tag-autocomplete/dist-es5/Tag.js ***!
-  \*************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var React = __webpack_require__(/*! react */ "react")
-
-module.exports = function (props) { return (
-  React.createElement( 'button', { type: 'button', className: props.classNames.selectedTag, title: 'Click to remove tag', onClick: props.onDelete },
-    React.createElement( 'span', { className: props.classNames.selectedTagName }, props.tag.name)
-  )
-); }
-
-
-/***/ }),
-
-/***/ "./node_modules/style-loader/lib/addStyles.js":
-/*!****************************************************!*\
-  !*** ./node_modules/style-loader/lib/addStyles.js ***!
-  \****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Tobias Koppers @sokra
-*/
-
-var stylesInDom = {};
-
-var	memoize = function (fn) {
-	var memo;
-
-	return function () {
-		if (typeof memo === "undefined") memo = fn.apply(this, arguments);
-		return memo;
-	};
-};
-
-var isOldIE = memoize(function () {
-	// Test for IE <= 9 as proposed by Browserhacks
-	// @see http://browserhacks.com/#hack-e71d8692f65334173fee715c222cb805
-	// Tests for existence of standard globals is to allow style-loader
-	// to operate correctly into non-standard environments
-	// @see https://github.com/webpack-contrib/style-loader/issues/177
-	return window && document && document.all && !window.atob;
-});
-
-var getTarget = function (target, parent) {
-  if (parent){
-    return parent.querySelector(target);
-  }
-  return document.querySelector(target);
-};
-
-var getElement = (function (fn) {
-	var memo = {};
-
-	return function(target, parent) {
-                // If passing function in options, then use it for resolve "head" element.
-                // Useful for Shadow Root style i.e
-                // {
-                //   insertInto: function () { return document.querySelector("#foo").shadowRoot }
-                // }
-                if (typeof target === 'function') {
-                        return target();
-                }
-                if (typeof memo[target] === "undefined") {
-			var styleTarget = getTarget.call(this, target, parent);
-			// Special case to return head of iframe instead of iframe itself
-			if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
-				try {
-					// This will throw an exception if access to iframe is blocked
-					// due to cross-origin restrictions
-					styleTarget = styleTarget.contentDocument.head;
-				} catch(e) {
-					styleTarget = null;
-				}
-			}
-			memo[target] = styleTarget;
-		}
-		return memo[target]
-	};
-})();
-
-var singleton = null;
-var	singletonCounter = 0;
-var	stylesInsertedAtTop = [];
-
-var	fixUrls = __webpack_require__(/*! ./urls */ "./node_modules/style-loader/lib/urls.js");
-
-module.exports = function(list, options) {
-	if (typeof DEBUG !== "undefined" && DEBUG) {
-		if (typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
-	}
-
-	options = options || {};
-
-	options.attrs = typeof options.attrs === "object" ? options.attrs : {};
-
-	// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
-	// tags it will allow on a page
-	if (!options.singleton && typeof options.singleton !== "boolean") options.singleton = isOldIE();
-
-	// By default, add <style> tags to the <head> element
-        if (!options.insertInto) options.insertInto = "head";
-
-	// By default, add <style> tags to the bottom of the target
-	if (!options.insertAt) options.insertAt = "bottom";
-
-	var styles = listToStyles(list, options);
-
-	addStylesToDom(styles, options);
-
-	return function update (newList) {
-		var mayRemove = [];
-
-		for (var i = 0; i < styles.length; i++) {
-			var item = styles[i];
-			var domStyle = stylesInDom[item.id];
-
-			domStyle.refs--;
-			mayRemove.push(domStyle);
-		}
-
-		if(newList) {
-			var newStyles = listToStyles(newList, options);
-			addStylesToDom(newStyles, options);
-		}
-
-		for (var i = 0; i < mayRemove.length; i++) {
-			var domStyle = mayRemove[i];
-
-			if(domStyle.refs === 0) {
-				for (var j = 0; j < domStyle.parts.length; j++) domStyle.parts[j]();
-
-				delete stylesInDom[domStyle.id];
-			}
-		}
-	};
-};
-
-function addStylesToDom (styles, options) {
-	for (var i = 0; i < styles.length; i++) {
-		var item = styles[i];
-		var domStyle = stylesInDom[item.id];
-
-		if(domStyle) {
-			domStyle.refs++;
-
-			for(var j = 0; j < domStyle.parts.length; j++) {
-				domStyle.parts[j](item.parts[j]);
-			}
-
-			for(; j < item.parts.length; j++) {
-				domStyle.parts.push(addStyle(item.parts[j], options));
-			}
-		} else {
-			var parts = [];
-
-			for(var j = 0; j < item.parts.length; j++) {
-				parts.push(addStyle(item.parts[j], options));
-			}
-
-			stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
-		}
-	}
-}
-
-function listToStyles (list, options) {
-	var styles = [];
-	var newStyles = {};
-
-	for (var i = 0; i < list.length; i++) {
-		var item = list[i];
-		var id = options.base ? item[0] + options.base : item[0];
-		var css = item[1];
-		var media = item[2];
-		var sourceMap = item[3];
-		var part = {css: css, media: media, sourceMap: sourceMap};
-
-		if(!newStyles[id]) styles.push(newStyles[id] = {id: id, parts: [part]});
-		else newStyles[id].parts.push(part);
-	}
-
-	return styles;
-}
-
-function insertStyleElement (options, style) {
-	var target = getElement(options.insertInto)
-
-	if (!target) {
-		throw new Error("Couldn't find a style target. This probably means that the value for the 'insertInto' parameter is invalid.");
-	}
-
-	var lastStyleElementInsertedAtTop = stylesInsertedAtTop[stylesInsertedAtTop.length - 1];
-
-	if (options.insertAt === "top") {
-		if (!lastStyleElementInsertedAtTop) {
-			target.insertBefore(style, target.firstChild);
-		} else if (lastStyleElementInsertedAtTop.nextSibling) {
-			target.insertBefore(style, lastStyleElementInsertedAtTop.nextSibling);
-		} else {
-			target.appendChild(style);
-		}
-		stylesInsertedAtTop.push(style);
-	} else if (options.insertAt === "bottom") {
-		target.appendChild(style);
-	} else if (typeof options.insertAt === "object" && options.insertAt.before) {
-		var nextSibling = getElement(options.insertAt.before, target);
-		target.insertBefore(style, nextSibling);
-	} else {
-		throw new Error("[Style Loader]\n\n Invalid value for parameter 'insertAt' ('options.insertAt') found.\n Must be 'top', 'bottom', or Object.\n (https://github.com/webpack-contrib/style-loader#insertat)\n");
-	}
-}
-
-function removeStyleElement (style) {
-	if (style.parentNode === null) return false;
-	style.parentNode.removeChild(style);
-
-	var idx = stylesInsertedAtTop.indexOf(style);
-	if(idx >= 0) {
-		stylesInsertedAtTop.splice(idx, 1);
-	}
-}
-
-function createStyleElement (options) {
-	var style = document.createElement("style");
-
-	if(options.attrs.type === undefined) {
-		options.attrs.type = "text/css";
-	}
-
-	if(options.attrs.nonce === undefined) {
-		var nonce = getNonce();
-		if (nonce) {
-			options.attrs.nonce = nonce;
-		}
-	}
-
-	addAttrs(style, options.attrs);
-	insertStyleElement(options, style);
-
-	return style;
-}
-
-function createLinkElement (options) {
-	var link = document.createElement("link");
-
-	if(options.attrs.type === undefined) {
-		options.attrs.type = "text/css";
-	}
-	options.attrs.rel = "stylesheet";
-
-	addAttrs(link, options.attrs);
-	insertStyleElement(options, link);
-
-	return link;
-}
-
-function addAttrs (el, attrs) {
-	Object.keys(attrs).forEach(function (key) {
-		el.setAttribute(key, attrs[key]);
-	});
-}
-
-function getNonce() {
-	if (false) {}
-
-	return __webpack_require__.nc;
-}
-
-function addStyle (obj, options) {
-	var style, update, remove, result;
-
-	// If a transform function was defined, run it on the css
-	if (options.transform && obj.css) {
-	    result = typeof options.transform === 'function'
-		 ? options.transform(obj.css) 
-		 : options.transform.default(obj.css);
-
-	    if (result) {
-	    	// If transform returns a value, use that instead of the original css.
-	    	// This allows running runtime transformations on the css.
-	    	obj.css = result;
-	    } else {
-	    	// If the transform function returns a falsy value, don't add this css.
-	    	// This allows conditional loading of css
-	    	return function() {
-	    		// noop
-	    	};
-	    }
-	}
-
-	if (options.singleton) {
-		var styleIndex = singletonCounter++;
-
-		style = singleton || (singleton = createStyleElement(options));
-
-		update = applyToSingletonTag.bind(null, style, styleIndex, false);
-		remove = applyToSingletonTag.bind(null, style, styleIndex, true);
-
-	} else if (
-		obj.sourceMap &&
-		typeof URL === "function" &&
-		typeof URL.createObjectURL === "function" &&
-		typeof URL.revokeObjectURL === "function" &&
-		typeof Blob === "function" &&
-		typeof btoa === "function"
-	) {
-		style = createLinkElement(options);
-		update = updateLink.bind(null, style, options);
-		remove = function () {
-			removeStyleElement(style);
-
-			if(style.href) URL.revokeObjectURL(style.href);
-		};
-	} else {
-		style = createStyleElement(options);
-		update = applyToTag.bind(null, style);
-		remove = function () {
-			removeStyleElement(style);
-		};
-	}
-
-	update(obj);
-
-	return function updateStyle (newObj) {
-		if (newObj) {
-			if (
-				newObj.css === obj.css &&
-				newObj.media === obj.media &&
-				newObj.sourceMap === obj.sourceMap
-			) {
-				return;
-			}
-
-			update(obj = newObj);
-		} else {
-			remove();
-		}
-	};
-}
-
-var replaceText = (function () {
-	var textStore = [];
-
-	return function (index, replacement) {
-		textStore[index] = replacement;
-
-		return textStore.filter(Boolean).join('\n');
-	};
-})();
-
-function applyToSingletonTag (style, index, remove, obj) {
-	var css = remove ? "" : obj.css;
-
-	if (style.styleSheet) {
-		style.styleSheet.cssText = replaceText(index, css);
-	} else {
-		var cssNode = document.createTextNode(css);
-		var childNodes = style.childNodes;
-
-		if (childNodes[index]) style.removeChild(childNodes[index]);
-
-		if (childNodes.length) {
-			style.insertBefore(cssNode, childNodes[index]);
-		} else {
-			style.appendChild(cssNode);
-		}
-	}
-}
-
-function applyToTag (style, obj) {
-	var css = obj.css;
-	var media = obj.media;
-
-	if(media) {
-		style.setAttribute("media", media)
-	}
-
-	if(style.styleSheet) {
-		style.styleSheet.cssText = css;
-	} else {
-		while(style.firstChild) {
-			style.removeChild(style.firstChild);
-		}
-
-		style.appendChild(document.createTextNode(css));
-	}
-}
-
-function updateLink (link, options, obj) {
-	var css = obj.css;
-	var sourceMap = obj.sourceMap;
-
-	/*
-		If convertToAbsoluteUrls isn't defined, but sourcemaps are enabled
-		and there is no publicPath defined then lets turn convertToAbsoluteUrls
-		on by default.  Otherwise default to the convertToAbsoluteUrls option
-		directly
-	*/
-	var autoFixUrls = options.convertToAbsoluteUrls === undefined && sourceMap;
-
-	if (options.convertToAbsoluteUrls || autoFixUrls) {
-		css = fixUrls(css);
-	}
-
-	if (sourceMap) {
-		// http://stackoverflow.com/a/26603875
-		css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
-	}
-
-	var blob = new Blob([css], { type: "text/css" });
-
-	var oldSrc = link.href;
-
-	link.href = URL.createObjectURL(blob);
-
-	if(oldSrc) URL.revokeObjectURL(oldSrc);
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/style-loader/lib/urls.js":
-/*!***********************************************!*\
-  !*** ./node_modules/style-loader/lib/urls.js ***!
-  \***********************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-
-/**
- * When source maps are enabled, `style-loader` uses a link element with a data-uri to
- * embed the css on the page. This breaks all relative urls because now they are relative to a
- * bundle instead of the current page.
- *
- * One solution is to only use full urls, but that may be impossible.
- *
- * Instead, this function "fixes" the relative urls to be absolute according to the current page location.
- *
- * A rudimentary test suite is located at `test/fixUrls.js` and can be run via the `npm test` command.
- *
- */
-
-module.exports = function (css) {
-  // get current location
-  var location = typeof window !== "undefined" && window.location;
-
-  if (!location) {
-    throw new Error("fixUrls requires window.location");
-  }
-
-	// blank or null?
-	if (!css || typeof css !== "string") {
-	  return css;
-  }
-
-  var baseUrl = location.protocol + "//" + location.host;
-  var currentDir = baseUrl + location.pathname.replace(/\/[^\/]*$/, "/");
-
-	// convert each url(...)
-	/*
-	This regular expression is just a way to recursively match brackets within
-	a string.
-
-	 /url\s*\(  = Match on the word "url" with any whitespace after it and then a parens
-	   (  = Start a capturing group
-	     (?:  = Start a non-capturing group
-	         [^)(]  = Match anything that isn't a parentheses
-	         |  = OR
-	         \(  = Match a start parentheses
-	             (?:  = Start another non-capturing groups
-	                 [^)(]+  = Match anything that isn't a parentheses
-	                 |  = OR
-	                 \(  = Match a start parentheses
-	                     [^)(]*  = Match anything that isn't a parentheses
-	                 \)  = Match a end parentheses
-	             )  = End Group
-              *\) = Match anything and then a close parens
-          )  = Close non-capturing group
-          *  = Match anything
-       )  = Close capturing group
-	 \)  = Match a close parens
-
-	 /gi  = Get all matches, not the first.  Be case insensitive.
-	 */
-	var fixedCss = css.replace(/url\s*\(((?:[^)(]|\((?:[^)(]+|\([^)(]*\))*\))*)\)/gi, function(fullMatch, origUrl) {
-		// strip quotes (if they exist)
-		var unquotedOrigUrl = origUrl
-			.trim()
-			.replace(/^"(.*)"$/, function(o, $1){ return $1; })
-			.replace(/^'(.*)'$/, function(o, $1){ return $1; });
-
-		// already a full url? no change
-		if (/^(#|data:|http:\/\/|https:\/\/|file:\/\/\/|\s*$)/i.test(unquotedOrigUrl)) {
-		  return fullMatch;
-		}
-
-		// convert the url to a full url
-		var newUrl;
-
-		if (unquotedOrigUrl.indexOf("//") === 0) {
-		  	//TODO: should we add protocol?
-			newUrl = unquotedOrigUrl;
-		} else if (unquotedOrigUrl.indexOf("/") === 0) {
-			// path should be relative to the base url
-			newUrl = baseUrl + unquotedOrigUrl; // already starts with '/'
-		} else {
-			// path should be relative to current directory
-			newUrl = currentDir + unquotedOrigUrl.replace(/^\.\//, ""); // Strip leading './'
-		}
-
-		// send back the fixed url(...)
-		return "url(" + JSON.stringify(newUrl) + ")";
-	});
-
-	// send back the fixed css
-	return fixedCss;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/tabulator-tables/dist/js/tabulator_esm.js":
-/*!****************************************************************!*\
-  !*** ./node_modules/tabulator-tables/dist/js/tabulator_esm.js ***!
-  \****************************************************************/
+/***/ "./node_modules/react-tabulator/node_modules/tabulator-tables/dist/js/tabulator_esm.js":
+/*!*********************************************************************************************!*\
+  !*** ./node_modules/react-tabulator/node_modules/tabulator-tables/dist/js/tabulator_esm.js ***!
+  \*********************************************************************************************/
 /*! exports provided: AccessorModule, AjaxModule, CalcComponent, CellComponent, ClipboardModule, ColumnCalcsModule, ColumnComponent, DataTreeModule, DownloadModule, EditModule, ExportModule, FilterModule, FormatModule, FrozenColumnsModule, FrozenRowsModule, GroupComponent, GroupRowsModule, HistoryModule, HtmlTableImportModule, InteractionModule, KeybindingsModule, MenuModule, Module, MoveColumnsModule, MoveRowsModule, MutatorModule, PageModule, PersistenceModule, PrintModule, PseudoRow, ReactiveDataModule, Renderer, ResizeColumnsModule, ResizeRowsModule, ResizeTableModule, ResponsiveLayoutModule, RowComponent, SelectRowModule, SortModule, Tabulator, TabulatorFull, ValidateModule */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -29002,6 +27941,1067 @@ class PseudoRow {
 
 /***/ }),
 
+/***/ "./node_modules/react-tag-autocomplete/dist-es5/Input.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/react-tag-autocomplete/dist-es5/Input.js ***!
+  \***************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var React = __webpack_require__(/*! react */ "react")
+
+var SIZER_STYLES = {
+  position: 'absolute',
+  width: 0,
+  height: 0,
+  visibility: 'hidden',
+  overflow: 'scroll',
+  whiteSpace: 'pre'
+}
+
+var STYLE_PROPS = [
+  'fontSize',
+  'fontFamily',
+  'fontWeight',
+  'fontStyle',
+  'letterSpacing',
+  'textTransform'
+]
+
+var Input = /*@__PURE__*/(function (superclass) {
+  function Input (props) {
+    superclass.call(this, props)
+    this.state = { inputWidth: null }
+  }
+
+  if ( superclass ) Input.__proto__ = superclass;
+  Input.prototype = Object.create( superclass && superclass.prototype );
+  Input.prototype.constructor = Input;
+
+  Input.prototype.componentDidMount = function componentDidMount () {
+    if (this.props.autoresize) {
+      this.copyInputStyles()
+      this.updateInputWidth()
+    }
+
+    if (this.props.autofocus) {
+      this.input.focus()
+    }
+  };
+
+  Input.prototype.componentDidUpdate = function componentDidUpdate (ref) {
+    var query = ref.query;
+    var placeholder = ref.placeholder;
+
+    if (query !== this.props.query || placeholder !== this.props.placeholder) {
+      this.updateInputWidth()
+    }
+  };
+
+  Input.prototype.copyInputStyles = function copyInputStyles () {
+    var this$1 = this;
+
+    var inputStyle = window.getComputedStyle(this.input)
+
+    STYLE_PROPS.forEach(function (prop) {
+      this$1.sizer.style[prop] = inputStyle[prop]
+    })
+  };
+
+  Input.prototype.updateInputWidth = function updateInputWidth () {
+    var inputWidth
+
+    if (this.props.autoresize) {
+      // scrollWidth is designed to be fast not accurate.
+      // +2 is completely arbitrary but does the job.
+      inputWidth = Math.ceil(this.sizer.scrollWidth) + 2
+    }
+
+    if (inputWidth !== this.state.inputWidth) {
+      this.setState({ inputWidth: inputWidth })
+    }
+  };
+
+  Input.prototype.render = function render () {
+    var this$1 = this;
+
+    var ref = this.props;
+    var inputAttributes = ref.inputAttributes;
+    var inputEventHandlers = ref.inputEventHandlers;
+    var query = ref.query;
+    var placeholder = ref.placeholder;
+    var expandable = ref.expandable;
+    var listboxId = ref.listboxId;
+    var selectedIndex = ref.selectedIndex;
+    var ariaLabel = ref.ariaLabel;
+
+    return (
+      React.createElement( 'div', { className: this.props.classNames.searchInput },
+        React.createElement( 'input', Object.assign({},
+          inputAttributes, inputEventHandlers, { ref: function (c) { this$1.input = c }, value: query, placeholder: placeholder, role: 'combobox', 'aria-autocomplete': 'list', 'aria-label': ariaLabel || placeholder, 'aria-owns': listboxId, 'aria-activedescendant': selectedIndex > -1 ? (listboxId + "-" + selectedIndex) : null, 'aria-expanded': expandable, style: { width: this.state.inputWidth } })),
+        React.createElement( 'div', { ref: function (c) { this$1.sizer = c }, style: SIZER_STYLES }, query || placeholder)
+      )
+    )
+  };
+
+  return Input;
+}(React.Component));
+
+module.exports = Input
+
+
+/***/ }),
+
+/***/ "./node_modules/react-tag-autocomplete/dist-es5/ReactTags.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/react-tag-autocomplete/dist-es5/ReactTags.js ***!
+  \*******************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var React = __webpack_require__(/*! react */ "react")
+var PropTypes = __webpack_require__(/*! prop-types */ "prop-types")
+var Tag = __webpack_require__(/*! ./Tag */ "./node_modules/react-tag-autocomplete/dist-es5/Tag.js")
+var Input = __webpack_require__(/*! ./Input */ "./node_modules/react-tag-autocomplete/dist-es5/Input.js")
+var Suggestions = __webpack_require__(/*! ./Suggestions */ "./node_modules/react-tag-autocomplete/dist-es5/Suggestions.js")
+
+var KEYS = {
+  ENTER: 13,
+  TAB: 9,
+  BACKSPACE: 8,
+  UP_ARROW: 38,
+  DOWN_ARROW: 40
+}
+
+var CLASS_NAMES = {
+  root: 'react-tags',
+  rootFocused: 'is-focused',
+  selected: 'react-tags__selected',
+  selectedTag: 'react-tags__selected-tag',
+  selectedTagName: 'react-tags__selected-tag-name',
+  search: 'react-tags__search',
+  searchInput: 'react-tags__search-input',
+  suggestions: 'react-tags__suggestions',
+  suggestionActive: 'is-active',
+  suggestionDisabled: 'is-disabled'
+}
+
+var ReactTags = /*@__PURE__*/(function (superclass) {
+  function ReactTags (props) {
+    superclass.call(this, props)
+
+    this.state = {
+      query: '',
+      focused: false,
+      expandable: false,
+      selectedIndex: -1,
+      classNames: Object.assign({}, CLASS_NAMES, this.props.classNames)
+    }
+
+    this.inputEventHandlers = {
+      // Provide a no-op function to the input component to avoid warnings
+      // <https://github.com/i-like-robots/react-tags/issues/135>
+      // <https://github.com/facebook/react/issues/13835>
+      onChange: function () { },
+      onBlur: this.handleBlur.bind(this),
+      onFocus: this.handleFocus.bind(this),
+      onInput: this.handleInput.bind(this),
+      onKeyDown: this.handleKeyDown.bind(this)
+    }
+
+    this.container = React.createRef()
+  }
+
+  if ( superclass ) ReactTags.__proto__ = superclass;
+  ReactTags.prototype = Object.create( superclass && superclass.prototype );
+  ReactTags.prototype.constructor = ReactTags;
+
+  ReactTags.prototype.componentWillReceiveProps = function componentWillReceiveProps (newProps) {
+    this.setState({
+      classNames: Object.assign({}, CLASS_NAMES, newProps.classNames)
+    })
+  };
+
+  ReactTags.prototype.handleInput = function handleInput (e) {
+    var query = e.target.value
+
+    if (this.props.handleInputChange) {
+      this.props.handleInputChange(query)
+    }
+
+    this.setState({ query: query })
+  };
+
+  ReactTags.prototype.handleKeyDown = function handleKeyDown (e) {
+    var ref = this.state;
+    var query = ref.query;
+    var selectedIndex = ref.selectedIndex;
+    var ref$1 = this.props;
+    var delimiters = ref$1.delimiters;
+    var delimiterChars = ref$1.delimiterChars;
+
+    // when one of the terminating keys is pressed, add current query to the tags.
+    if (delimiters.indexOf(e.keyCode) > -1 || delimiterChars.indexOf(e.key) > -1) {
+      if (query || selectedIndex > -1) {
+        e.preventDefault()
+      }
+
+      this.handleDelimiter()
+    }
+
+    // when backspace key is pressed and query is blank, delete the last tag
+    if (e.keyCode === KEYS.BACKSPACE && query.length === 0 && this.props.allowBackspace) {
+      this.deleteTag(this.props.tags.length - 1)
+    }
+
+    if (e.keyCode === KEYS.UP_ARROW) {
+      e.preventDefault()
+
+      // if last item, cycle to the bottom
+      if (selectedIndex <= 0) {
+        this.setState({ selectedIndex: this.suggestions.state.options.length - 1 })
+      } else {
+        this.setState({ selectedIndex: selectedIndex - 1 })
+      }
+    }
+
+    if (e.keyCode === KEYS.DOWN_ARROW) {
+      e.preventDefault()
+
+      this.setState({ selectedIndex: (selectedIndex + 1) % this.suggestions.state.options.length })
+    }
+  };
+
+  ReactTags.prototype.handleDelimiter = function handleDelimiter () {
+    var ref = this.state;
+    var query = ref.query;
+    var selectedIndex = ref.selectedIndex;
+
+    if (query.length >= this.props.minQueryLength) {
+      // Check if the user typed in an existing suggestion.
+      var match = this.suggestions.state.options.findIndex(function (suggestion) {
+        return suggestion.name.search(new RegExp(("^" + query + "$"), 'i')) === 0
+      })
+
+      var index = selectedIndex === -1 ? match : selectedIndex
+
+      if (index > -1 && this.suggestions.state.options[index]) {
+        this.addTag(this.suggestions.state.options[index])
+      } else if (this.props.allowNew) {
+        this.addTag({ name: query })
+      }
+    }
+  };
+
+  ReactTags.prototype.handleClick = function handleClick (e) {
+    if (document.activeElement !== e.target) {
+      this.input.input.focus()
+    }
+  };
+
+  ReactTags.prototype.handleBlur = function handleBlur () {
+    this.setState({ focused: false, selectedIndex: -1 })
+
+    if (this.props.handleBlur) {
+      this.props.handleBlur()
+    }
+
+    if (this.props.addOnBlur) {
+      this.handleDelimiter()
+    }
+  };
+
+  ReactTags.prototype.handleFocus = function handleFocus () {
+    this.setState({ focused: true })
+
+    if (this.props.handleFocus) {
+      this.props.handleFocus()
+    }
+  };
+
+  ReactTags.prototype.handleDeleteTag = function handleDeleteTag (index, event) {
+    // Because we'll destroy the element with cursor focus we need to ensure
+    // it does not get lost and move it to the next interactive element
+    if (this.container.current) {
+      var interactiveEls = this.container.current.querySelectorAll('a,button,input')
+
+      var currentEl = Array.prototype.findIndex.call(interactiveEls, function (element) {
+        return element === event.currentTarget
+      })
+
+      var nextEl = interactiveEls[currentEl - 1] || interactiveEls[currentEl + 1]
+
+      if (nextEl) {
+        nextEl.focus()
+      }
+    }
+
+    this.deleteTag(index)
+  };
+
+  ReactTags.prototype.addTag = function addTag (tag) {
+    if (tag.disabled) {
+      return
+    }
+
+    if (typeof this.props.handleValidate === 'function' && !this.props.handleValidate(tag)) {
+      return
+    }
+
+    this.props.handleAddition(tag)
+
+    // reset the state
+    this.setState({
+      query: '',
+      selectedIndex: -1
+    })
+  };
+
+  ReactTags.prototype.deleteTag = function deleteTag (i) {
+    this.props.handleDelete(i)
+
+    if (this.props.clearInputOnDelete && this.state.query !== '') {
+      this.setState({ query: '' })
+    }
+  };
+
+  ReactTags.prototype.render = function render () {
+    var this$1 = this;
+
+    var listboxId = 'ReactTags-listbox'
+
+    var TagComponent = this.props.tagComponent || Tag
+
+    var tags = this.props.tags.map(function (tag, i) { return (
+      React.createElement( TagComponent, {
+        key: i, tag: tag, classNames: this$1.state.classNames, onDelete: this$1.handleDeleteTag.bind(this$1, i) })
+    ); })
+
+    var expandable = this.state.focused && this.state.query.length >= this.props.minQueryLength
+    var classNames = [this.state.classNames.root]
+
+    this.state.focused && classNames.push(this.state.classNames.rootFocused)
+
+    return (
+      React.createElement( 'div', { ref: this.container, className: classNames.join(' '), onClick: this.handleClick.bind(this) },
+        React.createElement( 'div', { className: this.state.classNames.selected, 'aria-live': 'polite', 'aria-relevant': 'additions removals' },
+          tags
+        ),
+        React.createElement( 'div', { className: this.state.classNames.search },
+          React.createElement( Input, Object.assign({},
+            this.state, { inputAttributes: this.props.inputAttributes, inputEventHandlers: this.inputEventHandlers, ref: function (c) { this$1.input = c }, listboxId: listboxId, autofocus: this.props.autofocus, autoresize: this.props.autoresize, expandable: expandable, placeholder: this.props.placeholder, ariaLabel: this.props.ariaLabel })),
+          React.createElement( Suggestions, Object.assign({},
+            this.state, { ref: function (c) { this$1.suggestions = c }, listboxId: listboxId, expandable: expandable, noSuggestionsText: this.props.noSuggestionsText, suggestions: this.props.suggestions, suggestionsFilter: this.props.suggestionsFilter, addTag: this.addTag.bind(this), maxSuggestionsLength: this.props.maxSuggestionsLength }))
+        )
+      )
+    )
+  };
+
+  return ReactTags;
+}(React.Component));
+
+ReactTags.defaultProps = {
+  tags: [],
+  placeholder: 'Add new tag',
+  noSuggestionsText: null,
+  suggestions: [],
+  suggestionsFilter: null,
+  autofocus: true,
+  autoresize: true,
+  delimiters: [KEYS.TAB, KEYS.ENTER],
+  delimiterChars: [],
+  minQueryLength: 2,
+  maxSuggestionsLength: 6,
+  allowNew: false,
+  allowBackspace: true,
+  tagComponent: null,
+  inputAttributes: {},
+  addOnBlur: false,
+  clearInputOnDelete: true
+}
+
+ReactTags.propTypes = {
+  tags: PropTypes.arrayOf(PropTypes.object),
+  placeholder: PropTypes.string,
+  ariaLabel: PropTypes.string,
+  noSuggestionsText: PropTypes.string,
+  suggestions: PropTypes.arrayOf(PropTypes.object),
+  suggestionsFilter: PropTypes.func,
+  autofocus: PropTypes.bool,
+  autoresize: PropTypes.bool,
+  delimiters: PropTypes.arrayOf(PropTypes.number),
+  delimiterChars: PropTypes.arrayOf(PropTypes.string),
+  handleDelete: PropTypes.func.isRequired,
+  handleAddition: PropTypes.func.isRequired,
+  handleInputChange: PropTypes.func,
+  handleFocus: PropTypes.func,
+  handleBlur: PropTypes.func,
+  handleValidate: PropTypes.func,
+  minQueryLength: PropTypes.number,
+  maxSuggestionsLength: PropTypes.number,
+  classNames: PropTypes.object,
+  allowNew: PropTypes.bool,
+  allowBackspace: PropTypes.bool,
+  tagComponent: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.element
+  ]),
+  inputAttributes: PropTypes.object,
+  addOnBlur: PropTypes.bool,
+  clearInputOnDelete: PropTypes.bool
+}
+
+module.exports = ReactTags
+
+
+/***/ }),
+
+/***/ "./node_modules/react-tag-autocomplete/dist-es5/Suggestions.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/react-tag-autocomplete/dist-es5/Suggestions.js ***!
+  \*********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var React = __webpack_require__(/*! react */ "react")
+
+function escapeForRegExp (query) {
+  return query.replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&')
+}
+
+function markIt (input, query) {
+  if (query) {
+    var regex = RegExp(escapeForRegExp(query), 'gi')
+    input = input.replace(regex, '<mark>$&</mark>')
+  }
+
+  return {
+    __html: input
+  }
+}
+
+function filterSuggestions (query, suggestions, length, suggestionsFilter, noSuggestionsText) {
+  if (!suggestionsFilter) {
+    var regex = new RegExp(("(?:^|\\s)" + (escapeForRegExp(query))), 'i')
+    suggestionsFilter = function (item) { return regex.test(item.name); }
+  }
+
+  var filtered = suggestions.filter(function (item) { return suggestionsFilter(item, query); }).slice(0, length)
+
+  if (filtered.length === 0 && noSuggestionsText) {
+    filtered.push({ id: 0, name: noSuggestionsText, disabled: true, disableMarkIt: true })
+  }
+
+  return filtered
+}
+
+var Suggestions = /*@__PURE__*/(function (superclass) {
+  function Suggestions (props) {
+    superclass.call(this, props)
+
+    this.state = {
+      options: filterSuggestions(this.props.query, this.props.suggestions, this.props.maxSuggestionsLength, this.props.suggestionsFilter, this.props.noSuggestionsText)
+    }
+  }
+
+  if ( superclass ) Suggestions.__proto__ = superclass;
+  Suggestions.prototype = Object.create( superclass && superclass.prototype );
+  Suggestions.prototype.constructor = Suggestions;
+
+  Suggestions.prototype.componentWillReceiveProps = function componentWillReceiveProps (newProps) {
+    this.setState({
+      options: filterSuggestions(newProps.query, newProps.suggestions, newProps.maxSuggestionsLength, newProps.suggestionsFilter, newProps.noSuggestionsText)
+    })
+  };
+
+  Suggestions.prototype.handleMouseDown = function handleMouseDown (item, e) {
+    // focus is shifted on mouse down but calling preventDefault prevents this
+    e.preventDefault()
+    this.props.addTag(item)
+  };
+
+  Suggestions.prototype.render = function render () {
+    var this$1 = this;
+
+    if (!this.props.expandable || !this.state.options.length) {
+      return null
+    }
+
+    var options = this.state.options.map(function (item, i) {
+      var key = (this$1.props.listboxId) + "-" + i
+      var classNames = []
+
+      if (this$1.props.selectedIndex === i) {
+        classNames.push(this$1.props.classNames.suggestionActive)
+      }
+
+      if (item.disabled) {
+        classNames.push(this$1.props.classNames.suggestionDisabled)
+      }
+
+      return (
+        React.createElement( 'li', {
+          id: key, key: key, role: 'option', className: classNames.join(' '), 'aria-disabled': item.disabled === true, onMouseDown: this$1.handleMouseDown.bind(this$1, item) },
+          item.disableMarkIt ? item.name
+            : React.createElement( 'span', { dangerouslySetInnerHTML: markIt(item.name, this$1.props.query, item.markInput) })
+        )
+      )
+    })
+
+    return (
+      React.createElement( 'div', { className: this.props.classNames.suggestions },
+        React.createElement( 'ul', { role: 'listbox', id: this.props.listboxId }, options)
+      )
+    )
+  };
+
+  return Suggestions;
+}(React.Component));
+
+module.exports = Suggestions
+
+
+/***/ }),
+
+/***/ "./node_modules/react-tag-autocomplete/dist-es5/Tag.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/react-tag-autocomplete/dist-es5/Tag.js ***!
+  \*************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var React = __webpack_require__(/*! react */ "react")
+
+module.exports = function (props) { return (
+  React.createElement( 'button', { type: 'button', className: props.classNames.selectedTag, title: 'Click to remove tag', onClick: props.onDelete },
+    React.createElement( 'span', { className: props.classNames.selectedTagName }, props.tag.name)
+  )
+); }
+
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/lib/addStyles.js":
+/*!****************************************************!*\
+  !*** ./node_modules/style-loader/lib/addStyles.js ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+
+var stylesInDom = {};
+
+var	memoize = function (fn) {
+	var memo;
+
+	return function () {
+		if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+		return memo;
+	};
+};
+
+var isOldIE = memoize(function () {
+	// Test for IE <= 9 as proposed by Browserhacks
+	// @see http://browserhacks.com/#hack-e71d8692f65334173fee715c222cb805
+	// Tests for existence of standard globals is to allow style-loader
+	// to operate correctly into non-standard environments
+	// @see https://github.com/webpack-contrib/style-loader/issues/177
+	return window && document && document.all && !window.atob;
+});
+
+var getTarget = function (target, parent) {
+  if (parent){
+    return parent.querySelector(target);
+  }
+  return document.querySelector(target);
+};
+
+var getElement = (function (fn) {
+	var memo = {};
+
+	return function(target, parent) {
+                // If passing function in options, then use it for resolve "head" element.
+                // Useful for Shadow Root style i.e
+                // {
+                //   insertInto: function () { return document.querySelector("#foo").shadowRoot }
+                // }
+                if (typeof target === 'function') {
+                        return target();
+                }
+                if (typeof memo[target] === "undefined") {
+			var styleTarget = getTarget.call(this, target, parent);
+			// Special case to return head of iframe instead of iframe itself
+			if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
+				try {
+					// This will throw an exception if access to iframe is blocked
+					// due to cross-origin restrictions
+					styleTarget = styleTarget.contentDocument.head;
+				} catch(e) {
+					styleTarget = null;
+				}
+			}
+			memo[target] = styleTarget;
+		}
+		return memo[target]
+	};
+})();
+
+var singleton = null;
+var	singletonCounter = 0;
+var	stylesInsertedAtTop = [];
+
+var	fixUrls = __webpack_require__(/*! ./urls */ "./node_modules/style-loader/lib/urls.js");
+
+module.exports = function(list, options) {
+	if (typeof DEBUG !== "undefined" && DEBUG) {
+		if (typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+	}
+
+	options = options || {};
+
+	options.attrs = typeof options.attrs === "object" ? options.attrs : {};
+
+	// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+	// tags it will allow on a page
+	if (!options.singleton && typeof options.singleton !== "boolean") options.singleton = isOldIE();
+
+	// By default, add <style> tags to the <head> element
+        if (!options.insertInto) options.insertInto = "head";
+
+	// By default, add <style> tags to the bottom of the target
+	if (!options.insertAt) options.insertAt = "bottom";
+
+	var styles = listToStyles(list, options);
+
+	addStylesToDom(styles, options);
+
+	return function update (newList) {
+		var mayRemove = [];
+
+		for (var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+
+			domStyle.refs--;
+			mayRemove.push(domStyle);
+		}
+
+		if(newList) {
+			var newStyles = listToStyles(newList, options);
+			addStylesToDom(newStyles, options);
+		}
+
+		for (var i = 0; i < mayRemove.length; i++) {
+			var domStyle = mayRemove[i];
+
+			if(domStyle.refs === 0) {
+				for (var j = 0; j < domStyle.parts.length; j++) domStyle.parts[j]();
+
+				delete stylesInDom[domStyle.id];
+			}
+		}
+	};
+};
+
+function addStylesToDom (styles, options) {
+	for (var i = 0; i < styles.length; i++) {
+		var item = styles[i];
+		var domStyle = stylesInDom[item.id];
+
+		if(domStyle) {
+			domStyle.refs++;
+
+			for(var j = 0; j < domStyle.parts.length; j++) {
+				domStyle.parts[j](item.parts[j]);
+			}
+
+			for(; j < item.parts.length; j++) {
+				domStyle.parts.push(addStyle(item.parts[j], options));
+			}
+		} else {
+			var parts = [];
+
+			for(var j = 0; j < item.parts.length; j++) {
+				parts.push(addStyle(item.parts[j], options));
+			}
+
+			stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+		}
+	}
+}
+
+function listToStyles (list, options) {
+	var styles = [];
+	var newStyles = {};
+
+	for (var i = 0; i < list.length; i++) {
+		var item = list[i];
+		var id = options.base ? item[0] + options.base : item[0];
+		var css = item[1];
+		var media = item[2];
+		var sourceMap = item[3];
+		var part = {css: css, media: media, sourceMap: sourceMap};
+
+		if(!newStyles[id]) styles.push(newStyles[id] = {id: id, parts: [part]});
+		else newStyles[id].parts.push(part);
+	}
+
+	return styles;
+}
+
+function insertStyleElement (options, style) {
+	var target = getElement(options.insertInto)
+
+	if (!target) {
+		throw new Error("Couldn't find a style target. This probably means that the value for the 'insertInto' parameter is invalid.");
+	}
+
+	var lastStyleElementInsertedAtTop = stylesInsertedAtTop[stylesInsertedAtTop.length - 1];
+
+	if (options.insertAt === "top") {
+		if (!lastStyleElementInsertedAtTop) {
+			target.insertBefore(style, target.firstChild);
+		} else if (lastStyleElementInsertedAtTop.nextSibling) {
+			target.insertBefore(style, lastStyleElementInsertedAtTop.nextSibling);
+		} else {
+			target.appendChild(style);
+		}
+		stylesInsertedAtTop.push(style);
+	} else if (options.insertAt === "bottom") {
+		target.appendChild(style);
+	} else if (typeof options.insertAt === "object" && options.insertAt.before) {
+		var nextSibling = getElement(options.insertAt.before, target);
+		target.insertBefore(style, nextSibling);
+	} else {
+		throw new Error("[Style Loader]\n\n Invalid value for parameter 'insertAt' ('options.insertAt') found.\n Must be 'top', 'bottom', or Object.\n (https://github.com/webpack-contrib/style-loader#insertat)\n");
+	}
+}
+
+function removeStyleElement (style) {
+	if (style.parentNode === null) return false;
+	style.parentNode.removeChild(style);
+
+	var idx = stylesInsertedAtTop.indexOf(style);
+	if(idx >= 0) {
+		stylesInsertedAtTop.splice(idx, 1);
+	}
+}
+
+function createStyleElement (options) {
+	var style = document.createElement("style");
+
+	if(options.attrs.type === undefined) {
+		options.attrs.type = "text/css";
+	}
+
+	if(options.attrs.nonce === undefined) {
+		var nonce = getNonce();
+		if (nonce) {
+			options.attrs.nonce = nonce;
+		}
+	}
+
+	addAttrs(style, options.attrs);
+	insertStyleElement(options, style);
+
+	return style;
+}
+
+function createLinkElement (options) {
+	var link = document.createElement("link");
+
+	if(options.attrs.type === undefined) {
+		options.attrs.type = "text/css";
+	}
+	options.attrs.rel = "stylesheet";
+
+	addAttrs(link, options.attrs);
+	insertStyleElement(options, link);
+
+	return link;
+}
+
+function addAttrs (el, attrs) {
+	Object.keys(attrs).forEach(function (key) {
+		el.setAttribute(key, attrs[key]);
+	});
+}
+
+function getNonce() {
+	if (false) {}
+
+	return __webpack_require__.nc;
+}
+
+function addStyle (obj, options) {
+	var style, update, remove, result;
+
+	// If a transform function was defined, run it on the css
+	if (options.transform && obj.css) {
+	    result = typeof options.transform === 'function'
+		 ? options.transform(obj.css) 
+		 : options.transform.default(obj.css);
+
+	    if (result) {
+	    	// If transform returns a value, use that instead of the original css.
+	    	// This allows running runtime transformations on the css.
+	    	obj.css = result;
+	    } else {
+	    	// If the transform function returns a falsy value, don't add this css.
+	    	// This allows conditional loading of css
+	    	return function() {
+	    		// noop
+	    	};
+	    }
+	}
+
+	if (options.singleton) {
+		var styleIndex = singletonCounter++;
+
+		style = singleton || (singleton = createStyleElement(options));
+
+		update = applyToSingletonTag.bind(null, style, styleIndex, false);
+		remove = applyToSingletonTag.bind(null, style, styleIndex, true);
+
+	} else if (
+		obj.sourceMap &&
+		typeof URL === "function" &&
+		typeof URL.createObjectURL === "function" &&
+		typeof URL.revokeObjectURL === "function" &&
+		typeof Blob === "function" &&
+		typeof btoa === "function"
+	) {
+		style = createLinkElement(options);
+		update = updateLink.bind(null, style, options);
+		remove = function () {
+			removeStyleElement(style);
+
+			if(style.href) URL.revokeObjectURL(style.href);
+		};
+	} else {
+		style = createStyleElement(options);
+		update = applyToTag.bind(null, style);
+		remove = function () {
+			removeStyleElement(style);
+		};
+	}
+
+	update(obj);
+
+	return function updateStyle (newObj) {
+		if (newObj) {
+			if (
+				newObj.css === obj.css &&
+				newObj.media === obj.media &&
+				newObj.sourceMap === obj.sourceMap
+			) {
+				return;
+			}
+
+			update(obj = newObj);
+		} else {
+			remove();
+		}
+	};
+}
+
+var replaceText = (function () {
+	var textStore = [];
+
+	return function (index, replacement) {
+		textStore[index] = replacement;
+
+		return textStore.filter(Boolean).join('\n');
+	};
+})();
+
+function applyToSingletonTag (style, index, remove, obj) {
+	var css = remove ? "" : obj.css;
+
+	if (style.styleSheet) {
+		style.styleSheet.cssText = replaceText(index, css);
+	} else {
+		var cssNode = document.createTextNode(css);
+		var childNodes = style.childNodes;
+
+		if (childNodes[index]) style.removeChild(childNodes[index]);
+
+		if (childNodes.length) {
+			style.insertBefore(cssNode, childNodes[index]);
+		} else {
+			style.appendChild(cssNode);
+		}
+	}
+}
+
+function applyToTag (style, obj) {
+	var css = obj.css;
+	var media = obj.media;
+
+	if(media) {
+		style.setAttribute("media", media)
+	}
+
+	if(style.styleSheet) {
+		style.styleSheet.cssText = css;
+	} else {
+		while(style.firstChild) {
+			style.removeChild(style.firstChild);
+		}
+
+		style.appendChild(document.createTextNode(css));
+	}
+}
+
+function updateLink (link, options, obj) {
+	var css = obj.css;
+	var sourceMap = obj.sourceMap;
+
+	/*
+		If convertToAbsoluteUrls isn't defined, but sourcemaps are enabled
+		and there is no publicPath defined then lets turn convertToAbsoluteUrls
+		on by default.  Otherwise default to the convertToAbsoluteUrls option
+		directly
+	*/
+	var autoFixUrls = options.convertToAbsoluteUrls === undefined && sourceMap;
+
+	if (options.convertToAbsoluteUrls || autoFixUrls) {
+		css = fixUrls(css);
+	}
+
+	if (sourceMap) {
+		// http://stackoverflow.com/a/26603875
+		css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+	}
+
+	var blob = new Blob([css], { type: "text/css" });
+
+	var oldSrc = link.href;
+
+	link.href = URL.createObjectURL(blob);
+
+	if(oldSrc) URL.revokeObjectURL(oldSrc);
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/lib/urls.js":
+/*!***********************************************!*\
+  !*** ./node_modules/style-loader/lib/urls.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+
+/**
+ * When source maps are enabled, `style-loader` uses a link element with a data-uri to
+ * embed the css on the page. This breaks all relative urls because now they are relative to a
+ * bundle instead of the current page.
+ *
+ * One solution is to only use full urls, but that may be impossible.
+ *
+ * Instead, this function "fixes" the relative urls to be absolute according to the current page location.
+ *
+ * A rudimentary test suite is located at `test/fixUrls.js` and can be run via the `npm test` command.
+ *
+ */
+
+module.exports = function (css) {
+  // get current location
+  var location = typeof window !== "undefined" && window.location;
+
+  if (!location) {
+    throw new Error("fixUrls requires window.location");
+  }
+
+	// blank or null?
+	if (!css || typeof css !== "string") {
+	  return css;
+  }
+
+  var baseUrl = location.protocol + "//" + location.host;
+  var currentDir = baseUrl + location.pathname.replace(/\/[^\/]*$/, "/");
+
+	// convert each url(...)
+	/*
+	This regular expression is just a way to recursively match brackets within
+	a string.
+
+	 /url\s*\(  = Match on the word "url" with any whitespace after it and then a parens
+	   (  = Start a capturing group
+	     (?:  = Start a non-capturing group
+	         [^)(]  = Match anything that isn't a parentheses
+	         |  = OR
+	         \(  = Match a start parentheses
+	             (?:  = Start another non-capturing groups
+	                 [^)(]+  = Match anything that isn't a parentheses
+	                 |  = OR
+	                 \(  = Match a start parentheses
+	                     [^)(]*  = Match anything that isn't a parentheses
+	                 \)  = Match a end parentheses
+	             )  = End Group
+              *\) = Match anything and then a close parens
+          )  = Close non-capturing group
+          *  = Match anything
+       )  = Close capturing group
+	 \)  = Match a close parens
+
+	 /gi  = Get all matches, not the first.  Be case insensitive.
+	 */
+	var fixedCss = css.replace(/url\s*\(((?:[^)(]|\((?:[^)(]+|\([^)(]*\))*\))*)\)/gi, function(fullMatch, origUrl) {
+		// strip quotes (if they exist)
+		var unquotedOrigUrl = origUrl
+			.trim()
+			.replace(/^"(.*)"$/, function(o, $1){ return $1; })
+			.replace(/^'(.*)'$/, function(o, $1){ return $1; });
+
+		// already a full url? no change
+		if (/^(#|data:|http:\/\/|https:\/\/|file:\/\/\/|\s*$)/i.test(unquotedOrigUrl)) {
+		  return fullMatch;
+		}
+
+		// convert the url to a full url
+		var newUrl;
+
+		if (unquotedOrigUrl.indexOf("//") === 0) {
+		  	//TODO: should we add protocol?
+			newUrl = unquotedOrigUrl;
+		} else if (unquotedOrigUrl.indexOf("/") === 0) {
+			// path should be relative to the base url
+			newUrl = baseUrl + unquotedOrigUrl; // already starts with '/'
+		} else {
+			// path should be relative to current directory
+			newUrl = currentDir + unquotedOrigUrl.replace(/^\.\//, ""); // Strip leading './'
+		}
+
+		// send back the fixed url(...)
+		return "url(" + JSON.stringify(newUrl) + ")";
+	});
+
+	// send back the fixed css
+	return fixedCss;
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/webpack/buildin/global.js":
 /*!***********************************!*\
   !*** (webpack)/buildin/global.js ***!
@@ -29444,19 +29444,19 @@ DashTabulator.propTypes = {
   clearFilterButtonType: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object,
 
   /**
-   * initialHeaderFilter based on http://tabulator.info/docs/4.8/filter#header
+   * initialHeaderFilter based on http://tabulator.info/docs/5.2/filter#header
    * can take array of filters 
    */
   initialHeaderFilter: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.array,
 
   /**
-   * dataFiltering based on http://tabulator.info/docs/4.8/callbacks#filter
+   * dataFiltering based on http://tabulator.info/docs/5.2/callbacks#filter
    * The dataFiltering callback is triggered whenever a filter event occurs, before the filter happens.
    */
   dataFiltering: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.array,
 
   /**
-   * dataFiltered based on http://tabulator.info/docs/4.8/callbacks#filter
+   * dataFiltered based on http://tabulator.info/docs/5.2/callbacks#filter
    * The dataFiltered callback is triggered after the table dataset is filtered
    */
   dataFiltered: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object,
