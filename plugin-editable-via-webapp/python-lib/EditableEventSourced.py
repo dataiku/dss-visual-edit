@@ -263,16 +263,15 @@ class EditableEventSourced:
                 #    t_col["editorParams"] = {"values": col["values"]}
 
                 if col_name in self.linked_record_names:
-                    t_col["editor"] = "list"
+                    t_col["editor"] = "autocomplete"
                     linked_ds_name = linked_records_df.loc[col_name, "ds_name"]
                     linked_ds_key = linked_records_df.loc[col_name, "ds_key"]
                     values = Dataset(linked_ds_name).get_dataframe()[linked_ds_key].to_list()
-                    # ns = Namespace("myNamespace", "tabulator")
+                    ns = Namespace("myNamespace", "tabulator")
                     t_col["editorParams"] = {
-                        "autocomplete": True,
                         "values": values,
-                        "freetext": True
-                        # "searchFunc": ns("searchFunc")
+                        "freetext": True,
+                        "searchFunc": ns("searchFunc")
                     }
                 else:
                     if t_type=="boolean":
