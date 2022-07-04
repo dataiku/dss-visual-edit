@@ -129,7 +129,7 @@ window["dash_tabulator"] =
 /******/ 	        var srcFragments = src.split('/');
 /******/ 	        var fileFragments = srcFragments.slice(-1)[0].split('.');
 /******/
-/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1656924433");
+/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1656925199");
 /******/ 	        srcFragments.splice(-1, 1, fileFragments.join('.'))
 /******/
 /******/ 	        return srcFragments.join('/');
@@ -29251,6 +29251,16 @@ var DashTabulator = /*#__PURE__*/function (_Component) {
 
           if (o instanceof Object) {
             header[key] = Object(dash_extensions__WEBPACK_IMPORTED_MODULE_4__["resolveProp"])(o, this);
+
+            if (o.variable) {
+              for (var key2 in o) {
+                var o2 = o[key2];
+
+                if (o2 instanceof Object) {
+                  o[key2] = Object(dash_extensions__WEBPACK_IMPORTED_MODULE_4__["resolveProp"])(o2, this);
+                }
+              }
+            }
           }
         }
       } // check all options for a global windows function in the assets folder
