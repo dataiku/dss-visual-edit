@@ -14,11 +14,13 @@ from os import getenv
 from dash import Dash, html
 
 stylesheets = ["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
+scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"]
 
 if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     print("Webapp is being run in Dataiku")
     run_context = "dataiku"
     stylesheets += ["https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/style.css"] # this points to a copy of assets/style.css (which is ignored by Dataiku's Dash)
+    scripts += ["https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/custom_tabulator.js"] # same for assets/custom_tabulator.js
 
     from dataiku.customwebapp import get_webapp_config
     from json5 import loads
@@ -58,7 +60,7 @@ else:
     app = Dash(__name__, server=f_app)
 
 app.config.external_stylesheets = stylesheets
-app.config.external_scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"]
+app.config.external_scripts = scripts
 
 #%%
 from EditableEventSourced import EditableEventSourced
