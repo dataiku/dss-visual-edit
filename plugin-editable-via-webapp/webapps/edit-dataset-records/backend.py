@@ -27,7 +27,7 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     original_ds_name = get_webapp_config().get("original_dataset")
     primary_keys = get_webapp_config().get("primary_keys")
     editable_column_names = get_webapp_config().get("editable_column_names")
-    freeze_editable_columns = False
+    freeze_editable_columns = get_webapp_config().get("freeze_editable_columns")
     editschema_manual_raw = get_webapp_config().get("editschema")
     if (editschema_manual_raw and editschema_manual_raw!=""):
         editschema_manual = loads(editschema_manual_raw)
@@ -48,8 +48,7 @@ else:
     settings = project.get_dataset(original_ds_name).get_settings()
     primary_keys = settings.custom_fields.get("primary_keys")
     editable_column_names = settings.custom_fields.get("editable_column_names")
-    freeze_editable_columns = settings.custom_fields.get("freeze_editable_columns")
-    if (freeze_editable_columns==None): freeze_editable_columns = False
+    freeze_editable_columns = False
     try:
         editschema_manual = load(open("example-editschemas/" + original_ds_name + ".json"))
     except:
