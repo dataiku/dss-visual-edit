@@ -27,7 +27,8 @@
     "ramda": "^0.26.1",
     "dash-extensions": "^0.0.1",
     "react-tabulator": "^0.18.1",
-    "set-blocking": "^2.0.0"
+    "set-blocking": "^2.0.0",
+    "tabulator-tables": "^5.2.7"
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",
