@@ -16,42 +16,11 @@ import {resolveProps, resolveProp} from 'dash-extensions'
  */
 export default class DashTabulator extends Component {
     constructor(props) {
-
         super(props);
         this.ref = null;
-        
         this.theme = props.theme;
         switch(this.theme) {
-            
             case null : // theme not set use default
-            case 'tabulator': // name of default theme
-            case 'default' : // default - expect the unexpected 
-                require('react-tabulator/lib/css/tabulator.min.css');
-                break
-            case 'tabulator_modern' : 
-                require('react-tabulator/lib/css/tabulator_modern.min.css');
-                break;
-            case 'tabulator_midnight':
-                require('react-tabulator/lib/css/tabulator_midnight.min.css');
-                break;
-            case 'tabulator_simple' :
-                require('react-tabulator/lib/css/tabulator_simple.min.css');
-                break;
-            case 'tabulator_site' :
-                require('react-tabulator/lib/css/tabulator_site.min.css');
-                break;
-            case 'bootstrap/tabulator_bootstrap' :
-                require('react-tabulator/lib/css/bootstrap/tabulator_bootstrap.min.css');
-                break;
-            case 'bootstrap/tabulator_bootstrap4' :
-                require('react-tabulator/lib/css/bootstrap/tabulator_bootstrap4.min.css');
-                break;   
-            case 'bulma/tabulator_bulma' :
-                require('react-tabulator/lib/css/bulma/tabulator_bulma.min.css');
-                break;
-            case 'materialize/tabulator_materialize' :
-                require('react-tabulator/lib/css/materialize/tabulator_materialize.min.css'); 
-                break;
             case 'semantic-ui/tabulator_semantic-ui':
                 require('react-tabulator/lib/css/semantic-ui/tabulator_semantic-ui.min.css'); 
                 break; 
@@ -63,7 +32,7 @@ export default class DashTabulator extends Component {
      *          or resetting a filter field as it's being typed, shouldRerender can be used to turn off render
      *          as setProps is being called
      */
-    shouldRerender = false; 
+    shouldRerender = false;
     
     rowClick = (e, row) => {
         //console.log('ref table: ', this.ref.table); // this is the Tabulator table instance
@@ -79,13 +48,6 @@ export default class DashTabulator extends Component {
         this.props.setProps({multiRowsClicked: data }) 
         this.shouldRerender = true;
     }
-
-    downloadData = () => {
-        let type = this.props.downloadButtonType.type || "csv";
-        let filename = this.props.downloadButtonType.filename || "data";
-        filename += `.${type}`
-        this.ref.table.download(type, filename);
-    };
 
     clearFilters = () => {
         this.ref.table.clearFilter(true);
@@ -103,16 +65,17 @@ export default class DashTabulator extends Component {
         // TODO: resolve any columns method
         for(let i=0; i < columns.length; i++){
             let header = columns[i];
-            
             for (let key in header){ 
                 let o = header[key];
                 console.log(key);
                 console.log(o);
                 if (o instanceof Object) { 
                     header[key] = resolveProp(o, this);
-                    if (o.variable) {
+                    if (!o.variable && !o.arrow) {
                         for (let key2 in o){
                             let o2 = o[key2]
+                            console.log(key2);
+                            console.log(o2);
                             if (o2 instanceof Object) { 
                                 o[key2] = resolveProp(o2, this);
                             }
