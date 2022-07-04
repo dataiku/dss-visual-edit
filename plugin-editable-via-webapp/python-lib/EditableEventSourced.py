@@ -243,10 +243,10 @@ class EditableEventSourced:
                 col_meaning = None
             if col_meaning and col_meaning==col_meaning: # this tests that col_meaning isn't None and that it isn't a nan
                 if col_meaning=="Boolean": t_type = "boolean"
-                if col_meaning=="DoubleMeaning" or col_meaning=="LongMeaning": t_type = "number"
+                if col_meaning=="DoubleMeaning" or col_meaning=="LongMeaning" or col_meaning=="IntMeaning": t_type = "number"
             else:
                 if col_type=="boolean": t_type = "boolean"
-                if col_type in ["tinyint", "smallint", "int", "bigint" "float", "double"]: t_type = "number"
+                if col_type in ["tinyint", "smallint", "int", "bigint", "float", "double"]: t_type = "number"
             if t_type=="boolean":
                 t_col["formatter"] = "tickCross"
                 t_col["formatterParams"] = {"allowEmpty": True}
