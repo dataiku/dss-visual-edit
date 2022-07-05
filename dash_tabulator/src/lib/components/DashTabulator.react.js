@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import PropTypes, { array } from 'prop-types';
 
-import 'react-tabulator/lib/styles.css'; // required styles
+import './react-tabulator/lib/styles.css'; // required styles
 //import 'react-tabulator/lib/css/tabulator.min.css'; // theme
-import { ReactTabulator } from 'react-tabulator'
+import { ReactTabulator } from './react-tabulator/lib'
 import {resolveProps, resolveProp} from 'dash-extensions'
 
 /**
@@ -22,7 +22,7 @@ export default class DashTabulator extends Component {
         switch(this.theme) {
             case null : // theme not set use default
             case 'semantic-ui/tabulator_semantic-ui':
-                require('react-tabulator/lib/css/semantic-ui/tabulator_semantic-ui.min.css'); 
+                require('./react-tabulator/lib/css/semantic-ui/tabulator_semantic-ui.min.css'); 
                 break; 
         }
     }
