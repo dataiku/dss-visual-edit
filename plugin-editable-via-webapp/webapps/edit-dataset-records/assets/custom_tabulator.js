@@ -7,7 +7,7 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
             if (term && term.length>2) {
                 values.forEach(function(value){
                     //value - one of the values from the value property
-                    if(toString(value).startsWith(term)){
+                    if(value.toString().startsWith(term)){
                         matches.push(value);
                     }
                 });
