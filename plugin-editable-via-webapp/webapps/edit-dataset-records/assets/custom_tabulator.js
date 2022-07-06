@@ -4,10 +4,10 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
 
         searchFunc: function (term, values) { //search for exact matches
             var matches = [];
-            if (term.length>2) {
+            if (term && term.length>2) {
                 values.forEach(function(value){
                     //value - one of the values from the value property
-                    if(value.startsWith(term)){
+                    if(toString(value).startsWith(term)){
                         matches.push(value);
                     }
                 });

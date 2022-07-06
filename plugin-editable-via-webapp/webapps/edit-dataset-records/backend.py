@@ -50,7 +50,7 @@ else:
     editable_column_names = settings.custom_fields.get("editable_column_names")
     freeze_editable_columns = False
     try:
-        editschema_manual = load(open("example-editschemas/" + original_ds_name + ".json"))
+        editschema_manual = load(open("../../../example-editschemas/" + original_ds_name + ".json"))
     except:
         editschema_manual = {}
     

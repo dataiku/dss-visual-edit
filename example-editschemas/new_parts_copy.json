@@ -1,0 +1,12 @@
+[
+    {
+        "name": "model",
+        "editable_type": "linked_record",
+        "linked_ds_name": "airplane_models_copy"
+    },
+ {
+        "name": "commodity",
+        "editable_type": "linked_record",
+        "linked_ds_name": "commodities_copy"
+    }
+]
