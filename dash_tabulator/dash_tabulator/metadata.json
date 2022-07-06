@@ -161,6 +161,27 @@
         "required": false,
         "description": "dataFiltered based on http://tabulator.info/docs/5.2/callbacks#filter\nThe dataFiltered callback is triggered after the table dataset is filtered"
       },
+      "dataSorting": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "dataSorted": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
+      "columnMoved": {
+        "type": {
+          "name": "any"
+        },
+        "required": false,
+        "description": ""
+      },
       "rowClick": {
         "type": {
           "name": "any"
@@ -329,13 +350,6 @@
         "required": false,
         "description": ""
       },
-      "columnMoved": {
-        "type": {
-          "name": "any"
-        },
-        "required": false,
-        "description": ""
-      },
       "columnResized": {
         "type": {
           "name": "any"
@@ -442,20 +456,6 @@
         "description": ""
       },
       "ajaxError": {
-        "type": {
-          "name": "any"
-        },
-        "required": false,
-        "description": ""
-      },
-      "dataSorting": {
-        "type": {
-          "name": "any"
-        },
-        "required": false,
-        "description": ""
-      },
-      "dataSorted": {
         "type": {
           "name": "any"
         },

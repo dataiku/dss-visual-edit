@@ -59,7 +59,7 @@ export default class DashTabulator extends Component {
 
     render() {
         const {id, data, setProps, columns, options, rowClicked, multiRowsClicked, cellEdited, dataChanged,
-            downloadButtonType, clearFilterButtonType, initialHeaderFilter, dataFiltering, dataFiltered} = this.props;
+            downloadButtonType, clearFilterButtonType, initialHeaderFilter, dataFiltering, dataFiltered, dataSorted, columnMoved} = this.props;
         
         // Interpret column formatters as function handles.
         // TODO: resolve any columns method
@@ -105,6 +105,10 @@ export default class DashTabulator extends Component {
         if (clearFilterButtonType) {
             clearFilterButton = <button type="button" onClick={this.clearFilters} className={clearFilterButtonType.css} id="clearFilters">{clearFilterButtonType.text}</button>
         }
+        try {
+            window.parent.WT1SVC.event("lca-datatable-viewed");
+        }
+        catch (e) { }
 
         return (
             <div>
@@ -126,6 +130,11 @@ export default class DashTabulator extends Component {
                     edited.value = cell.getValue()
                     edited.row = cell.getData()
                     this.props.setProps({cellEdited: edited})
+                    try {
+                        window.parent.WT1SVC.event("lca-datatable-edited", {
+                            "column_name": edited.column
+                        });
+                    } catch (e) { }
                 }}
                 rowSelectionChanged={this.rowSelected}
                 dataChanged={(newData) => {
@@ -161,11 +170,37 @@ export default class DashTabulator extends Component {
                                         }
                                         )
                     this.shouldRerender = true;
+                    try {
+                        window.parent.WT1SVC.event("lca-datatable-filtered", {
+                            "filter-headers": filterHeaders
+                        });
+                    } catch (e) { }
                     }
                 } // dataFiltered end
-
                 initialHeaderFilter={initialHeaderFilter}
-
+                dataSorted={(sorters, rows) => {
+                    this.props.setProps({dataSorted: {
+                        sorters: sorters,
+                        rows: rows
+                    }})
+                    try {
+                        window.parent.WT1SVC.event("lca-datatable-sorted", {
+                            "sorters": sorters
+                        });
+                    } catch (e) { }
+                }}
+                columnMoved={(column, columns) => {
+                    this.props.setProps({columnMoved: {
+                        column: column,
+                        columns: columns
+                    }})
+                    try {
+                        window.parent.WT1SVC.event("lca-datatable-column-moved", {
+                            "column_name": column
+                        });
+                    } catch (e) { }
+                }
+                }
             />
             </div>
         );
@@ -265,6 +300,10 @@ DashTabulator.propTypes = {
      */
     dataFiltered: PropTypes.object,
 
+    dataSorting : PropTypes.any,
+    dataSorted : PropTypes.any,
+
+    columnMoved : PropTypes.any,
 
     /**
      * standard props not used by dash-tabulator directly
@@ -294,7 +333,6 @@ DashTabulator.propTypes = {
     cellTapHold : PropTypes.any,
     cellEditing : PropTypes.any,
     cellEditCancelled : PropTypes.any,
-    columnMoved : PropTypes.any,
     columnResized : PropTypes.any,
     columnTitleChanged : PropTypes.any,
     columnVisibilityChanged : PropTypes.any,
@@ -311,8 +349,6 @@ DashTabulator.propTypes = {
     ajaxRequesting : PropTypes.any,
     ajaxResponse : PropTypes.any,
     ajaxError : PropTypes.any,
-    dataSorting : PropTypes.any,
-    dataSorted : PropTypes.any,
     renderStarted : PropTypes.any,
     renderComplete : PropTypes.any,
     pageLoaded : PropTypes.any,

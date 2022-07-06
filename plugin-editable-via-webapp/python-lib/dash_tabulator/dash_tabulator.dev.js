@@ -129,7 +129,7 @@ window["dash_tabulator"] =
 /******/ 	        var srcFragments = src.split('/');
 /******/ 	        var fileFragments = srcFragments.slice(-1)[0].split('.');
 /******/
-/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1656945752");
+/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1657123837");
 /******/ 	        srcFragments.splice(-1, 1, fileFragments.join('.'))
 /******/
 /******/ 	        return srcFragments.join('/');
@@ -28532,7 +28532,9 @@ var DashTabulator = /*#__PURE__*/function (_Component) {
           clearFilterButtonType = _this$props.clearFilterButtonType,
           initialHeaderFilter = _this$props.initialHeaderFilter,
           dataFiltering = _this$props.dataFiltering,
-          dataFiltered = _this$props.dataFiltered; // Interpret column formatters as function handles.
+          dataFiltered = _this$props.dataFiltered,
+          dataSorted = _this$props.dataSorted,
+          columnMoved = _this$props.columnMoved; // Interpret column formatters as function handles.
       // TODO: resolve any columns method
 
       for (var i = 0; i < columns.length; i++) {
@@ -28601,6 +28603,10 @@ var DashTabulator = /*#__PURE__*/function (_Component) {
         }, clearFilterButtonType.text);
       }
 
+      try {
+        window.parent.WT1SVC.event("lca-datatable-viewed");
+      } catch (e) {}
+
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, downloadButton, clearFilterButton, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_tabulator__WEBPACK_IMPORTED_MODULE_3__["ReactTabulator"], {
         ref: function ref(_ref) {
           return _this2.ref = _ref;
@@ -28623,6 +28629,12 @@ var DashTabulator = /*#__PURE__*/function (_Component) {
           _this2.props.setProps({
             cellEdited: edited
           });
+
+          try {
+            window.parent.WT1SVC.event("lca-datatable-edited", {
+              "column_name": edited.column
+            });
+          } catch (e) {}
         },
         rowSelectionChanged: this.rowSelected,
         dataChanged: function dataChanged(newData) {
@@ -28667,9 +28679,43 @@ var DashTabulator = /*#__PURE__*/function (_Component) {
           });
 
           _this2.shouldRerender = true;
+
+          try {
+            window.parent.WT1SVC.event("lca-datatable-filtered", {
+              "filter-headers": filterHeaders
+            });
+          } catch (e) {}
         } // dataFiltered end
         ,
-        initialHeaderFilter: initialHeaderFilter
+        initialHeaderFilter: initialHeaderFilter,
+        dataSorted: function dataSorted(sorters, rows) {
+          _this2.props.setProps({
+            dataSorted: {
+              sorters: sorters,
+              rows: rows
+            }
+          });
+
+          try {
+            window.parent.WT1SVC.event("lca-datatable-sorted", {
+              "sorters": sorters
+            });
+          } catch (e) {}
+        },
+        columnMoved: function columnMoved(column, columns) {
+          _this2.props.setProps({
+            columnMoved: {
+              column: column,
+              columns: columns
+            }
+          });
+
+          try {
+            window.parent.WT1SVC.event("lca-datatable-column-moved", {
+              "column_name": column
+            });
+          } catch (e) {}
+        }
       }));
     }
   }]);
@@ -28766,6 +28812,9 @@ DashTabulator.propTypes = {
    * The dataFiltered callback is triggered after the table dataset is filtered
    */
   dataFiltered: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object,
+  dataSorting: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any,
+  dataSorted: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any,
+  columnMoved: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any,
 
   /**
    * standard props not used by dash-tabulator directly
@@ -28795,7 +28844,6 @@ DashTabulator.propTypes = {
   cellTapHold: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any,
   cellEditing: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any,
   cellEditCancelled: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any,
-  columnMoved: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any,
   columnResized: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any,
   columnTitleChanged: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any,
   columnVisibilityChanged: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any,
@@ -28812,8 +28860,6 @@ DashTabulator.propTypes = {
   ajaxRequesting: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any,
   ajaxResponse: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any,
   ajaxError: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any,
-  dataSorting: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any,
-  dataSorted: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any,
   renderStarted: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any,
   renderComplete: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any,
   pageLoaded: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any,
