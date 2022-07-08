@@ -85,6 +85,13 @@ data = ees.get_data_tabulator()
 
 def serve_layout():
     return html.Div(children=[
+        html.Div(id="original_ds_update_msg", children=""),
+        html.Div(id="last_build_date", children=str(get_last_build_date()), style={"display": "none"}),
+        dcc.Interval(
+                id="interval-component-iu",
+                interval=3*1000, # in milliseconds TODO: increase this
+                n_intervals=0
+        ),
         dash_tabulator.DashTabulator(
             id="datatable",
             columns=columns,
