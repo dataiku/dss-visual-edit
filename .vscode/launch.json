@@ -14,8 +14,8 @@
                 "FLASK_APP": "backend.py",
                 "FLASK_ENV": "development",
                 "PYTHONPATH": "../../python-lib",
-                "DKU_CURRENT_PROJECT_KEY": "EDIT", // choose from CATEGORIZE_TRANSACTIONS, JOIN_COMPANIES, STAKEHOLDER_OWNERSHIP, EDIT
-                "ORIGINAL_DATASET": "demand_stream_prepared_filtered", // choose from transactions_missing, matches, stakeholders_tbc_prepared, demand_stream_prepared_filtered, equipment_shifts_dates
+                "DKU_CURRENT_PROJECT_KEY": "STAKEHOLDER_OWNERSHIP", // choose from CATEGORIZE_TRANSACTIONS, JOIN_COMPANIES, STAKEHOLDER_OWNERSHIP, EDIT
+                "ORIGINAL_DATASET": "stakeholders_tbc_prepared", // choose from transactions_missing, matches, stakeholders_tbc_prepared, demand_stream_prepared_filtered, equipment_shifts_dates, new_parts_copy
             },
             "args": [
                 "run",
