@@ -188,8 +188,11 @@ class EditableEventSourced:
 
         self.__connection_name__ = self.original_ds.get_config().get("params").get("connection")
         self.__schema__ = self.original_ds.get_config().get("schema").get("columns")
-        self.primary_keys = primary_keys
-        self.editable_column_names = editable_column_names
+        if (primary_keys):
+            self.primary_keys = primary_keys
+        # else: it's in the custom field
+        if (editable_column_names):
+            self.editable_column_names = editable_column_names
         self.editschema_manual = editschema_manual
         if (editschema):
             self.primary_keys = get_primary_keys(editschema)

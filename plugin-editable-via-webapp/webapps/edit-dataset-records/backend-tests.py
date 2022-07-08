@@ -1,4 +1,15 @@
 #%%
+import dataiku
+ds = dataiku.Dataset("stakeholders_tbc_prepared", "STAKEHOLDER_OWNERSHIP")
+client = dataiku.api_client()
+project = client.get_project("STAKEHOLDER_OWNERSHIP")
+ds = project.get_dataset("stakeholders_tbc_prepared")
+settings = ds.get_settings()
+definition = ds.get_definition()
+last_metrics = ds.get_last_metric_values()
+
+
+#%%
 import sys
 sys.path.append('../../python-lib')
 original_ds_name = "stakeholders_tbc_filtered"
