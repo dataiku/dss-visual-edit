@@ -111,6 +111,23 @@ def serve_layout():
 app.layout = serve_layout
 
 @app.callback(
+    [
+        Output("original_ds_update_msg", "children"),
+        Output("last_build_date", "children")
+    ],
+    [
+        Input("interval-component-iu", "n_intervals"),
+        Input("last_build_date", "children")
+    ])
+def check_original_data_update(n_intervals, last_build_date):
+    last_build_date_new = last_build_date
+    duration = 0
+    # duration = get_last_build_date()-int(last_build_date)
+    # if duration>0:
+    #     last_build_date_new = str(get_last_build_date())
+    #     # note: this is a number of milli-seconds -> divide by 1000 and use in datetime.datetime.utcfromtimestamp() to get a human-readable date
+    print(str(n_intervals) + " - " + str(duration))
+    return "The original dataset has changed. Would you like to refresh the data?", last_build_date_new
 
 @app.callback(
     Output("info", "children"),
