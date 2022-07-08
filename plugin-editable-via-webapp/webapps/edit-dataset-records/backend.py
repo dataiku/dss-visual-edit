@@ -10,11 +10,14 @@
 #%%
 # Get original dataset name and editschema
 
+from dataiku import api_client
 from os import getenv
-from dash import Dash, html
+from dash import Dash, html, dcc
 
 stylesheets = ["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
 scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"]
+client = api_client()
+project = client.get_project(getenv("DKU_CURRENT_PROJECT_KEY"))
 
 if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     print("Webapp is being run in Dataiku")
@@ -42,11 +45,8 @@ else:
 
     # Get original dataset name as an environment variable
     # Get primary keys and editable column names from the custom fields of that dataset
-    import dataiku
     from json5 import load
     original_ds_name = getenv("ORIGINAL_DATASET")
-    client = dataiku.api_client()
-    project = client.get_project(getenv("DKU_CURRENT_PROJECT_KEY"))
     settings = project.get_dataset(original_ds_name).get_settings()
     primary_keys = settings.custom_fields.get("primary_keys")
     editable_column_names = settings.custom_fields.get("editable_column_names")
@@ -59,6 +59,9 @@ else:
     from flask import Flask
     f_app = Flask(__name__)
     app = Dash(__name__, server=f_app)
+
+def get_last_build_date(ds_name=original_ds_name):
+    return project.get_dataset(ds_name).get_last_metric_values().get_metric_by_id("reporting:BUILD_START_DATE").get("lastValues")[0].get("computed")
 
 app.config.external_stylesheets = stylesheets
 app.config.external_scripts = scripts
