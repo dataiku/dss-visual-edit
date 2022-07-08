@@ -117,7 +117,21 @@ app.layout = serve_layout
     ],
     [
         Input("interval-component-iu", "n_intervals"),
-        Input("last_build_date", "children")
+        State("refresh-btn", "style"),
+        State("original_ds_update_msg", "children"),
+        State("last_build_date", "children")
+    ])
+def check_original_data_update(n_intervals, style, original_ds_update_msg, last_build_date):
+    msg = original_ds_update_msg
+    style_new = style
+    last_build_date_new = project.get_dataset(original_ds_name).get_last_metric_values().get_metric_by_id("reporting:BUILD_START_DATE").get("lastValues")[0].get("computed")
+    print(f"""last build date: {last_build_date} - last build date new: {str(last_build_date_new)}""") # note: this is a number of milli-seconds -> divide by 1000 and use in datetime.datetime.utcfromtimestamp() to get a human-readable date
+    if last_build_date_new>int(last_build_date):
+        msg = "The original dataset has changed. Would you like to refresh the data?"
+        style_new["display"] = "block"
+    print(str(n_intervals) + " - " + msg + " - " + str(last_build_date_new))
+    return style_new, msg, last_build_date_new
+
     ])
 def check_original_data_update(n_intervals, last_build_date):
     last_build_date_new = last_build_date
