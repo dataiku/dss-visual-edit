@@ -102,7 +102,7 @@ app.layout = serve_layout
 def update(cell):
     return ees.add_edit_tabulator(cell, user)
 
-if __name__=="__main__":
+if __name__=="backend":
     if run_context=="local":
         print("Running in debug mode")
         app.run_server(debug=True)
