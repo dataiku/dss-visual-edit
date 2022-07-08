@@ -78,7 +78,7 @@ user = get_user_details()
 # Define the webapp layout and components
 
 import dash_tabulator
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 
 columns = ees.get_columns_tabulator(freeze_editable_columns)
 data = ees.get_data_tabulator()
@@ -115,6 +115,7 @@ app.layout = serve_layout
 
 @app.callback(
     [
+        Output("refresh", "style"),
         Output("original_ds_update_msg", "children"),
         Output("last_build_date", "children")
     ],
