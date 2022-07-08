@@ -21,6 +21,7 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     run_context = "dataiku"
     stylesheets += ["https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/style.css"] # this points to a copy of assets/style.css (which is ignored by Dataiku's Dash)
     scripts += ["https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/custom_tabulator.js"] # same for assets/custom_tabulator.js
+    info_display = "none"
 
     from dataiku.customwebapp import get_webapp_config
     from json5 import loads
@@ -37,6 +38,7 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
 else:
     print("Webapp is being run outside of Dataiku")
     run_context = "local"
+    info_display = "block"
 
     # Get original dataset name as an environment variable
     # Get primary keys and editable column names from the custom fields of that dataset
@@ -75,12 +77,15 @@ user = get_user_details()
 import dash_tabulator
 from dash.dependencies import Input, Output
 
+columns = ees.get_columns_tabulator(freeze_editable_columns)
+data = ees.get_data_tabulator()
+
 def serve_layout():
     return html.Div(children=[
         dash_tabulator.DashTabulator(
             id="datatable",
-            columns=ees.get_columns_tabulator(freeze_editable_columns),
-            data=ees.get_data_tabulator(),
+            columns=columns,
+            data=data,
             theme="semantic-ui/tabulator_semantic-ui",
             options={
                 "selectable": 1,
@@ -91,13 +96,15 @@ def serve_layout():
                 "movableColumns": True
             }
         ),
-        html.Div(id="edit-info", children="", style={"display": "none"}),
-    ], style={})
+        html.Div(id="edit-info", children="Info zone for tabulator", style={"display": info_display})
+    ])
 app.layout = serve_layout
 
 @app.callback(
-    Output('edit-info', 'children'),
-    Input('datatable', 'cellEdited'),
+
+@app.callback(
+    Output("info", "children"),
+    Input("datatable", "cellEdited"),
     prevent_initial_call=True)
 def update(cell):
     return ees.add_edit_tabulator(cell, user)
