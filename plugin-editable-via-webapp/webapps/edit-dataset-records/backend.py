@@ -136,19 +136,25 @@ def check_original_data_update(n_intervals, style, original_ds_update_msg, last_
     print(str(n_intervals) + " - " + msg + " - " + str(last_build_date_new))
     return style_new, msg, last_build_date_new
 
+@app.callback(
+    [
+        Output("refresh", "style"),
+        Output("datatable", "columns"),
+        Output("datatable", "data")
+    ],
+    [
+        Input("refresh-btn", "n_clicks")
     ])
-def check_original_data_update(n_intervals, last_build_date):
-    last_build_date_new = last_build_date
-    duration = 0
-    # duration = get_last_build_date()-int(last_build_date)
-    # if duration>0:
-    #     last_build_date_new = str(get_last_build_date())
-    #     # note: this is a number of milli-seconds -> divide by 1000 and use in datetime.datetime.utcfromtimestamp() to get a human-readable date
-    print(str(n_intervals) + " - " + str(duration))
-    return "The original dataset has changed. Would you like to refresh the data?", last_build_date_new
+def refresh(n_clicks):
+    print("Refreshing the data")
+    # TODO: have ees load original df again, pivot editlog and merge edits again
+    columns = ees.get_columns_tabulator(freeze_editable_columns)
+    data = ees.get_data_tabulator()
+    style = {"display": "none"}
+    return columns, data
 
 @app.callback(
-    Output("info", "children"),
+    Output("edit-info", "children"),
     Input("datatable", "cellEdited"),
     prevent_initial_call=True)
 def update(cell):
