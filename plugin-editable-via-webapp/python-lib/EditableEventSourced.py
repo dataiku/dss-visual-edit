@@ -174,6 +174,20 @@ class EditableEventSourced:
             merge_settings.save()
             print("Done.")
 
+    def load_data(self):
+        self.__original_df__ = self.original_ds.get_dataframe()[self.edited_df_cols]
+        self.__edited_df_indexed__ = merge_edits(
+                                        self.__original_df__,
+                                        pivot_editlog(
+                                            self.editlog_ds,
+                                            self.primary_keys,
+                                            self.editable_column_names
+                                        ),
+                                        self.primary_keys
+                                     )
+        # self.__edited_df_indexed__ = self.__extend_with_lookup_columns__(self.__edited_df_indexed__)
+        self.__edited_df_indexed__.set_index(self.primary_keys, inplace=True) # index makes it easier to id values in the DataFrame
+
     def __init__(self, original_ds_name, primary_keys=None, editable_column_names=None, editschema_manual={}, project_key=None, editschema=None):
         self.original_ds_name = original_ds_name
         if (project_key is None): self.project_key = getenv("DKU_CURRENT_PROJECT_KEY")
@@ -205,18 +219,7 @@ class EditableEventSourced:
         self.__setup_linked_records__()
         self.__setup_editlog__()
         self.__setup_editlog_downstream__()
-        self.original_df = self.original_ds.get_dataframe()[self.edited_df_cols]
-        self.__edited_df_indexed__ = merge_edits(
-                                        self.original_df,
-                                        pivot_editlog(
-                                            self.editlog_ds,
-                                            self.primary_keys,
-                                            self.editable_column_names
-                                        ),
-                                        self.primary_keys
-                                     )
-        # self.__edited_df_indexed__ = self.__extend_with_lookup_columns__(self.__edited_df_indexed__)
-        self.__edited_df_indexed__.set_index(self.primary_keys, inplace=True) # index makes it easier to id values in the DataFrame
+        self.load_data()
 
     def get_edited_df_indexed(self):
         return self.__edited_df_indexed__
