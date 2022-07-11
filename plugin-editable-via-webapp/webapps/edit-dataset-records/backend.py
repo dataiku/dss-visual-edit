@@ -12,7 +12,7 @@
 
 from dataiku import api_client
 from os import getenv
-from dash import Dash, html, dcc
+from dash import Dash, html, dcc, Input, Output, State, callback_context
 
 stylesheets = ["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
 scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"]
@@ -78,21 +78,22 @@ user = get_user_details()
 # Define the webapp layout and components
 
 import dash_tabulator
-from dash.dependencies import Input, Output, State
+from datetime import datetime
 
 columns = ees.get_columns_tabulator(freeze_editable_columns)
 data = ees.get_data_tabulator()
 
 def serve_layout():
     return html.Div(children=[
-        html.Div(id="refresh", children=[
-            html.Div(id="original_ds_update_msg", children=""),
+        html.Div(id="refresh-div", children=[
+            html.Div(id="ds_update_msg", children="The original dataset has changed. Do you want to refresh? (Your edits will persist.)", className="ui warning message"),
             html.Div(id="last_build_date", children=str(get_last_build_date()), style={"display": "none"}),
-            html.Button("Refresh", id="refresh-btn", n_clicks=0)
+            html.Div(id="refresh-date", children="", style={"display": "none"}),
+            html.Button("Refresh", id="refresh-btn", n_clicks=0, className="ui button", style={})
         ], style={"display": "none"}),
         dcc.Interval(
                 id="interval-component-iu",
-                interval=5*1000, # in milliseconds TODO: increase this
+                interval=20*1000, # in milliseconds
                 n_intervals=0
         ),
         dash_tabulator.DashTabulator(
@@ -115,43 +116,48 @@ app.layout = serve_layout
 
 @app.callback(
     [
-        Output("refresh", "style"),
-        Output("original_ds_update_msg", "children"),
+        Output("refresh-div", "style"),
         Output("last_build_date", "children")
     ],
     [
         Input("interval-component-iu", "n_intervals"),
-        State("refresh-btn", "style"),
-        State("original_ds_update_msg", "children"),
+        Input("refresh-date", "children"),
+        State("refresh-div", "style"),
         State("last_build_date", "children")
-    ])
-def check_original_data_update(n_intervals, style, original_ds_update_msg, last_build_date):
-    msg = original_ds_update_msg
-    style_new = style
-    last_build_date_new = project.get_dataset(original_ds_name).get_last_metric_values().get_metric_by_id("reporting:BUILD_START_DATE").get("lastValues")[0].get("computed")
-    print(f"""last build date: {last_build_date} - last build date new: {str(last_build_date_new)}""") # note: this is a number of milli-seconds -> divide by 1000 and use in datetime.datetime.utcfromtimestamp() to get a human-readable date
-    if last_build_date_new>int(last_build_date):
-        msg = "The original dataset has changed. Would you like to refresh the data?"
-        style_new["display"] = "block"
-    print(str(n_intervals) + " - " + msg + " - " + str(last_build_date_new))
-    return style_new, msg, last_build_date_new
+    ],
+    prevent_initial_call=True)
+def check_data_update(n_intervals, refresh_date, refresh_div_style, last_build_date):
+    style_new = refresh_div_style
+    style_new["display"] = "none"
+    if (callback_context.triggered_id=="interval-component-iu"):
+        last_build_date_new = str(project.get_dataset(original_ds_name).get_last_metric_values().get_metric_by_id("reporting:BUILD_START_DATE").get("lastValues")[0].get("computed"))
+        if int(last_build_date_new)>int(last_build_date):
+            print("The original dataset has changed.")
+            last_build_date_new_fmtd = datetime.utcfromtimestamp(int(last_build_date_new)/1000).isoformat()
+            last_build_date_fmtd = datetime.utcfromtimestamp(int(last_build_date)/1000).isoformat()
+            print(f"""Last build date: {last_build_date_new_fmtd} — previously {last_build_date_fmtd}""")
+            style_new["display"] = "block"
+    else:
+        print("Datatable has been refreshed -> hiding refresh div")
+        last_build_date_new = last_build_date
+        style_new["display"] = "none"
+    return style_new, last_build_date_new
 
 @app.callback(
     [
-        Output("refresh", "style"),
-        Output("datatable", "columns"),
-        Output("datatable", "data")
+        Output("refresh-date", "children"),
+        Output("datatable", "data"),
     ],
     [
         Input("refresh-btn", "n_clicks")
-    ])
+    ],
+    prevent_initial_call=True)
 def refresh(n_clicks):
-    print("Refreshing the data")
-    # TODO: have ees load original df again, pivot editlog and merge edits again
-    columns = ees.get_columns_tabulator(freeze_editable_columns)
+    print("Refreshing the data...")
+    ees.load_data() # this loads the original df again, pivots the editlog and merges edits
     data = ees.get_data_tabulator()
-    style = {"display": "none"}
-    return columns, data
+    print("Done.")
+    return datetime.now().isoformat(), data
 
 @app.callback(
     Output("edit-info", "children"),
@@ -160,9 +166,8 @@ def refresh(n_clicks):
 def update(cell):
     return ees.add_edit_tabulator(cell, user)
 
-if __name__=="backend":
-    if run_context=="local":
-        print("Running in debug mode")
-        app.run_server(debug=True)
+# if run_context=="local":
+#     print("Running in debug mode")
+#     app.run_server(debug=True)
 
 print("Webapp OK")
