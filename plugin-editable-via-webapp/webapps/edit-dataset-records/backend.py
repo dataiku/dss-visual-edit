@@ -71,14 +71,11 @@ from EditableEventSourced import EditableEventSourced
 ees = EditableEventSourced(original_ds_name, primary_keys, editable_column_names, editschema_manual)
 
 #%%
-from commons import get_user_details
-user = get_user_details()
-
-#%%
 # Define the webapp layout and components
 
 import dash_tabulator
 from datetime import datetime
+from commons import get_user_details
 
 columns = ees.get_columns_tabulator(freeze_editable_columns)
 data = ees.get_data_tabulator()
@@ -164,6 +161,8 @@ def refresh(n_clicks):
     Input("datatable", "cellEdited"),
     prevent_initial_call=True)
 def update(cell):
+    if run_context=="local": user = "local"
+    else: user = get_user_details()
     return ees.add_edit_tabulator(cell, user)
 
 # if run_context=="local":
