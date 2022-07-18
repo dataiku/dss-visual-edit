@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "build": "npm run clean && tsc --outDir ./lib --jsx react --declaration ./src/index.ts && npm run postbuild",
-    "postbuild": "cp ./src/styles.css ./lib/ && cp -R ./src/css ./lib && cp ./src/styles.css ./ && cp -R ./src/css ./",
+    "postbuild": "cp ./src/styles.css ./lib/ && cp -R ./src/css ./lib && cp ./src/styles.css ./ && cp -R ./src/css ./ && cp -R ./lib/ ../dash_tabulator/src/lib/components/react-tabulator/lib/",
     "clean": "nwb clean-module && nwb clean-demo",
     "prepublishOnly": "npm run build",
     "start": "cross-env NODE_ENV=development nwb serve-react-demo --port 3003",
