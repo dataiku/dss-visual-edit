@@ -40,13 +40,15 @@ class EditableEventSourced:
         for col in self.editschema_manual:
             if col.get("editable_type")=="linked_record":
                 linked_ds_key = col.get("linked_ds_key")
-                if not linked_ds_key:
-                    linked_ds_key = col.get("name")
+                linked_ds_label = col.get("linked_ds_label")
+                if not linked_ds_key: linked_ds_key = col.get("name")
+                if not linked_ds_label: linked_ds_label = linked_ds_key
                 self.linked_records.append(
                     {
                         "name": col.get("name"),
                         "ds_name": col.get("linked_ds_name"),
                         "ds_key": linked_ds_key,
+                        "ds_label": linked_ds_label,
                         "lookup_columns": []
                     }
                 )
@@ -174,6 +176,20 @@ class EditableEventSourced:
             merge_settings.save()
             print("Done.")
 
+    def load_data(self):
+        self.__original_df__ = self.original_ds.get_dataframe()[self.edited_df_cols]
+        self.__edited_df_indexed__ = merge_edits(
+                                        self.__original_df__,
+                                        pivot_editlog(
+                                            self.editlog_ds,
+                                            self.primary_keys,
+                                            self.editable_column_names
+                                        ),
+                                        self.primary_keys
+                                     )
+        # self.__edited_df_indexed__ = self.__extend_with_lookup_columns__(self.__edited_df_indexed__)
+        self.__edited_df_indexed__.set_index(self.primary_keys, inplace=True) # index makes it easier to id values in the DataFrame
+
     def __init__(self, original_ds_name, primary_keys=None, editable_column_names=None, editschema_manual={}, project_key=None, editschema=None):
         self.original_ds_name = original_ds_name
         if (project_key is None): self.project_key = getenv("DKU_CURRENT_PROJECT_KEY")
@@ -188,8 +204,11 @@ class EditableEventSourced:
 
         self.__connection_name__ = self.original_ds.get_config().get("params").get("connection")
         self.__schema__ = self.original_ds.get_config().get("schema").get("columns")
-        self.primary_keys = primary_keys
-        self.editable_column_names = editable_column_names
+        if (primary_keys):
+            self.primary_keys = primary_keys
+        # else: it's in the custom field
+        if (editable_column_names):
+            self.editable_column_names = editable_column_names
         self.editschema_manual = editschema_manual
         if (editschema):
             self.primary_keys = get_primary_keys(editschema)
@@ -202,18 +221,7 @@ class EditableEventSourced:
         self.__setup_linked_records__()
         self.__setup_editlog__()
         self.__setup_editlog_downstream__()
-        self.original_df = self.original_ds.get_dataframe()[self.edited_df_cols]
-        self.__edited_df_indexed__ = merge_edits(
-                                        self.original_df,
-                                        pivot_editlog(
-                                            self.editlog_ds,
-                                            self.primary_keys,
-                                            self.editable_column_names
-                                        ),
-                                        self.primary_keys
-                                     )
-        # self.__edited_df_indexed__ = self.__extend_with_lookup_columns__(self.__edited_df_indexed__)
-        self.__edited_df_indexed__.set_index(self.primary_keys, inplace=True) # index makes it easier to id values in the DataFrame
+        self.load_data()
 
     def get_edited_df_indexed(self):
         return self.__edited_df_indexed__
@@ -267,14 +275,25 @@ class EditableEventSourced:
                 #    t_col["editorParams"] = {"values": col["values"]}
 
                 if col_name in self.linked_record_names:
-                    t_col["editor"] = "autocomplete"
                     linked_ds_name = linked_records_df.loc[col_name, "ds_name"]
                     linked_ds_key = linked_records_df.loc[col_name, "ds_key"]
-                    values = Dataset(linked_ds_name).get_dataframe()[linked_ds_key].to_list()
+                    linked_ds_label = linked_records_df.loc[col_name, "ds_label"]
+                    linked_cols = [linked_ds_key]
+                    if (linked_ds_label!=linked_ds_key):
+                        linked_cols += [linked_ds_label]
+                    values_df = Dataset(linked_ds_name).get_dataframe()[linked_cols]
+                    formatter_lookup_param = values_df.set_index(linked_ds_key)[linked_ds_label].to_dict()
+                    formatter_lookup_param["null"] = ""
+                    editor_values_param = values_df.rename(columns={linked_ds_key:"value", linked_ds_label:"label"}).to_dict("records")
+
+                    t_col["formatter"] = "lookup"
+                    t_col["formatterParams"] = formatter_lookup_param
+                    t_col["editor"] = "list"
                     t_col["editorParams"] = {
-                        "values": values,
+                        "values": editor_values_param,
+                        "autocomplete": True,
                         "freetext": True,
-                        "searchFunc": ns("searchFunc")
+                        "filterFunc": ns("filterFunc")
                     }
                 else:
                     if t_type=="boolean":

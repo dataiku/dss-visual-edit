@@ -9,3 +9,8 @@
 .htmlcov
 .DS_Store
 .idea
+dash_tabulator/dash_tabulator
+react-tabulator/lib
+**/.build_cache
+**/node_modules
+*.log

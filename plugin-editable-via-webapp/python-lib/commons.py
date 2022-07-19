@@ -3,6 +3,7 @@ from pandas import DataFrame, concat, pivot_table
 from json5 import loads
 from os import getenv
 import requests
+from flask import request
 
 
 ### Editlog utils
@@ -153,8 +154,11 @@ def merge_edits(original_df, editlog_pivoted_df, primary_keys):
 
 def get_user_details():
     client = dataiku.api_client()
-    current_user_settings = client.get_own_user().get_settings().get_raw()
-    return f"""{current_user_settings.get("displayName")} <{current_user_settings.get("email")}>"""
+    # from https://doc.dataiku.com/dss/latest/webapps/security.html#identifying-users-from-within-a-webapp
+    # don't use client.get_own_user().get_settings().get_raw() as this would give the user who started the webapp
+    request_headers = dict(request.headers)
+    auth_info_browser = client.get_auth_info_from_browser_headers(request_headers)
+    return auth_info_browser["authIdentifier"]
 
 def tabulator_row_key_values(row, primary_keys):
     """Get values for a given row coming from Tabulator and a list of columns that are primary keys"""

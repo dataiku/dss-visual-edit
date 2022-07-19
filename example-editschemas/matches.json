@@ -1,0 +1,21 @@
+[
+    {
+        "name": "id_companies_ext",
+        "editable_type": "linked_record",
+        "linked_ds_name": "companies_ext",
+        "linked_ds_key": "id",
+        "linked_ds_label": "name"
+    },
+    {
+        "name": "city_companies_ext",
+        "editable_type": "lookup_column",
+        "linked_record_col": "id_companies_ext",
+        "linked_ds_column_name": "city"
+    },
+    {
+        "name": "country_companies_ext",
+        "editable_type": "lookup_column",
+        "linked_record_col": "id_companies_ext",
+        "linked_ds_column_name": "country"
+    }
+]
