@@ -34,9 +34,9 @@ export default class DashTabulator extends Component {
     shouldRerender = false;
     
     rowClick = (e, row) => {
-        //console.log('ref table: ', this.ref.table); // this is the Tabulator table instance
-        //console.log('rowClick id: ${row.getData().id}', row, e);
-        //console.log( this.ref.table.getSelectedData());
+        console.log('ref table: ', this.ref.table); // this is the Tabulator table instance
+        console.log('rowClick id: ${row.getData().id}', row, e);
+        console.log( this.ref.table.getSelectedData());
         this.shouldRerender = false; 
         this.props.setProps({rowClicked: row._row.data})
         this.shouldRerender = true;
@@ -57,8 +57,9 @@ export default class DashTabulator extends Component {
     }
 
     render() {
-        const {id, data, setProps, columns, options, rowClicked, multiRowsClicked, cellEdited, dataChanged,
-            downloadButtonType, clearFilterButtonType, initialHeaderFilter, dataFiltering, dataFiltered, dataSorted, columnMoved} = this.props;
+        console.log("Rendering!")
+
+        const {id, data, setProps, columns, options, rowClicked, multiRowsClicked, cellEdited, dataChanged, downloadButtonType, clearFilterButtonType, initialHeaderFilter, dataFiltering, dataFiltered, dataSorted, columnMoved} = this.props;
         
         // Interpret column formatters as function handles.
         // TODO: resolve any columns method
@@ -91,11 +92,6 @@ export default class DashTabulator extends Component {
                 options[key] = resolveProp(o, this)    
             }
         } 
-        const options2 = {...options, 
-            downloadDataFormatter: (data) => data,
-            downloadReady: (fileContents, blob) => blob
-        }
-
         let downloadButton;
         if (downloadButtonType) {
             downloadButton = <button type="button" onClick={this.downloadData} className={downloadButtonType.css} id="download">{downloadButtonType.text}</button>
@@ -118,9 +114,10 @@ export default class DashTabulator extends Component {
                 columns={columns}
                 tooltips={true}
                 layout={"fitData"}
-                options={options2}
+                options={options}
                 rowClick={this.rowClick}
                 cellEdited={(cell) => {
+                    console.log("Cell edited")
                     console.log(cell)
                     var edited =new Object() 
                     edited.column = cell.getField()
@@ -155,10 +152,9 @@ export default class DashTabulator extends Component {
                     var filterHeaders = new Array()
                     if (this.ref) {
                         filterHeaders =this.ref.table.getHeaderFilters() 
-                        //console.log(this.ref.table.getHeaderFilters())
+                        console.log(this.ref.table.getHeaderFilters())
                         
                     }
-                    
                     this.shouldRerender = false;
                     this.props.setProps(
                                         {
@@ -242,10 +238,8 @@ DashTabulator.propTypes = {
     /**
      * Tabulator Options
      */
-
     options: PropTypes.object,
 
-    
     /**
      * rowClick captures the row that was clicked on
      */
@@ -291,7 +285,7 @@ DashTabulator.propTypes = {
      * dataFiltering based on http://tabulator.info/docs/5.2/callbacks#filter
      * The dataFiltering callback is triggered whenever a filter event occurs, before the filter happens.
      */
-    dataFiltering: PropTypes.array ,
+    dataFiltering: PropTypes.array,
 
     /**
      * dataFiltered based on http://tabulator.info/docs/5.2/callbacks#filter
