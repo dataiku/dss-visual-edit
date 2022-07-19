@@ -165,8 +165,8 @@ def update(cell):
     else: user = get_user_details()
     return ees.add_edit_tabulator(cell, user)
 
-if run_context=="local":
-    print("Running in debug mode")
-    app.run_server(debug=True)
+# if run_context=="local":
+#     print("Running in debug mode")
+#     app.run_server(debug=True)
 
 print("Webapp OK")

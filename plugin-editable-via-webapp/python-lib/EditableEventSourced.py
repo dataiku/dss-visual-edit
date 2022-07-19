@@ -40,13 +40,15 @@ class EditableEventSourced:
         for col in self.editschema_manual:
             if col.get("editable_type")=="linked_record":
                 linked_ds_key = col.get("linked_ds_key")
-                if not linked_ds_key:
-                    linked_ds_key = col.get("name")
+                linked_ds_label = col.get("linked_ds_label")
+                if not linked_ds_key: linked_ds_key = col.get("name")
+                if not linked_ds_label: linked_ds_label = linked_ds_key
                 self.linked_records.append(
                     {
                         "name": col.get("name"),
                         "ds_name": col.get("linked_ds_name"),
                         "ds_key": linked_ds_key,
+                        "ds_label": linked_ds_label,
                         "lookup_columns": []
                     }
                 )
@@ -273,14 +275,25 @@ class EditableEventSourced:
                 #    t_col["editorParams"] = {"values": col["values"]}
 
                 if col_name in self.linked_record_names:
-                    t_col["editor"] = "autocomplete"
                     linked_ds_name = linked_records_df.loc[col_name, "ds_name"]
                     linked_ds_key = linked_records_df.loc[col_name, "ds_key"]
-                    values = Dataset(linked_ds_name).get_dataframe()[linked_ds_key].to_list()
+                    linked_ds_label = linked_records_df.loc[col_name, "ds_label"]
+                    linked_cols = [linked_ds_key]
+                    if (linked_ds_label!=linked_ds_key):
+                        linked_cols += [linked_ds_label]
+                    values_df = Dataset(linked_ds_name).get_dataframe()[linked_cols]
+                    formatter_lookup_param = values_df.set_index(linked_ds_key)[linked_ds_label].to_dict()
+                    formatter_lookup_param["null"] = ""
+                    editor_values_param = values_df.rename(columns={linked_ds_key:"value", linked_ds_label:"label"}).to_dict("records")
+
+                    t_col["formatter"] = "lookup"
+                    t_col["formatterParams"] = formatter_lookup_param
+                    t_col["editor"] = "list"
                     t_col["editorParams"] = {
-                        "values": values,
+                        "values": editor_values_param,
+                        "autocomplete": True,
                         "freetext": True,
-                        "searchFunc": ns("searchFunc")
+                        "filterFunc": ns("filterFunc")
                     }
                 else:
                     if t_type=="boolean":

@@ -117,7 +117,7 @@ export default class DashTabulator extends Component {
                 options={options2}
                 rowClick={this.rowClick}
                 cellEdited={(cell) => {
-                    //console.log(cell)
+                    console.log(cell)
                     var edited =new Object() 
                     edited.column = cell.getField()
                     edited.initialValue = cell.getInitialValue()
