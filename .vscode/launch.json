@@ -5,6 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: Module",
+            "cwd": "${workspaceFolder}/dash_tabulator/",
+            "type": "python",
+            "request": "launch",
+            "module": "dash.development.component_generator",
+            "args": ["src/lib/components", "dash_tabulator", "-p", "package-info.json"],
+            "justMyCode": false
+        },
+        {
             "name": "Python: Flask",
             "cwd": "${workspaceFolder}/plugin-editable-via-webapp/webapps/edit-dataset-records/",
             "type": "python",
