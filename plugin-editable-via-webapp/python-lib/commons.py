@@ -3,6 +3,7 @@ from pandas import DataFrame, concat, pivot_table
 from json5 import loads
 from os import getenv
 import requests
+from flask import request
 
 
 ### Editlog utils
@@ -55,31 +56,34 @@ def get_editable_column_names(schema):
     return editable_column_names
 
 def unpack_keys(df, new_key_names, old_key_name="key"):
-    # 1. Convert key values from strings to tuples
-    keys_series = df.apply(lambda row: eval(row[old_key_name]), axis=1)
-    
-    # 2. Expand tuples found in keys_series into a dataframe with new_key_names as columns
-    #    If no key value was found in the tuple, the dataframe will have a missing value
-    #    (Previously we were using result_type="expand", but this fails when
-    #     the results of the unpack function are arrays of different lengths)
-    keys_df = DataFrame(columns=new_key_names)
-    i1 = 0
-    for t in keys_series:
-        # create a dict `d` that holds, for each of the new keys, the value found in tuple `t` (and nothing if no value is found)
-        d = {}
-        i2 = 0
-        for k in new_key_names:
-            if i2 < len(t):
-                d[k] = t[i2] # this assumes that keys are in the same order in the tuples coming from the editlog and in new_key_names
-            i2 += 1
-        keys_df = concat([keys_df, DataFrame(data=d, index=[i1])])
-        i1 += 1
+    if (len(new_key_names)==1):
+        df.rename(columns={old_key_name: new_key_names[0]}, inplace=True)
+    else:
+        # 1. Convert key values from strings to tuples
+        keys_series = df.apply(lambda row: eval(row[old_key_name]), axis=1)
+        
+        # 2. Expand tuples found in keys_series into a dataframe with new_key_names as columns
+        #    If no key value was found in the tuple, the dataframe will have a missing value
+        #    (Previously we were using result_type="expand", but this fails when
+        #     the results of the unpack function are arrays of different lengths)
+        keys_df = DataFrame(columns=new_key_names)
+        i1 = 0
+        for t in keys_series:
+            # create a dict `d` that holds, for each of the new keys, the value found in tuple `t` (and nothing if no value is found)
+            d = {}
+            i2 = 0
+            for k in new_key_names:
+                if i2 < len(t):
+                    d[k] = t[i2] # this assumes that keys are in the same order in the tuples coming from the editlog and in new_key_names
+                i2 += 1
+            keys_df = concat([keys_df, DataFrame(data=d, index=[i1])])
+            i1 += 1
 
-    # 3. Add a column to editlog_pivoted for each key listed in primary_keys
-    df[new_key_names] = keys_df
+        # 3. Add a column to editlog_pivoted for each key listed in primary_keys
+        df[new_key_names] = keys_df
 
-    # 4. Remove the old key column
-    df.drop(columns=[old_key_name], inplace=True)
+        # 4. Remove the old key column
+        df.drop(columns=[old_key_name], inplace=True)
 
     return df
 
@@ -150,8 +154,11 @@ def merge_edits(original_df, editlog_pivoted_df, primary_keys):
 
 def get_user_details():
     client = dataiku.api_client()
-    current_user_settings = client.get_own_user().get_settings().get_raw()
-    return f"""{current_user_settings.get("displayName")} <{current_user_settings.get("email")}>"""
+    # from https://doc.dataiku.com/dss/latest/webapps/security.html#identifying-users-from-within-a-webapp
+    # don't use client.get_own_user().get_settings().get_raw() as this would give the user who started the webapp
+    request_headers = dict(request.headers)
+    auth_info_browser = client.get_auth_info_from_browser_headers(request_headers)
+    return auth_info_browser["authIdentifier"]
 
 def tabulator_row_key_values(row, primary_keys):
     """Get values for a given row coming from Tabulator and a list of columns that are primary keys"""

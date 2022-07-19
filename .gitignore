@@ -9,8 +9,8 @@
 .htmlcov
 .DS_Store
 .idea
-dash_tabulator/.build_cache
 dash_tabulator/dash_tabulator
 react-tabulator/lib
+**/.build_cache
 **/node_modules
 *.log
