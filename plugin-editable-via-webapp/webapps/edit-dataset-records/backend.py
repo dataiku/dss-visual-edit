@@ -96,16 +96,7 @@ def serve_layout():
         dash_tabulator.DashTabulator(
             id="datatable",
             columns=columns,
-            data=data,
-            theme="semantic-ui/tabulator_semantic-ui",
-            options={
-                "selectable": 1,
-                "layout": "fitDataTable",
-                "pagination": "local",
-                "paginationSize": 20,
-                "paginationSizeSelector":[10, 20, 50, 100],
-                "movableColumns": True
-            }
+            data=data
         ),
         html.Div(id="edit-info", children="Info zone for tabulator", style={"display": info_display})
     ])

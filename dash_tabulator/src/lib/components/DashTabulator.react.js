@@ -1,26 +1,20 @@
-import React, {Component} from 'react';
-import PropTypes, { array } from 'prop-types';
-
-//import Tabulator stylesheets
+import React from 'react';
+import PropTypes from 'prop-types';
+import {resolveProp} from 'dash-extensions';
+import {TabulatorFull as Tabulator} from "tabulator-tables"; //import Tabulator library
 import "tabulator-tables/dist/css/tabulator.min.css";
 import "tabulator-tables/dist/css/tabulator_semanticui.min.css";
 
-import { ReactTabulator } from './react-tabulator/lib'
-import {resolveProps, resolveProp} from 'dash-extensions'
+export default class DashTabulator extends React.Component {
+    el = React.createRef();
+    tabulator = null; //variable to hold your table
 
-export default class DashTabulator extends Component {
-    constructor(props) {
-        super(props);
-        this.ref = null;
-    }
+    componentDidMount() {
+        // Instantiate Tabulator when element is mounted
 
-    render() {
-        console.log("Rendering!")
+        const {id, data, columns, cellEdited} = this.props;
 
-        const {id, data, setProps, columns, options, cellEdited} = this.props;
-        
         // Interpret column formatters as function handles.
-        // TODO: resolve any columns method
         for(let i=0; i < columns.length; i++){
             let header = columns[i];
             for (let key in header){ 
@@ -43,47 +37,48 @@ export default class DashTabulator extends Component {
             }
         }
 
-        // check all options for a global windows function in the assets folder
-        for (let key in options) {
-            let o = options[key] 
-            if (o instanceof Object) {
-                options[key] = resolveProp(o, this)    
-            }
-        }
+        this.tabulator = new Tabulator(this.el, {
+            "data": data,
+            "reactiveData": true,
+            "columns": columns,
+            "selectable": 1,
+            "layout": "fitDataTable",
+            "pagination": "local",
+            "paginationSize": 20,
+            "paginationSizeSelector": [10, 20, 50, 100],
+            "movableColumns": true
+        });
 
-        try {
-            window.parent.WT1SVC.event("lca-datatable-viewed");
-        }
+        this.tabulator.on("cellEdited", (cell) => { 
+            console.log("Cell edited!")
+            console.log('cellEdited', cell)
+            var edited = new Object() 
+            edited.column = cell.getField()
+            edited.initialValue = cell.getInitialValue()
+            edited.oldValue = cell.getOldValue()
+            edited.value = cell.getValue()
+            edited.row = cell.getData()
+            this.props.setProps({cellEdited: edited})
+            try {
+                window.parent.WT1SVC.event("lca-datatable-edited", {
+                    "column_name": edited.column
+                });
+            } catch (e) { }
+        })
+    }
+
+    constructor(props) {
+        super(props);
+        this.ref = null;
+    }
+
+    render() {
+        console.log("Rendering!")
+        try { window.parent.WT1SVC.event("lca-datatable-viewed"); }
         catch (e) { }
-
         return (
-            <div>
-            <ReactTabulator
-                onRef={(ref) => (this.ref = ref)}
-                data={data}
-                columns={columns}
-                options={options}
-                layout={"fitData"}
-                theme={"semantic-ui/tabulator_semantic-ui"}
-                cellEdited={(cell) => {
-                    console.log("Cell edited!")
-                    console.log(cell)
-                    var edited = new Object() 
-                    edited.column = cell.getField()
-                    edited.initialValue = cell.getInitialValue()
-                    edited.oldValue = cell.getOldValue()
-                    edited.value = cell.getValue()
-                    edited.row = cell.getData()
-                    this.props.setProps({cellEdited: edited})
-                    try {
-                        window.parent.WT1SVC.event("lca-datatable-edited", {
-                            "column_name": edited.column
-                        });
-                    } catch (e) { }
-                }}
-            />
-            </div>
-        );
+            <div ref={el => (this.el = el)} />
+        )
     }
 }
 
@@ -97,11 +92,6 @@ DashTabulator.propTypes = {
      * The ID used to identify this component in Dash callbacks.
      */
     id: PropTypes.string,
-
-    /**
-     * theme
-     */
-    theme: PropTypes.string,
 
     /**
      * A label that will be printed when this component is rendered.
@@ -118,11 +108,6 @@ DashTabulator.propTypes = {
      * to Dash, to make them available for callbacks.
      */
     setProps: PropTypes.func,
-
-    /**
-     * Tabulator Options
-     */
-    options: PropTypes.object,
 
     /**
      * cellEdited captures the cell that was clicked on
