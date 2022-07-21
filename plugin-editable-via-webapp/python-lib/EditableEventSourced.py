@@ -282,18 +282,24 @@ class EditableEventSourced:
                     if (linked_ds_label!=linked_ds_key):
                         linked_cols += [linked_ds_label]
                     values_df = Dataset(linked_ds_name).get_dataframe()[linked_cols]
-                    formatter_lookup_param = values_df.set_index(linked_ds_key)[linked_ds_label].to_dict()
-                    formatter_lookup_param["null"] = ""
-                    editor_values_param = values_df.rename(columns={linked_ds_key:"value", linked_ds_label:"label"}).to_dict("records")
+                    if (linked_ds_label!=linked_ds_key):
+                        values_df.sort_values(linked_ds_label, inplace=True)
+                        formatter_lookup_param = values_df.set_index(linked_ds_key)[linked_ds_label].to_dict()
+                        formatter_lookup_param["null"] = ""
+                        t_col["formatter"] = "lookup"
+                        t_col["formatterParams"] = formatter_lookup_param
 
-                    t_col["formatter"] = "lookup"
-                    t_col["formatterParams"] = formatter_lookup_param
+                    editor_values_param = values_df.rename(columns={linked_ds_key:"value", linked_ds_label:"label"}).to_dict("records")
                     t_col["editor"] = "list"
                     t_col["editorParams"] = {
                         "values": editor_values_param,
                         "autocomplete": True,
                         "freetext": True,
-                        "filterFunc": ns("filterFunc")
+                        "filterFunc": ns("filterFunc"),
+                        "listOnEmpty": False,
+                        "clearable": True
+                        # "placeholderEmpty": "empty",
+                        # "placeholderLoading": "loading"
                     }
                 else:
                     if t_type=="boolean":

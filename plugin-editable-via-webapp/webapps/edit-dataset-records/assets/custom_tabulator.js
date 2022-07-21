@@ -16,12 +16,18 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
         },
 
         filterFunc: function (term, label, value, item) {
-            if (term && term.length>2) {
-                return label.toString().toLowerCase().startsWith(term.toLowerCase());
-            } else {
-                return false;
+            if (term !== null) {
+                term = String(term).toLowerCase();
+                if (term.length>2 && label !== null && typeof label !== "undefined") {
+                    label = String(label).toLowerCase();
+                    if (label.startsWith(term)) {
+                        return true;
+                    }
+                }
             }
+            return false;
         },
+        
 
         //custom max min filter function
         minMaxFilterFunction: function (headerValue, rowValue, rowData, filterParams) {
