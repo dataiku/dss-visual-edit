@@ -28,6 +28,13 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
             return false;
         },
         
+        itemFormatter: function (label, value, item, element) {
+            //label - the text lable for the item
+            //value - the value for the item
+            //item - the original value object for the item
+            //element - the DOM element for the item
+            return "<strong>" + label + "</strong><br/><div>" + item.description + "</div>";
+        },
 
         //custom max min filter function
         minMaxFilterFunction: function (headerValue, rowValue, rowData, filterParams) {

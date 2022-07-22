@@ -41,28 +41,30 @@ class EditableEventSourced:
             if col.get("editable_type")=="linked_record":
                 linked_ds_key = col.get("linked_ds_key")
                 linked_ds_label = col.get("linked_ds_label")
+                linked_ds_lookup_columns = col.get("linked_ds_lookup_columns")
                 if not linked_ds_key: linked_ds_key = col.get("name")
                 if not linked_ds_label: linked_ds_label = linked_ds_key
+                if not linked_ds_lookup_columns: linked_ds_lookup_columns = []
                 self.linked_records.append(
                     {
                         "name": col.get("name"),
                         "ds_name": col.get("linked_ds_name"),
                         "ds_key": linked_ds_key,
                         "ds_label": linked_ds_label,
-                        "lookup_columns": []
+                        "ds_lookup_columns": linked_ds_lookup_columns
                     }
                 )
                 self.linked_record_names.append(col.get("name"))
 
         # Second pass to create the lookup columns for each linked record
-        for col in self.editschema_manual:
-            if col.get("editable_type")=="lookup_column":
-                for linked_record in self.linked_records:
-                    if linked_record["name"]==col.get("linked_record_col"):
-                        linked_record["lookup_columns"].append({
-                            "name": col.get("name"),
-                            "linked_ds_column_name": col.get("linked_ds_column_name")
-                        })
+        # for col in self.editschema_manual:
+        #     if col.get("editable_type")=="lookup_column":
+        #         for linked_record in self.linked_records:
+        #             if linked_record["name"]==col.get("linked_record_col"):
+        #                 linked_record["lookup_columns"].append({
+        #                     "name": col.get("name"),
+        #                     "linked_ds_column_name": col.get("linked_ds_column_name")
+        #                 })
 
     def __extend_with_lookup_columns__(self, df):
         for linked_record in self.linked_records:
@@ -278,10 +280,14 @@ class EditableEventSourced:
                     linked_ds_name = linked_records_df.loc[col_name, "ds_name"]
                     linked_ds_key = linked_records_df.loc[col_name, "ds_key"]
                     linked_ds_label = linked_records_df.loc[col_name, "ds_label"]
-                    linked_cols = [linked_ds_key]
+                    linked_ds_lookup_columns = linked_records_df.loc[col_name, "ds_lookup_columns"]
+                    linked_columns = [linked_ds_key]
                     if (linked_ds_label!=linked_ds_key):
-                        linked_cols += [linked_ds_label]
-                    values_df = Dataset(linked_ds_name).get_dataframe()[linked_cols]
+                        linked_columns += [linked_ds_label]
+                    linked_df = Dataset(linked_ds_name).get_dataframe()
+                    linked_df["description"] = linked_df.apply(lambda row: " - ".join(row[linked_ds_lookup_columns]), axis=1)
+                    linked_columns += ["description"]
+                    values_df = linked_df[linked_columns]
                     if (linked_ds_label!=linked_ds_key):
                         values_df.sort_values(linked_ds_label, inplace=True)
                         formatter_lookup_param = values_df.set_index(linked_ds_key)[linked_ds_label].to_dict()
@@ -297,7 +303,8 @@ class EditableEventSourced:
                         "freetext": True,
                         "filterFunc": ns("filterFunc"),
                         "listOnEmpty": False,
-                        "clearable": True
+                        "clearable": True,
+                        "itemFormatter": ns("itemFormatter")
                         # "placeholderEmpty": "empty",
                         # "placeholderLoading": "loading"
                     }
