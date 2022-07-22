@@ -2,6 +2,64 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
 
     tabulator: {
 
+        headerMenu: [
+            {
+                label:"Hide Column",
+                action:function(e, column){
+                    column.toggle(); // or hide()
+                },
+                label:"Group By",
+                action:function(e, column){
+                    column.getTable().setGroupBy(column.getField());
+                }
+            },
+        ],
+
+        // headerMenu: function() {
+        //     var menu = [];
+        //     var columns = this.getColumns();
+        
+        //     for(let column of columns){
+        
+        //         //create checkbox element using font awesome icons
+        //         let icon = document.createElement("i");
+        //         icon.classList.add("fas");
+        //         icon.classList.add(column.isVisible() ? "fa-check-square" : "fa-square");
+        
+        //         //build label
+        //         let label = document.createElement("span");
+        //         let title = document.createElement("span");
+        
+        //         title.textContent = " " + column.getDefinition().title;
+        
+        //         label.appendChild(icon);
+        //         label.appendChild(title);
+        
+        //         //create menu item
+        //         menu.push({
+        //             label:label,
+        //             action:function(e){
+        //                 //prevent menu closing
+        //                 e.stopPropagation();
+        
+        //                 //toggle current column visibility
+        //                 column.toggle();
+        
+        //                 //change menu item icon
+        //                 if(column.isVisible()){
+        //                     icon.classList.remove("fa-square");
+        //                     icon.classList.add("fa-check-square");
+        //                 }else{
+        //                     icon.classList.remove("fa-check-square");
+        //                     icon.classList.add("fa-square");
+        //                 }
+        //             }
+        //         });
+        //     }
+
+        //    return menu;
+        // },
+
         searchFunc: function (term, values) { //search for exact matches
             var matches = [];
             if (term && term.length>2) {

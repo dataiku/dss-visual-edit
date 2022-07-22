@@ -244,7 +244,7 @@ class EditableEventSourced:
         if (len(self.linked_records) > 0):
             linked_records_df = DataFrame(data=self.linked_records).set_index("name")
         for col_name in self.edited_df_cols:
-            t_col = {"field": col_name, "headerFilter": True, "resizable": True}
+            t_col = {"field": col_name, "headerFilter": True, "resizable": True, "headerContextMenu": ns("headerMenu")}
             t_type = "string"
             col_type = schema_df.loc[col_name, "type"]
             if "meaning" in schema_df.columns.to_list():
