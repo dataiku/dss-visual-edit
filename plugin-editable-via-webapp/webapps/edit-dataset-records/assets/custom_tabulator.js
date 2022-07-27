@@ -7,7 +7,9 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
                 label:"Hide Column",
                 action:function(e, column){
                     column.toggle(); // or hide()
-                },
+                }
+            },
+            {
                 label:"Group By",
                 action:function(e, column){
                     column.getTable().setGroupBy(column.getField());
