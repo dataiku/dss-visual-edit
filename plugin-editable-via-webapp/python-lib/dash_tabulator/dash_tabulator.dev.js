@@ -129,7 +129,7 @@ window["dash_tabulator"] =
 /******/ 	        var srcFragments = src.split('/');
 /******/ 	        var fileFragments = srcFragments.slice(-1)[0].split('.');
 /******/
-/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1658412734");
+/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1658939453");
 /******/ 	        srcFragments.splice(-1, 1, fileFragments.join('.'))
 /******/
 /******/ 	        return srcFragments.join('/');
@@ -26703,7 +26703,9 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
         "pagination": "local",
         "paginationSize": 20,
         "paginationSizeSelector": [10, 20, 50, 100],
-        "movableColumns": true
+        "movableColumns": true,
+        "persistence": true,
+        "footerElement": "<button class='tabulator-page' onclick='localStorage.clear(); window.location.reload();'>Reset View</button>"
       });
       this.tabulator.on("cellEdited", function (cell) {
         console.log("Cell edited!");

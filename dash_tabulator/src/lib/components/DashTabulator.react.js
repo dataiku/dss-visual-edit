@@ -46,7 +46,9 @@ export default class DashTabulator extends React.Component {
             "pagination": "local",
             "paginationSize": 20,
             "paginationSizeSelector": [10, 20, 50, 100],
-            "movableColumns": true
+            "movableColumns": true,
+            "persistence": true,
+            "footerElement":"<button class='tabulator-page' onclick='localStorage.clear(); window.location.reload();'>Reset View</button>"
         });
 
         this.tabulator.on("cellEdited", (cell) => { 
