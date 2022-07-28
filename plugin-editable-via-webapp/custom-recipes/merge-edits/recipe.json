@@ -40,6 +40,11 @@
             "label": "⚠️ DO NOT EDIT THIS RECIPE",
             "description": "[Link](http://localhost:11200/)",
             "type": "SEPARATOR"
+        },
+        {
+            "name": "hey",
+            "type": "STRING",
+            "defaultValue": "ho"
         }
     ],
     "resourceKeys": []
