@@ -38,8 +38,8 @@ class EditableEventSourced:
     
     def __init_webapp_url__(self):
         webapp_id = find_webapp_id(self.original_ds_name)
-        webapp_name = get_webapp_json(id).get("name")
-        self.webapp_url = f"/projects/{self.project_key}/webapps/{webapp_id}_{webapp_name}/"
+        webapp_name = get_webapp_json(webapp_id).get("name")
+        self.webapp_url = f"/projects/{self.project_key}/webapps/{webapp_id}_{webapp_name}/edit"
 
     def __setup_linked_records__(self):
         self.linked_records = []
@@ -149,11 +149,10 @@ class EditableEventSourced:
         if (recipe_already_exists(pivot_recipe_name, self.project)):
             print("Found recipe to create editlog pivoted")
             pivot_recipe = self.project.get_recipe(pivot_recipe_name)
-            self.pivot_settings = pivot_recipe.get_settings()
         else:
             print("No recipe to create editlog pivoted, creating it...")
             pivot_recipe = pivot_recipe_creator.create()
-            self.pivot_settings = pivot_recipe.get_settings()
+            pivot_settings = pivot_recipe.get_settings()
             pivot_settings.add_input("editlog", self.editlog_ds_name)
             pivot_settings.add_output("editlog_pivoted", self.editlog_pivoted_ds_name)
             pivot_settings.custom_fields["webapp_url"] = self.webapp_url
@@ -179,11 +178,10 @@ class EditableEventSourced:
         if (recipe_already_exists(merge_recipe_name, self.project)):
             print("Found recipe to create edited dataset")
             merge_recipe = self.project.get_recipe(merge_recipe_name)
-            self.merge_settings = merge_recipe.get_settings()
         else:
             print("No recipe to create edited dataset, creating it...")
             merge_recipe = merge_recipe_creator.create()
-            self.merge_settings = merge_recipe.get_settings()
+            merge_settings = merge_recipe.get_settings()
             merge_settings.add_input("original", self.original_ds_name)
             merge_settings.add_input("editlog_pivoted", self.editlog_pivoted_ds_name)
             merge_settings.add_output("edited", self.edited_ds_name)
@@ -207,9 +205,9 @@ class EditableEventSourced:
 
     def __init__(self, original_ds_name, primary_keys=None, editable_column_names=None, editschema_manual={}, project_key=None, editschema=None):
         self.original_ds_name = original_ds_name
-        self.__init_webapp_url__()
         if (project_key is None): self.project_key = getenv("DKU_CURRENT_PROJECT_KEY")
         else: self.project_key = project_key
+        self.__init_webapp_url__()
         client = api_client()
         self.project = client.get_project(self.project_key)
         self.original_ds = Dataset(self.original_ds_name, self.project_key)
