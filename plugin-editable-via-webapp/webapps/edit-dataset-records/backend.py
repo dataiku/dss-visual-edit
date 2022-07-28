@@ -104,13 +104,14 @@ def serve_layout():
     ])
 app.layout = serve_layout
 
-@callback(
+@app.callback(
     Output("url-div", "children"),
     Input("url", "pathname")
 )
 def display_page(pathname):
-    print(pathname)
-    return f"URL: {pathname}"
+    msg = f"Webapp URL: {pathname}"
+    print(msg)
+    return msg
 
 @app.callback(
     [
