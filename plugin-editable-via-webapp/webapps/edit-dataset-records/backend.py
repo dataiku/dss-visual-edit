@@ -111,7 +111,8 @@ app.layout = serve_layout
 def display_page(href):
     msg = f"Webapp URL: {href}"
     print(msg)
-    # ees.set_url(href)
+    if (run_context=="dataiku"):
+        ees.set_url(href)
     return msg
 
 @app.callback(
