@@ -8,6 +8,18 @@
         {
             "applyToObjects": {
                 "mode": "SOME",
+                "includedObjectTypes": ["DATASET", "RECIPE"]
+            },
+            "field": {
+                "name": "webapp_url",
+                "label": "Webapp URL",
+                "description": "",
+                "type": "STRING"
+            }
+        },
+        {
+            "applyToObjects": {
+                "mode": "SOME",
                 "includedObjectTypes": ["DATASET"]
             },
             "field": {
