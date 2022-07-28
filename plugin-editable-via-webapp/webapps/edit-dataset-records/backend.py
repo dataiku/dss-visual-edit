@@ -106,11 +106,11 @@ app.layout = serve_layout
 
 @app.callback(
     Output("url-div", "children"),
-    Input("url", "pathname")
+    Input("url", "href")
 )
-def display_page(pathname):
-    ees.set_url(pathname)
-    msg = f"Webapp URL: {pathname}"
+def display_page(href):
+    ees.set_url(href)
+    msg = f"Webapp URL: {href}"
     print(msg)
     return msg
 

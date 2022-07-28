@@ -8,6 +8,7 @@ from json5 import loads
 from datetime import datetime
 from pytz import timezone
 from dash_extensions.javascript import Namespace
+from urllib.parse import urlparse
 
 def get_lookup_column_names(linked_record):
     lookup_column_names = []
@@ -377,7 +378,13 @@ class EditableEventSourced:
             user
         )
 
-    def set_url(self, url):
+    def set_url(self, href):
+        o = urlparse(href)
+        id = o.path.split("/")[-1]
+        from commons import get_webapp_json
+        name = get_webapp_json(id)["name"]
+        url = f"{o.scheme}://{o.netloc}/projects/{self.project_key}/webapps/{id}_{name}/edit"
+
         # see save_custom_fields method for inspiration
 
         # editlog
