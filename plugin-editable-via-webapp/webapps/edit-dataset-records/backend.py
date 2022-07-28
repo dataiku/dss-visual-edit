@@ -82,6 +82,8 @@ data = ees.get_data_tabulator()
 
 def serve_layout():
     return html.Div(children=[
+        dcc.Location(id="url", refresh=False), # represents the browser address bar and doesn't render anything
+        html.Div(id="url-div", style={"display": "none"}),
         html.Div(id="refresh-div", children=[
             html.Div(id="ds_update_msg", children="The original dataset has changed. Do you want to refresh? (Your edits will persist.)", className="ui warning message"),
             html.Div(id="last_build_date", children=str(get_last_build_date()), style={"display": "none"}),
@@ -101,6 +103,14 @@ def serve_layout():
         html.Div(id="edit-info", children="Info zone for tabulator", style={"display": info_display})
     ])
 app.layout = serve_layout
+
+@callback(
+    Output("url-div", "children"),
+    Input("url", "pathname")
+)
+def display_page(pathname):
+    print(pathname)
+    return f"URL: {pathname}"
 
 @app.callback(
     [
