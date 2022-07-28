@@ -109,9 +109,9 @@ app.layout = serve_layout
     Input("url", "href")
 )
 def display_page(href):
-    ees.set_url(href)
     msg = f"Webapp URL: {href}"
     print(msg)
+    # ees.set_url(href)
     return msg
 
 @app.callback(
