@@ -169,11 +169,23 @@ def tabulator_row_key_values(row, primary_keys):
 def get_table_name(dataset, project_key):
     return dataset.get_config()["params"]["table"].replace("${projectKey}", project_key).replace("${NODE}", dataiku.get_custom_variables().get("NODE"))
 
-def get_webapp_json(webapp_ID):
-    project_key = getenv("DKU_CURRENT_PROJECT_KEY")
+def call_rest_api(path):
+    BASE_API_URL = "http://127.0.0.1:" + dataiku.base.remoterun.get_env_var("DKU_BASE_PORT") + "/public/api/projects/" + getenv("DKU_CURRENT_PROJECT_KEY")
     return loads(
         requests.get(
-            url="http://127.0.0.1:" + dataiku.base.remoterun.get_env_var("DKU_BASE_PORT") + "/public/api/projects/" + project_key + "/webapps/" + webapp_ID,
+            url=BASE_API_URL + path,
             headers=dataiku.core.intercom.get_auth_headers(),
             verify=False
         ).text)
+
+def get_webapp_json(webapp_ID):
+    return call_rest_api("/webapps/" + webapp_ID)
+
+def find_webapp_id(original_ds_name):
+    from pandas import DataFrame
+    webapps_df = DataFrame(call_rest_api("/webapps/"))
+    webapps_edit_df = webapps_df[webapps_df["type"]=="webapp_editable-via-webapp_edit-dataset-records"]
+    webapps_edit_df["original_ds_name"] = webapps_edit_df.apply(
+        lambda row: get_webapp_json(row["id"]).get("config").get("original_dataset"),
+        axis=1)
+    return webapps_edit_df[webapps_edit_df["original_ds_name"]==original_ds_name].loc[0, "id"]

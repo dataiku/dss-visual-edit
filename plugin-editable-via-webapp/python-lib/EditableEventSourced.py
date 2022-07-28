@@ -378,12 +378,11 @@ class EditableEventSourced:
             user
         )
 
-    def set_url(self, href):
-        o = urlparse(href)
-        id = o.path.split("/")[-2]
-        from commons import get_webapp_json
-        name = get_webapp_json(id).get("name")
-        url = f"{o.scheme}://{o.netloc}/projects/{self.project_key}/webapps/{id}_{name}/edit"
+    def set_url(self):
+        from commons import find_webapp_id, get_webapp_json
+        webapp_id = find_webapp_id(self.original_ds_name)
+        webapp_name = get_webapp_json(id).get("name")
+        url = f"/projects/{self.project_key}/webapps/{webapp_id}_{webapp_name}/edit"
 
         # see save_custom_fields method for inspiration
 
