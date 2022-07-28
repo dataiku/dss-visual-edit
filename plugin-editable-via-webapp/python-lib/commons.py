@@ -170,7 +170,9 @@ def get_table_name(dataset, project_key):
     return dataset.get_config()["params"]["table"].replace("${projectKey}", project_key).replace("${NODE}", dataiku.get_custom_variables().get("NODE"))
 
 def call_rest_api(path):
-    BASE_API_URL = "http://127.0.0.1:" + dataiku.base.remoterun.get_env_var("DKU_BASE_PORT") + "/public/api/projects/" + getenv("DKU_CURRENT_PROJECT_KEY")
+    PORT = dataiku.base.remoterun.get_env_var("DKU_BASE_PORT")
+    if (PORT==None): PORT = "11200"
+    BASE_API_URL = "http://127.0.0.1:" + PORT + "/public/api/projects/" + getenv("DKU_CURRENT_PROJECT_KEY")
     return loads(
         requests.get(
             url=BASE_API_URL + path,
