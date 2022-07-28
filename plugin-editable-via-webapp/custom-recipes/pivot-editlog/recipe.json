@@ -25,6 +25,13 @@
             "acceptsDataset": true
         }
     ],
-    "params": [],
+    "params": [
+        {
+            "name": "sep",
+            "label": "⚠️ DO NOT EDIT THIS RECIPE",
+            "description": "This recipe is controlled by a data edition webapp (see URL in the recipe details, by clicking on the (i) icon in the vertical menu bar on the right-hand side).",
+            "type": "SEPARATOR"
+        }
+    ],
     "resourceKeys": []
 }

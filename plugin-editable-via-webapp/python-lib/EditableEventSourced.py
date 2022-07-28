@@ -2,12 +2,13 @@ from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
 from pandas import DataFrame
-from commons import get_primary_keys, get_editable_column_names, merge_edits, pivot_editlog, tabulator_row_key_values
+from commons import get_primary_keys, get_editable_column_names, merge_edits, pivot_editlog, tabulator_row_key_values, find_webapp_id, get_webapp_json
 from os import getenv
 from json5 import loads
 from datetime import datetime
 from pytz import timezone
 from dash_extensions.javascript import Namespace
+from urllib.parse import urlparse
 
 def get_lookup_column_names(linked_record):
     lookup_column_names = []
@@ -32,7 +33,13 @@ class EditableEventSourced:
         settings.custom_fields["editlog_ds"] = self.editlog_ds_name
         settings.custom_fields["primary_keys"] = self.primary_keys
         settings.custom_fields["editable_column_names"] = self.editable_column_names
+        settings.custom_fields["webapp_url"] = self.webapp_url
         settings.save()
+    
+    def __init_webapp_url__(self):
+        webapp_id = find_webapp_id(self.original_ds_name)
+        webapp_name = get_webapp_json(webapp_id).get("name")
+        self.webapp_url = f"/projects/{self.project_key}/webapps/{webapp_id}_{webapp_name}/edit"
 
     def __setup_linked_records__(self):
         self.linked_records = []
@@ -141,12 +148,14 @@ class EditableEventSourced:
         pivot_recipe_creator = DSSRecipeCreator("CustomCode_pivot-editlog", pivot_recipe_name, self.project)
         if (recipe_already_exists(pivot_recipe_name, self.project)):
             print("Found recipe to create editlog pivoted")
+            pivot_recipe = self.project.get_recipe(pivot_recipe_name)
         else:
             print("No recipe to create editlog pivoted, creating it...")
             pivot_recipe = pivot_recipe_creator.create()
             pivot_settings = pivot_recipe.get_settings()
             pivot_settings.add_input("editlog", self.editlog_ds_name)
             pivot_settings.add_output("editlog_pivoted", self.editlog_pivoted_ds_name)
+            pivot_settings.custom_fields["webapp_url"] = self.webapp_url
             pivot_settings.save()
             print("Done.")
 
@@ -168,6 +177,7 @@ class EditableEventSourced:
         merge_recipe_creator = DSSRecipeCreator("CustomCode_merge-edits", merge_recipe_name, self.project)
         if (recipe_already_exists(merge_recipe_name, self.project)):
             print("Found recipe to create edited dataset")
+            merge_recipe = self.project.get_recipe(merge_recipe_name)
         else:
             print("No recipe to create edited dataset, creating it...")
             merge_recipe = merge_recipe_creator.create()
@@ -175,6 +185,7 @@ class EditableEventSourced:
             merge_settings.add_input("original", self.original_ds_name)
             merge_settings.add_input("editlog_pivoted", self.editlog_pivoted_ds_name)
             merge_settings.add_output("edited", self.edited_ds_name)
+            merge_settings.custom_fields["webapp_url"] = self.webapp_url
             merge_settings.save()
             print("Done.")
 
@@ -196,6 +207,7 @@ class EditableEventSourced:
         self.original_ds_name = original_ds_name
         if (project_key is None): self.project_key = getenv("DKU_CURRENT_PROJECT_KEY")
         else: self.project_key = project_key
+        self.__init_webapp_url__()
         client = api_client()
         self.project = client.get_project(self.project_key)
         self.original_ds = Dataset(self.original_ds_name, self.project_key)

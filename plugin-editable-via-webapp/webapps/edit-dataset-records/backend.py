@@ -82,6 +82,7 @@ data = ees.get_data_tabulator()
 
 def serve_layout():
     return html.Div(children=[
+        html.Div(id="url-div", style={"display": "none"}),
         html.Div(id="refresh-div", children=[
             html.Div(id="ds_update_msg", children="The original dataset has changed. Do you want to refresh? (Your edits will persist.)", className="ui warning message"),
             html.Div(id="last_build_date", children=str(get_last_build_date()), style={"display": "none"}),
