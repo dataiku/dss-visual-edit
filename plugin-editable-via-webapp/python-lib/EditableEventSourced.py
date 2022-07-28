@@ -141,10 +141,12 @@ class EditableEventSourced:
         pivot_recipe_creator = DSSRecipeCreator("CustomCode_pivot-editlog", pivot_recipe_name, self.project)
         if (recipe_already_exists(pivot_recipe_name, self.project)):
             print("Found recipe to create editlog pivoted")
+            pivot_recipe = self.project.get_recipe(pivot_recipe_name)
+            self.pivot_settings = pivot_recipe.get_settings()
         else:
             print("No recipe to create editlog pivoted, creating it...")
             pivot_recipe = pivot_recipe_creator.create()
-            pivot_settings = pivot_recipe.get_settings()
+            self.pivot_settings = pivot_recipe.get_settings()
             pivot_settings.add_input("editlog", self.editlog_ds_name)
             pivot_settings.add_output("editlog_pivoted", self.editlog_pivoted_ds_name)
             pivot_settings.save()
@@ -168,10 +170,12 @@ class EditableEventSourced:
         merge_recipe_creator = DSSRecipeCreator("CustomCode_merge-edits", merge_recipe_name, self.project)
         if (recipe_already_exists(merge_recipe_name, self.project)):
             print("Found recipe to create edited dataset")
+            merge_recipe = self.project.get_recipe(merge_recipe_name)
+            self.merge_settings = merge_recipe.get_settings()
         else:
             print("No recipe to create edited dataset, creating it...")
             merge_recipe = merge_recipe_creator.create()
-            merge_settings = merge_recipe.get_settings()
+            self.merge_settings = merge_recipe.get_settings()
             merge_settings.add_input("original", self.original_ds_name)
             merge_settings.add_input("editlog_pivoted", self.editlog_pivoted_ds_name)
             merge_settings.add_output("edited", self.edited_ds_name)
@@ -372,3 +376,15 @@ class EditableEventSourced:
             cell["value"],
             user
         )
+
+    def set_url(self, url):
+        # see save_custom_fields method for inspiration
+
+        # editlog
+        # pivoted
+        # edited
+        # editlog_ds.get_config()["customFields"]["primary_keys"]
+        self.pivot_settings.custom_fields["webapp_url"] = url
+        self.pivot_settings.save()
+        self.merge_settings.custom_fields["webapp_url"] = url
+        self.merge_settings.save()

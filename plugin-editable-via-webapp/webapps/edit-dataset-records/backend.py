@@ -109,6 +109,7 @@ app.layout = serve_layout
     Input("url", "pathname")
 )
 def display_page(pathname):
+    ees.set_url(pathname)
     msg = f"Webapp URL: {pathname}"
     print(msg)
     return msg
