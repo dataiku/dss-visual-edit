@@ -2,7 +2,7 @@ from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
 from pandas import DataFrame
-from commons import get_primary_keys, get_editable_column_names, merge_edits, pivot_editlog, tabulator_row_key_values
+from commons import get_primary_keys, get_editable_column_names, merge_edits, pivot_editlog, tabulator_row_key_values, find_webapp_id, get_webapp_json
 from os import getenv
 from json5 import loads
 from datetime import datetime
@@ -33,7 +33,13 @@ class EditableEventSourced:
         settings.custom_fields["editlog_ds"] = self.editlog_ds_name
         settings.custom_fields["primary_keys"] = self.primary_keys
         settings.custom_fields["editable_column_names"] = self.editable_column_names
+        settings.custom_fields["webapp_url"] = self.webapp_url
         settings.save()
+    
+    def __init_webapp_url__(self):
+        webapp_id = find_webapp_id(self.original_ds_name)
+        webapp_name = get_webapp_json(id).get("name")
+        self.webapp_url = f"/projects/{self.project_key}/webapps/{webapp_id}_{webapp_name}/"
 
     def __setup_linked_records__(self):
         self.linked_records = []
@@ -150,6 +156,7 @@ class EditableEventSourced:
             self.pivot_settings = pivot_recipe.get_settings()
             pivot_settings.add_input("editlog", self.editlog_ds_name)
             pivot_settings.add_output("editlog_pivoted", self.editlog_pivoted_ds_name)
+            pivot_settings.custom_fields["webapp_url"] = self.webapp_url
             pivot_settings.save()
             print("Done.")
 
@@ -180,6 +187,7 @@ class EditableEventSourced:
             merge_settings.add_input("original", self.original_ds_name)
             merge_settings.add_input("editlog_pivoted", self.editlog_pivoted_ds_name)
             merge_settings.add_output("edited", self.edited_ds_name)
+            merge_settings.custom_fields["webapp_url"] = self.webapp_url
             merge_settings.save()
             print("Done.")
 
@@ -199,6 +207,7 @@ class EditableEventSourced:
 
     def __init__(self, original_ds_name, primary_keys=None, editable_column_names=None, editschema_manual={}, project_key=None, editschema=None):
         self.original_ds_name = original_ds_name
+        self.__init_webapp_url__()
         if (project_key is None): self.project_key = getenv("DKU_CURRENT_PROJECT_KEY")
         else: self.project_key = project_key
         client = api_client()
@@ -377,20 +386,3 @@ class EditableEventSourced:
             cell["value"],
             user
         )
-
-    def set_url(self):
-        from commons import find_webapp_id, get_webapp_json
-        webapp_id = find_webapp_id(self.original_ds_name)
-        webapp_name = get_webapp_json(id).get("name")
-        url = f"/projects/{self.project_key}/webapps/{webapp_id}_{webapp_name}/edit"
-
-        # see save_custom_fields method for inspiration
-
-        # editlog
-        # pivoted
-        # edited
-        # editlog_ds.get_config()["customFields"]["primary_keys"]
-        self.pivot_settings.custom_fields["webapp_url"] = url
-        self.pivot_settings.save()
-        self.merge_settings.custom_fields["webapp_url"] = url
-        self.merge_settings.save()
