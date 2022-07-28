@@ -36,9 +36,9 @@
     ],
     "params": [
         {
-            "name": "sep1",
-            "label": "Sep label",
-            "description": "Sep description",
+            "name": "sep",
+            "label": "⚠️ DO NOT EDIT THIS RECIPE",
+            "description": "[Link](http://localhost:11200/)",
             "type": "SEPARATOR"
         }
     ],
