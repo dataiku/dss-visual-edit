@@ -2,7 +2,7 @@
   "name": "dash_tabulator",
   "version": "0.0.1",
   "description": "Tabulator component for Dash",
-"repository": {
+  "repository": {
     "type": "git",
     "url": "git://github.com/dataiku/dash-tabulator.git"
   },
@@ -19,23 +19,24 @@
     "build:backends": "dash-generate-components ./src/lib/components dash_tabulator -p package-info.json --r-prefix '' --jl-prefix '' --ignore \\.test\\.",
     "build:backends-activated": "(. venv/bin/activate || venv\\scripts\\activate && npm run build:py_and_r)",
     "build": "npm run build:js && npm run build:backends",
-    "build:activated": "npm run build:js && npm run build:backends-activated"
+    "build:activated": "npm run build:js && npm run build:backends-activated",
+    "postbuild": "cp -R ./dash_tabulator/ ../plugin-editable-via-webapp/python-lib/dash_tabulator/"
   },
   "author": "Louis Dorard <louis.dorard@dataiku.com>",
   "license": "",
   "dependencies": {
-    "ramda": "^0.26.1",
     "dash-extensions": "^0.0.1",
-    "react-tabulator": "0.14.2",
-    "set-blocking": "^2.0.0"
+    "ramda": "^0.26.1",
+    "set-blocking": "^2.0.0",
+    "tabulator-tables": "5.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",
     "@babel/plugin-proposal-object-rest-spread": "^7.5.4",
     "@babel/preset-env": "^7.5.4",
     "@babel/preset-react": "^7.0.0",
-    "@plotly/webpack-dash-dynamic-import": "^1.2.0",
     "@plotly/dash-component-plugins": "^1.2.0",
+    "@plotly/webpack-dash-dynamic-import": "^1.2.0",
     "babel-eslint": "^10.0.2",
     "babel-loader": "^8.0.6",
     "copyfiles": "^2.1.1",
@@ -48,8 +49,8 @@
     "react": "^16.8.6",
     "react-docgen": "^4.1.1",
     "react-dom": "^16.8.6",
-    "styled-jsx": "^3.2.1",
     "style-loader": "^0.23.1",
+    "styled-jsx": "^3.2.1",
     "terser-webpack-plugin": "^2.3.0",
     "webpack": "4.36.1",
     "webpack-cli": "3.3.6",

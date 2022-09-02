@@ -20,8 +20,7 @@ app.layout = html.Div([
     dash_tabulator.DashTabulator(
         id="tabulator",
         columns=columns,
-        data=data,
-        renderHorizontal="virtual"
+        data=data
     ),
     dcc.Interval(
                 id='interval-component-iu',

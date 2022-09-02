@@ -45,10 +45,16 @@
         },
         {
             "name": "freeze_editable_columns",
-            "label": "Freeze editable columns?",
+            "label": "Freeze editable columns",
             "description": "Freezing to the right-hand side",
             "type": "BOOLEAN",
             "defaultValue": false
+        },
+        {
+            "name": "group_column_names",
+            "label": "Group data by columns",
+            "type": "DATASET_COLUMNS",
+            "datasetParamName": "original_dataset"
         },
         {
             "name": "sep3",

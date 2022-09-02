@@ -1,20 +1,11 @@
 [
     {
-        "name": "match_id",
-        "editable_type": "key"
-    },
-    {
         "name": "id_companies_ext",
-        "editable": "true",
         "editable_type": "linked_record",
         "linked_ds_name": "companies_ext",
-        "linked_ds_key": "id"
-    },
-    {
-        "name": "name_companies_ext",
-        "editable_type": "lookup_column",
-        "linked_record_col": "id_companies_ext",
-        "linked_ds_column_name": "name"
+        "linked_ds_key": "id",
+        "linked_ds_label": "name",
+        "linked_ds_lookup_columns": ["city", "country"]
     },
     {
         "name": "city_companies_ext",
@@ -27,5 +18,9 @@
         "editable_type": "lookup_column",
         "linked_record_col": "id_companies_ext",
         "linked_ds_column_name": "country"
+    },
+    {
+        "name": "reviewed",
+        "type": "boolean_tick"
     }
 ]

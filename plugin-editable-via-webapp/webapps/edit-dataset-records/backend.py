@@ -32,6 +32,7 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     primary_keys = get_webapp_config().get("primary_keys")
     editable_column_names = get_webapp_config().get("editable_column_names")
     freeze_editable_columns = get_webapp_config().get("freeze_editable_columns")
+    group_column_names = get_webapp_config().get("group_column_names")
     editschema_manual_raw = get_webapp_config().get("editschema")
     if (editschema_manual_raw and editschema_manual_raw!=""):
         editschema_manual = loads(editschema_manual_raw)
@@ -51,6 +52,7 @@ else:
     primary_keys = settings.custom_fields.get("primary_keys")
     editable_column_names = settings.custom_fields.get("editable_column_names")
     freeze_editable_columns = False
+    group_column_names = []
     try:
         editschema_manual = load(open("../../../example-editschemas/" + original_ds_name + ".json"))
     except:
@@ -68,20 +70,18 @@ from EditableEventSourced import EditableEventSourced
 ees = EditableEventSourced(original_ds_name, primary_keys, editable_column_names, editschema_manual)
 
 #%%
-from commons import get_user_details, get_last_build_date
-user = get_user_details()
-
-#%%
 # Define the webapp layout and components
 
 import dash_tabulator
 from datetime import datetime
+from commons import get_user_details, get_last_build_date
 
 columns = ees.get_columns_tabulator(freeze_editable_columns)
 data = ees.get_data_tabulator()
 
 def serve_layout():
     return html.Div(children=[
+        html.Div(id="url-div", style={"display": "none"}),
         html.Div(id="refresh-div", children=[
             html.Div(id="ds_update_msg", children="The original dataset has changed. Do you want to refresh? (Your edits will persist.)", className="ui warning message"),
             html.Div(id="last_build_date", children=str(get_last_build_date(original_ds_name, project)), style={"display": "none"}),
@@ -97,15 +97,7 @@ def serve_layout():
             id="datatable",
             columns=columns,
             data=data,
-            theme="semantic-ui/tabulator_semantic-ui",
-            options={
-                "selectable": 1,
-                "layout": "fitDataTable",
-                "pagination": "local",
-                "paginationSize": 20,
-                "paginationSizeSelector":[10, 20, 50, 100],
-                "movableColumns": True
-            }
+            groupBy=group_column_names
         ),
         html.Div(id="edit-info", children="Info zone for tabulator", style={"display": info_display})
     ])
@@ -161,6 +153,8 @@ def refresh(n_clicks):
     Input("datatable", "cellEdited"),
     prevent_initial_call=True)
 def update(cell):
+    if run_context=="local": user = "local"
+    else: user = get_user_details()
     return ees.add_edit_tabulator(cell, user)
 
 # if run_context=="local":

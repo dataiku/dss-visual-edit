@@ -2,12 +2,13 @@ from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
 from pandas import DataFrame
-from commons import get_primary_keys, get_editable_column_names, merge_edits, pivot_editlog, tabulator_row_key_values
+from commons import get_primary_keys, get_editable_column_names, merge_edits, pivot_editlog, tabulator_row_key_values, find_webapp_id, get_webapp_json
 from os import getenv
 from json5 import loads
 from datetime import datetime
 from pytz import timezone
 from dash_extensions.javascript import Namespace
+from urllib.parse import urlparse
 
 def get_lookup_column_names(linked_record):
     lookup_column_names = []
@@ -32,7 +33,13 @@ class EditableEventSourced:
         settings.custom_fields["editlog_ds"] = self.editlog_ds_name
         settings.custom_fields["primary_keys"] = self.primary_keys
         settings.custom_fields["editable_column_names"] = self.editable_column_names
+        settings.custom_fields["webapp_url"] = self.webapp_url
         settings.save()
+    
+    def __init_webapp_url__(self):
+        webapp_id = find_webapp_id(self.original_ds_name)
+        webapp_name = get_webapp_json(webapp_id).get("name")
+        self.webapp_url = f"/projects/{self.project_key}/webapps/{webapp_id}_{webapp_name}/edit"
 
     def __setup_linked_records__(self):
         self.linked_records = []
@@ -40,27 +47,31 @@ class EditableEventSourced:
         for col in self.editschema_manual:
             if col.get("editable_type")=="linked_record":
                 linked_ds_key = col.get("linked_ds_key")
-                if not linked_ds_key:
-                    linked_ds_key = col.get("name")
+                linked_ds_label = col.get("linked_ds_label")
+                linked_ds_lookup_columns = col.get("linked_ds_lookup_columns")
+                if not linked_ds_key: linked_ds_key = col.get("name")
+                if not linked_ds_label: linked_ds_label = linked_ds_key
+                if not linked_ds_lookup_columns: linked_ds_lookup_columns = []
                 self.linked_records.append(
                     {
                         "name": col.get("name"),
                         "ds_name": col.get("linked_ds_name"),
                         "ds_key": linked_ds_key,
-                        "lookup_columns": []
+                        "ds_label": linked_ds_label,
+                        "ds_lookup_columns": linked_ds_lookup_columns
                     }
                 )
                 self.linked_record_names.append(col.get("name"))
 
         # Second pass to create the lookup columns for each linked record
-        for col in self.editschema_manual:
-            if col.get("editable_type")=="lookup_column":
-                for linked_record in self.linked_records:
-                    if linked_record["name"]==col.get("linked_record_col"):
-                        linked_record["lookup_columns"].append({
-                            "name": col.get("name"),
-                            "linked_ds_column_name": col.get("linked_ds_column_name")
-                        })
+        # for col in self.editschema_manual:
+        #     if col.get("editable_type")=="lookup_column":
+        #         for linked_record in self.linked_records:
+        #             if linked_record["name"]==col.get("linked_record_col"):
+        #                 linked_record["lookup_columns"].append({
+        #                     "name": col.get("name"),
+        #                     "linked_ds_column_name": col.get("linked_ds_column_name")
+        #                 })
 
     def __extend_with_lookup_columns__(self, df):
         for linked_record in self.linked_records:
@@ -114,7 +125,7 @@ class EditableEventSourced:
         # make sure that editlog is in append mode
         self.editlog_ds.spec_item["appendMode"] = True
         
-        # make sure that editlog has the right editschema in its custom field
+        # make sure that editlog has the right custom field values
         self.__save_custom_fields__(self.editlog_ds_name)
 
     def __setup_editlog_downstream__(self):
@@ -137,12 +148,14 @@ class EditableEventSourced:
         pivot_recipe_creator = DSSRecipeCreator("CustomCode_pivot-editlog", pivot_recipe_name, self.project)
         if (recipe_already_exists(pivot_recipe_name, self.project)):
             print("Found recipe to create editlog pivoted")
+            pivot_recipe = self.project.get_recipe(pivot_recipe_name)
         else:
             print("No recipe to create editlog pivoted, creating it...")
             pivot_recipe = pivot_recipe_creator.create()
             pivot_settings = pivot_recipe.get_settings()
             pivot_settings.add_input("editlog", self.editlog_ds_name)
             pivot_settings.add_output("editlog_pivoted", self.editlog_pivoted_ds_name)
+            pivot_settings.custom_fields["webapp_url"] = self.webapp_url
             pivot_settings.save()
             print("Done.")
 
@@ -164,6 +177,7 @@ class EditableEventSourced:
         merge_recipe_creator = DSSRecipeCreator("CustomCode_merge-edits", merge_recipe_name, self.project)
         if (recipe_already_exists(merge_recipe_name, self.project)):
             print("Found recipe to create edited dataset")
+            merge_recipe = self.project.get_recipe(merge_recipe_name)
         else:
             print("No recipe to create edited dataset, creating it...")
             merge_recipe = merge_recipe_creator.create()
@@ -171,6 +185,7 @@ class EditableEventSourced:
             merge_settings.add_input("original", self.original_ds_name)
             merge_settings.add_input("editlog_pivoted", self.editlog_pivoted_ds_name)
             merge_settings.add_output("edited", self.edited_ds_name)
+            merge_settings.custom_fields["webapp_url"] = self.webapp_url
             merge_settings.save()
             print("Done.")
 
@@ -192,6 +207,7 @@ class EditableEventSourced:
         self.original_ds_name = original_ds_name
         if (project_key is None): self.project_key = getenv("DKU_CURRENT_PROJECT_KEY")
         else: self.project_key = project_key
+        self.__init_webapp_url__()
         client = api_client()
         self.project = client.get_project(self.project_key)
         self.original_ds = Dataset(self.original_ds_name, self.project_key)
@@ -211,6 +227,7 @@ class EditableEventSourced:
         if (editschema):
             self.primary_keys = get_primary_keys(editschema)
             self.editable_column_names = get_editable_column_names(editschema)
+            self.editschema_manual = editschema
         self.display_column_names = [col.get("name") for col in self.__schema__ if col.get("name") not in self.primary_keys + self.editable_column_names]
         self.edited_df_cols = self.primary_keys + self.display_column_names + self.editable_column_names
 
@@ -234,35 +251,74 @@ class EditableEventSourced:
         # Setup columns to be used by data table
         # Add "editor" to editable columns. Possible values include: "input", "textarea", "number", "tickCross", "list". See all options at options http://tabulator.info/docs/5.2/edit.
         # IDEA: improve this code with a dict to do matching (instead of if/else)?
+
         ns = Namespace("myNamespace", "tabulator")
         t_cols = [] # columns for tabulator
         schema_df = DataFrame(data=self.__schema__).set_index("name") # turn __schema__ into a DataFrame with "name" as index, and thus easily get the type for a given name
+        if self.editschema_manual!={}:
+            editschema_manual_df = DataFrame(data=self.editschema_manual).set_index("name")
+        else:
+            editschema_manual_df = DataFrame(data=self.editschema_manual) # this will be an empty dataframe
+
         if (len(self.linked_records) > 0):
             linked_records_df = DataFrame(data=self.linked_records).set_index("name")
+
         for col_name in self.edited_df_cols:
-            t_col = {"field": col_name, "headerFilter": True, "resizable": True}
-            t_type = "string"
-            col_type = schema_df.loc[col_name, "type"]
-            if "meaning" in schema_df.columns.to_list():
-                col_meaning = schema_df.loc[col_name, "meaning"]
+
+            t_col = {"field": col_name, "headerFilter": True, "resizable": True, "headerContextMenu": ns("headerMenu")} # properties to be shared by all columns
+            
+
+            # Determine column type as string, boolean, boolean_tick, or number
+            # - based on the type given in editschema_manual, if any
+            # - the dataset's schema, otherwise
+            ###
+
+            t_type = "string" # default type
+            if not editschema_manual_df.empty and "type" in editschema_manual_df.columns and col_name in editschema_manual_df.index:
+                editschema_manual_type = editschema_manual_df.loc[col_name, "type"]
             else:
-                col_meaning = None
-            if col_meaning and col_meaning==col_meaning: # this tests that col_meaning isn't None and that it isn't a nan
-                if col_meaning=="Boolean": t_type = "boolean"
-                if col_meaning=="DoubleMeaning" or col_meaning=="LongMeaning" or col_meaning=="IntMeaning": t_type = "number"
+                editschema_manual_type = None
+
+            if editschema_manual_type and editschema_manual_type==editschema_manual_type: # this tests that 1) editschema_manual_type isn't None, and 2) it isn't a nan
+                t_type = editschema_manual_type
             else:
-                if col_type=="boolean": t_type = "boolean"
-                if col_type in ["tinyint", "smallint", "int", "bigint", "float", "double"]: t_type = "number"
+                if "meaning" in schema_df.columns.to_list():
+                    schema_meaning = schema_df.loc[col_name, "meaning"]
+                else:
+                    schema_meaning = None
+                # If a meaning has been defined, we use it to infer t_type
+                if schema_meaning and schema_meaning==schema_meaning:
+                    if schema_meaning=="Boolean": t_type = "boolean"
+                    if schema_meaning=="DoubleMeaning" or schema_meaning=="LongMeaning" or schema_meaning=="IntMeaning": t_type = "number"
+                else:
+                    schema_type = schema_df.loc[col_name, "type"] # type coming from schema
+                    if schema_type=="boolean": t_type = "boolean"
+                    if schema_type in ["tinyint", "smallint", "int", "bigint", "float", "double"]: t_type = "number"
+            
+
+            # Define formatter and header filters based on type
+            ###
+
             if t_type=="boolean":
                 t_col["formatter"] = "tickCross"
                 t_col["formatterParams"] = {"allowEmpty": True}
                 t_col["hozAlign"] = "center"
                 t_col["headerFilterParams"] = {"tristate": True}
                 # t_col["headerFilterEmptyCheck"] = "function(value){return value === null;}"
+            
+            if t_type=="boolean_tick":
+                t_col["formatter"] = "tickCross"
+                t_col["formatterParams"] = {"allowEmpty": True, "crossElement": " "}
+                t_col["hozAlign"] = "center"
+
             if t_type=="number":
                 t_col["headerFilter"] = ns("minMaxFilterEditor")
                 t_col["headerFilterFunc"] = ns("minMaxFilterFunction")
                 t_col["headerFilterLiveFilter"] = False
+
+
+            # Define editor and its params for each editable column
+            ###
 
             if col_name in self.editable_column_names:
                 t_col["title"] = "🖊 " + col_name
@@ -273,21 +329,49 @@ class EditableEventSourced:
                 #    t_col["editorParams"] = {"values": col["values"]}
 
                 if col_name in self.linked_record_names:
-                    t_col["editor"] = "autocomplete"
                     linked_ds_name = linked_records_df.loc[col_name, "ds_name"]
                     linked_ds_key = linked_records_df.loc[col_name, "ds_key"]
-                    values = Dataset(linked_ds_name).get_dataframe()[linked_ds_key].to_list()
+                    linked_ds_label = linked_records_df.loc[col_name, "ds_label"]
+                    linked_ds_lookup_columns = linked_records_df.loc[col_name, "ds_lookup_columns"]
+                    linked_columns = [linked_ds_key]
+                    if (linked_ds_label!=linked_ds_key):
+                        linked_columns += [linked_ds_label]
+                    linked_df = Dataset(linked_ds_name).get_dataframe()
+                    linked_df["description"] = linked_df.apply(lambda row: " - ".join(row[linked_ds_lookup_columns]), axis=1)
+                    linked_columns += ["description"]
+                    values_df = linked_df[linked_columns]
+                    if (linked_ds_label!=linked_ds_key):
+                        values_df.sort_values(linked_ds_label, inplace=True)
+                        formatter_lookup_param = values_df.set_index(linked_ds_key)[linked_ds_label].to_dict()
+                        formatter_lookup_param["null"] = ""
+                        t_col["formatter"] = "lookup"
+                        t_col["formatterParams"] = formatter_lookup_param
+
+                    editor_values_param = values_df.rename(columns={linked_ds_key:"value", linked_ds_label:"label"}).to_dict("records")
+                    t_col["editor"] = "list"
                     t_col["editorParams"] = {
-                        "values": values,
+                        "values": editor_values_param,
+                        "autocomplete": True,
                         "freetext": True,
-                        "searchFunc": ns("searchFunc")
+                        "filterFunc": ns("filterFunc"),
+                        "listOnEmpty": False,
+                        "clearable": True,
+                        "itemFormatter": ns("itemFormatter")
+                        # "placeholderEmpty": "empty",
+                        # "placeholderLoading": "loading"
                     }
                 else:
                     if t_type=="boolean":
-                        t_col["editor"] = t_col["formatter"]
-                        t_col["editorParams"] = {"tristate": True}
+                        t_col["editor"] = "list"
+                        t_col["editorParams"] = {"values": {
+                            "true": "True",
+                            "false": "False",
+                            "": "(empty)"
+                        }}
                         t_col["headerFilter"] = "input"
                         t_col["headerFilterParams"] = {}
+                    elif t_type=="boolean_tick":
+                        t_col["editor"] = "tickCross"
                     elif t_type=="number":
                         t_col["editor"] = "number"
                     else:
@@ -305,7 +389,10 @@ class EditableEventSourced:
         for col in self.__schema__:
             if (col["name"]==column_name):
                 if type(value)==str and col.get("type")=="boolean":
-                    value = str(loads(value.lower()))
+                    if (value==""):
+                        value = None
+                    else:
+                        value = str(loads(value.lower()))
                 break
         
         # store value as a string, unless it's None
