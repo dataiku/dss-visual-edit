@@ -12,7 +12,7 @@ export default class DashTabulator extends React.Component {
     componentDidMount() {
         // Instantiate Tabulator when element is mounted
 
-        const {id, data, columns, cellEdited} = this.props;
+        const {id, data, columns, groupBy, cellEdited} = this.props;
 
         // Interpret column formatters as function handles.
         for(let i=0; i < columns.length; i++){
@@ -41,6 +41,7 @@ export default class DashTabulator extends React.Component {
             "data": data,
             "reactiveData": true,
             "columns": columns,
+            "groupBy": groupBy,
             "selectable": 1,
             "layout": "fitDataTable",
             "pagination": "local",
@@ -85,25 +86,31 @@ export default class DashTabulator extends React.Component {
 }
 
 DashTabulator.defaultProps = {
+    data: [],
     columns : [],
-    data: []
+    groupBy : []
 };
 
 DashTabulator.propTypes = {
     /**
-     * The ID used to identify this component in Dash callbacks.
+     * ID used to identify this component in Dash callbacks.
      */
     id: PropTypes.string,
 
     /**
-     * A label that will be printed when this component is rendered.
+     * Data to display in the table.
+     */
+     data: PropTypes.array,
+
+    /**
+     * Column definitions.
      */
     columns: PropTypes.array,
 
     /**
-     * The value displayed in the input.
+     * Columns to group by.
      */
-    data: PropTypes.array,
+     groupBy: PropTypes.array,
 
     /**
      * Dash-assigned callback that should be called to report property changes
