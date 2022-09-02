@@ -125,7 +125,7 @@ class EditableEventSourced:
         # make sure that editlog is in append mode
         self.editlog_ds.spec_item["appendMode"] = True
         
-        # make sure that editlog has the right editschema in its custom field
+        # make sure that editlog has the right custom field values
         self.__save_custom_fields__(self.editlog_ds_name)
 
     def __setup_editlog_downstream__(self):
@@ -227,6 +227,7 @@ class EditableEventSourced:
         if (editschema):
             self.primary_keys = get_primary_keys(editschema)
             self.editable_column_names = get_editable_column_names(editschema)
+            self.editschema_manual = editschema
         self.display_column_names = [col.get("name") for col in self.__schema__ if col.get("name") not in self.primary_keys + self.editable_column_names]
         self.edited_df_cols = self.primary_keys + self.display_column_names + self.editable_column_names
 
