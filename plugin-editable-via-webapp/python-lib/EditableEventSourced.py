@@ -250,35 +250,56 @@ class EditableEventSourced:
         # Setup columns to be used by data table
         # Add "editor" to editable columns. Possible values include: "input", "textarea", "number", "tickCross", "list". See all options at options http://tabulator.info/docs/5.2/edit.
         # IDEA: improve this code with a dict to do matching (instead of if/else)?
+
         ns = Namespace("myNamespace", "tabulator")
         t_cols = [] # columns for tabulator
         schema_df = DataFrame(data=self.__schema__).set_index("name") # turn __schema__ into a DataFrame with "name" as index, and thus easily get the type for a given name
+
         if (len(self.linked_records) > 0):
             linked_records_df = DataFrame(data=self.linked_records).set_index("name")
+
         for col_name in self.edited_df_cols:
-            t_col = {"field": col_name, "headerFilter": True, "resizable": True, "headerContextMenu": ns("headerMenu")}
-            t_type = "string"
-            col_type = schema_df.loc[col_name, "type"]
+
+            t_col = {"field": col_name, "headerFilter": True, "resizable": True, "headerContextMenu": ns("headerMenu")} # properties to be shared by all columns
+            
+
+            # Determine column type as string, boolean or number, based on the dataset's schema
+            ###
+
+            t_type = "string" # default type
+            schema_type = schema_df.loc[col_name, "type"] # type coming from schema
+
             if "meaning" in schema_df.columns.to_list():
-                col_meaning = schema_df.loc[col_name, "meaning"]
+                schema_meaning = schema_df.loc[col_name, "meaning"]
             else:
-                col_meaning = None
-            if col_meaning and col_meaning==col_meaning: # this tests that col_meaning isn't None and that it isn't a nan
-                if col_meaning=="Boolean": t_type = "boolean"
-                if col_meaning=="DoubleMeaning" or col_meaning=="LongMeaning" or col_meaning=="IntMeaning": t_type = "number"
+                schema_meaning = None
+            
+            if schema_meaning and schema_meaning==schema_meaning: # this tests that col_meaning isn't None and that it isn't a nan
+                if schema_meaning=="Boolean": t_type = "boolean"
+                if schema_meaning=="DoubleMeaning" or schema_meaning=="LongMeaning" or schema_meaning=="IntMeaning": t_type = "number"
             else:
-                if col_type=="boolean": t_type = "boolean"
-                if col_type in ["tinyint", "smallint", "int", "bigint", "float", "double"]: t_type = "number"
+                if schema_type=="boolean": t_type = "boolean"
+                if schema_type in ["tinyint", "smallint", "int", "bigint", "float", "double"]: t_type = "number"
+            
+
+            # Define formatter and header filters based on type
+            ###
+
             if t_type=="boolean":
                 t_col["formatter"] = "tickCross"
                 t_col["formatterParams"] = {"allowEmpty": True}
                 t_col["hozAlign"] = "center"
                 t_col["headerFilterParams"] = {"tristate": True}
                 # t_col["headerFilterEmptyCheck"] = "function(value){return value === null;}"
+            
             if t_type=="number":
                 t_col["headerFilter"] = ns("minMaxFilterEditor")
                 t_col["headerFilterFunc"] = ns("minMaxFilterFunction")
                 t_col["headerFilterLiveFilter"] = False
+
+
+            # Define editor and its params for each editable column
+            ###
 
             if col_name in self.editable_column_names:
                 t_col["title"] = "🖊 " + col_name
