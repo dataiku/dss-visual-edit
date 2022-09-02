@@ -255,7 +255,10 @@ class EditableEventSourced:
         ns = Namespace("myNamespace", "tabulator")
         t_cols = [] # columns for tabulator
         schema_df = DataFrame(data=self.__schema__).set_index("name") # turn __schema__ into a DataFrame with "name" as index, and thus easily get the type for a given name
-        editschema_manual_df = DataFrame(data=self.editschema_manual).set_index("name")
+        if self.editschema_manual!={}:
+            editschema_manual_df = DataFrame(data=self.editschema_manual).set_index("name")
+        else:
+            editschema_manual_df = None
 
         if (len(self.linked_records) > 0):
             linked_records_df = DataFrame(data=self.linked_records).set_index("name")
@@ -271,12 +274,12 @@ class EditableEventSourced:
             ###
 
             t_type = "string" # default type
-            if "type" in editschema_manual_df.columns:
+            if editschema_manual_df and "type" in editschema_manual_df.columns and col_name in editschema_manual_df.index:
                 editschema_manual_type = editschema_manual_df.loc[col_name, "type"]
             else:
                 editschema_manual_type = None
 
-            if editschema_manual_type:
+            if editschema_manual_type and editschema_manual_type==editschema_manual_type: # this tests that 1) editschema_manual_type isn't None, and 2) it isn't a nan
                 t_type = editschema_manual_type
             else:
                 if "meaning" in schema_df.columns.to_list():
@@ -284,7 +287,7 @@ class EditableEventSourced:
                 else:
                     schema_meaning = None
                 # If a meaning has been defined, we use it to infer t_type
-                if schema_meaning and schema_meaning==schema_meaning: # this tests that 1) schema_meaning isn't None, and 2) it isn't a nan
+                if schema_meaning and schema_meaning==schema_meaning:
                     if schema_meaning=="Boolean": t_type = "boolean"
                     if schema_meaning=="DoubleMeaning" or schema_meaning=="LongMeaning" or schema_meaning=="IntMeaning": t_type = "number"
                 else:
