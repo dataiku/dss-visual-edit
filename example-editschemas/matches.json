@@ -18,5 +18,9 @@
         "editable_type": "lookup_column",
         "linked_record_col": "id_companies_ext",
         "linked_ds_column_name": "country"
+    },
+    {
+        "name": "reviewed",
+        "type": "boolean_tick"
     }
 ]
