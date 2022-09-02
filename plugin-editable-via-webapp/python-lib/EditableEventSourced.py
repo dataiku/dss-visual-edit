@@ -343,8 +343,13 @@ class EditableEventSourced:
                     }
                 else:
                     if t_type=="boolean":
-                        t_col["editor"] = t_col["formatter"]
-                        t_col["editorParams"] = {"tristate": True}
+                        t_col["editor"] = "tickCross"
+                        t_col["editor"] = "list"
+                        t_col["editorParams"] = {"values": {
+                            "true": "True",
+                            "false": "False",
+                            "": "(empty)"
+                        }}
                         t_col["headerFilter"] = "input"
                         t_col["headerFilterParams"] = {}
                     elif t_type=="number":
@@ -364,7 +369,10 @@ class EditableEventSourced:
         for col in self.__schema__:
             if (col["name"]==column_name):
                 if type(value)==str and col.get("type")=="boolean":
-                    value = str(loads(value.lower()))
+                    if (value==""):
+                        value = None
+                    else:
+                        value = str(loads(value.lower()))
                 break
         
         # store value as a string, unless it's None
