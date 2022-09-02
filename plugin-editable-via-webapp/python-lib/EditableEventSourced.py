@@ -254,6 +254,7 @@ class EditableEventSourced:
         ns = Namespace("myNamespace", "tabulator")
         t_cols = [] # columns for tabulator
         schema_df = DataFrame(data=self.__schema__).set_index("name") # turn __schema__ into a DataFrame with "name" as index, and thus easily get the type for a given name
+        editschema_manual_df = DataFrame(data=self.editschema_manual).set_index("name")
 
         if (len(self.linked_records) > 0):
             linked_records_df = DataFrame(data=self.linked_records).set_index("name")
@@ -263,23 +264,32 @@ class EditableEventSourced:
             t_col = {"field": col_name, "headerFilter": True, "resizable": True, "headerContextMenu": ns("headerMenu")} # properties to be shared by all columns
             
 
-            # Determine column type as string, boolean or number, based on the dataset's schema
+            # Determine column type as string, boolean, boolean_tick, or number
+            # - based on the type given in editschema_manual, if any
+            # - the dataset's schema, otherwise
             ###
 
             t_type = "string" # default type
-            schema_type = schema_df.loc[col_name, "type"] # type coming from schema
+            if "type" in editschema_manual_df.columns:
+                editschema_manual_type = editschema_manual_df.loc[col_name, "type"]
+            else:
+                editschema_manual_type = None
 
-            if "meaning" in schema_df.columns.to_list():
-                schema_meaning = schema_df.loc[col_name, "meaning"]
+            if editschema_manual_type:
+                t_type = editschema_manual_type
             else:
-                schema_meaning = None
-            
-            if schema_meaning and schema_meaning==schema_meaning: # this tests that col_meaning isn't None and that it isn't a nan
-                if schema_meaning=="Boolean": t_type = "boolean"
-                if schema_meaning=="DoubleMeaning" or schema_meaning=="LongMeaning" or schema_meaning=="IntMeaning": t_type = "number"
-            else:
-                if schema_type=="boolean": t_type = "boolean"
-                if schema_type in ["tinyint", "smallint", "int", "bigint", "float", "double"]: t_type = "number"
+                if "meaning" in schema_df.columns.to_list():
+                    schema_meaning = schema_df.loc[col_name, "meaning"]
+                else:
+                    schema_meaning = None
+                # If a meaning has been defined, we use it to infer t_type
+                if schema_meaning and schema_meaning==schema_meaning: # this tests that 1) schema_meaning isn't None, and 2) it isn't a nan
+                    if schema_meaning=="Boolean": t_type = "boolean"
+                    if schema_meaning=="DoubleMeaning" or schema_meaning=="LongMeaning" or schema_meaning=="IntMeaning": t_type = "number"
+                else:
+                    schema_type = schema_df.loc[col_name, "type"] # type coming from schema
+                    if schema_type=="boolean": t_type = "boolean"
+                    if schema_type in ["tinyint", "smallint", "int", "bigint", "float", "double"]: t_type = "number"
             
 
             # Define formatter and header filters based on type
@@ -292,6 +302,11 @@ class EditableEventSourced:
                 t_col["headerFilterParams"] = {"tristate": True}
                 # t_col["headerFilterEmptyCheck"] = "function(value){return value === null;}"
             
+            if t_type=="boolean_tick":
+                t_col["formatter"] = "tickCross"
+                t_col["formatterParams"] = {"allowEmpty": True, "crossElement": " "}
+                t_col["hozAlign"] = "center"
+
             if t_type=="number":
                 t_col["headerFilter"] = ns("minMaxFilterEditor")
                 t_col["headerFilterFunc"] = ns("minMaxFilterFunction")
@@ -343,7 +358,6 @@ class EditableEventSourced:
                     }
                 else:
                     if t_type=="boolean":
-                        t_col["editor"] = "tickCross"
                         t_col["editor"] = "list"
                         t_col["editorParams"] = {"values": {
                             "true": "True",
@@ -352,6 +366,8 @@ class EditableEventSourced:
                         }}
                         t_col["headerFilter"] = "input"
                         t_col["headerFilterParams"] = {}
+                    elif t_type=="boolean_tick":
+                        t_col["editor"] = "tickCross"
                     elif t_type=="number":
                         t_col["editor"] = "number"
                     else:
