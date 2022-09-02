@@ -129,7 +129,7 @@ window["dash_tabulator"] =
 /******/ 	        var srcFragments = src.split('/');
 /******/ 	        var fileFragments = srcFragments.slice(-1)[0].split('.');
 /******/
-/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1658939453");
+/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1662113134");
 /******/ 	        srcFragments.splice(-1, 1, fileFragments.join('.'))
 /******/
 /******/ 	        return srcFragments.join('/');
@@ -26666,6 +26666,7 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
           id = _this$props.id,
           data = _this$props.data,
           columns = _this$props.columns,
+          groupBy = _this$props.groupBy,
           cellEdited = _this$props.cellEdited; // Interpret column formatters as function handles.
 
       for (var i = 0; i < columns.length; i++) {
@@ -26698,6 +26699,7 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
         "data": data,
         "reactiveData": true,
         "columns": columns,
+        "groupBy": groupBy,
         "selectable": 1,
         "layout": "fitDataTable",
         "pagination": "local",
@@ -26752,24 +26754,30 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
 
 
 DashTabulator.defaultProps = {
+  data: [],
   columns: [],
-  data: []
+  groupBy: []
 };
 DashTabulator.propTypes = {
   /**
-   * The ID used to identify this component in Dash callbacks.
+   * ID used to identify this component in Dash callbacks.
    */
   id: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.string,
 
   /**
-   * A label that will be printed when this component is rendered.
+   * Data to display in the table.
+   */
+  data: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.array,
+
+  /**
+   * Column definitions.
    */
   columns: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.array,
 
   /**
-   * The value displayed in the input.
+   * Columns to group by.
    */
-  data: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.array,
+  groupBy: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.array,
 
   /**
    * Dash-assigned callback that should be called to report property changes

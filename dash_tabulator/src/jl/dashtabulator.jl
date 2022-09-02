@@ -8,13 +8,14 @@ export dashtabulator
 A DashTabulator component.
 
 Keyword arguments:
-- `id` (String; optional): The ID used to identify this component in Dash callbacks.
+- `id` (String; optional): ID used to identify this component in Dash callbacks.
 - `cellEdited` (Dict; optional): cellEdited captures the cell that was clicked on
-- `columns` (Array; optional): A label that will be printed when this component is rendered.
-- `data` (Array; optional): The value displayed in the input.
+- `columns` (Array; optional): Column definitions.
+- `data` (Array; optional): Data to display in the table.
+- `groupBy` (Array; optional): Columns to group by.
 """
 function dashtabulator(; kwargs...)
-        available_props = Symbol[:id, :cellEdited, :columns, :data]
+        available_props = Symbol[:id, :cellEdited, :columns, :data, :groupBy]
         wild_props = Symbol[]
         return Component("dashtabulator", "DashTabulator", "dash_tabulator", available_props, wild_props; kwargs...)
 end

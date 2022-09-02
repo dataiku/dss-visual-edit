@@ -18,7 +18,7 @@
     "build:js": "webpack --mode development",
     "build:backends": "dash-generate-components ./src/lib/components dash_tabulator -p package-info.json --r-prefix '' --jl-prefix '' --ignore \\.test\\.",
     "build:backends-activated": "(. venv/bin/activate || venv\\scripts\\activate && npm run build:py_and_r)",
-    "build": "npm run build:js && npm run build:backends && npm run postbuild",
+    "build": "npm run build:js && npm run build:backends",
     "build:activated": "npm run build:js && npm run build:backends-activated",
     "postbuild": "cp -R ./dash_tabulator/ ../plugin-editable-via-webapp/python-lib/dash_tabulator/"
   },
