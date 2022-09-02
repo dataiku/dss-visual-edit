@@ -62,9 +62,6 @@ else:
     f_app = Flask(__name__)
     app = Dash(__name__, server=f_app)
 
-def get_last_build_date(ds_name=original_ds_name):
-    return project.get_dataset(ds_name).get_last_metric_values().get_metric_by_id("reporting:BUILD_START_DATE").get("lastValues")[0].get("computed")
-
 app.config.external_stylesheets = stylesheets
 app.config.external_scripts = scripts
 
@@ -77,17 +74,24 @@ ees = EditableEventSourced(original_ds_name, primary_keys, editable_column_names
 
 import dash_tabulator
 from datetime import datetime
-from commons import get_user_details
+from commons import get_user_details, get_last_build_date
 
 columns = ees.get_columns_tabulator(freeze_editable_columns)
 data = ees.get_data_tabulator()
+
+try:
+    last_build_date = get_last_build_date(original_ds_name, project)
+    last_build_date_ok = True
+except:
+    last_build_date = ""
+    last_build_date_ok = False
 
 def serve_layout():
     return html.Div(children=[
         html.Div(id="url-div", style={"display": "none"}),
         html.Div(id="refresh-div", children=[
             html.Div(id="ds_update_msg", children="The original dataset has changed. Do you want to refresh? (Your edits will persist.)", className="ui warning message"),
-            html.Div(id="last_build_date", children=str(get_last_build_date()), style={"display": "none"}),
+            html.Div(id="last_build_date", children=str(last_build_date), style={"display": "none"}),
             html.Div(id="refresh-date", children="", style={"display": "none"}),
             html.Button("Refresh", id="refresh-btn", n_clicks=0, className="ui button", style={})
         ], style={"display": "none"}),
@@ -121,8 +125,8 @@ app.layout = serve_layout
 def check_data_update(n_intervals, refresh_date, refresh_div_style, last_build_date):
     style_new = refresh_div_style
     style_new["display"] = "none"
-    if (callback_context.triggered_id=="interval-component-iu"):
-        last_build_date_new = str(project.get_dataset(original_ds_name).get_last_metric_values().get_metric_by_id("reporting:BUILD_START_DATE").get("lastValues")[0].get("computed"))
+    if (callback_context.triggered_id=="interval-component-iu" and last_build_date_ok):
+        last_build_date_new = str(get_last_build_date(original_ds_name, project))
         if int(last_build_date_new)>int(last_build_date):
             print("The original dataset has changed.")
             last_build_date_new_fmtd = datetime.utcfromtimestamp(int(last_build_date_new)/1000).isoformat()
