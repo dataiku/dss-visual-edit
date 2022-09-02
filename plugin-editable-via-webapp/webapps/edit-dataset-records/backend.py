@@ -32,6 +32,7 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     primary_keys = get_webapp_config().get("primary_keys")
     editable_column_names = get_webapp_config().get("editable_column_names")
     freeze_editable_columns = get_webapp_config().get("freeze_editable_columns")
+    group_column_names = get_webapp_config().get("group_column_names")
     editschema_manual_raw = get_webapp_config().get("editschema")
     if (editschema_manual_raw and editschema_manual_raw!=""):
         editschema_manual = loads(editschema_manual_raw)
@@ -51,6 +52,7 @@ else:
     primary_keys = settings.custom_fields.get("primary_keys")
     editable_column_names = settings.custom_fields.get("editable_column_names")
     freeze_editable_columns = False
+    group_column_names = []
     try:
         editschema_manual = load(open("../../../example-editschemas/" + original_ds_name + ".json"))
     except:
@@ -97,7 +99,8 @@ def serve_layout():
         dash_tabulator.DashTabulator(
             id="datatable",
             columns=columns,
-            data=data
+            data=data,
+            groupBy=group_column_names
         ),
         html.Div(id="edit-info", children="Info zone for tabulator", style={"display": info_display})
     ])
