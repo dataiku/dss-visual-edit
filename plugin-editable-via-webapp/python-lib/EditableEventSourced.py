@@ -258,7 +258,7 @@ class EditableEventSourced:
         if self.editschema_manual!={}:
             editschema_manual_df = DataFrame(data=self.editschema_manual).set_index("name")
         else:
-            editschema_manual_df = None
+            editschema_manual_df = DataFrame(data=self.editschema_manual) # this will be an empty dataframe
 
         if (len(self.linked_records) > 0):
             linked_records_df = DataFrame(data=self.linked_records).set_index("name")
@@ -274,7 +274,7 @@ class EditableEventSourced:
             ###
 
             t_type = "string" # default type
-            if editschema_manual_df and "type" in editschema_manual_df.columns and col_name in editschema_manual_df.index:
+            if not editschema_manual_df.empty and "type" in editschema_manual_df.columns and col_name in editschema_manual_df.index:
                 editschema_manual_type = editschema_manual_df.loc[col_name, "type"]
             else:
                 editschema_manual_type = None
