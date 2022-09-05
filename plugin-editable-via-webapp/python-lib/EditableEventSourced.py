@@ -233,7 +233,7 @@ class EditableEventSourced:
         self.display_column_names = [col.get("name") for col in self.__schema__ if col.get("name") not in self.primary_keys + self.editable_column_names]
         self.edited_df_cols = self.primary_keys + self.display_column_names + self.editable_column_names
 
-        # make sure that original dataset has up-to-date custom fields
+        # make sure that original dataset has up-to-date custom fields (editlog and datasets/recipes that follow may not - TODO: change this?)
         self.__save_custom_fields__(self.original_ds_name)
         self.__setup_linked_records__()
         self.__setup_editlog__()

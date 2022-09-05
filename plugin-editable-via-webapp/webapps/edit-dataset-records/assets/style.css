@@ -15,7 +15,7 @@
 }
 
 body {
-    padding: 20px 0px 0px 20px;
+    padding: 20px;
     background-color: rgb(242, 242, 242);
 }
 
@@ -83,6 +83,10 @@ body, button, select.tabulator-page-size, input[type=search] {
 
 .tabulator-row.tabulator-selectable:hover .tabulator-editable {
     background-color: #A7CBFA !important;
+}
+
+.tabulator-cell.tabulator-editable:hover {
+    color: white;
 }
 
 .tabulator-row.tabulator-selectable.tabulator-selected .tabulator-editable {

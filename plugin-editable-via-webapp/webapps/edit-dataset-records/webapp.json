@@ -52,7 +52,7 @@
         },
         {
             "name": "group_column_names",
-            "label": "Group data by columns",
+            "label": "Group data by column(s)",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset"
         },
