@@ -90,11 +90,11 @@ def serve_layout():
     return html.Div(children=[
         html.Div(id="url-div", style={"display": "none"}),
         html.Div(id="refresh-div", children=[
-            html.Div(id="ds_update_msg", children="The original dataset has changed. Do you want to refresh? (Your edits will persist.)", className="ui warning message"),
+            html.Div(id="ds_update_msg", children="The original dataset has changed. Do you want to refresh? (Your edits are safe.)", style={"display": "inline"}),
             html.Div(id="last_build_date", children=str(last_build_date), style={"display": "none"}),
             html.Div(id="refresh-date", children="", style={"display": "none"}),
-            html.Button("Refresh", id="refresh-btn", n_clicks=0, className="ui button", style={})
-        ], style={"display": "none"}),
+            html.Button("Refresh", id="refresh-btn", n_clicks=0, className="ui compact yellow button", style={"margin-left": "2em", })
+        ], className="ui compact warning message", style={"display": "none"}),
         dcc.Interval(
                 id="interval-component-iu",
                 interval=20*1000, # in milliseconds
@@ -124,19 +124,19 @@ app.layout = serve_layout
     prevent_initial_call=True)
 def check_data_update(n_intervals, refresh_date, refresh_div_style, last_build_date):
     style_new = refresh_div_style
-    style_new["display"] = "none"
-    if (callback_context.triggered_id=="interval-component-iu" and last_build_date_ok):
-        last_build_date_new = str(get_last_build_date(original_ds_name, project))
-        if int(last_build_date_new)>int(last_build_date):
-            print("The original dataset has changed.")
-            last_build_date_new_fmtd = datetime.utcfromtimestamp(int(last_build_date_new)/1000).isoformat()
-            last_build_date_fmtd = datetime.utcfromtimestamp(int(last_build_date)/1000).isoformat()
-            print(f"""Last build date: {last_build_date_new_fmtd} — previously {last_build_date_fmtd}""")
-            style_new["display"] = "block"
-    else:
-        print("Datatable has been refreshed -> hiding refresh div")
-        last_build_date_new = last_build_date
-        style_new["display"] = "none"
+    if last_build_date_ok:
+        if (callback_context.triggered_id=="interval-component-iu"):
+            last_build_date_new = str(get_last_build_date(original_ds_name, project))
+            if int(last_build_date_new)>int(last_build_date):
+                print("The original dataset has changed.")
+                last_build_date_new_fmtd = datetime.utcfromtimestamp(int(last_build_date_new)/1000).isoformat()
+                last_build_date_fmtd = datetime.utcfromtimestamp(int(last_build_date)/1000).isoformat()
+                print(f"""Last build date: {last_build_date_new_fmtd} — previously {last_build_date_fmtd}""")
+                style_new["display"] = "block"
+        else: # callback_context must be "refresh_date"
+            print("Datatable has been refreshed -> hiding refresh div")
+            last_build_date_new = last_build_date
+            style_new["display"] = "none"
     return style_new, last_build_date_new
 
 @app.callback(
