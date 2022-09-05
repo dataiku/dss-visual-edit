@@ -9,6 +9,7 @@ from datetime import datetime
 from pytz import timezone
 from dash_extensions.javascript import Namespace
 from urllib.parse import urlparse
+from re import sub
 
 def get_lookup_column_names(linked_record):
     lookup_column_names = []
@@ -38,7 +39,7 @@ class EditableEventSourced:
     
     def __init_webapp_url__(self):
         webapp_id = find_webapp_id(self.original_ds_name)
-        webapp_name = get_webapp_json(webapp_id).get("name")
+        webapp_name = sub(r'[\W_]+', '-', get_webapp_json(webapp_id).get("name").lower())
         self.webapp_url = f"/projects/{self.project_key}/webapps/{webapp_id}_{webapp_name}/edit"
 
     def __setup_linked_records__(self):
