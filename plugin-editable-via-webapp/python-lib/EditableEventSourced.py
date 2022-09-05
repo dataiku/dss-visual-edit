@@ -218,6 +218,7 @@ class EditableEventSourced:
         self.edited_ds_name = self.original_ds_name + "_edited"
 
         self.__connection_name__ = self.original_ds.get_config().get("params").get("connection")
+        if self.__connection_name__==None: self.__connection_name__ = "filesystem_managed"
         self.__schema__ = self.original_ds.get_config().get("schema").get("columns")
         if (primary_keys):
             self.primary_keys = primary_keys
