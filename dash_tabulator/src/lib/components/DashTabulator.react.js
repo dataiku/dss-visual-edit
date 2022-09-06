@@ -79,6 +79,10 @@ export default class DashTabulator extends React.Component {
         console.log("Rendering!")
         try { window.parent.WT1SVC.event("lca-datatable-viewed"); }
         catch (e) { }
+
+        const {id, data, columns, groupBy, cellEdited} = this.props;
+        if (this.tabulator) this.tabulator.setData(data)
+
         return (
             <div ref={el => (this.el = el)} />
         )
