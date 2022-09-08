@@ -88,24 +88,26 @@ except:
 
 def serve_layout():
     return html.Div(children=[
-        html.Div(id="url-div", style={"display": "none"}),
         html.Div(id="refresh-div", children=[
-            html.Div(id="ds_update_msg", children="The original dataset has changed. Do you want to refresh? (Your edits are safe.)", style={"display": "inline"}),
-            html.Div(id="last_build_date", children=str(last_build_date), style={"display": "none"}),
-            html.Div(id="refresh-date", children="", style={"display": "none"}),
+            html.Div(id="data-refresh-message", children="The original dataset has changed. Do you want to refresh? (Your edits are safe.)", style={"display": "inline"}),
+            html.Div(id="last-build-date", children=str(last_build_date), style={"display": "none"}), # when the original dataset was last built
+            html.Div(id="last-refresh-date", children="", style={"display": "none"}), # when the data in the datatable was last refreshed
             html.Button("Refresh", id="refresh-btn", n_clicks=0, className="ui compact yellow button", style={"margin-left": "2em", })
         ], className="ui compact warning message", style={"display": "none"}),
+
         dcc.Interval(
                 id="interval-component-iu",
                 interval=20*1000, # in milliseconds
                 n_intervals=0
         ),
+
         dash_tabulator.DashTabulator(
             id="datatable",
             columns=columns,
             data=data,
             groupBy=group_column_names
         ),
+
         html.Div(id="edit-info", children="Info zone for tabulator", style={"display": info_display})
     ])
 app.layout = serve_layout
@@ -113,16 +115,22 @@ app.layout = serve_layout
 @app.callback(
     [
         Output("refresh-div", "style"),
-        Output("last_build_date", "children")
+        Output("last-build-date", "children")
     ],
     [
         Input("interval-component-iu", "n_intervals"),
-        Input("refresh-date", "children"),
+        Input("last-refresh-date", "children"),
         State("refresh-div", "style"),
-        State("last_build_date", "children")
+        State("last-build-date", "children")
     ],
     prevent_initial_call=True)
-def check_data_update(n_intervals, refresh_date, refresh_div_style, last_build_date):
+def toggle_refresh_div_visibility(n_intervals, last_refresh_date, refresh_div_style, last_build_date):
+    """
+    Toggle visibility of refresh div, once...
+
+    * The interval component has fired: check last build date of original dataset and if it's more recent than what we had, display the refresh div
+    * The refresh date has changed: hide the refresh div
+    """
     style_new = refresh_div_style
     if last_build_date_ok:
         if (callback_context.triggered_id=="interval-component-iu"):
@@ -133,7 +141,7 @@ def check_data_update(n_intervals, refresh_date, refresh_div_style, last_build_d
                 last_build_date_fmtd = datetime.utcfromtimestamp(int(last_build_date)/1000).isoformat()
                 print(f"""Last build date: {last_build_date_new_fmtd} — previously {last_build_date_fmtd}""")
                 style_new["display"] = "block"
-        else: # callback_context must be "refresh_date"
+        else: # callback_context must be "last_refresh_date"
             print("Datatable has been refreshed -> hiding refresh div")
             last_build_date_new = last_build_date
             style_new["display"] = "none"
@@ -141,14 +149,17 @@ def check_data_update(n_intervals, refresh_date, refresh_div_style, last_build_d
 
 @app.callback(
     [
-        Output("refresh-date", "children"),
+        Output("last-refresh-date", "children"),
         Output("datatable", "data"),
     ],
     [
         Input("refresh-btn", "n_clicks")
     ],
     prevent_initial_call=True)
-def refresh(n_clicks):
+def refresh_data(n_clicks):
+    """
+    Refresh datatable's contents based on the latest original and editlog datasets, once the refresh button has been clicked
+    """
     print("Refreshing the data...")
     ees.load_data() # this loads the original df again, pivots the editlog and merges edits
     data = ees.get_data_tabulator()
@@ -159,7 +170,10 @@ def refresh(n_clicks):
     Output("edit-info", "children"),
     Input("datatable", "cellEdited"),
     prevent_initial_call=True)
-def update(cell):
+def add_edit(cell):
+    """
+    Record edit in editlog, once a cell has been edited
+    """
     if run_context=="local": user = "local"
     else: user = get_user_details()
     return ees.add_edit_tabulator(cell, user)
