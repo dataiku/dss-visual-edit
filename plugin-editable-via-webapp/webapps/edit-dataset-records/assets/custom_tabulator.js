@@ -1,3 +1,6 @@
+filterFuncResultCount = 0
+addEventListener('keyup', (event) => {filterFuncResultCount = 0});
+
 window.myNamespace = Object.assign({}, window.myNamespace, {
 
     tabulator: {
@@ -76,16 +79,21 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
         },
 
         filterFunc: function (term, label, value, item) {
-            if (term !== null) {
-                term = String(term).toLowerCase();
-                if (term.length>2 && label !== null && typeof label !== "undefined") {
-                    label = String(label).toLowerCase();
-                    if (label.startsWith(term)) {
-                        return true;
+            if (filterFuncResultCount>=100) {
+                return false;
+            } else {
+                if (term !== null) {
+                    term = String(term).toLowerCase();
+                    if (term.length>2 && label !== null && typeof label !== "undefined") {
+                        label = String(label).toLowerCase();
+                        if (label.startsWith(term)) {
+                            filterFuncResultCount += 1
+                            return true;
+                        }
                     }
                 }
+                return false;
             }
-            return false;
         },
         
         itemFormatter: function (label, value, item, element) {
