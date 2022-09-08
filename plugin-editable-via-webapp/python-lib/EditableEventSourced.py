@@ -34,13 +34,16 @@ class EditableEventSourced:
         settings.custom_fields["editlog_ds"] = self.editlog_ds_name
         settings.custom_fields["primary_keys"] = self.primary_keys
         settings.custom_fields["editable_column_names"] = self.editable_column_names
-        settings.custom_fields["webapp_url"] = self.webapp_url
+        if (self.webapp_url): settings.custom_fields["webapp_url"] = self.webapp_url
         settings.save()
     
     def __init_webapp_url__(self):
-        webapp_id = find_webapp_id(self.original_ds_name)
-        webapp_name = sub(r'[\W_]+', '-', get_webapp_json(webapp_id).get("name").lower())
-        self.webapp_url = f"/projects/{self.project_key}/webapps/{webapp_id}_{webapp_name}/edit"
+        try:
+            webapp_id = find_webapp_id(self.original_ds_name)
+            webapp_name = sub(r'[\W_]+', '-', get_webapp_json(webapp_id).get("name").lower())
+            self.webapp_url = f"/projects/{self.project_key}/webapps/{webapp_id}_{webapp_name}/edit"
+        except:
+            self.webapp_url = None
 
     def __setup_linked_records__(self):
         self.linked_records = []
