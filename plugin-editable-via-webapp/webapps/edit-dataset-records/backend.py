@@ -188,8 +188,9 @@ def add_edit(cell):
 def my_dash_app():
     return app.index()
 
+from json import dumps
 @server.route("/flask")
 def my_flask_endpoint():
-    return ["one", "two"]
+    return dumps(["one", "two"])
 
 print("Webapp OK")
