@@ -39,6 +39,8 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     else:
         editschema_manual = {}
 
+    server = app.server
+
 else:
     print("Webapp is being run outside of Dataiku")
     run_context = "local"
@@ -59,8 +61,8 @@ else:
         editschema_manual = {}
     
     from flask import Flask
-    f_app = Flask(__name__)
-    app = Dash(__name__, server=f_app)
+    server = Flask(__name__)
+    app = Dash(__name__, server=server)
 
 app.config.external_stylesheets = stylesheets
 app.config.external_scripts = scripts
@@ -181,5 +183,13 @@ def add_edit(cell):
 # if run_context=="local":
 #     print("Running in debug mode")
 #     app.run_server(debug=True)
+
+@server.route("/dash")
+def my_dash_app():
+    return app.index()
+
+@server.route("/flask")
+def my_flask_endpoint():
+    return {"msg": "Hello"}
 
 print("Webapp OK")
