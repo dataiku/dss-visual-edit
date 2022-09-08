@@ -339,7 +339,7 @@ class EditableEventSourced:
                     if (linked_ds_label!=linked_ds_key):
                         linked_columns += [linked_ds_label]
                     linked_df = Dataset(linked_ds_name).get_dataframe()
-                    linked_df["description"] = linked_df.apply(lambda row: " - ".join(row[linked_ds_lookup_columns]), axis=1)
+                    linked_df["description"] = linked_df.apply(lambda row: " - ".join(row[linked_ds_lookup_columns]), axis=1) # TODO: fix this in case values for the lookup columns aren't defined (nan)
                     linked_columns += ["description"]
                     values_df = linked_df[linked_columns]
                     if (linked_ds_label!=linked_ds_key):
