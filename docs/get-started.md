@@ -71,11 +71,8 @@ As a consequence, it only works if this isn't a "source" dataset, i.e. there are
   * Add: no impact.
   * Remove: previous edits on this column won't be taken into account by the webapp / the recipes, and they won't appear in _editlog\_pivoted_ (but they will still be in the editlog).
 
-## Toy projects to use the plugin
+## Troubleshooting
 
-Currently these are private to my Github account (louisdorard) — reach out for an invite to get access.
-
-* [Categorize transactions](https://github.com/louisdorard/dataiku-categorize-transactions)
-* [Join companies](https://github.com/louisdorard/dataiku-join-companies)
+If the webapp backend started successfully but the webapp itself isn't functioning as expected, clear the browser's cached images and files.
 
 ## Next: [Going further](going-further)
