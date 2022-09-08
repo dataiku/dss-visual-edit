@@ -335,19 +335,21 @@ class EditableEventSourced:
 
                 if col_name in self.linked_record_names:
 
-                    # Get values of key/label/lookup columns from linked dataset
-                    ##
-
                     linked_ds_name = linked_records_df.loc[col_name, "ds_name"]
                     linked_ds_key = linked_records_df.loc[col_name, "ds_key"]
                     linked_ds_label = linked_records_df.loc[col_name, "ds_label"]
                     linked_ds_lookup_columns = linked_records_df.loc[col_name, "ds_lookup_columns"]
+                    linked_df = Dataset(linked_ds_name).get_dataframe()
+
+                    """
+                    # Get values of key/label/lookup columns from linked dataset
+                    ##
+
                     linked_columns = [linked_ds_key]
                     if (linked_ds_label!=linked_ds_key):
                         linked_columns += [linked_ds_label]
-                    linked_df = Dataset(linked_ds_name).get_dataframe()
-
-                    # Concatenate lookup column values into a description column
+                    
+                    # Concatenate lookup column values (if any) into a description column
                     if linked_ds_lookup_columns!=[]:
                         linked_df["description"] = linked_df.apply(lambda row: " - ".join(row[linked_ds_lookup_columns]), axis=1) # TODO: fix this in case values for the lookup columns aren't defined (nan)
                         linked_columns += ["description"]
@@ -374,14 +376,16 @@ class EditableEventSourced:
                         editor_values_param = values_df.rename(columns={linked_ds_key:"value", linked_ds_label:"label"}).to_dict("records")
                     else:
                         editor_values_param = values_df[linked_ds_key].to_list()
+                    """
 
                     t_col["editor"] = "list"
                     t_col["editorParams"] = {
-                        "values": editor_values_param,
-                        "autocomplete": True,
+                        # "values": editor_values_param,
+                        "valuesURL": "/flask",
+                        # "autocomplete": True,
                         "freetext": True,
-                        "filterDelay": 300,
-                        "filterFunc": ns("filterFunc"),
+                        # "filterDelay": 300,
+                        # "filterFunc": ns("filterFunc"),
                         "listOnEmpty": False,
                         "clearable": True,
                         "placeholderEmpty": "no results",

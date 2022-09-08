@@ -190,6 +190,6 @@ def my_dash_app():
 
 @server.route("/flask")
 def my_flask_endpoint():
-    return {"msg": "Hello"}
+    return ["one", "two"]
 
 print("Webapp OK")
