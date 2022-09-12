@@ -53,6 +53,7 @@ class EditableEventSourced:
                 linked_ds_key = col.get("linked_ds_key")
                 linked_ds_label = col.get("linked_ds_label")
                 linked_ds_lookup_columns = col.get("linked_ds_lookup_columns")
+                values_URL = col.get("values_URL")
                 if not linked_ds_key: linked_ds_key = col.get("name")
                 if not linked_ds_label: linked_ds_label = linked_ds_key
                 if not linked_ds_lookup_columns: linked_ds_lookup_columns = []
@@ -62,7 +63,8 @@ class EditableEventSourced:
                         "ds_name": col.get("linked_ds_name"),
                         "ds_key": linked_ds_key,
                         "ds_label": linked_ds_label,
-                        "ds_lookup_columns": linked_ds_lookup_columns
+                        "ds_lookup_columns": linked_ds_lookup_columns,
+                        "values_URL": values_URL
                     }
                 )
                 self.linked_record_names.append(col.get("name"))
@@ -326,6 +328,7 @@ class EditableEventSourced:
             ###
 
             if col_name in self.editable_column_names:
+
                 t_col["title"] = "🖊 " + col_name
                 if (freeze_editable_columns): t_col["frozen"] = True # freeze editable columns to the right
                 
@@ -335,58 +338,69 @@ class EditableEventSourced:
 
                 if col_name in self.linked_record_names:
 
-                    # Get values of key/label/lookup columns from linked dataset
-                    ##
-
                     linked_ds_name = linked_records_df.loc[col_name, "ds_name"]
                     linked_ds_key = linked_records_df.loc[col_name, "ds_key"]
                     linked_ds_label = linked_records_df.loc[col_name, "ds_label"]
                     linked_ds_lookup_columns = linked_records_df.loc[col_name, "ds_lookup_columns"]
                     linked_columns = [linked_ds_key]
-                    if (linked_ds_label!=linked_ds_key):
-                        linked_columns += [linked_ds_label]
-                    linked_df = Dataset(linked_ds_name).get_dataframe()
 
-                    # Concatenate lookup column values into a description column
-                    if linked_ds_lookup_columns!=[]:
-                        linked_df["description"] = linked_df.apply(lambda row: " - ".join(row[linked_ds_lookup_columns]), axis=1) # TODO: fix this in case values for the lookup columns aren't defined (nan)
-                        linked_columns += ["description"]
-
-                    values_df = linked_df[linked_columns]
-
-
-                    # If a label column has been provided, use a lookup formatter
+                    # Use a list editor and define its params
                     ##
-
-                    if (linked_ds_label!=linked_ds_key):
-                        values_df.sort_values(linked_ds_label, inplace=True)
-                        formatter_lookup_param = values_df.set_index(linked_ds_key)[linked_ds_label].to_dict()
-                        formatter_lookup_param["null"] = ""
-
-                        t_col["formatter"] = "lookup"
-                        t_col["formatterParams"] = formatter_lookup_param
-
-
-                    # Use a list editor and define its params, including possible values
-                    ##
-
-                    if (linked_ds_label!=linked_ds_key):
-                        editor_values_param = values_df.rename(columns={linked_ds_key:"value", linked_ds_label:"label"}).to_dict("records")
-                    else:
-                        editor_values_param = values_df[linked_ds_key].to_list()
 
                     t_col["editor"] = "list"
                     t_col["editorParams"] = {
-                        "values": editor_values_param,
                         "autocomplete": True,
-                        "freetext": True,
-                        "filterDelay": 300,
-                        "filterFunc": ns("filterFunc"),
-                        "listOnEmpty": False,
-                        "clearable": True,
+                        # "freetext": True,
+                        # "filterDelay": 300,
+                        # "listOnEmpty": False,
+                        # "clearable": True,
                         "placeholderEmpty": "no results",
-                        "placeholderLoading": "loading"
+                        "placeholderLoading": "loading",
                     }
+
+                    values_URL = linked_records_df.loc[col_name, "values_URL"]
+
+                    if (values_URL):
+
+                        t_col["editorParams"]["valuesURL"] = values_URL
+                        t_col["editorParams"]["filterRemote"] = True
+                    
+                    else:
+
+                        # Get values of key/label/lookup columns from linked dataset
+                        ##
+
+                        if (linked_ds_label!=linked_ds_key):
+                            linked_columns += [linked_ds_label]
+                        linked_df = Dataset(linked_ds_name).get_dataframe()
+
+                        # Concatenate lookup column values into a description column
+                        if linked_ds_lookup_columns!=[]:
+                            linked_df["description"] = linked_df.apply(lambda row: " - ".join(row[linked_ds_lookup_columns]), axis=1) # TODO: fix this in case values for the lookup columns aren't defined (nan)
+                            linked_columns += ["description"]
+
+                        values_df = linked_df[linked_columns]
+
+
+                        # If a label column has been provided, use a lookup formatter
+                        ##
+
+                        if (linked_ds_label!=linked_ds_key):
+                            values_df.sort_values(linked_ds_label, inplace=True) # TODO: adapt this logic to the case where the linked dataset is too large to fit in memory and should be accessed via an API
+                            formatter_lookup_param = values_df.set_index(linked_ds_key)[linked_ds_label].to_dict()
+                            formatter_lookup_param["null"] = ""
+
+                            t_col["formatter"] = "lookup"
+                            t_col["formatterParams"] = formatter_lookup_param
+
+                        if (linked_ds_label!=linked_ds_key):
+                            editor_values_param = values_df.rename(columns={linked_ds_key:"value", linked_ds_label:"label"}).to_dict("records")
+                        else:
+                            editor_values_param = values_df[linked_ds_key].to_list()
+
+                        t_col["editorParams"]["values"] = editor_values_param
+                        t_col["editorParams"]["filterFunc"] = ns("filterFunc")
+
                     if linked_ds_lookup_columns!=[]:
                         t_col["editorParams"]["itemFormatter"] = ns("itemFormatter")
 
