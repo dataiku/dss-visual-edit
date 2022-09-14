@@ -1,5 +1,6 @@
 from dataiku import Dataset
 from flask import Flask, request, jsonify
+from os import getenv
 
 ds = Dataset(getenv("DS_NAME"), getenv("PROJECT_KEY"))
 df = ds.get_dataframe()
