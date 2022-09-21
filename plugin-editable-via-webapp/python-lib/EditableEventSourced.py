@@ -383,7 +383,7 @@ class EditableEventSourced:
                     t_col["editor"] = "list"
                     t_col["editorParams"] = {
                         # "values": editor_values_param,
-                        "valuesURL": self.webapp_URL_public + "flask", # TODO: adapt this to execution context (local or dataiku?)
+                        "valuesURL": "flask",
                         # "autocomplete": True,
                         "freetext": True,
                         # "filterDelay": 300,
