@@ -54,8 +54,7 @@
                 "ORIGINAL_DATASET": "equipment_shifts_dates", // choose from transactions_missing, matches, stakeholders_tbc_prepared, demand_stream_prepared_filtered, equipment_shifts_dates, new_parts_copy
             },
             "args": [
-                "run",
-                "--no-debugger"
+                "run"
             ],
             "jinja": true,
             "justMyCode": false
