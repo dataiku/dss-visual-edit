@@ -42,8 +42,10 @@ class EditableEventSourced:
             webapp_id = find_webapp_id(self.original_ds_name)
             webapp_name = sub(r'[\W_]+', '-', get_webapp_json(webapp_id).get("name").lower())
             self.webapp_url = f"/projects/{self.project_key}/webapps/{webapp_id}_{webapp_name}/edit"
+            self.webapp_url_public = f"/public-webapps/{self.project_key}/{webapp_id}/"
         except:
             self.webapp_url = None
+            self.webapp_url_public = "/"
 
     def __setup_linked_records__(self):
         self.linked_records = []
@@ -381,7 +383,7 @@ class EditableEventSourced:
                     t_col["editor"] = "list"
                     t_col["editorParams"] = {
                         # "values": editor_values_param,
-                        "valuesURL": "/flask",
+                        "valuesURL": self.webapp_URL_public + "flask", # TODO: adapt this to execution context (local or dataiku?)
                         # "autocomplete": True,
                         "freetext": True,
                         # "filterDelay": 300,
