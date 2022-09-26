@@ -17,7 +17,8 @@ from dash import Dash, html, dcc, Input, Output, State, callback_context
 stylesheets = ["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
 scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"]
 client = api_client()
-project = client.get_project(getenv("DKU_CURRENT_PROJECT_KEY"))
+project_key = getenv("DKU_CURRENT_PROJECT_KEY")
+project = client.get_project(project_key)
 
 if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     print("Webapp is being run in Dataiku")
@@ -188,9 +189,50 @@ def add_edit(cell):
 def my_dash_app():
     return app.index()
 
+from flask import request, jsonify
 from json import dumps
-@server.route("/flask")
-def my_flask_endpoint():
-    return dumps(["one", "two"])
+from dataikuapi.utils import DataikuStreamedHttpUTF8CSVReader
+from pandas import DataFrame
+@server.route("/lookup/<dataset_name>/", methods=['GET', 'POST'])
+def my_flask_endpoint(dataset_name):
+    response = jsonify({})
+    if dataset_name in ees.linked_records_df["ds_name"].to_list(): # check that this is a linked dataset
+        linked_record_row = ees.linked_records_df.loc[ees.linked_records_df["ds_name"]==dataset_name]
+        lookup_columns = linked_record_row["ds_lookup_columns"][0]
+        label_column = linked_record_row["ds_label"][0]
+        dataset = project.get_dataset(dataset_name)
+
+        if request.method == 'POST':
+            term = request.get_json().get("term")
+        else:
+            term = request.args.get('term', '')
+        print(f"""Received a request for dataset "{dataset_name}", term "{term}" """)
+        
+        if (len(term)>=3):
+            csv_stream = client._perform_raw(
+                "GET" , f"/projects/{project_key}/datasets/{dataset_name}/data/",
+                params = {
+                    "format" : "tsv-excel-header",
+                    "filter" : f"""contains(toLowercase(strval("{label_column}")), toLowercase("{term}"))""",
+                    "sampling" : dumps({
+                        "samplingMethod": "HEAD_SEQUENTIAL",
+                        "maxRecords": 100
+                        })
+                })
+            csv_reader = DataikuStreamedHttpUTF8CSVReader(dataset.get_schema()["columns"], csv_stream)
+            rows = []
+            for row in csv_reader.iter_rows():
+                rows.append(row)
+            filtered_df = DataFrame(columns=rows[0], data=rows[1:])
+
+            if len(lookup_columns)>1:
+                result = filtered_df[lookup_columns].to_dict("records")
+            else:
+                result = filtered_df[lookup_columns].to_list()
+            
+            response = jsonify(result)
+
+    return response
+
 
 print("Webapp OK")
