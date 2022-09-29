@@ -92,7 +92,7 @@ def serve_layout():
             html.Div(id="data-refresh-message", children="The original dataset has changed. Do you want to refresh? (Your edits are safe.)", style={"display": "inline"}),
             html.Div(id="last-build-date", children=str(last_build_date), style={"display": "none"}), # when the original dataset was last built
             html.Div(id="last-refresh-date", children="", style={"display": "none"}), # when the data in the datatable was last refreshed
-            html.Button("Refresh", id="refresh-btn", n_clicks=0, className="ui compact yellow button", style={"margin-left": "2em", })
+            html.Button("Refresh table", id="refresh-btn", n_clicks=0, className="ui compact yellow button", style={"margin-left": "2em", })
         ], className="ui compact warning message", style={"display": "none"}),
 
         dcc.Interval(
