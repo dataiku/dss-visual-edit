@@ -80,17 +80,17 @@ columns = ees.get_columns_tabulator(freeze_editable_columns)
 data = ees.get_data_tabulator()
 
 try:
-    last_build_date = get_last_build_date(original_ds_name, project)
+    last_build_date_initial = get_last_build_date(original_ds_name, project)
     last_build_date_ok = True
 except:
-    last_build_date = ""
+    last_build_date_initial = ""
     last_build_date_ok = False
 
 def serve_layout():
     return html.Div(children=[
         html.Div(id="refresh-div", children=[
             html.Div(id="data-refresh-message", children="The original dataset has changed. Do you want to refresh? (Your edits are safe.)", style={"display": "inline"}),
-            html.Div(id="last-build-date", children=str(last_build_date), style={"display": "none"}), # when the original dataset was last built
+            html.Div(id="last-build-date", children=str(last_build_date_initial), style={"display": "none"}), # when the original dataset was last built
             html.Div(id="last-refresh-date", children="", style={"display": "none"}), # when the data in the datatable was last refreshed
             html.Button("Refresh table", id="refresh-btn", n_clicks=0, className="ui compact yellow button", style={"margin-left": "2em", })
         ], className="ui compact warning message", style={"display": "none"}),
