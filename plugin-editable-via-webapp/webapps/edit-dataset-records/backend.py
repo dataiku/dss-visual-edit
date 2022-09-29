@@ -97,7 +97,7 @@ def serve_layout():
 
         dcc.Interval(
                 id="interval-component-iu",
-                interval=20*1000, # in milliseconds
+                interval=10*1000, # in milliseconds
                 n_intervals=0
         ),
 
