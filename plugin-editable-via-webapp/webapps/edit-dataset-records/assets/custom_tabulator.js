@@ -101,6 +101,8 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
             //value - the value for the item
             //item - the original value object for the item
             //element - the DOM element for the item
+
+            // TODO: loop over properties of `item`
             return "<strong>" + label + "</strong><br/><div>" + item.description + "</div>";
         },
 
