@@ -348,13 +348,11 @@ class EditableEventSourced:
         linked_columns = [linked_ds_key]
         if (linked_ds_label!=linked_ds_key):
             linked_columns += [linked_ds_label]
+        if linked_ds_lookup_columns != []:
+            linked_columns += linked_ds_lookup_columns
         
         linked_df = Dataset(linked_ds_name).get_dataframe()
 
-        # Concatenate lookup column values (if any) into a description column
-        if linked_ds_lookup_columns!=[]:
-            linked_df["description"] = linked_df.apply(lambda row: " - ".join(row[linked_ds_lookup_columns]), axis=1) # TODO: fix this in case values for the lookup columns aren't defined (nan)
-            linked_columns += ["description"]
 
         return linked_df[linked_columns].sort_values(linked_ds_label)
 
@@ -365,11 +363,13 @@ class EditableEventSourced:
         t_col = {}
         t_col["editor"] = "list"
         t_col["editorParams"] = {
+            "autocomplete": True,
+            # "filterDelay": 300,
             # "freetext": True,
-            "listOnEmpty": False,
-            "clearable": True,
-            "placeholderEmpty": "no results",
-            "placeholderLoading": "loading"
+            # "listOnEmpty": False,
+            # "clearable": True,
+            # "placeholderEmpty": "no results",
+            # "placeholderLoading": "loading"
         }
 
         # If lookup columns have been provided, use an item formatter in the editor
