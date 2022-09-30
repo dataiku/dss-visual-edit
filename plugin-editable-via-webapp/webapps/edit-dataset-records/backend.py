@@ -193,42 +193,49 @@ from flask import request, jsonify
 from json import dumps
 from dataikuapi.utils import DataikuStreamedHttpUTF8CSVReader
 from pandas import DataFrame
-@server.route("/lookup/<dataset_name>/", methods=['GET', 'POST'])
-def my_flask_endpoint(dataset_name):
+@server.route("/lookup/<linked_ds_name>/", methods=['GET', 'POST'])
+def my_flask_endpoint(linked_ds_name):
     response = jsonify({})
-    if dataset_name in ees.linked_records_df["ds_name"].to_list(): # check that this is a linked dataset
-        linked_record_row = ees.linked_records_df.loc[ees.linked_records_df["ds_name"]==dataset_name]
-        lookup_columns = linked_record_row["ds_lookup_columns"][0]
-        label_column = linked_record_row["ds_label"][0]
-        dataset = project.get_dataset(dataset_name)
+    if linked_ds_name in ees.linked_records_df["ds_name"].to_list(): # check that this is a linked dataset
+        linked_record_row = ees.linked_records_df.loc[ees.linked_records_df["ds_name"]==linked_ds_name]
+        linked_ds_lookup_columns = linked_record_row["ds_lookup_columns"][0]
+        linked_ds_label = linked_record_row["ds_label"][0]
+        linked_ds_key = linked_record_row["ds_key"][0]
+        linked_ds = project.get_dataset(linked_ds_name)
 
         if request.method == 'POST':
             term = request.get_json().get("term")
         else:
             term = request.args.get('term', '')
-        print(f"""Received a request for dataset "{dataset_name}", term "{term}" """)
+        print(f"""Received a request for dataset "{linked_ds_name}", term "{term}" """)
         
         if (len(term)>=3):
             csv_stream = client._perform_raw(
-                "GET" , f"/projects/{project_key}/datasets/{dataset_name}/data/",
+                "GET" , f"/projects/{project_key}/datasets/{linked_ds_name}/data/",
                 params = {
                     "format" : "tsv-excel-header",
-                    "filter" : f"""contains(toLowercase(strval("{label_column}")), toLowercase("{term}"))""",
+                    "filter" : f"""contains(toLowercase(strval("{linked_ds_label}")), toLowercase("{term}"))""",
                     "sampling" : dumps({
                         "samplingMethod": "HEAD_SEQUENTIAL",
                         "maxRecords": 100
                         })
                 })
-            csv_reader = DataikuStreamedHttpUTF8CSVReader(dataset.get_schema()["columns"], csv_stream)
+            csv_reader = DataikuStreamedHttpUTF8CSVReader(linked_ds.get_schema()["columns"], csv_stream)
             rows = []
             for row in csv_reader.iter_rows():
                 rows.append(row)
-            filtered_df = DataFrame(columns=rows[0], data=rows[1:])
+            linked_df_filtered = DataFrame(columns=rows[0], data=rows[1:]).sort_values(linked_ds_label)
 
-            if len(lookup_columns)>1:
-                result = filtered_df[lookup_columns].to_dict("records")
+            linked_columns = [linked_ds_key]
+            if (linked_ds_label!=linked_ds_key):
+                linked_columns += [linked_ds_label]
+            if linked_ds_lookup_columns!=[]:
+                linked_columns += linked_ds_lookup_columns
+
+            if len(linked_columns)>1:
+                result = linked_df_filtered[linked_columns].to_dict("records")
             else:
-                result = filtered_df[lookup_columns].to_list()
+                result = linked_df_filtered[linked_columns[0]].to_list()
             
             response = jsonify(result)
 
