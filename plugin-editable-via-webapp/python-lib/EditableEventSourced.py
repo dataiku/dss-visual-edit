@@ -2,7 +2,7 @@ from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
 from pandas import DataFrame
-from commons import get_primary_keys, get_editable_column_names, merge_edits, pivot_editlog, tabulator_row_key_values, find_webapp_id, get_webapp_json
+from commons import get_primary_keys, get_editable_column_names, merge_edits, pivot_editlog, tabulator_row_key_values, find_webapp_id, get_webapp_json, get_values_from_linked_df
 from os import getenv
 from json5 import loads
 from datetime import datetime
@@ -381,19 +381,6 @@ class EditableEventSourced:
             t_col["editor"] = "input"
         return t_col
 
-    def __get_values_from_linked_ds__(self, linked_ds_name, linked_ds_key, linked_ds_label, linked_ds_lookup_columns):
-
-        linked_columns = [linked_ds_key]
-        if (linked_ds_label != linked_ds_key):
-            linked_columns += [linked_ds_label]
-        if linked_ds_lookup_columns != []:
-            linked_columns += linked_ds_lookup_columns
-        
-        linked_df = Dataset(linked_ds_name).get_dataframe()
-
-
-        return linked_df[linked_columns].sort_values(linked_ds_label)
-
     def __get_column_tabulator_editor_linked_record__(self, linked_record_name):
         """Define Tabulator editor settings for a column whose type is linked record"""
 
@@ -420,24 +407,20 @@ class EditableEventSourced:
         # Define possible values in the list
         linked_ds_name = self.linked_records_df.loc[linked_record_name, "ds_name"]
         if (False):  # TODO: implement a condition to see if the linked dataset is big
-            # TODO: don't need ds_key and ds_label here? (they're used when dataset is loaded in memory)
+            # ds_key and ds_label would normally be used, when loading the linked dataset in memory, but here they will be fetched by the API endpoint who has access to an EditableEventSourced dataset and who's given linked_ds_name in the URL
             t_col["editorParams"]["valuesURL"] = "lookup/" + linked_ds_name
 
         else:
             # The dataset can be loaded in memory
             linked_ds_key = self.linked_records_df.loc[linked_record_name, "ds_key"]
             linked_ds_label = self.linked_records_df.loc[linked_record_name, "ds_label"]
-            values_df = self.__get_values_from_linked_ds__(
-                linked_ds_name, linked_ds_key, linked_ds_label, linked_ds_lookup_columns)
-            if (linked_ds_label == linked_ds_key):
-                editor_values_param = values_df[linked_ds_key].to_list()
-            else:
-                # A label column was provided: use labels in the editor...
-                editor_values_param = values_df.rename(
-                    columns={linked_ds_key: "value", linked_ds_label: "label"}).to_dict("records")
-                # ... and in the formatter too, instead of the keys; for this we provide a "lookup" parameter which looks like this: {"key1": "label1", "key2": "label2", "null": ""}
+            linked_df = Dataset(linked_ds_name).get_dataframe()
+            editor_values_param = get_values_from_linked_df(
+                linked_df, linked_ds_key, linked_ds_label, linked_ds_lookup_columns)
+            if (linked_ds_label != linked_ds_key):
+                # A label column was provided: use labels in the formatter, instead of the keys; for this we provide a "lookup" parameter which looks like this: {"key1": "label1", "key2": "label2", "null": ""}
                 t_col["formatter"] = "lookup"
-                formatter_lookup_param = values_df.set_index(
+                formatter_lookup_param = values_df.set_index( # TODO: fix this
                     linked_ds_key)[linked_ds_label].to_dict()
                 # use empty label when key is missing
                 formatter_lookup_param["null"] = ""

@@ -181,63 +181,66 @@ def add_edit(cell):
     else: user = get_user_details()
     return ees.add_edit_tabulator(cell, user)
 
+
 # if run_context=="local":
 #     print("Running in debug mode")
 #     app.run_server(debug=True)
+
 
 @server.route("/dash")
 def my_dash_app():
     return app.index()
 
 from flask import request, jsonify
+@server.route("/flask", methods=['GET', 'POST'])
+def dummy_endpoint():
+    if request.method == 'POST':
+        term = request.get_json().get("term")
+    else:
+        term = request.args.get('term', '')
+    return jsonify([term])
+
 from json import dumps
 from dataikuapi.utils import DataikuStreamedHttpUTF8CSVReader
 from pandas import DataFrame
-@server.route("/lookup/<linked_ds_name>/", methods=['GET', 'POST'])
+def get_dataframe_filtered(ds_name, filter_column, filter_term, n_results):
+    csv_stream = client._perform_raw(
+            "GET" , f"/projects/{project_key}/datasets/{ds_name}/data/",
+            params = {
+                "format" : "tsv-excel-header",
+                "filter" : f"""contains(toLowercase(strval("{filter_column}")), toLowercase("{filter_term}"))""",
+                "sampling" : dumps({
+                    "samplingMethod": "HEAD_SEQUENTIAL",
+                    "maxRecords": n_results
+                    })
+            })
+    ds = project.get_dataset(ds_name)
+    csv_reader = DataikuStreamedHttpUTF8CSVReader(ds.get_schema()["columns"], csv_stream)
+    rows = []
+    for row in csv_reader.iter_rows():
+        rows.append(row)
+    return DataFrame(columns=rows[0], data=rows[1:])
+
+from commons import get_values_from_linked_df
+@server.route("/lookup/<linked_ds_name>", methods=['GET', 'POST'])
 def my_flask_endpoint(linked_ds_name):
+    if request.method == 'POST':
+        term = request.get_json().get("term")
+    else:
+        term = request.args.get('term', '')
+    print(f"""Received a request for dataset "{linked_ds_name}", term "{term}" """)
     response = jsonify({})
-    if linked_ds_name in ees.linked_records_df["ds_name"].to_list(): # check that this is a linked dataset
+    
+    # Return data only when it's a linked dataset
+    if linked_ds_name in ees.linked_records_df["ds_name"].to_list(): 
         linked_record_row = ees.linked_records_df.loc[ees.linked_records_df["ds_name"]==linked_ds_name]
         linked_ds_lookup_columns = linked_record_row["ds_lookup_columns"][0]
-        linked_ds_label = linked_record_row["ds_label"][0]
         linked_ds_key = linked_record_row["ds_key"][0]
-        linked_ds = project.get_dataset(linked_ds_name)
-
-        if request.method == 'POST':
-            term = request.get_json().get("term")
-        else:
-            term = request.args.get('term', '')
-        print(f"""Received a request for dataset "{linked_ds_name}", term "{term}" """)
-        
-        if (len(term)>=3):
-            csv_stream = client._perform_raw(
-                "GET" , f"/projects/{project_key}/datasets/{linked_ds_name}/data/",
-                params = {
-                    "format" : "tsv-excel-header",
-                    "filter" : f"""contains(toLowercase(strval("{linked_ds_label}")), toLowercase("{term}"))""",
-                    "sampling" : dumps({
-                        "samplingMethod": "HEAD_SEQUENTIAL",
-                        "maxRecords": 100
-                        })
-                })
-            csv_reader = DataikuStreamedHttpUTF8CSVReader(linked_ds.get_schema()["columns"], csv_stream)
-            rows = []
-            for row in csv_reader.iter_rows():
-                rows.append(row)
-            linked_df_filtered = DataFrame(columns=rows[0], data=rows[1:]).sort_values(linked_ds_label)
-
-            linked_columns = [linked_ds_key]
-            if (linked_ds_label!=linked_ds_key):
-                linked_columns += [linked_ds_label]
-            if linked_ds_lookup_columns!=[]:
-                linked_columns += linked_ds_lookup_columns
-
-            if len(linked_columns)>1:
-                result = linked_df_filtered[linked_columns].to_dict("records")
-            else:
-                result = linked_df_filtered[linked_columns[0]].to_list()
-            
-            response = jsonify(result)
+        linked_ds_label = linked_record_row["ds_label"][0]
+        linked_df_filtered = get_dataframe_filtered(linked_ds_name, linked_ds_label, term, 10)
+        editor_values_param = get_values_from_linked_df(
+                linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns)
+        response = jsonify(editor_values_param)
 
     return response
 
