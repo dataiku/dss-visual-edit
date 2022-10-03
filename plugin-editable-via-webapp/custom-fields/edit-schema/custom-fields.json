@@ -1,7 +1,7 @@
 {
     "meta": {
         "label": "Data Editing",
-        "description": "Do Not Modify. These properties are managed by a webapp that makes it possible to edit values in the \"original dataset\" mentioned below. Go to the settings of the corresponding webapp to make changes. See documentation of the editable-via-webapp plugin for more info.",
+        "description": "Properties managed by a Data Editing webapp. Do not modify directly — use the corresponding webapp's settings to make changes.",
         "icon": "icon-columns"
     },
     "customFields": [
