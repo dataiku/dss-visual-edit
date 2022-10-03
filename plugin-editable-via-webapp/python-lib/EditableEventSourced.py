@@ -389,12 +389,11 @@ class EditableEventSourced:
         t_col["editor"] = "list"
         t_col["editorParams"] = {
             "autocomplete": True,
-            # "filterDelay": 300,
+            "filterRemote": True,
+            "filterDelay": 300,
             # "freetext": True,
-            # "listOnEmpty": False,
-            # "clearable": True,
-            # "placeholderEmpty": "no results",
-            # "placeholderLoading": "loading"
+            "listOnEmpty": False,
+            "clearable": True
         }
 
         # If lookup columns have been provided, use an item formatter in the editor
