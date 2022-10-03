@@ -244,5 +244,9 @@ def my_flask_endpoint(linked_ds_name):
 
     return response
 
+from flask import current_app
+@server.route('/test')
+def test_page():
+    return current_app.send_static_file('values_url.html')
 
 print("Webapp OK")
