@@ -10,10 +10,12 @@
 #%%
 # Get original dataset name and editschema
 
+import logging
 from dataiku import api_client
 from os import getenv
 from dash import Dash, html, dcc, Input, Output, State, callback_context
 
+logging.basicConfig(level=logging.INFO)
 stylesheets = ["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
 scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"]
 client = api_client()
@@ -21,7 +23,7 @@ project_key = getenv("DKU_CURRENT_PROJECT_KEY")
 project = client.get_project(project_key)
 
 if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
-    print("Webapp is being run in Dataiku")
+    logging.info("Webapp is being run in Dataiku")
     run_context = "dataiku"
     stylesheets += ["https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/style.css"] # this points to a copy of assets/style.css (which is ignored by Dataiku's Dash)
     scripts += ["https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/custom_tabulator.js"] # same for assets/custom_tabulator.js
@@ -43,7 +45,7 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     server = app.server
 
 else:
-    print("Webapp is being run outside of Dataiku")
+    logging.info("Webapp is being run outside of Dataiku")
     run_context = "local"
     info_display = "block"
 
@@ -64,6 +66,7 @@ else:
     from flask import Flask
     server = Flask(__name__)
     app = Dash(__name__, server=server)
+    app.enable_dev_tools(debug=True, dev_tools_ui=True)
 
 app.config.external_stylesheets = stylesheets
 app.config.external_scripts = scripts
@@ -95,7 +98,7 @@ def serve_layout():
             html.Div(id="data-refresh-message", children="The original dataset has changed. Do you want to refresh? (Your edits are safe.)", style={"display": "inline"}),
             html.Div(id="last-build-date", children=str(last_build_date), style={"display": "none"}), # when the original dataset was last built
             html.Div(id="last-refresh-date", children="", style={"display": "none"}), # when the data in the datatable was last refreshed
-            html.Button("Refresh", id="refresh-btn", n_clicks=0, className="ui compact yellow button", style={"margin-left": "2em", })
+            html.Button("Refresh", id="refresh-btn", n_clicks=0, className="ui compact yellow button", style={"marginLeft": "2em"})
         ], className="ui compact warning message", style={"display": "none"}),
 
         dcc.Interval(
@@ -139,13 +142,13 @@ def toggle_refresh_div_visibility(n_intervals, last_refresh_date, refresh_div_st
         if (callback_context.triggered_id=="interval-component-iu"):
             last_build_date_new = str(get_last_build_date(original_ds_name, project))
             if int(last_build_date_new)>int(last_build_date):
-                print("The original dataset has changed.")
+                logging.info("The original dataset has changed.")
                 last_build_date_new_fmtd = datetime.utcfromtimestamp(int(last_build_date_new)/1000).isoformat()
                 last_build_date_fmtd = datetime.utcfromtimestamp(int(last_build_date)/1000).isoformat()
-                print(f"""Last build date: {last_build_date_new_fmtd} — previously {last_build_date_fmtd}""")
+                logging.info(f"""Last build date: {last_build_date_new_fmtd} — previously {last_build_date_fmtd}""")
                 style_new["display"] = "block"
         else: # callback_context must be "last_refresh_date"
-            print("Datatable has been refreshed -> hiding refresh div")
+            logging.info("Datatable has been refreshed -> hiding refresh div")
             last_build_date_new = last_build_date
             style_new["display"] = "none"
     return style_new, last_build_date_new
@@ -163,10 +166,10 @@ def refresh_data(n_clicks):
     """
     Refresh datatable's contents based on the latest original and editlog datasets, once the refresh button has been clicked
     """
-    print("Refreshing the data...")
+    logging.info("Refreshing the data...")
     ees.load_data() # this loads the original df again, pivots the editlog and merges edits
     data = ees.get_data_tabulator()
-    print("Done.")
+    logging.info("Done.")
     return datetime.now().isoformat(), data
 
 @app.callback(
@@ -180,11 +183,6 @@ def add_edit(cell):
     if run_context=="local": user = "local"
     else: user = get_user_details()
     return ees.add_edit_tabulator(cell, user)
-
-
-# if run_context=="local":
-#     print("Running in debug mode")
-#     app.run_server(debug=True)
 
 
 @server.route("/dash")
@@ -228,7 +226,7 @@ def my_flask_endpoint(linked_ds_name):
         term = request.get_json().get("term")
     else:
         term = request.args.get('term', '')
-    print(f"""Received a request for dataset "{linked_ds_name}", term "{term}" """)
+    logging.info(f"""Received a request for dataset "{linked_ds_name}", term "{term}" """)
     response = jsonify({})
     
     # Return data only when it's a linked dataset
@@ -249,4 +247,4 @@ from flask import current_app
 def test_page():
     return current_app.send_static_file('values_url.html')
 
-print("Webapp OK")
+logging.info("Webapp OK")

@@ -1,3 +1,4 @@
+import logging
 from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
@@ -137,15 +138,15 @@ class EditableEventSourced:
         editlog_ds_creator = DSSManagedDatasetCreationHelper(
             self.project, self.editlog_ds_name)
         if (editlog_ds_creator.already_exists()):
-            # print("Found editlog")
+            logging.debug("Found editlog")
             self.editlog_ds = Dataset(self.editlog_ds_name, self.project_key)
         else:
-            # print("No editlog found, creating it...")
+            logging.debug("No editlog found, creating it...")
             editlog_ds_creator.with_store_into(
                 connection=self.__connection_name__)
             editlog_ds_creator.create()
             self.editlog_ds = Dataset(self.editlog_ds_name, self.project_key)
-            # print("Done.")
+            logging.debug("Done.")
 
         # make sure that editlog is in append mode
         self.editlog_ds.spec_item["appendMode"] = True
@@ -158,10 +159,10 @@ class EditableEventSourced:
         editlog_pivoted_ds_creator = DSSManagedDatasetCreationHelper(
             self.project, self.editlog_pivoted_ds_name)
         if (editlog_pivoted_ds_creator.already_exists()):
-            # print("Found editlog pivoted")
+            logging.debug("Found editlog pivoted")
             unused_variable = None
         else:
-            # print("No editlog pivoted found, creating it...")
+            logging.debug("No editlog pivoted found, creating it...")
             editlog_pivoted_ds_creator.with_store_into(
                 connection=self.__connection_name__)
             editlog_pivoted_ds_creator.create()
@@ -172,16 +173,16 @@ class EditableEventSourced:
             editlog_pivoted_df = DataFrame(columns=cols)
             self.editlog_pivoted_ds.write_schema(editlog_pivoted_ds_schema)
             self.editlog_pivoted_ds.write_dataframe(editlog_pivoted_df)
-            # print("Done.")
+            logging.debug("Done.")
 
         pivot_recipe_name = "compute_" + self.editlog_pivoted_ds_name
         pivot_recipe_creator = DSSRecipeCreator(
             "CustomCode_pivot-editlog", pivot_recipe_name, self.project)
         if (recipe_already_exists(pivot_recipe_name, self.project)):
-            # print("Found recipe to create editlog pivoted")
+            logging.debug("Found recipe to create editlog pivoted")
             pivot_recipe = self.project.get_recipe(pivot_recipe_name)
         else:
-            # print("No recipe to create editlog pivoted, creating it...")
+            logging.debug("No recipe to create editlog pivoted, creating it...")
             pivot_recipe = pivot_recipe_creator.create()
             pivot_settings = pivot_recipe.get_settings()
             pivot_settings.add_input("editlog", self.editlog_ds_name)
@@ -189,15 +190,15 @@ class EditableEventSourced:
                 "editlog_pivoted", self.editlog_pivoted_ds_name)
             pivot_settings.custom_fields["webapp_url"] = self.webapp_url
             pivot_settings.save()
-            # print("Done.")
+            logging.debug("Done.")
 
         edited_ds_creator = DSSManagedDatasetCreationHelper(
             self.project, self.edited_ds_name)
         if (edited_ds_creator.already_exists()):
-            # print("Found edited dataset")
+            logging.debug("Found edited dataset")
             self.edited_ds = Dataset(self.edited_ds_name, self.project_key)
         else:
-            # print("No edited dataset found, creating it...")
+            logging.debug("No edited dataset found, creating it...")
             edited_ds_creator.with_store_into(
                 connection=self.__connection_name__)
             edited_ds_creator.create()
@@ -205,16 +206,16 @@ class EditableEventSourced:
             edited_df = DataFrame(columns=self.edited_df_cols)
             self.edited_ds.write_schema(edited_ds_schema)
             self.edited_ds.write_dataframe(edited_df)
-            # print("Done.")
+            logging.debug("Done.")
 
         merge_recipe_name = "compute_" + self.edited_ds_name
         merge_recipe_creator = DSSRecipeCreator(
             "CustomCode_merge-edits", merge_recipe_name, self.project)
         if (recipe_already_exists(merge_recipe_name, self.project)):
-            # print("Found recipe to create edited dataset")
+            logging.debug("Found recipe to create edited dataset")
             merge_recipe = self.project.get_recipe(merge_recipe_name)
         else:
-            # print("No recipe to create edited dataset, creating it...")
+            logging.debug("No recipe to create edited dataset, creating it...")
             merge_recipe = merge_recipe_creator.create()
             merge_settings = merge_recipe.get_settings()
             merge_settings.add_input("original", self.original_ds_name)
@@ -223,7 +224,7 @@ class EditableEventSourced:
             merge_settings.add_output("edited", self.edited_ds_name)
             merge_settings.custom_fields["webapp_url"] = self.webapp_url
             merge_settings.save()
-            # print("Done.")
+            logging.debug("Done.")
 
     def load_data(self):
         self.__original_df__ = self.original_ds.get_dataframe()[
@@ -405,7 +406,7 @@ class EditableEventSourced:
 
         # Define possible values in the list
         linked_ds_name = self.linked_records_df.loc[linked_record_name, "ds_name"]
-        if (False):  # TODO: implement a condition to see if the linked dataset is big
+        if (True):  # TODO: implement a condition to see if the linked dataset is big
             # ds_key and ds_label would normally be used, when loading the linked dataset in memory, but here they will be fetched by the API endpoint who has access to an EditableEventSourced dataset and who's given linked_ds_name in the URL
             t_col["editorParams"]["valuesURL"] = "lookup/" + linked_ds_name
 
@@ -502,7 +503,7 @@ class EditableEventSourced:
         #             self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0]
 
         info = f"""Updated column {column_name} where {self.primary_keys} is {primary_key_values}. New value: {value}."""
-        print(info)
+        logging.info(info)
         return info
 
     def add_edit_tabulator(self, cell, user):
