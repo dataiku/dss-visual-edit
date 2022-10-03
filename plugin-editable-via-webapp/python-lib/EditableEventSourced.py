@@ -61,19 +61,17 @@ class EditableEventSourced:
                 linked_ds_key = col.get("linked_ds_key")
                 linked_ds_label = col.get("linked_ds_label")
                 linked_ds_lookup_columns = col.get("linked_ds_lookup_columns")
-                if not linked_ds_key:
-                    linked_ds_key = col.get("name")
-                if not linked_ds_label:
-                    linked_ds_label = linked_ds_key
-                if not linked_ds_lookup_columns:
-                    linked_ds_lookup_columns = []
+                if not linked_ds_key: linked_ds_key = col.get("name")
+                if not linked_ds_label: linked_ds_label = linked_ds_key
+                if not linked_ds_lookup_columns: linked_ds_lookup_columns = []
                 self.linked_records.append(
                     {
                         "name": col.get("name"),
                         "ds_name": col.get("linked_ds_name"),
                         "ds_key": linked_ds_key,
                         "ds_label": linked_ds_label,
-                        "ds_lookup_columns": linked_ds_lookup_columns
+                        "ds_lookup_columns": linked_ds_lookup_columns,
+                        "values_URL": values_URL
                     }
                 )
                 self.linked_record_names.append(col.get("name"))

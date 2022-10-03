@@ -2,6 +2,7 @@
     {
         "name": "part_number",
         "editable_type": "linked_record",
-        "linked_ds_name": "valid_part_numbers"
+        // "linked_ds_name": "valid_part_numbers" // this will result in having the browser load the whole dataset in memory
+        "values_URL": "http://127.0.0.1:5005/part_numbers"
     }
 ]

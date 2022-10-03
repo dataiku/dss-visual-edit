@@ -7,7 +7,12 @@
             "type": "python",
             "request": "launch",
             "module": "dash.development.component_generator",
-            "args": ["src/lib/components", "dash_tabulator", "-p", "package-info.json"],
+            "args": [
+                "src/lib/components",
+                "dash_tabulator",
+                "-p",
+                "package-info.json"
+            ],
             "justMyCode": false
         },
         {

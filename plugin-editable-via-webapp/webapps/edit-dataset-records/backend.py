@@ -86,24 +86,24 @@ columns = ees.get_columns_tabulator(freeze_editable_columns)
 data = ees.get_data_tabulator()
 
 try:
-    last_build_date = get_last_build_date(original_ds_name, project)
+    last_build_date_initial = get_last_build_date(original_ds_name, project)
     last_build_date_ok = True
 except:
-    last_build_date = ""
+    last_build_date_initial = ""
     last_build_date_ok = False
 
 def serve_layout():
     return html.Div(children=[
         html.Div(id="refresh-div", children=[
             html.Div(id="data-refresh-message", children="The original dataset has changed. Do you want to refresh? (Your edits are safe.)", style={"display": "inline"}),
-            html.Div(id="last-build-date", children=str(last_build_date), style={"display": "none"}), # when the original dataset was last built
+            html.Div(id="last-build-date", children=str(last_build_date_initial), style={"display": "none"}), # when the original dataset was last built
             html.Div(id="last-refresh-date", children="", style={"display": "none"}), # when the data in the datatable was last refreshed
-            html.Button("Refresh", id="refresh-btn", n_clicks=0, className="ui compact yellow button", style={"marginLeft": "2em"})
+            html.Button("Refresh table", id="refresh-btn", n_clicks=0, className="ui compact yellow button", style={"marginLeft": "2em"})
         ], className="ui compact warning message", style={"display": "none"}),
 
         dcc.Interval(
                 id="interval-component-iu",
-                interval=20*1000, # in milliseconds
+                interval=10*1000, # in milliseconds
                 n_intervals=0
         ),
 
@@ -118,18 +118,21 @@ def serve_layout():
     ])
 app.layout = serve_layout
 
+data_fresh = True
+
 @app.callback(
     [
         Output("refresh-div", "style"),
         Output("last-build-date", "children")
     ],
     [
+        # Changes in the Inputs trigger the callback
         Input("interval-component-iu", "n_intervals"),
         Input("last-refresh-date", "children"),
+        # Changes in States don't trigger the callback
         State("refresh-div", "style"),
         State("last-build-date", "children")
-    ],
-    prevent_initial_call=True)
+    ])
 def toggle_refresh_div_visibility(n_intervals, last_refresh_date, refresh_div_style, last_build_date):
     """
     Toggle visibility of refresh div, once...
@@ -139,18 +142,25 @@ def toggle_refresh_div_visibility(n_intervals, last_refresh_date, refresh_div_st
     """
     style_new = refresh_div_style
     if last_build_date_ok:
-        if (callback_context.triggered_id=="interval-component-iu"):
+        if (callback_context.triggered_id==None): # initial call
+            last_build_date_new = last_build_date
+            global data_fresh
+            if not data_fresh:
+                style_new["display"] = "block"
+        elif (callback_context.triggered_id=="interval-component-iu"):
             last_build_date_new = str(get_last_build_date(original_ds_name, project))
             if int(last_build_date_new)>int(last_build_date):
                 logging.info("The original dataset has changed.")
                 last_build_date_new_fmtd = datetime.utcfromtimestamp(int(last_build_date_new)/1000).isoformat()
                 last_build_date_fmtd = datetime.utcfromtimestamp(int(last_build_date)/1000).isoformat()
-                logging.info(f"""Last build date: {last_build_date_new_fmtd} — previously {last_build_date_fmtd}""")
+                logging.info(f"""Last build date: {last_build_date_new} ({last_build_date_new_fmtd}) — previously {last_build_date} ({last_build_date_fmtd})""")
                 style_new["display"] = "block"
-        else: # callback_context must be "last_refresh_date"
+                data_fresh = False
+        else: # callback_context must be "last_refresh_date", i.e. that date has changed due to a click on "refresh table"
             logging.info("Datatable has been refreshed -> hiding refresh div")
             last_build_date_new = last_build_date
             style_new["display"] = "none"
+            data_fresh = True
     return style_new, last_build_date_new
 
 @app.callback(
