@@ -426,8 +426,6 @@ class EditableEventSourced:
                 formatter_lookup_param["null"] = ""
                 t_col["formatterParams"] = formatter_lookup_param
             t_col["editorParams"]["values"] = editor_values_param
-            t_col["editorParams"]["autocomplete"] = True
-            t_col["editorParams"]["filterDelay"] = 300
             t_col["editorParams"]["filterFunc"] = self.__ns__("filterFunc")
 
         return t_col
@@ -439,7 +437,7 @@ class EditableEventSourced:
         for col_name in self.edited_df_cols:
 
             # Properties to be shared by all columns
-            t_col = {"field": col_name, "headerFilter": True,
+            t_col = {"field": col_name, "title": col_name, "headerFilter": True,
                      "resizable": True, "headerContextMenu": self.__ns__("headerMenu")}
 
             # Define formatter and header filters based on type
