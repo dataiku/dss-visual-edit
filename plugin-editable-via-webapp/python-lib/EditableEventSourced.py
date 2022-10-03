@@ -70,8 +70,7 @@ class EditableEventSourced:
                         "ds_name": col.get("linked_ds_name"),
                         "ds_key": linked_ds_key,
                         "ds_label": linked_ds_label,
-                        "ds_lookup_columns": linked_ds_lookup_columns,
-                        "values_URL": values_URL
+                        "ds_lookup_columns": linked_ds_lookup_columns
                     }
                 )
                 self.linked_record_names.append(col.get("name"))
