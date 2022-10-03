@@ -406,7 +406,9 @@ class EditableEventSourced:
 
         # Define possible values in the list
         linked_ds_name = self.linked_records_df.loc[linked_record_name, "ds_name"]
-        if (True):  # TODO: implement a condition to see if the linked dataset is big
+        linked_ds = self.project.get_dataset(linked_ds_name)
+        count_records = linked_ds.compute_metrics(metric_ids=["records:COUNT_RECORDS"])["result"]["computed"][0]["value"]
+        if (count_records > 10000):
             # ds_key and ds_label would normally be used, when loading the linked dataset in memory, but here they will be fetched by the API endpoint who has access to an EditableEventSourced dataset and who's given linked_ds_name in the URL
             t_col["editorParams"]["valuesURL"] = "lookup/" + linked_ds_name
 
