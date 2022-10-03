@@ -407,8 +407,8 @@ class EditableEventSourced:
         # Define possible values in the list
         linked_ds_name = self.linked_records_df.loc[linked_record_name, "ds_name"]
         linked_ds = self.project.get_dataset(linked_ds_name)
-        count_records = linked_ds.compute_metrics(metric_ids=["records:COUNT_RECORDS"])["result"]["computed"][0]["value"]
-        if (count_records > 10000):
+        count_records = int(linked_ds.compute_metrics(metric_ids=["records:COUNT_RECORDS"])["result"]["computed"][0]["value"])
+        if (count_records > 1000):
             # ds_key and ds_label would normally be used, when loading the linked dataset in memory, but here they will be fetched by the API endpoint who has access to an EditableEventSourced dataset and who's given linked_ds_name in the URL
             t_col["editorParams"]["valuesURL"] = "lookup/" + linked_ds_name
 
@@ -422,7 +422,7 @@ class EditableEventSourced:
             if (linked_ds_label != linked_ds_key):
                 # A label column was provided: use labels in the formatter, instead of the keys; for this we provide a "lookup" parameter which looks like this: {"key1": "label1", "key2": "label2", "null": ""}
                 t_col["formatter"] = "lookup"
-                formatter_lookup_param = values_df.set_index( # TODO: fix this
+                formatter_lookup_param = linked_df.set_index(
                     linked_ds_key)[linked_ds_label].to_dict()
                 # use empty label when key is missing
                 formatter_lookup_param["null"] = ""
