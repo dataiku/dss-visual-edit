@@ -35,8 +35,8 @@ List of available fields to describe each item of the editschema:
 
 * `name`: name of a column of the original dataset.
 * `editable_type` allows to define "linked records"; the editor will be a text input with a dropdown menu showing results that match the input. Results will be coming from a given dataset, or from an API endpoint. These additional fields must be defined:
-  * `linked_ds_name` AND `linked_ds_key`: name of the dataset that is linked to the field AND primary key for it (there must be one and only one)
-  * OR `values_URL`: address to an endpoint accepting a `term` parameter and returning a list of linked records that match this search term
+  * `linked_ds_name`: name of the dataset that is linked to the field
+  * `linked_ds_key`: primary key for this dataset (there must be one and only one)
 * `linked_ds_label` (optional): name of a column of the linked dataset to use for display purposes in the webapp, instead of the key
 * `linked_ds_lookup_columns` (optional): list of columns from which to pull additional information to show in the dropdown menu
 * `type` allows to override the column's type inferred from the original dataset's schema, or to refine it:
