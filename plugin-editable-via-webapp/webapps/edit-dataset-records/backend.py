@@ -10,17 +10,20 @@
 #%%
 # Get original dataset name and editschema
 
+import logging
 from dataiku import api_client
 from os import getenv
 from dash import Dash, html, dcc, Input, Output, State, callback_context
 
+logging.basicConfig(level=logging.INFO)
 stylesheets = ["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
 scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"]
 client = api_client()
-project = client.get_project(getenv("DKU_CURRENT_PROJECT_KEY"))
+project_key = getenv("DKU_CURRENT_PROJECT_KEY")
+project = client.get_project(project_key)
 
 if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
-    print("Webapp is being run in Dataiku")
+    logging.info("Webapp is being run in Dataiku")
     run_context = "dataiku"
     stylesheets += ["https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/style.css"] # this points to a copy of assets/style.css (which is ignored by Dataiku's Dash)
     scripts += ["https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/custom_tabulator.js"] # same for assets/custom_tabulator.js
@@ -39,8 +42,10 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     else:
         editschema_manual = {}
 
+    server = app.server
+
 else:
-    print("Webapp is being run outside of Dataiku")
+    logging.info("Webapp is being run outside of Dataiku")
     run_context = "local"
     info_display = "block"
 
@@ -59,8 +64,9 @@ else:
         editschema_manual = {}
     
     from flask import Flask
-    f_app = Flask(__name__)
-    app = Dash(__name__, server=f_app)
+    server = Flask(__name__)
+    app = Dash(__name__, server=server)
+    app.enable_dev_tools(debug=True, dev_tools_ui=True)
 
 app.config.external_stylesheets = stylesheets
 app.config.external_scripts = scripts
@@ -92,7 +98,7 @@ def serve_layout():
             html.Div(id="data-refresh-message", children="The original dataset has changed. Do you want to refresh? (Your edits are safe.)", style={"display": "inline"}),
             html.Div(id="last-build-date", children=str(last_build_date_initial), style={"display": "none"}), # when the original dataset was last built
             html.Div(id="last-refresh-date", children="", style={"display": "none"}), # when the data in the datatable was last refreshed
-            html.Button("Refresh table", id="refresh-btn", n_clicks=0, className="ui compact yellow button", style={"margin-left": "2em", })
+            html.Button("Refresh table", id="refresh-btn", n_clicks=0, className="ui compact yellow button", style={"marginLeft": "2em"})
         ], className="ui compact warning message", style={"display": "none"}),
 
         dcc.Interval(
@@ -144,14 +150,14 @@ def toggle_refresh_div_visibility(n_intervals, last_refresh_date, refresh_div_st
         elif (callback_context.triggered_id=="interval-component-iu"):
             last_build_date_new = str(get_last_build_date(original_ds_name, project))
             if int(last_build_date_new)>int(last_build_date):
-                print("The original dataset has changed.")
+                logging.info("The original dataset has changed.")
                 last_build_date_new_fmtd = datetime.utcfromtimestamp(int(last_build_date_new)/1000).isoformat()
                 last_build_date_fmtd = datetime.utcfromtimestamp(int(last_build_date)/1000).isoformat()
-                print(f"""Last build date: {last_build_date_new} ({last_build_date_new_fmtd}) — previously {last_build_date} ({last_build_date_fmtd})""")
+                logging.info(f"""Last build date: {last_build_date_new} ({last_build_date_new_fmtd}) — previously {last_build_date} ({last_build_date_fmtd})""")
                 style_new["display"] = "block"
                 data_fresh = False
         else: # callback_context must be "last_refresh_date", i.e. that date has changed due to a click on "refresh table"
-            print("Datatable has been refreshed -> hiding refresh div")
+            logging.info("Datatable has been refreshed -> hiding refresh div")
             last_build_date_new = last_build_date
             style_new["display"] = "none"
             data_fresh = True
@@ -170,10 +176,10 @@ def refresh_data(n_clicks):
     """
     Refresh datatable's contents based on the latest original and editlog datasets, once the refresh button has been clicked
     """
-    print("Refreshing the data...")
+    logging.info("Refreshing the data...")
     ees.load_data() # this loads the original df again, pivots the editlog and merges edits
     data = ees.get_data_tabulator()
-    print("Done.")
+    logging.info("Done.")
     return datetime.now().isoformat(), data
 
 @app.callback(
@@ -188,8 +194,67 @@ def add_edit(cell):
     else: user = get_user_details()
     return ees.add_edit_tabulator(cell, user)
 
-# if run_context=="local":
-#     print("Running in debug mode")
-#     app.run_server(debug=True)
 
-print("Webapp OK")
+@server.route("/dash")
+def my_dash_app():
+    return app.index()
+
+from flask import request, jsonify
+@server.route("/flask", methods=['GET', 'POST'])
+def dummy_endpoint():
+    if request.method == 'POST':
+        term = request.get_json().get("term")
+    else:
+        term = request.args.get('term', '')
+    return jsonify([term])
+
+from json import dumps
+from dataikuapi.utils import DataikuStreamedHttpUTF8CSVReader
+from pandas import DataFrame
+def get_dataframe_filtered(ds_name, filter_column, filter_term, n_results):
+    csv_stream = client._perform_raw(
+            "GET" , f"/projects/{project_key}/datasets/{ds_name}/data/",
+            params = {
+                "format" : "tsv-excel-header",
+                "filter" : f"""contains(toLowercase(strval("{filter_column}")), toLowercase("{filter_term}"))""",
+                "sampling" : dumps({
+                    "samplingMethod": "HEAD_SEQUENTIAL",
+                    "maxRecords": n_results
+                    })
+            })
+    ds = project.get_dataset(ds_name)
+    csv_reader = DataikuStreamedHttpUTF8CSVReader(ds.get_schema()["columns"], csv_stream)
+    rows = []
+    for row in csv_reader.iter_rows():
+        rows.append(row)
+    return DataFrame(columns=rows[0], data=rows[1:])
+
+from commons import get_values_from_linked_df
+@server.route("/lookup/<linked_ds_name>", methods=['GET', 'POST'])
+def my_flask_endpoint(linked_ds_name):
+    if request.method == 'POST':
+        term = request.get_json().get("term")
+    else:
+        term = request.args.get('term', '')
+    logging.info(f"""Received a request for dataset "{linked_ds_name}", term "{term}" """)
+    response = jsonify({})
+    
+    # Return data only when it's a linked dataset
+    if linked_ds_name in ees.linked_records_df["ds_name"].to_list(): 
+        linked_record_row = ees.linked_records_df.loc[ees.linked_records_df["ds_name"]==linked_ds_name]
+        linked_ds_lookup_columns = linked_record_row["ds_lookup_columns"][0]
+        linked_ds_key = linked_record_row["ds_key"][0]
+        linked_ds_label = linked_record_row["ds_label"][0]
+        linked_df_filtered = get_dataframe_filtered(linked_ds_name, linked_ds_label, term, 10)
+        editor_values_param = get_values_from_linked_df(
+                linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns)
+        response = jsonify(editor_values_param)
+
+    return response
+
+from flask import current_app
+@server.route('/test')
+def test_page():
+    return current_app.send_static_file('values_url.html')
+
+logging.info("Webapp OK")

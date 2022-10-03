@@ -97,11 +97,21 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
         },
         
         itemFormatter: function (label, value, item, element) {
-            //label - the text lable for the item
-            //value - the value for the item
+            //label - the text label for the item -> this would be the value of linked_ds_label
+            //value - the value for the item -> this would be the value of linked_ds_key -> we don't display it
             //item - the original value object for the item
             //element - the DOM element for the item
-            return "<strong>" + label + "</strong><br/><div>" + item.description + "</div>";
+
+            // TODO: loop over properties of `item`
+            o = "<strong>" + label + "</strong><br/><div>"
+            for (const key in item) { // the first two keys are for linked_ds_key and linked_ds_label
+                if (key!="label" && key!="value") {
+                    o += item[key] + " - "
+                }
+            }
+            o = o.substring(0, o.length-3)
+            o += "</div>"
+            return o;
         },
 
         //custom max min filter function

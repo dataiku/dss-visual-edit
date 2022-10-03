@@ -1,6 +1,6 @@
 <link href="https://unpkg.com/tabulator-tables@5.3.4/dist/css/tabulator.min.css" rel="stylesheet">
 <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.3.4/dist/js/tabulator.min.js"></script>
-<h1>Many Columns with Vanilla Tabulator</h1>
+<h1>Values URL with Vanilla Tabulator</h1>
 <div id="example-table"></div>
 <script type="text/javascript">
     //define data array
@@ -13,13 +13,26 @@
         {id:6, name:"Frank Harbours", progress:38, gender:"male", rating:4, col:"red", dob:"12/05/1966", car:1},
     ];
 
-    var columns = [];
-    var randomMutator = function(){
-        return Math.random();
-    }
-    for (let z = 1; z <= 100; z++){
-        columns.push({title:"Column " + z, field:"a" + z, mutator:randomMutator});
-    }
+    var columns = [
+        {title:"Name", field:"name"},
+        {title:"Progress", field:"progress", hozAlign:"right", sorter:"number"},
+        {title:"Gender", field:"gender"},
+        {title:"Rating", field:"rating", hozAlign:"center"},
+
+        {
+            title:"Favourite Color",
+            field:"col",
+            editor:"list",
+            editorParams:{
+                valuesURL:"/lookup/valid_part_numbers",
+                autocomplete:true,
+                filterRemote:true
+            }
+        },
+        
+        {title:"Date Of Birth", field:"dob", hozAlign:"center", sorter:"date"},
+        {title:"Driver", field:"car", hozAlign:"center"},
+    ];
 
     //initialize table
     var table = new Tabulator("#example-table", {

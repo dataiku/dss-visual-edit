@@ -1,31 +1,6 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        {
-            "name": "Lookup API",
-            "cwd": "${workspaceFolder}",
-            "type": "python",
-            "request": "launch",
-            "module": "flask",
-            "env": {
-                "FLASK_APP": "lookup_api.py",
-                "FLASK_DEBUG": "1",
-                "PROJECT_KEY": "EDIT",
-                "DS_NAME": "valid_part_numbers"
-            },
-            "args": [
-                "run",
-                "--no-debugger",
-                "--no-reload",
-                "--port",
-                "5005"
-            ],
-            "jinja": true,
-            "justMyCode": true
-        },
         {
             "name": "Dash Component Generator",
             "cwd": "${workspaceFolder}/dash_tabulator/",
@@ -50,11 +25,14 @@
                 "FLASK_APP": "backend.py",
                 "FLASK_ENV": "development",
                 "PYTHONPATH": "../../python-lib",
-                "DKU_CURRENT_PROJECT_KEY": "EDIT", // choose from CATEGORIZE_TRANSACTIONS, JOIN_COMPANIES, STAKEHOLDER_OWNERSHIP, EDIT
-                "ORIGINAL_DATASET": "equipment_shifts_dates", // choose from transactions_missing, matches, stakeholders_tbc_prepared, demand_stream_prepared_filtered, equipment_shifts_dates, new_parts_copy
+                "DKU_CURRENT_PROJECT_KEY": "BOEING",
+                // choose from CATEGORIZE_TRANSACTIONS, JOIN_COMPANIES, STAKEHOLDER_OWNERSHIP, EDIT
+                "ORIGINAL_DATASET": "equipment_shifts_dates",
+                // choose from transactions_missing, matches, stakeholders_tbc_prepared, demand_stream_prepared_filtered, equipment_shifts_dates, new_parts_copy
             },
             "args": [
-                "run"
+                "run",
+                "--no-debugger" // this is used to disable the flask built-in debugger so that it doesn't interfere with the VS Code debugger - see https://flask.palletsprojects.com/en/2.2.x/debugging/
             ],
             "jinja": true,
             "justMyCode": false

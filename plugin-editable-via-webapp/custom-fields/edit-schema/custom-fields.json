@@ -1,7 +1,7 @@
 {
     "meta": {
         "label": "Data Editing",
-        "description": "Properties related to datasets made editable via webapp (see corresponding plugin)",
+        "description": "Properties managed by a Data Editing webapp. Do not modify directly — use the corresponding webapp's settings to make changes.",
         "icon": "icon-columns"
     },
     "customFields": [
