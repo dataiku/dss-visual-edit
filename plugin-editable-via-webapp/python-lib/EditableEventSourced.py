@@ -404,13 +404,18 @@ class EditableEventSourced:
         # Define possible values in the list
         linked_ds_name = self.linked_records_df.loc[linked_record_name, "ds_name"]
         linked_ds = self.project.get_dataset(linked_ds_name)
-        count_records = int(linked_ds.compute_metrics(metric_ids=["records:COUNT_RECORDS"])["result"]["computed"][0]["value"])
+        metrics = linked_ds.compute_metrics(metric_ids=["records:COUNT_RECORDS"])["result"]["computed"]
+        for m in metrics:
+            if (m["metric"]["metricType"] == "COUNT_RECORDS"):
+                count_records = int(m["value"])
         if (count_records > 1000):
             # ds_key and ds_label would normally be used, when loading the linked dataset in memory, but here they will be fetched by the API endpoint who has access to an EditableEventSourced dataset and who's given linked_ds_name in the URL
+            logging.debug(f"Using API to lookup values in {linked_ds_name} since this dataset has {count_records} rows")
             t_col["editorParams"]["valuesURL"] = "lookup/" + linked_ds_name
 
         else:
             # The dataset can be loaded in memory
+            logging.debug(f"Loading {linked_ds_name} in memory since this dataset has {count_records} rows")
             linked_ds_key = self.linked_records_df.loc[linked_record_name, "ds_key"]
             linked_ds_label = self.linked_records_df.loc[linked_record_name, "ds_label"]
             linked_df = Dataset(linked_ds_name).get_dataframe()
