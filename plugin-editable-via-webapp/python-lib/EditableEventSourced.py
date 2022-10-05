@@ -387,7 +387,6 @@ class EditableEventSourced:
         t_col["editor"] = "list"
         t_col["editorParams"] = {
             "autocomplete": True,
-            "filterRemote": True,
             "filterDelay": 300,
             # "freetext": True,
             "listOnEmpty": False,
@@ -411,6 +410,7 @@ class EditableEventSourced:
         if (count_records > 1000):
             # ds_key and ds_label would normally be used, when loading the linked dataset in memory, but here they will be fetched by the API endpoint who has access to an EditableEventSourced dataset and who's given linked_ds_name in the URL
             logging.debug(f"Using API to lookup values in {linked_ds_name} since this dataset has {count_records} rows")
+            t_col["editorParams"]["filterRemote"] = True
             t_col["editorParams"]["valuesURL"] = "lookup/" + linked_ds_name
 
         else:
