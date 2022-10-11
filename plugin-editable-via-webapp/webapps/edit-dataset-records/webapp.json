@@ -76,14 +76,6 @@
             "mandatory": true
         },
         {
-            "name": "linked_record_1_name_linked",
-            "label": "LR #1: column name in linked dataset",
-            "description": "",
-            "type": "DATASET_COLUMN",
-            "datasetParamName": "linked_record_1_ds_name",
-            "mandatory": true
-        },
-        {
             "name": "linked_record_1_key",
             "label": "LR #1: primary key in linked dataset",
             "description": "",
