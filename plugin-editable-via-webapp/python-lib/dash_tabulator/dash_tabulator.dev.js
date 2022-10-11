@@ -129,7 +129,7 @@ window["dash_tabulator"] =
 /******/ 	        var srcFragments = src.split('/');
 /******/ 	        var fileFragments = srcFragments.slice(-1)[0].split('.');
 /******/
-/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1664547687");
+/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1665416554");
 /******/ 	        srcFragments.splice(-1, 1, fileFragments.join('.'))
 /******/
 /******/ 	        return srcFragments.join('/');
@@ -155,7 +155,7 @@ window["dash_tabulator"] =
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../../css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.i, ".tabulator{position:relative;border:1px solid #999;background-color:#888;font-size:14px;text-align:left;overflow:hidden;-webkit-transform:translateZ(0);-moz-transform:translateZ(0);-ms-transform:translateZ(0);-o-transform:translateZ(0);transform:translateZ(0)}.tabulator[tabulator-layout=fitDataFill] .tabulator-tableholder .tabulator-table{min-width:100%}.tabulator[tabulator-layout=fitDataTable]{display:inline-block}.tabulator.tabulator-block-select{user-select:none}.tabulator .tabulator-header{position:relative;box-sizing:border-box;width:100%;border-bottom:1px solid #999;background-color:#e6e6e6;color:#555;font-weight:700;white-space:nowrap;overflow:hidden;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none}.tabulator .tabulator-header.tabulator-header-hidden{display:none}.tabulator .tabulator-header .tabulator-col{display:inline-flex;position:relative;box-sizing:border-box;flex-direction:column;justify-content:flex-start;border-right:1px solid #aaa;background:#e6e6e6;text-align:left;vertical-align:bottom;overflow:hidden}.tabulator .tabulator-header .tabulator-col.tabulator-moving{position:absolute;border:1px solid #999;background:#cdcdcd;pointer-events:none}.tabulator .tabulator-header .tabulator-col .tabulator-col-content{box-sizing:border-box;position:relative;padding:4px}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-header-popup-button{padding:0 8px}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-header-popup-button:hover{cursor:pointer;opacity:.6}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title-holder{position:relative}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title{box-sizing:border-box;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title .tabulator-title-editor{box-sizing:border-box;width:100%;border:1px solid #999;padding:1px;background:#fff}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title .tabulator-header-popup-button+.tabulator-title-editor{width:calc(100% - 22px)}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-sorter{display:flex;align-items:center;position:absolute;top:0;bottom:0;right:4px}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-sorter .tabulator-arrow{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:6px solid #bbb}.tabulator .tabulator-header .tabulator-col.tabulator-col-group .tabulator-col-group-cols{position:relative;display:flex;border-top:1px solid #aaa;overflow:hidden;margin-right:-1px}.tabulator .tabulator-header .tabulator-col .tabulator-header-filter{position:relative;box-sizing:border-box;margin-top:2px;width:100%;text-align:center}.tabulator .tabulator-header .tabulator-col .tabulator-header-filter textarea{height:auto!important}.tabulator .tabulator-header .tabulator-col .tabulator-header-filter svg{margin-top:3px}.tabulator .tabulator-header .tabulator-col .tabulator-header-filter input::-ms-clear{width:0;height:0}.tabulator .tabulator-header .tabulator-col.tabulator-sortable .tabulator-col-title{padding-right:25px}.tabulator .tabulator-header .tabulator-col.tabulator-sortable:hover{cursor:pointer;background-color:#cdcdcd}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=none] .tabulator-col-content .tabulator-col-sorter{color:#bbb}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=none] .tabulator-col-content .tabulator-col-sorter .tabulator-arrow{border-top:none;border-bottom:6px solid #bbb}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=ascending] .tabulator-col-content .tabulator-col-sorter{color:#666}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=ascending] .tabulator-col-content .tabulator-col-sorter .tabulator-arrow{border-top:none;border-bottom:6px solid #666}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=descending] .tabulator-col-content .tabulator-col-sorter{color:#666}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=descending] .tabulator-col-content .tabulator-col-sorter .tabulator-arrow{border-bottom:none;border-top:6px solid #666;color:#666}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical .tabulator-col-content .tabulator-col-title{writing-mode:vertical-rl;text-orientation:mixed;display:flex;align-items:center;justify-content:center}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical.tabulator-col-vertical-flip .tabulator-col-title{transform:rotate(180deg)}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical.tabulator-sortable .tabulator-col-title{padding-right:0;padding-top:20px}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical.tabulator-sortable.tabulator-col-vertical-flip .tabulator-col-title{padding-right:0;padding-bottom:20px}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical.tabulator-sortable .tabulator-col-sorter{justify-content:center;left:0;right:0;top:4px;bottom:auto}.tabulator .tabulator-header .tabulator-frozen{position:absolute;z-index:10}.tabulator .tabulator-header .tabulator-frozen.tabulator-frozen-left{border-right:2px solid #aaa}.tabulator .tabulator-header .tabulator-frozen.tabulator-frozen-right{border-left:2px solid #aaa}.tabulator .tabulator-header .tabulator-calcs-holder{box-sizing:border-box;min-width:600%;background:#f3f3f3!important;border-top:1px solid #aaa;border-bottom:1px solid #aaa;overflow:hidden}.tabulator .tabulator-header .tabulator-calcs-holder .tabulator-row{background:#f3f3f3!important}.tabulator .tabulator-header .tabulator-calcs-holder .tabulator-row .tabulator-col-resize-handle{display:none}.tabulator .tabulator-header .tabulator-frozen-rows-holder{min-width:600%}.tabulator .tabulator-header .tabulator-frozen-rows-holder:empty{display:none}.tabulator .tabulator-tableholder{position:relative;width:100%;white-space:nowrap;overflow:auto;-webkit-overflow-scrolling:touch}.tabulator .tabulator-tableholder:focus{outline:none}.tabulator .tabulator-tableholder .tabulator-placeholder{box-sizing:border-box;display:flex;align-items:center;width:100%}.tabulator .tabulator-tableholder .tabulator-placeholder[tabulator-render-mode=virtual]{min-height:100%;min-width:100%}.tabulator .tabulator-tableholder .tabulator-placeholder .tabulator-placeholder-contents{display:inline-block;text-align:center;padding:10px;color:#ccc;font-weight:700;font-size:20px;white-space:normal}.tabulator .tabulator-tableholder .tabulator-table{position:relative;display:inline-block;background-color:#fff;white-space:nowrap;overflow:visible;color:#333}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.tabulator-calcs{font-weight:700;background:#e2e2e2!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.tabulator-calcs.tabulator-calcs-top{border-bottom:2px solid #aaa}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.tabulator-calcs.tabulator-calcs-bottom{border-top:2px solid #aaa}.tabulator .tabulator-footer{border-top:1px solid #999;background-color:#e6e6e6;color:#555;font-weight:700;white-space:nowrap;user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none}.tabulator .tabulator-footer .tabulator-footer-contents{display:flex;flex-direction:row;align-items:center;justify-content:space-between;padding:5px 10px}.tabulator .tabulator-footer .tabulator-footer-contents:empty{display:none}.tabulator .tabulator-footer .tabulator-calcs-holder{box-sizing:border-box;width:calc(100% + 20px);text-align:left;background:#f3f3f3!important;border-bottom:1px solid #aaa;border-top:1px solid #aaa;overflow:hidden}.tabulator .tabulator-footer .tabulator-calcs-holder .tabulator-row{background:#f3f3f3!important}.tabulator .tabulator-footer .tabulator-calcs-holder .tabulator-row .tabulator-col-resize-handle{display:none}.tabulator .tabulator-footer .tabulator-calcs-holder:only-child{margin-bottom:-5px;border-bottom:none}.tabulator .tabulator-footer>*+.tabulator-page-counter{margin-left:10px}.tabulator .tabulator-footer .tabulator-page-counter{font-weight:400}.tabulator .tabulator-footer .tabulator-paginator{flex:1;text-align:right;color:#555;font-family:inherit;font-weight:inherit;font-size:inherit}.tabulator .tabulator-footer .tabulator-page-size{display:inline-block;margin:0 5px;padding:2px 5px;border:1px solid #aaa;border-radius:3px}.tabulator .tabulator-footer .tabulator-pages{margin:0 7px}.tabulator .tabulator-footer .tabulator-page{display:inline-block;margin:0 2px;padding:2px 5px;border:1px solid #aaa;border-radius:3px;background:hsla(0,0%,100%,.2)}.tabulator .tabulator-footer .tabulator-page.active{color:#d00}.tabulator .tabulator-footer .tabulator-page:disabled{opacity:.5}.tabulator .tabulator-footer .tabulator-page:not(.disabled):hover{cursor:pointer;background:rgba(0,0,0,.2);color:#fff}.tabulator .tabulator-col-resize-handle{position:relative;display:inline-block;width:6px;margin-left:-3px;margin-right:-3px;z-index:10;vertical-align:middle}.tabulator .tabulator-col-resize-handle:hover{cursor:ew-resize}.tabulator .tabulator-col-resize-handle:last-of-type{width:3px;margin-right:0}.tabulator .tabulator-alert{position:absolute;display:flex;align-items:center;top:0;left:0;z-index:100;height:100%;width:100%;background:rgba(0,0,0,.4);text-align:center}.tabulator .tabulator-alert .tabulator-alert-msg{display:inline-block;margin:0 auto;padding:10px 20px;border-radius:10px;background:#fff;font-weight:700;font-size:16px}.tabulator .tabulator-alert .tabulator-alert-msg.tabulator-alert-state-msg{border:4px solid #333;color:#000}.tabulator .tabulator-alert .tabulator-alert-msg.tabulator-alert-state-error{border:4px solid #d00;color:#590000}.tabulator-row{position:relative;box-sizing:border-box;min-height:22px;background-color:#fff}.tabulator-row.tabulator-row-even{background-color:#efefef}.tabulator-row.tabulator-selectable:hover{background-color:#bbb;cursor:pointer}.tabulator-row.tabulator-selected{background-color:#9abcea}.tabulator-row.tabulator-selected:hover{background-color:#769bcc;cursor:pointer}.tabulator-row.tabulator-row-moving{border:1px solid #000;background:#fff}.tabulator-row.tabulator-moving{position:absolute;border-top:1px solid #aaa;border-bottom:1px solid #aaa;pointer-events:none;z-index:15}.tabulator-row .tabulator-row-resize-handle{position:absolute;right:0;bottom:0;left:0;height:5px}.tabulator-row .tabulator-row-resize-handle.prev{top:0;bottom:auto}.tabulator-row .tabulator-row-resize-handle:hover{cursor:ns-resize}.tabulator-row .tabulator-frozen{display:inline-block;position:absolute;background-color:inherit;z-index:10}.tabulator-row .tabulator-frozen.tabulator-frozen-left{border-right:2px solid #aaa}.tabulator-row .tabulator-frozen.tabulator-frozen-right{border-left:2px solid #aaa}.tabulator-row .tabulator-responsive-collapse{box-sizing:border-box;padding:5px;border-top:1px solid #aaa;border-bottom:1px solid #aaa}.tabulator-row .tabulator-responsive-collapse:empty{display:none}.tabulator-row .tabulator-responsive-collapse table{font-size:14px}.tabulator-row .tabulator-responsive-collapse table tr td{position:relative}.tabulator-row .tabulator-responsive-collapse table tr td:first-of-type{padding-right:10px}.tabulator-row .tabulator-cell{display:inline-block;position:relative;box-sizing:border-box;padding:4px;border-right:1px solid #aaa;vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tabulator-row .tabulator-cell.tabulator-editing{border:1px solid #1d68cd;outline:none;padding:0}.tabulator-row .tabulator-cell.tabulator-editing input,.tabulator-row .tabulator-cell.tabulator-editing select{border:1px;background:transparent;outline:none}.tabulator-row .tabulator-cell.tabulator-validation-fail{border:1px solid #d00}.tabulator-row .tabulator-cell.tabulator-validation-fail input,.tabulator-row .tabulator-cell.tabulator-validation-fail select{border:1px;background:transparent;color:#d00}.tabulator-row .tabulator-cell.tabulator-row-handle{display:inline-flex;align-items:center;justify-content:center;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none}.tabulator-row .tabulator-cell.tabulator-row-handle .tabulator-row-handle-box{width:80%}.tabulator-row .tabulator-cell.tabulator-row-handle .tabulator-row-handle-box .tabulator-row-handle-bar{width:100%;height:3px;margin-top:2px;background:#666}.tabulator-row .tabulator-cell .tabulator-data-tree-branch{display:inline-block;vertical-align:middle;height:9px;width:7px;margin-top:-9px;margin-right:5px;border-bottom-left-radius:1px;border-left:2px solid #aaa;border-bottom:2px solid #aaa}.tabulator-row .tabulator-cell .tabulator-data-tree-control{display:inline-flex;justify-content:center;align-items:center;vertical-align:middle;height:11px;width:11px;margin-right:5px;border:1px solid #333;border-radius:2px;background:rgba(0,0,0,.1);overflow:hidden}.tabulator-row .tabulator-cell .tabulator-data-tree-control:hover{cursor:pointer;background:rgba(0,0,0,.2)}.tabulator-row .tabulator-cell .tabulator-data-tree-control .tabulator-data-tree-control-collapse{display:inline-block;position:relative;height:7px;width:1px;background:transparent}.tabulator-row .tabulator-cell .tabulator-data-tree-control .tabulator-data-tree-control-collapse:after{position:absolute;content:\"\";left:-3px;top:3px;height:1px;width:7px;background:#333}.tabulator-row .tabulator-cell .tabulator-data-tree-control .tabulator-data-tree-control-expand{display:inline-block;position:relative;height:7px;width:1px;background:#333}.tabulator-row .tabulator-cell .tabulator-data-tree-control .tabulator-data-tree-control-expand:after{position:absolute;content:\"\";left:-3px;top:3px;height:1px;width:7px;background:#333}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle{display:inline-flex;align-items:center;justify-content:center;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none;height:15px;width:15px;border-radius:20px;background:#666;color:#fff;font-weight:700;font-size:1.1em}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle:hover{opacity:.7}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle.open .tabulator-responsive-collapse-toggle-close{display:initial}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle.open .tabulator-responsive-collapse-toggle-open,.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle .tabulator-responsive-collapse-toggle-close{display:none}.tabulator-row .tabulator-cell .tabulator-traffic-light{display:inline-block;height:14px;width:14px;border-radius:14px}.tabulator-row.tabulator-group{box-sizing:border-box;border-bottom:1px solid #999;border-right:1px solid #aaa;border-top:1px solid #999;padding:5px 5px 5px 10px;background:#ccc;font-weight:700;min-width:100%}.tabulator-row.tabulator-group:hover{cursor:pointer;background-color:rgba(0,0,0,.1)}.tabulator-row.tabulator-group.tabulator-group-visible .tabulator-arrow{margin-right:10px;border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid #666;border-bottom:0}.tabulator-row.tabulator-group.tabulator-group-level-1{padding-left:30px}.tabulator-row.tabulator-group.tabulator-group-level-2{padding-left:50px}.tabulator-row.tabulator-group.tabulator-group-level-3{padding-left:70px}.tabulator-row.tabulator-group.tabulator-group-level-4{padding-left:90px}.tabulator-row.tabulator-group.tabulator-group-level-5{padding-left:110px}.tabulator-row.tabulator-group .tabulator-group-toggle{display:inline-block}.tabulator-row.tabulator-group .tabulator-arrow{display:inline-block;width:0;height:0;margin-right:16px;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:0;border-left:6px solid #666;vertical-align:middle}.tabulator-row.tabulator-group span{margin-left:10px;color:#d00}.tabulator-popup-container{position:absolute;display:inline-block;box-sizing:border-box;background:#fff;border:1px solid #aaa;box-shadow:0 0 5px 0 rgba(0,0,0,.2);font-size:14px;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:10000}.tabulator-popup{padding:5px;border-radius:3px}.tabulator-tooltip{max-width:Min(500px,100%);padding:3px 5px;border-radius:2px;box-shadow:none;font-size:12px;pointer-events:none}.tabulator-menu .tabulator-menu-item{position:relative;box-sizing:border-box;padding:5px 10px;user-select:none}.tabulator-menu .tabulator-menu-item.tabulator-menu-item-disabled{opacity:.5}.tabulator-menu .tabulator-menu-item:not(.tabulator-menu-item-disabled):hover{cursor:pointer;background:#efefef}.tabulator-menu .tabulator-menu-item.tabulator-menu-item-submenu{padding-right:25px}.tabulator-menu .tabulator-menu-item.tabulator-menu-item-submenu:after{display:inline-block;position:absolute;top:calc(5px + .4em);right:10px;height:7px;width:7px;content:\"\";border-color:#aaa;border-style:solid;border-width:1px 1px 0 0;vertical-align:top;transform:rotate(45deg)}.tabulator-menu .tabulator-menu-separator{border-top:1px solid #aaa}.tabulator-edit-list{max-height:200px;font-size:14px;overflow-y:auto;-webkit-overflow-scrolling:touch}.tabulator-edit-list .tabulator-edit-list-item{padding:4px;color:#333;outline:none}.tabulator-edit-list .tabulator-edit-list-item.active{color:#fff;background:#1d68cd}.tabulator-edit-list .tabulator-edit-list-item.active.focused{outline:1px solid hsla(0,0%,100%,.5)}.tabulator-edit-list .tabulator-edit-list-item.focused{outline:1px solid #1d68cd}.tabulator-edit-list .tabulator-edit-list-item:hover{cursor:pointer;color:#fff;background:#1d68cd}.tabulator-edit-list .tabulator-edit-list-placeholder{padding:4px;color:#333;text-align:center}.tabulator-edit-list .tabulator-edit-list-group{border-bottom:1px solid #aaa;padding:6px 4px 4px;color:#333;font-weight:700}.tabulator-edit-list .tabulator-edit-list-group.tabulator-edit-list-group-level-2,.tabulator-edit-list .tabulator-edit-list-item.tabulator-edit-list-group-level-2{padding-left:12px}.tabulator-edit-list .tabulator-edit-list-group.tabulator-edit-list-group-level-3,.tabulator-edit-list .tabulator-edit-list-item.tabulator-edit-list-group-level-3{padding-left:20px}.tabulator-edit-list .tabulator-edit-list-group.tabulator-edit-list-group-level-4,.tabulator-edit-list .tabulator-edit-list-item.tabulator-edit-list-group-level-4{padding-left:28px}.tabulator-edit-list .tabulator-edit-list-group.tabulator-edit-list-group-level-5,.tabulator-edit-list .tabulator-edit-list-item.tabulator-edit-list-group-level-5{padding-left:36px}.tabulator.tabulator-ltr{direction:ltr}.tabulator.tabulator-rtl{text-align:initial;direction:rtl}.tabulator.tabulator-rtl .tabulator-header .tabulator-col{text-align:initial;border-left:1px solid #aaa;border-right:initial}.tabulator.tabulator-rtl .tabulator-header .tabulator-col.tabulator-col-group .tabulator-col-group-cols{margin-right:0;margin-left:-1px}.tabulator.tabulator-rtl .tabulator-header .tabulator-col.tabulator-sortable .tabulator-col-title{padding-right:0;padding-left:25px}.tabulator.tabulator-rtl .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-sorter{left:8px;right:auto}.tabulator.tabulator-rtl .tabulator-row .tabulator-cell{border-right:initial;border-left:1px solid #aaa}.tabulator.tabulator-rtl .tabulator-row .tabulator-cell .tabulator-data-tree-branch{margin-right:0;margin-left:5px;border-bottom-left-radius:0;border-bottom-right-radius:1px;border-left:initial;border-right:2px solid #aaa}.tabulator.tabulator-rtl .tabulator-row .tabulator-cell .tabulator-data-tree-control{margin-right:0;margin-left:5px}.tabulator.tabulator-rtl .tabulator-footer .tabulator-calcs-holder{text-align:initial}.tabulator-print-fullscreen{position:absolute;top:0;bottom:0;left:0;right:0;z-index:10000}body.tabulator-print-fullscreen-hide>:not(.tabulator-print-fullscreen){display:none!important}.tabulator-print-table{border-collapse:collapse}.tabulator-print-table .tabulator-data-tree-branch{display:inline-block;vertical-align:middle;height:9px;width:7px;margin-top:-9px;margin-right:5px;border-bottom-left-radius:1px;border-left:2px solid #aaa;border-bottom:2px solid #aaa}.tabulator-print-table .tabulator-print-table-group{box-sizing:border-box;border-bottom:1px solid #999;border-right:1px solid #aaa;border-top:1px solid #999;padding:5px 5px 5px 10px;background:#ccc;font-weight:700;min-width:100%}.tabulator-print-table .tabulator-print-table-group:hover{cursor:pointer;background-color:rgba(0,0,0,.1)}.tabulator-print-table .tabulator-print-table-group.tabulator-group-visible .tabulator-arrow{margin-right:10px;border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid #666;border-bottom:0}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-1 td{padding-left:30px!important}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-2 td{padding-left:50px!important}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-3 td{padding-left:70px!important}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-4 td{padding-left:90px!important}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-5 td{padding-left:110px!important}.tabulator-print-table .tabulator-print-table-group .tabulator-group-toggle{display:inline-block}.tabulator-print-table .tabulator-print-table-group .tabulator-arrow{display:inline-block;width:0;height:0;margin-right:16px;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:0;border-left:6px solid #666;vertical-align:middle}.tabulator-print-table .tabulator-print-table-group span{margin-left:10px;color:#d00}.tabulator-print-table .tabulator-data-tree-control{display:inline-flex;justify-content:center;align-items:center;vertical-align:middle;height:11px;width:11px;margin-right:5px;border:1px solid #333;border-radius:2px;background:rgba(0,0,0,.1);overflow:hidden}.tabulator-print-table .tabulator-data-tree-control:hover{cursor:pointer;background:rgba(0,0,0,.2)}.tabulator-print-table .tabulator-data-tree-control .tabulator-data-tree-control-collapse{display:inline-block;position:relative;height:7px;width:1px;background:transparent}.tabulator-print-table .tabulator-data-tree-control .tabulator-data-tree-control-collapse:after{position:absolute;content:\"\";left:-3px;top:3px;height:1px;width:7px;background:#333}.tabulator-print-table .tabulator-data-tree-control .tabulator-data-tree-control-expand{display:inline-block;position:relative;height:7px;width:1px;background:#333}.tabulator-print-table .tabulator-data-tree-control .tabulator-data-tree-control-expand:after{position:absolute;content:\"\";left:-3px;top:3px;height:1px;width:7px;background:#333}", ""]);
+exports.push([module.i, ".tabulator{position:relative;border:1px solid #999;background-color:#888;font-size:14px;text-align:left;overflow:hidden;-webkit-transform:translateZ(0);-moz-transform:translateZ(0);-ms-transform:translateZ(0);-o-transform:translateZ(0);transform:translateZ(0)}.tabulator[tabulator-layout=fitDataFill] .tabulator-tableholder .tabulator-table{min-width:100%}.tabulator[tabulator-layout=fitDataTable]{display:inline-block}.tabulator.tabulator-block-select{user-select:none}.tabulator .tabulator-header{position:relative;box-sizing:border-box;width:100%;border-bottom:1px solid #999;background-color:#e6e6e6;color:#555;font-weight:700;white-space:nowrap;overflow:hidden;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none}.tabulator .tabulator-header.tabulator-header-hidden{display:none}.tabulator .tabulator-header .tabulator-header-contents{position:relative;overflow:hidden}.tabulator .tabulator-header .tabulator-header-contents .tabulator-headers{display:inline-block}.tabulator .tabulator-header .tabulator-col{display:inline-flex;position:relative;box-sizing:border-box;flex-direction:column;justify-content:flex-start;border-right:1px solid #aaa;background:#e6e6e6;text-align:left;vertical-align:bottom;overflow:hidden}.tabulator .tabulator-header .tabulator-col.tabulator-moving{position:absolute;border:1px solid #999;background:#cdcdcd;pointer-events:none}.tabulator .tabulator-header .tabulator-col .tabulator-col-content{box-sizing:border-box;position:relative;padding:4px}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-header-popup-button{padding:0 8px}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-header-popup-button:hover{cursor:pointer;opacity:.6}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title-holder{position:relative}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title{box-sizing:border-box;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title.tabulator-col-title-wrap{white-space:normal;text-overflow:clip}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title .tabulator-title-editor{box-sizing:border-box;width:100%;border:1px solid #999;padding:1px;background:#fff}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title .tabulator-header-popup-button+.tabulator-title-editor{width:calc(100% - 22px)}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-sorter{display:flex;align-items:center;position:absolute;top:0;bottom:0;right:4px}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-sorter .tabulator-arrow{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:6px solid #bbb}.tabulator .tabulator-header .tabulator-col.tabulator-col-group .tabulator-col-group-cols{position:relative;display:flex;border-top:1px solid #aaa;overflow:hidden;margin-right:-1px}.tabulator .tabulator-header .tabulator-col .tabulator-header-filter{position:relative;box-sizing:border-box;margin-top:2px;width:100%;text-align:center}.tabulator .tabulator-header .tabulator-col .tabulator-header-filter textarea{height:auto!important}.tabulator .tabulator-header .tabulator-col .tabulator-header-filter svg{margin-top:3px}.tabulator .tabulator-header .tabulator-col .tabulator-header-filter input::-ms-clear{width:0;height:0}.tabulator .tabulator-header .tabulator-col.tabulator-sortable .tabulator-col-title{padding-right:25px}.tabulator .tabulator-header .tabulator-col.tabulator-sortable.tabulator-col-sorter-element:hover{cursor:pointer;background-color:#cdcdcd}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=none] .tabulator-col-content .tabulator-col-sorter{color:#bbb}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=none] .tabulator-col-content .tabulator-col-sorter.tabulator-col-sorter-element .tabulator-arrow:hover{cursor:pointer;border-bottom:6px solid #555}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=none] .tabulator-col-content .tabulator-col-sorter .tabulator-arrow{border-top:none;border-bottom:6px solid #bbb}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=ascending] .tabulator-col-content .tabulator-col-sorter{color:#666}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=ascending] .tabulator-col-content .tabulator-col-sorter.tabulator-col-sorter-element .tabulator-arrow:hover{cursor:pointer;border-bottom:6px solid #555}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=ascending] .tabulator-col-content .tabulator-col-sorter .tabulator-arrow{border-top:none;border-bottom:6px solid #666}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=descending] .tabulator-col-content .tabulator-col-sorter{color:#666}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=descending] .tabulator-col-content .tabulator-col-sorter.tabulator-col-sorter-element .tabulator-arrow:hover{cursor:pointer;border-top:6px solid #555}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=descending] .tabulator-col-content .tabulator-col-sorter .tabulator-arrow{border-bottom:none;border-top:6px solid #666;color:#666}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical .tabulator-col-content .tabulator-col-title{writing-mode:vertical-rl;text-orientation:mixed;display:flex;align-items:center;justify-content:center}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical.tabulator-col-vertical-flip .tabulator-col-title{transform:rotate(180deg)}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical.tabulator-sortable .tabulator-col-title{padding-right:0;padding-top:20px}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical.tabulator-sortable.tabulator-col-vertical-flip .tabulator-col-title{padding-right:0;padding-bottom:20px}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical.tabulator-sortable .tabulator-col-sorter{justify-content:center;left:0;right:0;top:4px;bottom:auto}.tabulator .tabulator-header .tabulator-frozen{position:sticky;left:0;z-index:10}.tabulator .tabulator-header .tabulator-frozen.tabulator-frozen-left{border-right:2px solid #aaa}.tabulator .tabulator-header .tabulator-frozen.tabulator-frozen-right{border-left:2px solid #aaa}.tabulator .tabulator-header .tabulator-calcs-holder{box-sizing:border-box;min-width:600%;background:#f3f3f3!important;border-top:1px solid #aaa;border-bottom:1px solid #aaa}.tabulator .tabulator-header .tabulator-calcs-holder .tabulator-row{background:#f3f3f3!important}.tabulator .tabulator-header .tabulator-calcs-holder .tabulator-row .tabulator-col-resize-handle{display:none}.tabulator .tabulator-header .tabulator-frozen-rows-holder{min-width:600%}.tabulator .tabulator-header .tabulator-frozen-rows-holder:empty{display:none}.tabulator .tabulator-tableholder{position:relative;width:100%;white-space:nowrap;overflow:auto;-webkit-overflow-scrolling:touch}.tabulator .tabulator-tableholder:focus{outline:none}.tabulator .tabulator-tableholder .tabulator-placeholder{box-sizing:border-box;display:flex;align-items:center;width:100%}.tabulator .tabulator-tableholder .tabulator-placeholder[tabulator-render-mode=virtual]{min-height:100%;min-width:100%}.tabulator .tabulator-tableholder .tabulator-placeholder .tabulator-placeholder-contents{display:inline-block;text-align:center;padding:10px;color:#ccc;font-weight:700;font-size:20px;white-space:normal}.tabulator .tabulator-tableholder .tabulator-table{position:relative;display:inline-block;background-color:#fff;white-space:nowrap;overflow:visible;color:#333}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.tabulator-calcs{font-weight:700;background:#e2e2e2!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.tabulator-calcs.tabulator-calcs-top{border-bottom:2px solid #aaa}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.tabulator-calcs.tabulator-calcs-bottom{border-top:2px solid #aaa}.tabulator .tabulator-footer{border-top:1px solid #999;background-color:#e6e6e6;color:#555;font-weight:700;white-space:nowrap;user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none}.tabulator .tabulator-footer .tabulator-footer-contents{display:flex;flex-direction:row;align-items:center;justify-content:space-between;padding:5px 10px}.tabulator .tabulator-footer .tabulator-footer-contents:empty{display:none}.tabulator .tabulator-footer .tabulator-calcs-holder{box-sizing:border-box;width:100%;text-align:left;background:#f3f3f3!important;border-bottom:1px solid #aaa;border-top:1px solid #aaa;overflow:hidden}.tabulator .tabulator-footer .tabulator-calcs-holder .tabulator-row{display:inline-block;background:#f3f3f3!important}.tabulator .tabulator-footer .tabulator-calcs-holder .tabulator-row .tabulator-col-resize-handle{display:none}.tabulator .tabulator-footer .tabulator-calcs-holder:only-child{margin-bottom:-5px;border-bottom:none}.tabulator .tabulator-footer>*+.tabulator-page-counter{margin-left:10px}.tabulator .tabulator-footer .tabulator-page-counter{font-weight:400}.tabulator .tabulator-footer .tabulator-paginator{flex:1;text-align:right;color:#555;font-family:inherit;font-weight:inherit;font-size:inherit}.tabulator .tabulator-footer .tabulator-page-size{display:inline-block;margin:0 5px;padding:2px 5px;border:1px solid #aaa;border-radius:3px}.tabulator .tabulator-footer .tabulator-pages{margin:0 7px}.tabulator .tabulator-footer .tabulator-page{display:inline-block;margin:0 2px;padding:2px 5px;border:1px solid #aaa;border-radius:3px;background:hsla(0,0%,100%,.2)}.tabulator .tabulator-footer .tabulator-page.active{color:#d00}.tabulator .tabulator-footer .tabulator-page:disabled{opacity:.5}.tabulator .tabulator-footer .tabulator-page:not(.disabled):hover{cursor:pointer;background:rgba(0,0,0,.2);color:#fff}.tabulator .tabulator-col-resize-handle{position:relative;display:inline-block;width:6px;margin-left:-3px;margin-right:-3px;z-index:10;vertical-align:middle}.tabulator .tabulator-col-resize-handle:hover{cursor:ew-resize}.tabulator .tabulator-col-resize-handle:last-of-type{width:3px;margin-right:0}.tabulator .tabulator-alert{position:absolute;display:flex;align-items:center;top:0;left:0;z-index:100;height:100%;width:100%;background:rgba(0,0,0,.4);text-align:center}.tabulator .tabulator-alert .tabulator-alert-msg{display:inline-block;margin:0 auto;padding:10px 20px;border-radius:10px;background:#fff;font-weight:700;font-size:16px}.tabulator .tabulator-alert .tabulator-alert-msg.tabulator-alert-state-msg{border:4px solid #333;color:#000}.tabulator .tabulator-alert .tabulator-alert-msg.tabulator-alert-state-error{border:4px solid #d00;color:#590000}.tabulator-row{position:relative;box-sizing:border-box;min-height:22px;background-color:#fff}.tabulator-row.tabulator-row-even{background-color:#efefef}.tabulator-row.tabulator-selectable:hover{background-color:#bbb;cursor:pointer}.tabulator-row.tabulator-selected{background-color:#9abcea}.tabulator-row.tabulator-selected:hover{background-color:#769bcc;cursor:pointer}.tabulator-row.tabulator-row-moving{border:1px solid #000;background:#fff}.tabulator-row.tabulator-moving{position:absolute;border-top:1px solid #aaa;border-bottom:1px solid #aaa;pointer-events:none;z-index:15}.tabulator-row .tabulator-row-resize-handle{position:absolute;right:0;bottom:0;left:0;height:5px}.tabulator-row .tabulator-row-resize-handle.prev{top:0;bottom:auto}.tabulator-row .tabulator-row-resize-handle:hover{cursor:ns-resize}.tabulator-row .tabulator-responsive-collapse{box-sizing:border-box;padding:5px;border-top:1px solid #aaa;border-bottom:1px solid #aaa}.tabulator-row .tabulator-responsive-collapse:empty{display:none}.tabulator-row .tabulator-responsive-collapse table{font-size:14px}.tabulator-row .tabulator-responsive-collapse table tr td{position:relative}.tabulator-row .tabulator-responsive-collapse table tr td:first-of-type{padding-right:10px}.tabulator-row .tabulator-cell{display:inline-block;position:relative;box-sizing:border-box;padding:4px;border-right:1px solid #aaa;vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tabulator-row .tabulator-cell.tabulator-frozen{display:inline-block;position:sticky;left:0;background-color:inherit;z-index:10}.tabulator-row .tabulator-cell.tabulator-frozen.tabulator-frozen-left{border-right:2px solid #aaa}.tabulator-row .tabulator-cell.tabulator-frozen.tabulator-frozen-right{border-left:2px solid #aaa}.tabulator-row .tabulator-cell.tabulator-editing{border:1px solid #1d68cd;outline:none;padding:0}.tabulator-row .tabulator-cell.tabulator-editing input,.tabulator-row .tabulator-cell.tabulator-editing select{border:1px;background:transparent;outline:none}.tabulator-row .tabulator-cell.tabulator-validation-fail{border:1px solid #d00}.tabulator-row .tabulator-cell.tabulator-validation-fail input,.tabulator-row .tabulator-cell.tabulator-validation-fail select{border:1px;background:transparent;color:#d00}.tabulator-row .tabulator-cell.tabulator-row-handle{display:inline-flex;align-items:center;justify-content:center;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none}.tabulator-row .tabulator-cell.tabulator-row-handle .tabulator-row-handle-box{width:80%}.tabulator-row .tabulator-cell.tabulator-row-handle .tabulator-row-handle-box .tabulator-row-handle-bar{width:100%;height:3px;margin-top:2px;background:#666}.tabulator-row .tabulator-cell .tabulator-data-tree-branch{display:inline-block;vertical-align:middle;height:9px;width:7px;margin-top:-9px;margin-right:5px;border-bottom-left-radius:1px;border-left:2px solid #aaa;border-bottom:2px solid #aaa}.tabulator-row .tabulator-cell .tabulator-data-tree-control{display:inline-flex;justify-content:center;align-items:center;vertical-align:middle;height:11px;width:11px;margin-right:5px;border:1px solid #333;border-radius:2px;background:rgba(0,0,0,.1);overflow:hidden}.tabulator-row .tabulator-cell .tabulator-data-tree-control:hover{cursor:pointer;background:rgba(0,0,0,.2)}.tabulator-row .tabulator-cell .tabulator-data-tree-control .tabulator-data-tree-control-collapse{display:inline-block;position:relative;height:7px;width:1px;background:transparent}.tabulator-row .tabulator-cell .tabulator-data-tree-control .tabulator-data-tree-control-collapse:after{position:absolute;content:\"\";left:-3px;top:3px;height:1px;width:7px;background:#333}.tabulator-row .tabulator-cell .tabulator-data-tree-control .tabulator-data-tree-control-expand{display:inline-block;position:relative;height:7px;width:1px;background:#333}.tabulator-row .tabulator-cell .tabulator-data-tree-control .tabulator-data-tree-control-expand:after{position:absolute;content:\"\";left:-3px;top:3px;height:1px;width:7px;background:#333}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle{display:inline-flex;align-items:center;justify-content:center;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none;height:15px;width:15px;border-radius:20px;background:#666;color:#fff;font-weight:700;font-size:1.1em}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle:hover{opacity:.7;cursor:pointer}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle.open .tabulator-responsive-collapse-toggle-close{display:initial}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle.open .tabulator-responsive-collapse-toggle-open{display:none}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle svg{stroke:#fff}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle .tabulator-responsive-collapse-toggle-close{display:none}.tabulator-row .tabulator-cell .tabulator-traffic-light{display:inline-block;height:14px;width:14px;border-radius:14px}.tabulator-row.tabulator-group{box-sizing:border-box;border-bottom:1px solid #999;border-right:1px solid #aaa;border-top:1px solid #999;padding:5px 5px 5px 10px;background:#ccc;font-weight:700;min-width:100%}.tabulator-row.tabulator-group:hover{cursor:pointer;background-color:rgba(0,0,0,.1)}.tabulator-row.tabulator-group.tabulator-group-visible .tabulator-arrow{margin-right:10px;border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid #666;border-bottom:0}.tabulator-row.tabulator-group.tabulator-group-level-1{padding-left:30px}.tabulator-row.tabulator-group.tabulator-group-level-2{padding-left:50px}.tabulator-row.tabulator-group.tabulator-group-level-3{padding-left:70px}.tabulator-row.tabulator-group.tabulator-group-level-4{padding-left:90px}.tabulator-row.tabulator-group.tabulator-group-level-5{padding-left:110px}.tabulator-row.tabulator-group .tabulator-group-toggle{display:inline-block}.tabulator-row.tabulator-group .tabulator-arrow{display:inline-block;width:0;height:0;margin-right:16px;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:0;border-left:6px solid #666;vertical-align:middle}.tabulator-row.tabulator-group span{margin-left:10px;color:#d00}.tabulator-popup-container{position:absolute;display:inline-block;box-sizing:border-box;background:#fff;border:1px solid #aaa;box-shadow:0 0 5px 0 rgba(0,0,0,.2);font-size:14px;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:10000}.tabulator-popup{padding:5px;border-radius:3px}.tabulator-tooltip{max-width:Min(500px,100%);padding:3px 5px;border-radius:2px;box-shadow:none;font-size:12px;pointer-events:none}.tabulator-menu .tabulator-menu-item{position:relative;box-sizing:border-box;padding:5px 10px;user-select:none}.tabulator-menu .tabulator-menu-item.tabulator-menu-item-disabled{opacity:.5}.tabulator-menu .tabulator-menu-item:not(.tabulator-menu-item-disabled):hover{cursor:pointer;background:#efefef}.tabulator-menu .tabulator-menu-item.tabulator-menu-item-submenu{padding-right:25px}.tabulator-menu .tabulator-menu-item.tabulator-menu-item-submenu:after{display:inline-block;position:absolute;top:calc(5px + .4em);right:10px;height:7px;width:7px;content:\"\";border-color:#aaa;border-style:solid;border-width:1px 1px 0 0;vertical-align:top;transform:rotate(45deg)}.tabulator-menu .tabulator-menu-separator{border-top:1px solid #aaa}.tabulator-edit-list{max-height:200px;font-size:14px;overflow-y:auto;-webkit-overflow-scrolling:touch}.tabulator-edit-list .tabulator-edit-list-item{padding:4px;color:#333;outline:none}.tabulator-edit-list .tabulator-edit-list-item.active{color:#fff;background:#1d68cd}.tabulator-edit-list .tabulator-edit-list-item.active.focused{outline:1px solid hsla(0,0%,100%,.5)}.tabulator-edit-list .tabulator-edit-list-item.focused{outline:1px solid #1d68cd}.tabulator-edit-list .tabulator-edit-list-item:hover{cursor:pointer;color:#fff;background:#1d68cd}.tabulator-edit-list .tabulator-edit-list-placeholder{padding:4px;color:#333;text-align:center}.tabulator-edit-list .tabulator-edit-list-group{border-bottom:1px solid #aaa;padding:6px 4px 4px;color:#333;font-weight:700}.tabulator-edit-list .tabulator-edit-list-group.tabulator-edit-list-group-level-2,.tabulator-edit-list .tabulator-edit-list-item.tabulator-edit-list-group-level-2{padding-left:12px}.tabulator-edit-list .tabulator-edit-list-group.tabulator-edit-list-group-level-3,.tabulator-edit-list .tabulator-edit-list-item.tabulator-edit-list-group-level-3{padding-left:20px}.tabulator-edit-list .tabulator-edit-list-group.tabulator-edit-list-group-level-4,.tabulator-edit-list .tabulator-edit-list-item.tabulator-edit-list-group-level-4{padding-left:28px}.tabulator-edit-list .tabulator-edit-list-group.tabulator-edit-list-group-level-5,.tabulator-edit-list .tabulator-edit-list-item.tabulator-edit-list-group-level-5{padding-left:36px}.tabulator.tabulator-ltr{direction:ltr}.tabulator.tabulator-rtl{text-align:initial;direction:rtl}.tabulator.tabulator-rtl .tabulator-header .tabulator-col{text-align:initial;border-left:1px solid #aaa;border-right:initial}.tabulator.tabulator-rtl .tabulator-header .tabulator-col.tabulator-col-group .tabulator-col-group-cols{margin-right:0;margin-left:-1px}.tabulator.tabulator-rtl .tabulator-header .tabulator-col.tabulator-sortable .tabulator-col-title{padding-right:0;padding-left:25px}.tabulator.tabulator-rtl .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-sorter{left:8px;right:auto}.tabulator.tabulator-rtl .tabulator-row .tabulator-cell{border-right:initial;border-left:1px solid #aaa}.tabulator.tabulator-rtl .tabulator-row .tabulator-cell .tabulator-data-tree-branch{margin-right:0;margin-left:5px;border-bottom-left-radius:0;border-bottom-right-radius:1px;border-left:initial;border-right:2px solid #aaa}.tabulator.tabulator-rtl .tabulator-row .tabulator-cell .tabulator-data-tree-control{margin-right:0;margin-left:5px}.tabulator.tabulator-rtl .tabulator-row .tabulator-cell.tabulator-frozen.tabulator-frozen-left{border-left:2px solid #aaa}.tabulator.tabulator-rtl .tabulator-row .tabulator-cell.tabulator-frozen.tabulator-frozen-right{border-right:2px solid #aaa}.tabulator.tabulator-rtl .tabulator-row .tabulator-col-resize-handle:last-of-type{width:3px;margin-left:0;margin-right:-3px}.tabulator.tabulator-rtl .tabulator-footer .tabulator-calcs-holder{text-align:initial}.tabulator-print-fullscreen{position:absolute;top:0;bottom:0;left:0;right:0;z-index:10000}body.tabulator-print-fullscreen-hide>:not(.tabulator-print-fullscreen){display:none!important}.tabulator-print-table{border-collapse:collapse}.tabulator-print-table .tabulator-data-tree-branch{display:inline-block;vertical-align:middle;height:9px;width:7px;margin-top:-9px;margin-right:5px;border-bottom-left-radius:1px;border-left:2px solid #aaa;border-bottom:2px solid #aaa}.tabulator-print-table .tabulator-print-table-group{box-sizing:border-box;border-bottom:1px solid #999;border-right:1px solid #aaa;border-top:1px solid #999;padding:5px 5px 5px 10px;background:#ccc;font-weight:700;min-width:100%}.tabulator-print-table .tabulator-print-table-group:hover{cursor:pointer;background-color:rgba(0,0,0,.1)}.tabulator-print-table .tabulator-print-table-group.tabulator-group-visible .tabulator-arrow{margin-right:10px;border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid #666;border-bottom:0}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-1 td{padding-left:30px!important}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-2 td{padding-left:50px!important}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-3 td{padding-left:70px!important}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-4 td{padding-left:90px!important}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-5 td{padding-left:110px!important}.tabulator-print-table .tabulator-print-table-group .tabulator-group-toggle{display:inline-block}.tabulator-print-table .tabulator-print-table-group .tabulator-arrow{display:inline-block;width:0;height:0;margin-right:16px;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:0;border-left:6px solid #666;vertical-align:middle}.tabulator-print-table .tabulator-print-table-group span{margin-left:10px;color:#d00}.tabulator-print-table .tabulator-data-tree-control{display:inline-flex;justify-content:center;align-items:center;vertical-align:middle;height:11px;width:11px;margin-right:5px;border:1px solid #333;border-radius:2px;background:rgba(0,0,0,.1);overflow:hidden}.tabulator-print-table .tabulator-data-tree-control:hover{cursor:pointer;background:rgba(0,0,0,.2)}.tabulator-print-table .tabulator-data-tree-control .tabulator-data-tree-control-collapse{display:inline-block;position:relative;height:7px;width:1px;background:transparent}.tabulator-print-table .tabulator-data-tree-control .tabulator-data-tree-control-collapse:after{position:absolute;content:\"\";left:-3px;top:3px;height:1px;width:7px;background:#333}.tabulator-print-table .tabulator-data-tree-control .tabulator-data-tree-control-expand{display:inline-block;position:relative;height:7px;width:1px;background:#333}.tabulator-print-table .tabulator-data-tree-control .tabulator-data-tree-control-expand:after{position:absolute;content:\"\";left:-3px;top:3px;height:1px;width:7px;background:#333}", ""]);
 // Exports
 module.exports = exports;
 
@@ -173,7 +173,7 @@ module.exports = exports;
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../../css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.i, ".tabulator{position:relative;background-color:#fff;font-size:14px;text-align:left;overflow:hidden;-webkit-transform:translateZ(0);-moz-transform:translateZ(0);-ms-transform:translateZ(0);-o-transform:translateZ(0);transform:translateZ(0)}.tabulator[tabulator-layout=fitDataFill] .tabulator-tableholder .tabulator-table{min-width:100%}.tabulator[tabulator-layout=fitDataTable]{display:inline-block}.tabulator.tabulator-block-select{user-select:none}.tabulator .tabulator-header{position:relative;box-sizing:border-box;width:100%;border-bottom:1px solid #999;white-space:nowrap;overflow:hidden;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none}.tabulator .tabulator-header.tabulator-header-hidden{display:none}.tabulator .tabulator-header .tabulator-col{display:inline-flex;position:relative;box-sizing:border-box;flex-direction:column;justify-content:flex-start;border-right:1px solid #ddd;background:#f9fafb;text-align:left;vertical-align:bottom;overflow:hidden}.tabulator .tabulator-header .tabulator-col.tabulator-moving{position:absolute;border:1px solid #999;background:#dae1e7;pointer-events:none}.tabulator .tabulator-header .tabulator-col .tabulator-col-content{box-sizing:border-box;position:relative;padding:4px}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-header-popup-button{padding:0 8px}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-header-popup-button:hover{cursor:pointer;opacity:.6}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title-holder{position:relative}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title{box-sizing:border-box;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title .tabulator-title-editor{box-sizing:border-box;width:100%;border:1px solid #999;padding:1px;background:#fff}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title .tabulator-header-popup-button+.tabulator-title-editor{width:calc(100% - 22px)}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-sorter{display:flex;align-items:center;position:absolute;top:0;bottom:0;right:4px}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-sorter .tabulator-arrow{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:6px solid #bbb}.tabulator .tabulator-header .tabulator-col.tabulator-col-group .tabulator-col-group-cols{position:relative;display:flex;border-top:1px solid #ddd;overflow:hidden;margin-right:-1px}.tabulator .tabulator-header .tabulator-col .tabulator-header-filter{position:relative;box-sizing:border-box;margin-top:2px;width:100%;text-align:center}.tabulator .tabulator-header .tabulator-col .tabulator-header-filter textarea{height:auto!important}.tabulator .tabulator-header .tabulator-col .tabulator-header-filter svg{margin-top:3px}.tabulator .tabulator-header .tabulator-col .tabulator-header-filter input::-ms-clear{width:0;height:0}.tabulator .tabulator-header .tabulator-col.tabulator-sortable .tabulator-col-title{padding-right:25px}.tabulator .tabulator-header .tabulator-col.tabulator-sortable:hover{cursor:pointer;background-color:#dae1e7}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=none] .tabulator-col-content .tabulator-col-sorter{color:#bbb}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=none] .tabulator-col-content .tabulator-col-sorter .tabulator-arrow{border-top:none;border-bottom:6px solid #bbb}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=ascending] .tabulator-col-content .tabulator-col-sorter{color:#666}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=ascending] .tabulator-col-content .tabulator-col-sorter .tabulator-arrow{border-top:none;border-bottom:6px solid #666}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=descending] .tabulator-col-content .tabulator-col-sorter{color:#666}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=descending] .tabulator-col-content .tabulator-col-sorter .tabulator-arrow{border-bottom:none;border-top:6px solid #666;color:#666}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical .tabulator-col-content .tabulator-col-title{writing-mode:vertical-rl;text-orientation:mixed;display:flex;align-items:center;justify-content:center}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical.tabulator-col-vertical-flip .tabulator-col-title{transform:rotate(180deg)}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical.tabulator-sortable .tabulator-col-title{padding-right:0;padding-top:20px}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical.tabulator-sortable.tabulator-col-vertical-flip .tabulator-col-title{padding-right:0;padding-bottom:20px}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical.tabulator-sortable .tabulator-col-sorter{justify-content:center;left:0;right:0;top:4px;bottom:auto}.tabulator .tabulator-header .tabulator-frozen{position:absolute;z-index:10}.tabulator .tabulator-header .tabulator-frozen.tabulator-frozen-left{border-right:2px solid #ddd}.tabulator .tabulator-header .tabulator-frozen.tabulator-frozen-right{border-left:2px solid #ddd}.tabulator .tabulator-header .tabulator-calcs-holder{box-sizing:border-box;min-width:600%;background:#fff!important;border-top:1px solid #ddd;border-bottom:1px solid #ddd;overflow:hidden}.tabulator .tabulator-header .tabulator-calcs-holder .tabulator-row{background:#fff!important}.tabulator .tabulator-header .tabulator-calcs-holder .tabulator-row .tabulator-col-resize-handle{display:none}.tabulator .tabulator-header .tabulator-frozen-rows-holder{min-width:600%}.tabulator .tabulator-header .tabulator-frozen-rows-holder:empty{display:none}.tabulator .tabulator-tableholder{position:relative;width:100%;white-space:nowrap;overflow:auto;-webkit-overflow-scrolling:touch}.tabulator .tabulator-tableholder:focus{outline:none}.tabulator .tabulator-tableholder .tabulator-placeholder{box-sizing:border-box;display:flex;align-items:center;width:100%}.tabulator .tabulator-tableholder .tabulator-placeholder[tabulator-render-mode=virtual]{min-height:100%;min-width:100%}.tabulator .tabulator-tableholder .tabulator-placeholder .tabulator-placeholder-contents{display:inline-block;text-align:center;padding:10px;color:#ccc;font-weight:700;font-size:20px;white-space:normal}.tabulator .tabulator-tableholder .tabulator-table{position:relative;display:inline-block;background-color:#fff;white-space:nowrap;overflow:visible;color:#333}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.tabulator-calcs{font-weight:700;background:#e2e2e2!important}.tabulator .tabulator-footer{border-top:1px solid #999;background-color:#fff;color:#555;font-weight:700;white-space:nowrap;user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none}.tabulator .tabulator-footer .tabulator-footer-contents{display:flex;flex-direction:row;align-items:center;justify-content:space-between;padding:5px 10px}.tabulator .tabulator-footer .tabulator-footer-contents:empty{display:none}.tabulator .tabulator-footer .tabulator-calcs-holder{box-sizing:border-box;width:calc(100% + 20px);text-align:left;border-bottom:1px solid #ddd;border-top:1px solid #ddd;overflow:hidden}.tabulator .tabulator-footer .tabulator-calcs-holder .tabulator-row .tabulator-col-resize-handle{display:none}.tabulator .tabulator-footer .tabulator-calcs-holder:only-child{margin-bottom:-5px}.tabulator .tabulator-footer>*+.tabulator-page-counter{margin-left:10px}.tabulator .tabulator-footer .tabulator-page-counter{font-weight:400}.tabulator .tabulator-footer .tabulator-paginator{flex:1;text-align:right;color:#555;font-family:inherit;font-weight:inherit;font-size:inherit}.tabulator .tabulator-footer .tabulator-page-size{display:inline-block;margin:0 5px;padding:2px 5px;border:1px solid #aaa;border-radius:3px}.tabulator .tabulator-footer .tabulator-pages{margin:0 7px}.tabulator .tabulator-footer .tabulator-page{display:inline-block;margin:0 2px;padding:2px 5px;border:1px solid #aaa;border-radius:3px;background:hsla(0,0%,100%,.2)}.tabulator .tabulator-footer .tabulator-page.active{color:#d00}.tabulator .tabulator-footer .tabulator-page:disabled{opacity:.5}.tabulator .tabulator-footer .tabulator-page:not(.disabled):hover{cursor:pointer;background:rgba(0,0,0,.2);color:#fff}.tabulator .tabulator-col-resize-handle{position:relative;display:inline-block;width:6px;margin-left:-3px;margin-right:-3px;z-index:10;vertical-align:middle}.tabulator .tabulator-col-resize-handle:hover{cursor:ew-resize}.tabulator .tabulator-col-resize-handle:last-of-type{width:3px;margin-right:0}.tabulator .tabulator-alert{position:absolute;display:flex;align-items:center;top:0;left:0;z-index:100;height:100%;width:100%;background:rgba(0,0,0,.4);text-align:center}.tabulator .tabulator-alert .tabulator-alert-msg{display:inline-block;margin:0 auto;padding:10px 20px;border-radius:10px;background:#fff;font-weight:700;font-size:16px}.tabulator .tabulator-alert .tabulator-alert-msg.tabulator-alert-state-msg{border:4px solid #333;color:#000}.tabulator .tabulator-alert .tabulator-alert-msg.tabulator-alert-state-error{border:4px solid #d00;color:#590000}.tabulator-row{position:relative;box-sizing:border-box;min-height:22px;background-color:#fff}.tabulator-row.tabulator-row-even{background-color:#efefef}.tabulator-row.tabulator-selectable:hover{background-color:#bbb;cursor:pointer}.tabulator-row.tabulator-selected{background-color:#9abcea}.tabulator-row.tabulator-selected:hover{background-color:#769bcc}.tabulator-row.tabulator-row-moving{border:1px solid #000;background:#fff}.tabulator-row.tabulator-moving{position:absolute;border-top:1px solid #ddd;border-bottom:1px solid #ddd;pointer-events:none;z-index:15}.tabulator-row .tabulator-row-resize-handle{position:absolute;right:0;bottom:0;left:0;height:5px}.tabulator-row .tabulator-row-resize-handle.prev{top:0;bottom:auto}.tabulator-row .tabulator-row-resize-handle:hover{cursor:ns-resize}.tabulator-row .tabulator-frozen{display:inline-block;position:absolute;background-color:inherit;z-index:10}.tabulator-row .tabulator-frozen.tabulator-frozen-left{border-right:2px solid #ddd}.tabulator-row .tabulator-frozen.tabulator-frozen-right{border-left:2px solid #ddd}.tabulator-row .tabulator-responsive-collapse{box-sizing:border-box;padding:5px;border-top:1px solid #ddd;border-bottom:1px solid #ddd}.tabulator-row .tabulator-responsive-collapse:empty{display:none}.tabulator-row .tabulator-responsive-collapse table{font-size:14px}.tabulator-row .tabulator-responsive-collapse table tr td{position:relative}.tabulator-row .tabulator-responsive-collapse table tr td:first-of-type{padding-right:10px}.tabulator-row .tabulator-cell{display:inline-block;position:relative;box-sizing:border-box;padding:4px;border-right:1px solid #ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tabulator-row .tabulator-cell.tabulator-editing{border:1px solid #1d68cd;outline:none;padding:0}.tabulator-row .tabulator-cell.tabulator-editing input,.tabulator-row .tabulator-cell.tabulator-editing select{border:1px;background:transparent;outline:none}.tabulator-row .tabulator-cell.tabulator-validation-fail{border:1px solid #db2828}.tabulator-row .tabulator-cell.tabulator-validation-fail input,.tabulator-row .tabulator-cell.tabulator-validation-fail select{border:1px;background:transparent;color:#db2828}.tabulator-row .tabulator-cell.tabulator-row-handle{display:inline-flex;align-items:center;justify-content:center;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none}.tabulator-row .tabulator-cell.tabulator-row-handle .tabulator-row-handle-box{width:80%}.tabulator-row .tabulator-cell.tabulator-row-handle .tabulator-row-handle-box .tabulator-row-handle-bar{width:100%;height:3px;margin-top:2px;background:#666}.tabulator-row .tabulator-cell .tabulator-data-tree-branch{display:inline-block;vertical-align:middle;height:9px;width:7px;margin-top:-9px;margin-right:5px;border-bottom-left-radius:1px;border-left:2px solid #ddd;border-bottom:2px solid #ddd}.tabulator-row .tabulator-cell .tabulator-data-tree-control{display:inline-flex;justify-content:center;align-items:center;vertical-align:middle;height:11px;width:11px;margin-right:5px;border:1px solid #333;border-radius:2px;background:rgba(0,0,0,.1);overflow:hidden}.tabulator-row .tabulator-cell .tabulator-data-tree-control:hover{cursor:pointer;background:rgba(0,0,0,.2)}.tabulator-row .tabulator-cell .tabulator-data-tree-control .tabulator-data-tree-control-collapse{display:inline-block;position:relative;height:7px;width:1px;background:transparent}.tabulator-row .tabulator-cell .tabulator-data-tree-control .tabulator-data-tree-control-collapse:after{position:absolute;content:\"\";left:-3px;top:3px;height:1px;width:7px;background:#333}.tabulator-row .tabulator-cell .tabulator-data-tree-control .tabulator-data-tree-control-expand{display:inline-block;position:relative;height:7px;width:1px;background:#333}.tabulator-row .tabulator-cell .tabulator-data-tree-control .tabulator-data-tree-control-expand:after{position:absolute;content:\"\";left:-3px;top:3px;height:1px;width:7px;background:#333}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle{display:inline-flex;align-items:center;justify-content:center;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none;height:15px;width:15px;border-radius:20px;background:#666;font-weight:700;font-size:1.1em}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle:hover{opacity:.7}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle.open .tabulator-responsive-collapse-toggle-close{display:initial}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle.open .tabulator-responsive-collapse-toggle-open,.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle .tabulator-responsive-collapse-toggle-close{display:none}.tabulator-row .tabulator-cell .tabulator-traffic-light{display:inline-block;height:14px;width:14px;border-radius:14px}.tabulator-row.tabulator-group{box-sizing:border-box;border-bottom:1px solid #999;border-right:1px solid #ddd;border-top:1px solid #999;padding:5px 5px 5px 10px;background:#ccc;font-weight:700;min-width:100%}.tabulator-row.tabulator-group:hover{cursor:pointer;background-color:rgba(0,0,0,.1)}.tabulator-row.tabulator-group.tabulator-group-visible .tabulator-arrow{margin-right:10px;border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid #666;border-bottom:0}.tabulator-row.tabulator-group.tabulator-group-level-1{padding-left:30px}.tabulator-row.tabulator-group.tabulator-group-level-2{padding-left:50px}.tabulator-row.tabulator-group.tabulator-group-level-3{padding-left:70px}.tabulator-row.tabulator-group.tabulator-group-level-4{padding-left:90px}.tabulator-row.tabulator-group.tabulator-group-level-5{padding-left:110px}.tabulator-row.tabulator-group .tabulator-group-toggle{display:inline-block}.tabulator-row.tabulator-group .tabulator-arrow{display:inline-block;width:0;height:0;margin-right:16px;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:0;border-left:6px solid #666;vertical-align:middle}.tabulator-row.tabulator-group span{margin-left:10px;color:#d00}.tabulator-popup-container{position:absolute;display:inline-block;box-sizing:border-box;background:#fff;border:1px solid #ddd;box-shadow:0 0 5px 0 rgba(0,0,0,.2);font-size:14px;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:10000}.tabulator-popup{padding:5px;border-radius:3px}.tabulator-tooltip{max-width:Min(500px,100%);padding:3px 5px;border-radius:2px;box-shadow:none;font-size:12px;pointer-events:none}.tabulator-menu .tabulator-menu-item{position:relative;box-sizing:border-box;padding:5px 10px;user-select:none}.tabulator-menu .tabulator-menu-item.tabulator-menu-item-disabled{opacity:.5}.tabulator-menu .tabulator-menu-item:not(.tabulator-menu-item-disabled):hover{cursor:pointer;background:#efefef}.tabulator-menu .tabulator-menu-item.tabulator-menu-item-submenu{padding-right:25px}.tabulator-menu .tabulator-menu-item.tabulator-menu-item-submenu:after{display:inline-block;position:absolute;top:calc(5px + .4em);right:10px;height:7px;width:7px;content:\"\";border-color:#ddd;border-style:solid;border-width:1px 1px 0 0;vertical-align:top;transform:rotate(45deg)}.tabulator-menu .tabulator-menu-separator{border-top:1px solid #ddd}.tabulator-edit-list{max-height:200px;font-size:14px;overflow-y:auto;-webkit-overflow-scrolling:touch}.tabulator-edit-list .tabulator-edit-list-item{padding:4px;color:#333;outline:none}.tabulator-edit-list .tabulator-edit-list-item.active{color:#fff;background:#1d68cd}.tabulator-edit-list .tabulator-edit-list-item.active.focused{outline:1px solid hsla(0,0%,100%,.5)}.tabulator-edit-list .tabulator-edit-list-item.focused{outline:1px solid #1d68cd}.tabulator-edit-list .tabulator-edit-list-item:hover{cursor:pointer;color:#fff;background:#1d68cd}.tabulator-edit-list .tabulator-edit-list-placeholder{padding:4px;color:#333;text-align:center}.tabulator-edit-list .tabulator-edit-list-group{border-bottom:1px solid #ddd;padding:6px 4px 4px;color:#333;font-weight:700}.tabulator-edit-list .tabulator-edit-list-group.tabulator-edit-list-group-level-2,.tabulator-edit-list .tabulator-edit-list-item.tabulator-edit-list-group-level-2{padding-left:12px}.tabulator-edit-list .tabulator-edit-list-group.tabulator-edit-list-group-level-3,.tabulator-edit-list .tabulator-edit-list-item.tabulator-edit-list-group-level-3{padding-left:20px}.tabulator-edit-list .tabulator-edit-list-group.tabulator-edit-list-group-level-4,.tabulator-edit-list .tabulator-edit-list-item.tabulator-edit-list-group-level-4{padding-left:28px}.tabulator-edit-list .tabulator-edit-list-group.tabulator-edit-list-group-level-5,.tabulator-edit-list .tabulator-edit-list-item.tabulator-edit-list-group-level-5{padding-left:36px}.tabulator.tabulator-ltr{direction:ltr}.tabulator.tabulator-rtl{text-align:initial;direction:rtl}.tabulator.tabulator-rtl .tabulator-header .tabulator-col{text-align:initial;border-left:1px solid #ddd;border-right:initial}.tabulator.tabulator-rtl .tabulator-header .tabulator-col.tabulator-col-group .tabulator-col-group-cols{margin-right:0;margin-left:-1px}.tabulator.tabulator-rtl .tabulator-header .tabulator-col.tabulator-sortable .tabulator-col-title{padding-right:0;padding-left:25px}.tabulator.tabulator-rtl .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-sorter{left:8px;right:auto}.tabulator.tabulator-rtl .tabulator-row .tabulator-cell{border-right:initial;border-left:1px solid #ddd}.tabulator.tabulator-rtl .tabulator-row .tabulator-cell .tabulator-data-tree-branch{margin-right:0;margin-left:5px;border-bottom-left-radius:0;border-bottom-right-radius:1px;border-left:initial;border-right:2px solid #ddd}.tabulator.tabulator-rtl .tabulator-row .tabulator-cell .tabulator-data-tree-control{margin-right:0;margin-left:5px}.tabulator.tabulator-rtl .tabulator-footer .tabulator-calcs-holder{text-align:initial}.tabulator-print-fullscreen{position:absolute;top:0;bottom:0;left:0;right:0;z-index:10000}body.tabulator-print-fullscreen-hide>:not(.tabulator-print-fullscreen){display:none!important}.tabulator-print-table{border-collapse:collapse}.tabulator-print-table .tabulator-data-tree-branch{display:inline-block;vertical-align:middle;height:9px;width:7px;margin-top:-9px;margin-right:5px;border-bottom-left-radius:1px;border-left:2px solid #ddd;border-bottom:2px solid #ddd}.tabulator-print-table .tabulator-print-table-group{box-sizing:border-box;border-bottom:1px solid #999;border-right:1px solid #ddd;border-top:1px solid #999;padding:5px 5px 5px 10px;background:#ccc;font-weight:700;min-width:100%}.tabulator-print-table .tabulator-print-table-group:hover{cursor:pointer;background-color:rgba(0,0,0,.1)}.tabulator-print-table .tabulator-print-table-group.tabulator-group-visible .tabulator-arrow{margin-right:10px;border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid #666;border-bottom:0}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-1 td{padding-left:30px!important}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-2 td{padding-left:50px!important}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-3 td{padding-left:70px!important}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-4 td{padding-left:90px!important}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-5 td{padding-left:110px!important}.tabulator-print-table .tabulator-print-table-group .tabulator-group-toggle{display:inline-block}.tabulator-print-table .tabulator-print-table-group .tabulator-arrow{display:inline-block;width:0;height:0;margin-right:16px;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:0;border-left:6px solid #666;vertical-align:middle}.tabulator-print-table .tabulator-print-table-group span{margin-left:10px;color:#d00}.tabulator-print-table .tabulator-data-tree-control{display:inline-flex;justify-content:center;align-items:center;vertical-align:middle;height:11px;width:11px;margin-right:5px;border:1px solid #333;border-radius:2px;background:rgba(0,0,0,.1);overflow:hidden}.tabulator-print-table .tabulator-data-tree-control:hover{cursor:pointer;background:rgba(0,0,0,.2)}.tabulator-print-table .tabulator-data-tree-control .tabulator-data-tree-control-collapse{display:inline-block;position:relative;height:7px;width:1px;background:transparent}.tabulator-print-table .tabulator-data-tree-control .tabulator-data-tree-control-collapse:after{position:absolute;content:\"\";left:-3px;top:3px;height:1px;width:7px;background:#333}.tabulator-print-table .tabulator-data-tree-control .tabulator-data-tree-control-expand{display:inline-block;position:relative;height:7px;width:1px;background:#333}.tabulator-print-table .tabulator-data-tree-control .tabulator-data-tree-control-expand:after{position:absolute;content:\"\";left:-3px;top:3px;height:1px;width:7px;background:#333}.tabulator{width:100%;margin:1em 0;border:1px solid rgba(34,36,38,.15);box-shadow:none;border-radius:.28571rem;color:rgba(0,0,0,.87)}.tabulator .tabulator-header{border-bottom:1px solid rgba(34,36,38,.1);box-shadow:none;color:rgba(0,0,0,.87);font-style:none;font-weight:700;text-transform:none}.tabulator .tabulator-header,.tabulator .tabulator-header .tabulator-col{border-right:none;background-color:#f9fafb}.tabulator .tabulator-header .tabulator-col .tabulator-col-content{padding:.92857em .78571em}.tabulator .tabulator-tableholder .tabulator-table{background-color:transparent}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.tabulator-calcs{background:#f2f2f2!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.tabulator-calcs.tabulator-calcs-top{border-bottom:2px solid #ddd}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.tabulator-calcs.tabulator-calcs-bottom{border-top:2px solid #ddd}.tabulator .tabulator-footer{padding:.78571em;border-top:1px solid rgba(34,36,38,.15);box-shadow:none;background:#f9fafb;text-align:right;color:rgba(0,0,0,.87);font-style:normal;font-weight:400;text-transform:none}.tabulator .tabulator-footer .tabulator-calcs-holder{margin:-.78571em -.78571em .78571em;background:#fff!important}.tabulator .tabulator-footer .tabulator-calcs-holder .tabulator-row{background:#fff!important}.tabulator .tabulator-footer .tabulator-calcs-holder:only-child{margin-bottom:-.78571em;border-bottom:none}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.positive,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.positive{box-shadow:inset 0 0 0 #a3c293;background:#fcfff5!important;color:#21ba45!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.positive:hover,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.positive:hover{background:#f7ffe6!important;color:#13ae38!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.negative,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.negative{box-shadow:inset 0 0 0 #e0b4b4;background:#fff6f6!important;color:#db2828!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.negative:hover,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.negative:hover{background:#ffe7e7!important;color:#d41616!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.error,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.error{box-shadow:inset 0 0 0 #e0b4b4;background:#fff6f6!important;color:#db2828!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.error:hover,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.error:hover{background:#ffe7e7!important;color:#d12323!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.warning,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.warning{box-shadow:inset 0 0 0 #c9ba9b;background:#fffaf3!important;color:#f2c037!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.warning:hover,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.warning:hover{background:#fff4e4!important;color:#f1bb29!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.active,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.active{box-shadow:inset 0 0 0 rgba(0,0,0,.87);background:#e0e0e0!important;color:rgba(0,0,0,.87)!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.active:hover,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.active:hover{background:#f7ffe6!important;color:#13ae38!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.active,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.disabled:hover,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.active{pointer-events:none;color:rgba(0,0,0,.2)}.tabulator.inverted{background:#333;color:hsla(0,0%,100%,.9);border:none}.tabulator.inverted .tabulator-header{background-color:rgba(0,0,0,.15);color:hsla(0,0%,100%,.9)}.tabulator.inverted .tabulator-header,.tabulator.inverted .tabulator-header .tabulator-col{border-color:hsla(0,0%,100%,.1)!important}.tabulator.inverted .tabulator-tableholder .tabulator-table .tabulator-row{color:hsla(0,0%,100%,.9);border:none}.tabulator.inverted .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell{border-color:hsla(0,0%,100%,.1)!important}.tabulator.inverted .tabulator-footer{background:#fff}.tabulator.striped .tabulator-row:nth-child(2n){background-color:rgba(0,0,0,.05)}.tabulator.celled{border:1px solid rgba(34,36,38,.15)}.tabulator.celled .tabulator-header .tabulator-col,.tabulator.celled .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell{border-right:1px solid rgba(34,36,38,.1)}.tabulator[class*=\"single line\"] .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell{border-right:none}.tabulator.red{border-top:.2em solid #db2828}.tabulator.inverted.red{background-color:#db2828!important;color:#fff!important}.tabulator.orange{border-top:.2em solid #f2711c}.tabulator.inverted.orange{background-color:#f2711c!important;color:#fff!important}.tabulator.yellow{border-top:.2em solid #fbbd08}.tabulator.inverted.yellow{background-color:#fbbd08!important;color:#fff!important}.tabulator.olive{border-top:.2em solid #b5cc18}.tabulator.inverted.olive{background-color:#b5cc18!important;color:#fff!important}.tabulator.green{border-top:.2em solid #21ba45}.tabulator.inverted.green{background-color:#21ba45!important;color:#fff!important}.tabulator.teal{border-top:.2em solid #00b5ad}.tabulator.inverted.teal{background-color:#00b5ad!important;color:#fff!important}.tabulator.blue{border-top:.2em solid #2185d0}.tabulator.inverted.blue{background-color:#2185d0!important;color:#fff!important}.tabulator.violet{border-top:.2em solid #6435c9}.tabulator.inverted.violet{background-color:#6435c9!important;color:#fff!important}.tabulator.purple{border-top:.2em solid #a333c8}.tabulator.inverted.purple{background-color:#a333c8!important;color:#fff!important}.tabulator.pink{border-top:.2em solid #e03997}.tabulator.inverted.pink{background-color:#e03997!important;color:#fff!important}.tabulator.brown{border-top:.2em solid #a5673f}.tabulator.inverted.brown{background-color:#a5673f!important;color:#fff!important}.tabulator.grey{border-top:.2em solid #767676}.tabulator.inverted.grey{background-color:#767676!important;color:#fff!important}.tabulator.black{border-top:.2em solid #1b1c1d}.tabulator.inverted.black{background-color:#1b1c1d!important;color:#fff!important}.tabulator.padded .tabulator-header .tabulator-col .tabulator-col-content{padding:1em}.tabulator.padded .tabulator-header .tabulator-col .tabulator-col-content .tabulator-arrow{top:20px}.tabulator.padded .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell{padding:1em}.tabulator.padded.very .tabulator-header .tabulator-col .tabulator-col-content{padding:1.5em}.tabulator.padded.very .tabulator-header .tabulator-col .tabulator-col-content .tabulator-arrow{top:26px}.tabulator.padded.very .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell{padding:1.5em}.tabulator.compact .tabulator-header .tabulator-col .tabulator-col-content{padding:.5em .7em}.tabulator.compact .tabulator-header .tabulator-col .tabulator-col-content .tabulator-arrow{top:12px}.tabulator.compact .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell{padding:.5em .7em}.tabulator.compact.very .tabulator-header .tabulator-col .tabulator-col-content{padding:.4em .6em}.tabulator.compact.very .tabulator-header .tabulator-col .tabulator-col-content .tabulator-arrow{top:10px}.tabulator.compact.very .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell{padding:.4em .6em}.tabulator-row{border-bottom:1px solid rgba(34,36,38,.1)}.tabulator-row.tabulator-row-even{background-color:transparent}.tabulator-row.tabulator-selectable:hover{box-shadow:inset 0 0 0 rgba(0,0,0,.87);background:#e0e0e0!important;color:rgba(0,0,0,.87)!important}.tabulator-row.tabulator-selected{background-color:#9abcea!important}.tabulator-row.tabulator-selected:hover{background-color:#769bcc!important;cursor:pointer}.tabulator-row.tabulator-moving{pointer-events:none!important}.tabulator-row .tabulator-cell{padding:.78571em;border-right:none;vertical-align:middle}.tabulator-row .tabulator-cell:last-of-type{border-right:none}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle{color:#fff}.tabulator-row.tabulator-group{background:#fafafa}.tabulator-row.tabulator-group span{color:#666}.tabulator-menu{background:#fff}.tabulator-menu .tabulator-menu-item:not(.tabulator-menu-item-disabled):hover{background:#f9fafb}.tabulator-edit-select-list{background:#fff}.tabulator-edit-select-list .tabulator-edit-select-list-item.active{color:#fff}.tabulator-edit-select-list .tabulator-edit-select-list-item.active.focused{outline:1px solid hsla(0,0%,100%,.5)}.tabulator-edit-select-list .tabulator-edit-select-list-item:hover{color:#fff}.tabulator-edit-select-list .tabulator-edit-select-list-notice{color:inherit}.tabulator-print-table .tabulator-print-table-group{background:#fafafa}.tabulator-print-table .tabulator-print-table-group span{color:#666}", ""]);
+exports.push([module.i, ".tabulator{position:relative;background-color:#fff;font-size:14px;text-align:left;overflow:hidden;-webkit-transform:translateZ(0);-moz-transform:translateZ(0);-ms-transform:translateZ(0);-o-transform:translateZ(0);transform:translateZ(0)}.tabulator[tabulator-layout=fitDataFill] .tabulator-tableholder .tabulator-table{min-width:100%}.tabulator[tabulator-layout=fitDataTable]{display:inline-block}.tabulator.tabulator-block-select{user-select:none}.tabulator .tabulator-header{position:relative;box-sizing:border-box;width:100%;border-bottom:1px solid #999;white-space:nowrap;overflow:hidden;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none}.tabulator .tabulator-header.tabulator-header-hidden{display:none}.tabulator .tabulator-header .tabulator-header-contents{position:relative;overflow:hidden}.tabulator .tabulator-header .tabulator-header-contents .tabulator-headers{display:inline-block}.tabulator .tabulator-header .tabulator-col{display:inline-flex;position:relative;box-sizing:border-box;flex-direction:column;justify-content:flex-start;border-right:1px solid #ddd;background:#f9fafb;text-align:left;vertical-align:bottom;overflow:hidden}.tabulator .tabulator-header .tabulator-col.tabulator-moving{position:absolute;border:1px solid #999;background:#dae1e7;pointer-events:none}.tabulator .tabulator-header .tabulator-col .tabulator-col-content{box-sizing:border-box;position:relative;padding:4px}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-header-popup-button{padding:0 8px}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-header-popup-button:hover{cursor:pointer;opacity:.6}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title-holder{position:relative}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title{box-sizing:border-box;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title.tabulator-col-title-wrap{white-space:normal;text-overflow:clip}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title .tabulator-title-editor{box-sizing:border-box;width:100%;border:1px solid #999;padding:1px;background:#fff}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title .tabulator-header-popup-button+.tabulator-title-editor{width:calc(100% - 22px)}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-sorter{display:flex;align-items:center;position:absolute;top:0;bottom:0;right:4px}.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-sorter .tabulator-arrow{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:6px solid #bbb}.tabulator .tabulator-header .tabulator-col.tabulator-col-group .tabulator-col-group-cols{position:relative;display:flex;border-top:1px solid #ddd;overflow:hidden;margin-right:-1px}.tabulator .tabulator-header .tabulator-col .tabulator-header-filter{position:relative;box-sizing:border-box;margin-top:2px;width:100%;text-align:center}.tabulator .tabulator-header .tabulator-col .tabulator-header-filter textarea{height:auto!important}.tabulator .tabulator-header .tabulator-col .tabulator-header-filter svg{margin-top:3px}.tabulator .tabulator-header .tabulator-col .tabulator-header-filter input::-ms-clear{width:0;height:0}.tabulator .tabulator-header .tabulator-col.tabulator-sortable .tabulator-col-title{padding-right:25px}.tabulator .tabulator-header .tabulator-col.tabulator-sortable.tabulator-col-sorter-element:hover{cursor:pointer;background-color:#dae1e7}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=none] .tabulator-col-content .tabulator-col-sorter{color:#bbb}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=none] .tabulator-col-content .tabulator-col-sorter.tabulator-col-sorter-element .tabulator-arrow:hover{cursor:pointer;border-bottom:6px solid #555}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=none] .tabulator-col-content .tabulator-col-sorter .tabulator-arrow{border-top:none;border-bottom:6px solid #bbb}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=ascending] .tabulator-col-content .tabulator-col-sorter{color:#666}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=ascending] .tabulator-col-content .tabulator-col-sorter.tabulator-col-sorter-element .tabulator-arrow:hover{cursor:pointer;border-bottom:6px solid #555}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=ascending] .tabulator-col-content .tabulator-col-sorter .tabulator-arrow{border-top:none;border-bottom:6px solid #666}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=descending] .tabulator-col-content .tabulator-col-sorter{color:#666}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=descending] .tabulator-col-content .tabulator-col-sorter.tabulator-col-sorter-element .tabulator-arrow:hover{cursor:pointer;border-top:6px solid #555}.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort=descending] .tabulator-col-content .tabulator-col-sorter .tabulator-arrow{border-bottom:none;border-top:6px solid #666;color:#666}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical .tabulator-col-content .tabulator-col-title{writing-mode:vertical-rl;text-orientation:mixed;display:flex;align-items:center;justify-content:center}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical.tabulator-col-vertical-flip .tabulator-col-title{transform:rotate(180deg)}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical.tabulator-sortable .tabulator-col-title{padding-right:0;padding-top:20px}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical.tabulator-sortable.tabulator-col-vertical-flip .tabulator-col-title{padding-right:0;padding-bottom:20px}.tabulator .tabulator-header .tabulator-col.tabulator-col-vertical.tabulator-sortable .tabulator-col-sorter{justify-content:center;left:0;right:0;top:4px;bottom:auto}.tabulator .tabulator-header .tabulator-frozen{position:sticky;left:0;z-index:10}.tabulator .tabulator-header .tabulator-frozen.tabulator-frozen-left{border-right:2px solid #ddd}.tabulator .tabulator-header .tabulator-frozen.tabulator-frozen-right{border-left:2px solid #ddd}.tabulator .tabulator-header .tabulator-calcs-holder{box-sizing:border-box;min-width:600%;background:#fff!important;border-top:1px solid #ddd;border-bottom:1px solid #ddd}.tabulator .tabulator-header .tabulator-calcs-holder .tabulator-row{background:#fff!important}.tabulator .tabulator-header .tabulator-calcs-holder .tabulator-row .tabulator-col-resize-handle{display:none}.tabulator .tabulator-header .tabulator-frozen-rows-holder{min-width:600%}.tabulator .tabulator-header .tabulator-frozen-rows-holder:empty{display:none}.tabulator .tabulator-tableholder{position:relative;width:100%;white-space:nowrap;overflow:auto;-webkit-overflow-scrolling:touch}.tabulator .tabulator-tableholder:focus{outline:none}.tabulator .tabulator-tableholder .tabulator-placeholder{box-sizing:border-box;display:flex;align-items:center;width:100%}.tabulator .tabulator-tableholder .tabulator-placeholder[tabulator-render-mode=virtual]{min-height:100%;min-width:100%}.tabulator .tabulator-tableholder .tabulator-placeholder .tabulator-placeholder-contents{display:inline-block;text-align:center;padding:10px;color:#ccc;font-weight:700;font-size:20px;white-space:normal}.tabulator .tabulator-tableholder .tabulator-table{position:relative;display:inline-block;background-color:#fff;white-space:nowrap;overflow:visible;color:#333}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.tabulator-calcs{font-weight:700;background:#e2e2e2!important}.tabulator .tabulator-footer{border-top:1px solid #999;background-color:#fff;color:#555;font-weight:700;white-space:nowrap;user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none}.tabulator .tabulator-footer .tabulator-footer-contents{display:flex;flex-direction:row;align-items:center;justify-content:space-between;padding:5px 10px}.tabulator .tabulator-footer .tabulator-footer-contents:empty{display:none}.tabulator .tabulator-footer .tabulator-calcs-holder{box-sizing:border-box;width:100%;text-align:left;border-bottom:1px solid #ddd;border-top:1px solid #ddd;overflow:hidden}.tabulator .tabulator-footer .tabulator-calcs-holder .tabulator-row{display:inline-block}.tabulator .tabulator-footer .tabulator-calcs-holder .tabulator-row .tabulator-col-resize-handle{display:none}.tabulator .tabulator-footer .tabulator-calcs-holder:only-child{margin-bottom:-5px}.tabulator .tabulator-footer>*+.tabulator-page-counter{margin-left:10px}.tabulator .tabulator-footer .tabulator-page-counter{font-weight:400}.tabulator .tabulator-footer .tabulator-paginator{flex:1;text-align:right;color:#555;font-family:inherit;font-weight:inherit;font-size:inherit}.tabulator .tabulator-footer .tabulator-page-size{display:inline-block;margin:0 5px;padding:2px 5px;border:1px solid #aaa;border-radius:3px}.tabulator .tabulator-footer .tabulator-pages{margin:0 7px}.tabulator .tabulator-footer .tabulator-page{display:inline-block;margin:0 2px;padding:2px 5px;border:1px solid #aaa;border-radius:3px;background:hsla(0,0%,100%,.2)}.tabulator .tabulator-footer .tabulator-page.active{color:#d00}.tabulator .tabulator-footer .tabulator-page:disabled{opacity:.5}.tabulator .tabulator-footer .tabulator-page:not(.disabled):hover{cursor:pointer;background:rgba(0,0,0,.2);color:#fff}.tabulator .tabulator-col-resize-handle{position:relative;display:inline-block;width:6px;margin-left:-3px;margin-right:-3px;z-index:10;vertical-align:middle}.tabulator .tabulator-col-resize-handle:hover{cursor:ew-resize}.tabulator .tabulator-col-resize-handle:last-of-type{width:3px;margin-right:0}.tabulator .tabulator-alert{position:absolute;display:flex;align-items:center;top:0;left:0;z-index:100;height:100%;width:100%;background:rgba(0,0,0,.4);text-align:center}.tabulator .tabulator-alert .tabulator-alert-msg{display:inline-block;margin:0 auto;padding:10px 20px;border-radius:10px;background:#fff;font-weight:700;font-size:16px}.tabulator .tabulator-alert .tabulator-alert-msg.tabulator-alert-state-msg{border:4px solid #333;color:#000}.tabulator .tabulator-alert .tabulator-alert-msg.tabulator-alert-state-error{border:4px solid #d00;color:#590000}.tabulator-row{position:relative;box-sizing:border-box;min-height:22px;background-color:#fff}.tabulator-row.tabulator-row-even{background-color:#efefef}.tabulator-row.tabulator-selectable:hover{background-color:#bbb;cursor:pointer}.tabulator-row.tabulator-selected{background-color:#9abcea}.tabulator-row.tabulator-selected:hover{background-color:#769bcc}.tabulator-row.tabulator-row-moving{border:1px solid #000;background:#fff}.tabulator-row.tabulator-moving{position:absolute;border-top:1px solid #ddd;border-bottom:1px solid #ddd;pointer-events:none;z-index:15}.tabulator-row .tabulator-row-resize-handle{position:absolute;right:0;bottom:0;left:0;height:5px}.tabulator-row .tabulator-row-resize-handle.prev{top:0;bottom:auto}.tabulator-row .tabulator-row-resize-handle:hover{cursor:ns-resize}.tabulator-row .tabulator-responsive-collapse{box-sizing:border-box;padding:5px;border-top:1px solid #ddd;border-bottom:1px solid #ddd}.tabulator-row .tabulator-responsive-collapse:empty{display:none}.tabulator-row .tabulator-responsive-collapse table{font-size:14px}.tabulator-row .tabulator-responsive-collapse table tr td{position:relative}.tabulator-row .tabulator-responsive-collapse table tr td:first-of-type{padding-right:10px}.tabulator-row .tabulator-cell{display:inline-block;position:relative;box-sizing:border-box;padding:4px;border-right:1px solid #ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tabulator-row .tabulator-cell.tabulator-frozen{display:inline-block;position:sticky;left:0;background-color:inherit;z-index:10}.tabulator-row .tabulator-cell.tabulator-frozen.tabulator-frozen-left{border-right:2px solid #ddd}.tabulator-row .tabulator-cell.tabulator-frozen.tabulator-frozen-right{border-left:2px solid #ddd}.tabulator-row .tabulator-cell.tabulator-editing{border:1px solid #1d68cd;outline:none;padding:0}.tabulator-row .tabulator-cell.tabulator-editing input,.tabulator-row .tabulator-cell.tabulator-editing select{border:1px;background:transparent;outline:none}.tabulator-row .tabulator-cell.tabulator-validation-fail{border:1px solid #db2828}.tabulator-row .tabulator-cell.tabulator-validation-fail input,.tabulator-row .tabulator-cell.tabulator-validation-fail select{border:1px;background:transparent;color:#db2828}.tabulator-row .tabulator-cell.tabulator-row-handle{display:inline-flex;align-items:center;justify-content:center;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none}.tabulator-row .tabulator-cell.tabulator-row-handle .tabulator-row-handle-box{width:80%}.tabulator-row .tabulator-cell.tabulator-row-handle .tabulator-row-handle-box .tabulator-row-handle-bar{width:100%;height:3px;margin-top:2px;background:#666}.tabulator-row .tabulator-cell .tabulator-data-tree-branch{display:inline-block;vertical-align:middle;height:9px;width:7px;margin-top:-9px;margin-right:5px;border-bottom-left-radius:1px;border-left:2px solid #ddd;border-bottom:2px solid #ddd}.tabulator-row .tabulator-cell .tabulator-data-tree-control{display:inline-flex;justify-content:center;align-items:center;vertical-align:middle;height:11px;width:11px;margin-right:5px;border:1px solid #333;border-radius:2px;background:rgba(0,0,0,.1);overflow:hidden}.tabulator-row .tabulator-cell .tabulator-data-tree-control:hover{cursor:pointer;background:rgba(0,0,0,.2)}.tabulator-row .tabulator-cell .tabulator-data-tree-control .tabulator-data-tree-control-collapse{display:inline-block;position:relative;height:7px;width:1px;background:transparent}.tabulator-row .tabulator-cell .tabulator-data-tree-control .tabulator-data-tree-control-collapse:after{position:absolute;content:\"\";left:-3px;top:3px;height:1px;width:7px;background:#333}.tabulator-row .tabulator-cell .tabulator-data-tree-control .tabulator-data-tree-control-expand{display:inline-block;position:relative;height:7px;width:1px;background:#333}.tabulator-row .tabulator-cell .tabulator-data-tree-control .tabulator-data-tree-control-expand:after{position:absolute;content:\"\";left:-3px;top:3px;height:1px;width:7px;background:#333}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle{display:inline-flex;align-items:center;justify-content:center;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none;height:15px;width:15px;border-radius:20px;background:#666;font-weight:700;font-size:1.1em}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle:hover{opacity:.7;cursor:pointer}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle.open .tabulator-responsive-collapse-toggle-close{display:initial}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle.open .tabulator-responsive-collapse-toggle-open{display:none}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle svg{stroke:#fff}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle .tabulator-responsive-collapse-toggle-close{display:none}.tabulator-row .tabulator-cell .tabulator-traffic-light{display:inline-block;height:14px;width:14px;border-radius:14px}.tabulator-row.tabulator-group{box-sizing:border-box;border-bottom:1px solid #999;border-right:1px solid #ddd;border-top:1px solid #999;padding:5px 5px 5px 10px;background:#ccc;font-weight:700;min-width:100%}.tabulator-row.tabulator-group:hover{cursor:pointer;background-color:rgba(0,0,0,.1)}.tabulator-row.tabulator-group.tabulator-group-visible .tabulator-arrow{margin-right:10px;border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid #666;border-bottom:0}.tabulator-row.tabulator-group.tabulator-group-level-1{padding-left:30px}.tabulator-row.tabulator-group.tabulator-group-level-2{padding-left:50px}.tabulator-row.tabulator-group.tabulator-group-level-3{padding-left:70px}.tabulator-row.tabulator-group.tabulator-group-level-4{padding-left:90px}.tabulator-row.tabulator-group.tabulator-group-level-5{padding-left:110px}.tabulator-row.tabulator-group .tabulator-group-toggle{display:inline-block}.tabulator-row.tabulator-group .tabulator-arrow{display:inline-block;width:0;height:0;margin-right:16px;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:0;border-left:6px solid #666;vertical-align:middle}.tabulator-row.tabulator-group span{margin-left:10px;color:#d00}.tabulator-popup-container{position:absolute;display:inline-block;box-sizing:border-box;background:#fff;border:1px solid #ddd;box-shadow:0 0 5px 0 rgba(0,0,0,.2);font-size:14px;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:10000}.tabulator-popup{padding:5px;border-radius:3px}.tabulator-tooltip{max-width:Min(500px,100%);padding:3px 5px;border-radius:2px;box-shadow:none;font-size:12px;pointer-events:none}.tabulator-menu .tabulator-menu-item{position:relative;box-sizing:border-box;padding:5px 10px;user-select:none}.tabulator-menu .tabulator-menu-item.tabulator-menu-item-disabled{opacity:.5}.tabulator-menu .tabulator-menu-item:not(.tabulator-menu-item-disabled):hover{cursor:pointer;background:#efefef}.tabulator-menu .tabulator-menu-item.tabulator-menu-item-submenu{padding-right:25px}.tabulator-menu .tabulator-menu-item.tabulator-menu-item-submenu:after{display:inline-block;position:absolute;top:calc(5px + .4em);right:10px;height:7px;width:7px;content:\"\";border-color:#ddd;border-style:solid;border-width:1px 1px 0 0;vertical-align:top;transform:rotate(45deg)}.tabulator-menu .tabulator-menu-separator{border-top:1px solid #ddd}.tabulator-edit-list{max-height:200px;font-size:14px;overflow-y:auto;-webkit-overflow-scrolling:touch}.tabulator-edit-list .tabulator-edit-list-item{padding:4px;color:#333;outline:none}.tabulator-edit-list .tabulator-edit-list-item.active{color:#fff;background:#1d68cd}.tabulator-edit-list .tabulator-edit-list-item.active.focused{outline:1px solid hsla(0,0%,100%,.5)}.tabulator-edit-list .tabulator-edit-list-item.focused{outline:1px solid #1d68cd}.tabulator-edit-list .tabulator-edit-list-item:hover{cursor:pointer;color:#fff;background:#1d68cd}.tabulator-edit-list .tabulator-edit-list-placeholder{padding:4px;color:#333;text-align:center}.tabulator-edit-list .tabulator-edit-list-group{border-bottom:1px solid #ddd;padding:6px 4px 4px;color:#333;font-weight:700}.tabulator-edit-list .tabulator-edit-list-group.tabulator-edit-list-group-level-2,.tabulator-edit-list .tabulator-edit-list-item.tabulator-edit-list-group-level-2{padding-left:12px}.tabulator-edit-list .tabulator-edit-list-group.tabulator-edit-list-group-level-3,.tabulator-edit-list .tabulator-edit-list-item.tabulator-edit-list-group-level-3{padding-left:20px}.tabulator-edit-list .tabulator-edit-list-group.tabulator-edit-list-group-level-4,.tabulator-edit-list .tabulator-edit-list-item.tabulator-edit-list-group-level-4{padding-left:28px}.tabulator-edit-list .tabulator-edit-list-group.tabulator-edit-list-group-level-5,.tabulator-edit-list .tabulator-edit-list-item.tabulator-edit-list-group-level-5{padding-left:36px}.tabulator.tabulator-ltr{direction:ltr}.tabulator.tabulator-rtl{text-align:initial;direction:rtl}.tabulator.tabulator-rtl .tabulator-header .tabulator-col{text-align:initial;border-left:1px solid #ddd;border-right:initial}.tabulator.tabulator-rtl .tabulator-header .tabulator-col.tabulator-col-group .tabulator-col-group-cols{margin-right:0;margin-left:-1px}.tabulator.tabulator-rtl .tabulator-header .tabulator-col.tabulator-sortable .tabulator-col-title{padding-right:0;padding-left:25px}.tabulator.tabulator-rtl .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-sorter{left:8px;right:auto}.tabulator.tabulator-rtl .tabulator-row .tabulator-cell{border-right:initial;border-left:1px solid #ddd}.tabulator.tabulator-rtl .tabulator-row .tabulator-cell .tabulator-data-tree-branch{margin-right:0;margin-left:5px;border-bottom-left-radius:0;border-bottom-right-radius:1px;border-left:initial;border-right:2px solid #ddd}.tabulator.tabulator-rtl .tabulator-row .tabulator-cell .tabulator-data-tree-control{margin-right:0;margin-left:5px}.tabulator.tabulator-rtl .tabulator-row .tabulator-cell.tabulator-frozen.tabulator-frozen-left{border-left:2px solid #ddd}.tabulator.tabulator-rtl .tabulator-row .tabulator-cell.tabulator-frozen.tabulator-frozen-right{border-right:2px solid #ddd}.tabulator.tabulator-rtl .tabulator-row .tabulator-col-resize-handle:last-of-type{width:3px;margin-left:0;margin-right:-3px}.tabulator.tabulator-rtl .tabulator-footer .tabulator-calcs-holder{text-align:initial}.tabulator-print-fullscreen{position:absolute;top:0;bottom:0;left:0;right:0;z-index:10000}body.tabulator-print-fullscreen-hide>:not(.tabulator-print-fullscreen){display:none!important}.tabulator-print-table{border-collapse:collapse}.tabulator-print-table .tabulator-data-tree-branch{display:inline-block;vertical-align:middle;height:9px;width:7px;margin-top:-9px;margin-right:5px;border-bottom-left-radius:1px;border-left:2px solid #ddd;border-bottom:2px solid #ddd}.tabulator-print-table .tabulator-print-table-group{box-sizing:border-box;border-bottom:1px solid #999;border-right:1px solid #ddd;border-top:1px solid #999;padding:5px 5px 5px 10px;background:#ccc;font-weight:700;min-width:100%}.tabulator-print-table .tabulator-print-table-group:hover{cursor:pointer;background-color:rgba(0,0,0,.1)}.tabulator-print-table .tabulator-print-table-group.tabulator-group-visible .tabulator-arrow{margin-right:10px;border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid #666;border-bottom:0}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-1 td{padding-left:30px!important}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-2 td{padding-left:50px!important}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-3 td{padding-left:70px!important}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-4 td{padding-left:90px!important}.tabulator-print-table .tabulator-print-table-group.tabulator-group-level-5 td{padding-left:110px!important}.tabulator-print-table .tabulator-print-table-group .tabulator-group-toggle{display:inline-block}.tabulator-print-table .tabulator-print-table-group .tabulator-arrow{display:inline-block;width:0;height:0;margin-right:16px;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:0;border-left:6px solid #666;vertical-align:middle}.tabulator-print-table .tabulator-print-table-group span{margin-left:10px;color:#d00}.tabulator-print-table .tabulator-data-tree-control{display:inline-flex;justify-content:center;align-items:center;vertical-align:middle;height:11px;width:11px;margin-right:5px;border:1px solid #333;border-radius:2px;background:rgba(0,0,0,.1);overflow:hidden}.tabulator-print-table .tabulator-data-tree-control:hover{cursor:pointer;background:rgba(0,0,0,.2)}.tabulator-print-table .tabulator-data-tree-control .tabulator-data-tree-control-collapse{display:inline-block;position:relative;height:7px;width:1px;background:transparent}.tabulator-print-table .tabulator-data-tree-control .tabulator-data-tree-control-collapse:after{position:absolute;content:\"\";left:-3px;top:3px;height:1px;width:7px;background:#333}.tabulator-print-table .tabulator-data-tree-control .tabulator-data-tree-control-expand{display:inline-block;position:relative;height:7px;width:1px;background:#333}.tabulator-print-table .tabulator-data-tree-control .tabulator-data-tree-control-expand:after{position:absolute;content:\"\";left:-3px;top:3px;height:1px;width:7px;background:#333}.tabulator{width:100%;margin:1em 0;border:1px solid rgba(34,36,38,.15);box-shadow:none;border-radius:.28571rem;color:rgba(0,0,0,.87)}.tabulator .tabulator-header{border-bottom:1px solid rgba(34,36,38,.1);box-shadow:none;color:rgba(0,0,0,.87);font-style:none;font-weight:700;text-transform:none}.tabulator .tabulator-header,.tabulator .tabulator-header .tabulator-col{border-right:none;background-color:#f9fafb}.tabulator .tabulator-header .tabulator-col .tabulator-col-content{padding:.92857em .78571em}.tabulator .tabulator-tableholder .tabulator-table{background-color:transparent}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.tabulator-calcs{background:#f2f2f2!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.tabulator-calcs.tabulator-calcs-top{border-bottom:2px solid #ddd}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.tabulator-calcs.tabulator-calcs-bottom{border-top:2px solid #ddd}.tabulator .tabulator-footer{padding:.78571em;border-top:1px solid rgba(34,36,38,.15);box-shadow:none;background:#f9fafb;text-align:right;color:rgba(0,0,0,.87);font-style:normal;font-weight:400;text-transform:none}.tabulator .tabulator-footer .tabulator-calcs-holder{margin:-.78571em -.78571em .78571em;background:#fff!important}.tabulator .tabulator-footer .tabulator-calcs-holder .tabulator-row{background:#fff!important}.tabulator .tabulator-footer .tabulator-calcs-holder:only-child{margin-bottom:-.78571em;border-bottom:none}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.positive,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.positive{box-shadow:inset 0 0 0 #a3c293;background:#fcfff5!important;color:#21ba45!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.positive:hover,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.positive:hover{background:#f7ffe6!important;color:#13ae38!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.negative,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.negative{box-shadow:inset 0 0 0 #e0b4b4;background:#fff6f6!important;color:#db2828!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.negative:hover,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.negative:hover{background:#ffe7e7!important;color:#d41616!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.error,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.error{box-shadow:inset 0 0 0 #e0b4b4;background:#fff6f6!important;color:#db2828!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.error:hover,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.error:hover{background:#ffe7e7!important;color:#d12323!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.warning,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.warning{box-shadow:inset 0 0 0 #c9ba9b;background:#fffaf3!important;color:#f2c037!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.warning:hover,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.warning:hover{background:#fff4e4!important;color:#f1bb29!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.active,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.active{box-shadow:inset 0 0 0 rgba(0,0,0,.87);background:#e0e0e0!important;color:rgba(0,0,0,.87)!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.active:hover,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.active:hover{background:#f7ffe6!important;color:#13ae38!important}.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.active,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row.disabled:hover,.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell.active{pointer-events:none;color:rgba(0,0,0,.2)}.tabulator.inverted{background:#333;color:hsla(0,0%,100%,.9);border:none}.tabulator.inverted .tabulator-header{background-color:rgba(0,0,0,.15);color:hsla(0,0%,100%,.9)}.tabulator.inverted .tabulator-header,.tabulator.inverted .tabulator-header .tabulator-col{border-color:hsla(0,0%,100%,.1)!important}.tabulator.inverted .tabulator-tableholder .tabulator-table .tabulator-row{color:hsla(0,0%,100%,.9);border:none}.tabulator.inverted .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell{border-color:hsla(0,0%,100%,.1)!important}.tabulator.inverted .tabulator-footer{background:#fff}.tabulator.striped .tabulator-row:nth-child(2n){background-color:rgba(0,0,0,.05)}.tabulator.celled{border:1px solid rgba(34,36,38,.15)}.tabulator.celled .tabulator-header .tabulator-col,.tabulator.celled .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell{border-right:1px solid rgba(34,36,38,.1)}.tabulator[class*=\"single line\"] .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell{border-right:none}.tabulator.red{border-top:.2em solid #db2828}.tabulator.inverted.red{background-color:#db2828!important;color:#fff!important}.tabulator.orange{border-top:.2em solid #f2711c}.tabulator.inverted.orange{background-color:#f2711c!important;color:#fff!important}.tabulator.yellow{border-top:.2em solid #fbbd08}.tabulator.inverted.yellow{background-color:#fbbd08!important;color:#fff!important}.tabulator.olive{border-top:.2em solid #b5cc18}.tabulator.inverted.olive{background-color:#b5cc18!important;color:#fff!important}.tabulator.green{border-top:.2em solid #21ba45}.tabulator.inverted.green{background-color:#21ba45!important;color:#fff!important}.tabulator.teal{border-top:.2em solid #00b5ad}.tabulator.inverted.teal{background-color:#00b5ad!important;color:#fff!important}.tabulator.blue{border-top:.2em solid #2185d0}.tabulator.inverted.blue{background-color:#2185d0!important;color:#fff!important}.tabulator.violet{border-top:.2em solid #6435c9}.tabulator.inverted.violet{background-color:#6435c9!important;color:#fff!important}.tabulator.purple{border-top:.2em solid #a333c8}.tabulator.inverted.purple{background-color:#a333c8!important;color:#fff!important}.tabulator.pink{border-top:.2em solid #e03997}.tabulator.inverted.pink{background-color:#e03997!important;color:#fff!important}.tabulator.brown{border-top:.2em solid #a5673f}.tabulator.inverted.brown{background-color:#a5673f!important;color:#fff!important}.tabulator.grey{border-top:.2em solid #767676}.tabulator.inverted.grey{background-color:#767676!important;color:#fff!important}.tabulator.black{border-top:.2em solid #1b1c1d}.tabulator.inverted.black{background-color:#1b1c1d!important;color:#fff!important}.tabulator.padded .tabulator-header .tabulator-col .tabulator-col-content{padding:1em}.tabulator.padded .tabulator-header .tabulator-col .tabulator-col-content .tabulator-arrow{top:20px}.tabulator.padded .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell{padding:1em}.tabulator.padded.very .tabulator-header .tabulator-col .tabulator-col-content{padding:1.5em}.tabulator.padded.very .tabulator-header .tabulator-col .tabulator-col-content .tabulator-arrow{top:26px}.tabulator.padded.very .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell{padding:1.5em}.tabulator.compact .tabulator-header .tabulator-col .tabulator-col-content{padding:.5em .7em}.tabulator.compact .tabulator-header .tabulator-col .tabulator-col-content .tabulator-arrow{top:12px}.tabulator.compact .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell{padding:.5em .7em}.tabulator.compact.very .tabulator-header .tabulator-col .tabulator-col-content{padding:.4em .6em}.tabulator.compact.very .tabulator-header .tabulator-col .tabulator-col-content .tabulator-arrow{top:10px}.tabulator.compact.very .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell{padding:.4em .6em}.tabulator-row{border-bottom:1px solid rgba(34,36,38,.1)}.tabulator-row.tabulator-row-even{background-color:transparent}.tabulator-row.tabulator-selectable:hover{box-shadow:inset 0 0 0 rgba(0,0,0,.87);background:#e0e0e0!important;color:rgba(0,0,0,.87)!important}.tabulator-row.tabulator-selected{background-color:#9abcea!important}.tabulator-row.tabulator-selected:hover{background-color:#769bcc!important;cursor:pointer}.tabulator-row.tabulator-moving{pointer-events:none!important}.tabulator-row .tabulator-cell{padding:.78571em;border-right:none;vertical-align:middle}.tabulator-row .tabulator-cell:last-of-type{border-right:none}.tabulator-row .tabulator-cell .tabulator-responsive-collapse-toggle{color:#fff}.tabulator-row.tabulator-group{background:#fafafa}.tabulator-row.tabulator-group span{color:#666}.tabulator-menu{background:#fff}.tabulator-menu .tabulator-menu-item:not(.tabulator-menu-item-disabled):hover{background:#f9fafb}.tabulator-edit-select-list{background:#fff}.tabulator-edit-select-list .tabulator-edit-select-list-item.active{color:#fff}.tabulator-edit-select-list .tabulator-edit-select-list-item.active.focused{outline:1px solid hsla(0,0%,100%,.5)}.tabulator-edit-select-list .tabulator-edit-select-list-item:hover{color:#fff}.tabulator-edit-select-list .tabulator-edit-select-list-notice{color:inherit}.tabulator-print-table .tabulator-print-table-group{background:#fafafa}.tabulator-print-table .tabulator-print-table-group span{color:#666}", ""]);
 // Exports
 module.exports = exports;
 
@@ -982,7 +982,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TabulatorFull", function() { return TabulatorFull; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TooltipModule", function() { return Tooltip; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ValidateModule", function() { return Validate; });
-/* Tabulator v5.3.4 (c) Oliver Folkerd 2022 */
+/* Tabulator v5.4.1 (c) Oliver Folkerd 2022 */
 class CoreFeature{
 
 	constructor(table){
@@ -1174,60 +1174,61 @@ class Helpers{
 class Popup extends CoreFeature{
 	constructor(table, element, parent){
 		super(table);
-        
+		
 		this.element = element;
 		this.container = this._lookupContainer();
-        
+		
 		this.parent = parent;
-        
+		
 		this.reversedX = false;
 		this.childPopup = null;
 		this.blurable = false;
 		this.blurCallback = null;
+		this.blurEventsBound = false;
 		this.renderedCallback = null;
-        
+		
 		this.visible = false;
 		this.hideable = true;
-        
+		
 		this.element.classList.add("tabulator-popup-container");
-        
+		
 		this.blurEvent = this.hide.bind(this, false);
 		this.escEvent = this._escapeCheck.bind(this);
-
+		
 		this.destroyBinding = this.tableDestroyed;
 		this.destroyed = false;
 	}
-
+	
 	tableDestroyed(){
 		this.destroyed = true;
 		this.hide(true);
 	}
-    
+	
 	_lookupContainer(){
 		var container = this.table.options.popupContainer;
-        
+		
 		if(typeof container === "string"){
 			container = document.querySelector(container);
-            
+			
 			if(!container){
 				console.warn("Menu Error - no container element found matching selector:",  this.table.options.popupContainer , "(defaulting to document body)");
 			}
 		}else if (container === true){
 			container = this.table.element;
 		}
-        
+		
 		if(container && !this._checkContainerIsParent(container)){
 			container = false;
 			console.warn("Menu Error - container element does not contain this table:",  this.table.options.popupContainer , "(defaulting to document body)");
 		}
-        
+		
 		if(!container){
 			container = document.body;
 		}
-        
+		
 		return container;
 	}
-    
+	
 	_checkContainerIsParent(container, element = this.table.element){
 		if(container === element){
 			return true;
@@ -1235,119 +1236,135 @@ class Popup extends CoreFeature{
 			return element.parentNode ? this._checkContainerIsParent(container, element.parentNode) : false;
 		}
 	}
-    
+	
 	renderCallback(callback){
 		this.renderedCallback = callback;
 	}
-    
+	
 	containerEventCoords(e){
 		var touch = !(e instanceof MouseEvent);
-        
+		
 		var x = touch ? e.touches[0].pageX : e.pageX;
 		var y = touch ? e.touches[0].pageY : e.pageY;
-        
+		
 		if(this.container !== document.body){
 			let parentOffset = Helpers.elOffset(this.container);
-            
+			
 			x -= parentOffset.left;
 			y -= parentOffset.top;
 		}
-        
+		
 		return {x, y};
 	}
-    
+	
 	elementPositionCoords(element, position = "right"){
 		var offset = Helpers.elOffset(element),
 		containerOffset, x, y;
-        
+		
 		if(this.container !== document.body){
 			containerOffset = Helpers.elOffset(this.container);
-            
+			
 			offset.left -= containerOffset.left;
 			offset.top -= containerOffset.top;
 		}
-        
+		
 		switch(position){
 			case "right":
 				x = offset.left + element.offsetWidth;
 				y = offset.top - 1;
 				break;
-            
+			
 			case "bottom":
 				x = offset.left;
 				y = offset.top + element.offsetHeight;
 				break;
+			
+			case "left":
+				x = offset.left;
+				y = offset.top - 1;
+				break;
+			
+			case "top":
+				x = offset.left;
+				y = offset.top;
+				break;
+			
+			case "center":
+				x = offset.left + (element.offsetWidth / 2);
+				y = offset.top + (element.offsetHeight / 2);
+				break;
+			
 		}
-        
+		
 		return {x, y, offset};
 	}
-    
+	
 	show(origin, position){
 		var x, y, parentEl, parentOffset, coords;
-
+		
 		if(this.destroyed || this.table.destroyed){
 			return this;
 		}
-        
+		
 		if(origin instanceof HTMLElement){
 			parentEl = origin;
 			coords = this.elementPositionCoords(origin, position);
-            
+			
 			parentOffset = coords.offset;
 			x = coords.x;
 			y = coords.y;
-            
+			
 		}else if(typeof origin === "number"){
 			parentOffset = {top:0, left:0};
 			x = origin;
 			y = position;
 		}else {
 			coords = this.containerEventCoords(origin);
-            
+			
 			x = coords.x;
 			y = coords.y;
-            
+			
 			this.reversedX = false;
 		}
-        
+		
 		this.element.style.top = y + "px";
 		this.element.style.left = x + "px";
-        
+		
 		this.container.appendChild(this.element);
-        
+		
 		if(typeof this.renderedCallback === "function"){
 			this.renderedCallback();
 		}
-        
+		
 		this._fitToScreen(x, y, parentEl, parentOffset, position);
-        
+		
 		this.visible = true;
-
+		
 		this.subscribe("table-destroy", this.destroyBinding);
-
+		
 		this.element.addEventListener("mousedown", (e) => {
 			e.stopPropagation();
 		});
-        
+		
 		return this;
 	}
-    
+	
 	_fitToScreen(x, y, parentEl, parentOffset, position){
 		var scrollTop = this.container === document.body ? document.documentElement.scrollTop : this.container.scrollTop;
-
+		
 		//move menu to start on right edge if it is too close to the edge of the screen
 		if((x + this.element.offsetWidth) >= this.container.offsetWidth || this.reversedX){
 			this.element.style.left = "";
-            
+			
 			if(parentEl){
 				this.element.style.right = (this.container.offsetWidth - parentOffset.left) + "px";
 			}else {
 				this.element.style.right = (this.container.offsetWidth - x) + "px";
 			}
-            
+			
 			this.reversedX = true;
 		}
-
+		
 		//move menu to start on bottom edge if it is too close to the edge of the screen
 		if((y + this.element.offsetHeight) > Math.max(this.container.offsetHeight, scrollTop ? this.container.scrollHeight : 0)) {
 			if(parentEl){
@@ -1355,59 +1372,62 @@ class Popup extends CoreFeature{
 					case "bottom":
 						this.element.style.top = (parseInt(this.element.style.top) - this.element.offsetHeight - parentEl.offsetHeight - 1) + "px";
 						break;
-
+					
 					default:
 						this.element.style.top = (parseInt(this.element.style.top) - this.element.offsetHeight + parentEl.offsetHeight + 1) + "px";
 				}
-                
+				
 			}else {
 				this.element.style.top = (parseInt(this.element.style.top) - this.element.offsetHeight) + "px";
 			}
 		}
 	}
-    
+	
 	isVisible(){
 		return this.visible;
 	}
-    
+	
 	hideOnBlur(callback){
 		this.blurable = true;
-        
+		
 		if(this.visible){
 			setTimeout(() => {
-				this.table.rowManager.element.addEventListener("scroll", this.blurEvent);
-				this.subscribe("cell-editing", this.blurEvent);
-				document.body.addEventListener("click", this.blurEvent);
-				document.body.addEventListener("contextmenu", this.blurEvent);
-				document.body.addEventListener("mousedown", this.blurEvent);
-				window.addEventListener("resize", this.blurEvent);
-				document.body.addEventListener("keydown", this.escEvent);
+				if(this.visible){
+					this.table.rowManager.element.addEventListener("scroll", this.blurEvent);
+					this.subscribe("cell-editing", this.blurEvent);
+					document.body.addEventListener("click", this.blurEvent);
+					document.body.addEventListener("contextmenu", this.blurEvent);
+					document.body.addEventListener("mousedown", this.blurEvent);
+					window.addEventListener("resize", this.blurEvent);
+					document.body.addEventListener("keydown", this.escEvent);
 
+					this.blurEventsBound = true;
+				}
 			}, 100);
-            
+			
 			this.blurCallback = callback;
 		}
-        
+		
 		return this;
 	}
-    
+	
 	_escapeCheck(e){
 		if(e.keyCode == 27){
 			this.hide();
 		}
 	}
-
+	
 	blockHide(){
 		this.hideable = false;
 	}
-
+	
 	restoreHide(){
 		this.hideable = true;
 	}
-    
+	
 	hide(silent = false){
 		if(this.visible && this.hideable){
-			if(this.blurable){
+			if(this.blurable && this.blurEventsBound){
 				document.body.removeEventListener("keydown", this.escEvent);
 				document.body.removeEventListener("click", this.blurEvent);
 				document.body.removeEventListener("contextmenu", this.blurEvent);
@@ -1415,39 +1435,41 @@ class Popup extends CoreFeature{
 				window.removeEventListener("resize", this.blurEvent);
 				this.table.rowManager.element.removeEventListener("scroll", this.blurEvent);
 				this.unsubscribe("cell-editing", this.blurEvent);
+
+				this.blurEventsBound = false;
 			}
-            
+			
 			if(this.childPopup){
 				this.childPopup.hide();
 			}
-            
+			
 			if(this.parent){
 				this.parent.childPopup = null;
 			}
-            
+			
 			if(this.element.parentNode){
 				this.element.parentNode.removeChild(this.element);
 			}
-
+			
 			this.visible = false;
-
+			
 			if(this.blurCallback && !silent){
 				this.blurCallback();
 			}
-
+			
 			this.unsubscribe("table-destroy", this.destroyBinding);
 		}
-        
+		
 		return this;
 	}
-    
+	
 	child(element){
 		if(this.childPopup){
 			this.childPopup.hide();
 		}
-        
+		
 		this.childPopup = new Popup(this.table, element, this);
-        
+		
 		return this.childPopup;
 	}
 }
@@ -2968,6 +2990,7 @@ var defaultColumnOptions = {
 	"variableHeight": undefined,
 	"headerVertical": undefined,
 	"headerHozAlign": undefined,
+	"headerWordWrap": false,
 	"editableTitle": undefined,
 };
 
@@ -3210,6 +3233,10 @@ class Column extends CoreFeature{
 
 		var titleHolderElement = document.createElement("div");
 		titleHolderElement.classList.add("tabulator-col-title");
+		
+		if(def.headerWordWrap){
+			titleHolderElement.classList.add("tabulator-col-title-wrap");
+		}
 
 		if(def.editableTitle){
 			var titleElement = document.createElement("input");
@@ -4256,7 +4283,7 @@ class Row extends CoreFeature{
 					
 					if(cell){
 						let value = column.getFieldValue(newRowData);
-						if(cell.getValue() != value){
+						if(cell.getValue() !== value){
 							cell.setValueProcessData(value);
 							
 							if(visible){
@@ -4536,10 +4563,10 @@ var defaultCalculations = {
 };
 
 class ColumnCalcs extends Module{
-
+	
 	constructor(table){
 		super(table);
-
+		
 		this.topCalcs = [];
 		this.botCalcs = [];
 		this.genColumn = false;
@@ -4549,9 +4576,12 @@ class ColumnCalcs extends Module{
 		this.botRow = false;
 		this.topInitialized = false;
 		this.botInitialized = false;
-
+		
+		this.blocked = false;
+		this.recalcAfterBlock = false;
+		
 		this.registerTableOption("columnCalcs", true);
-
+		
 		this.registerColumnOption("topCalc");
 		this.registerColumnOption("topCalcParams");
 		this.registerColumnOption("topCalcFormatter");
@@ -4561,16 +4591,16 @@ class ColumnCalcs extends Module{
 		this.registerColumnOption("bottomCalcFormatter");
 		this.registerColumnOption("bottomCalcFormatterParams");
 	}
-
+	
 	createElement (){
 		var el = document.createElement("div");
 		el.classList.add("tabulator-calcs-holder");
 		return el;
 	}
-
+	
 	initialize(){
 		this.genColumn = new Column({field:"value"}, this);
-
+		
 		this.subscribe("cell-value-changed", this.cellValueChanged.bind(this));
 		this.subscribe("column-init", this.initializeColumnCheck.bind(this));
 		this.subscribe("row-deleted", this.rowsUpdated.bind(this));
@@ -4581,43 +4611,69 @@ class ColumnCalcs extends Module{
 		this.subscribe("data-refreshed", this.recalcActiveRowsRefresh.bind(this));
 		this.subscribe("table-redraw", this.tableRedraw.bind(this));
 		this.subscribe("rows-visible", this.visibleRows.bind(this));
-
+		this.subscribe("scrollbar-vertical", this.adjustForScrollbar.bind(this));
+		
+		this.subscribe("redraw-blocked", this.blockRedraw.bind(this));
+		this.subscribe("redraw-restored", this.restoreRedraw.bind(this));
+		
 		this.registerTableFunction("getCalcResults", this.getResults.bind(this));
 		this.registerTableFunction("recalc", this.userRecalc.bind(this));
 	}
-
+	
 	tableRedraw(force){
 		this.recalc(this.table.rowManager.activeRows);
-
+		
 		if(force){
 			this.redraw();
 		}
 	}
-
-
+	
+	blockRedraw(){
+		this.blocked = true;
+		this.recalcAfterBlock = false;
+	}
+	
+	
+	restoreRedraw(){
+		this.blocked = false;
+		
+		if(this.recalcAfterBlock){
+			this.recalcAfterBlock = false;
+			this.recalcActiveRowsRefresh();
+		}
+	}
+	
 	///////////////////////////////////
 	///////// Table Functions /////////
 	///////////////////////////////////
 	userRecalc(){
 		this.recalc(this.table.rowManager.activeRows);
 	}
-
+	
 	///////////////////////////////////
 	///////// Internal Logic //////////
 	///////////////////////////////////
-
+	
+	blockCheck(){
+		if(this.blocked){
+			this.recalcAfterBlock = true;
+		}
+		
+		return this.blocked;
+	}
+	
 	visibleRows(viewable, rows){
 		if(this.topRow){
 			rows.unshift(this.topRow);
 		}
-
+		
 		if(this.botRow){
 			rows.push(this.botRow);
 		}
-	
+		
 		return rows;
 	}
-
+	
 	rowsUpdated(row){
 		if(this.table.options.groupBy){
 			this.recalcRowGroup(row);
@@ -4625,7 +4681,7 @@ class ColumnCalcs extends Module{
 			this.recalcActiveRows();
 		}
 	}
-
+	
 	recalcActiveRowsRefresh(){
 		if(this.table.options.groupBy && this.table.options.dataTreeStartExpanded && this.table.options.dataTree){
 			this.recalcAll();
@@ -4633,18 +4689,18 @@ class ColumnCalcs extends Module{
 			this.recalcActiveRows();
 		}
 	}
-
+	
 	recalcActiveRows(){
 		this.recalc(this.table.rowManager.activeRows);
 	}
-
+	
 	cellValueChanged(cell){
 		if(cell.column.definition.topCalc || cell.column.definition.bottomCalc){
 			if(this.table.options.groupBy){
 				if(this.table.options.columnCalcs == "table" || this.table.options.columnCalcs == "both"){
 					this.recalcActiveRows();
 				}
-
+				
 				if(this.table.options.columnCalcs != "table"){
 					this.recalcRowGroup(cell.row);
 				}
@@ -4653,24 +4709,24 @@ class ColumnCalcs extends Module{
 			}
 		}
 	}
-
+	
 	initializeColumnCheck(column){
 		if(column.definition.topCalc || column.definition.bottomCalc){
 			this.initializeColumn(column);
 		}
 	}
-
+	
 	//initialize column calcs
 	initializeColumn(column){
 		var def = column.definition;
-
+		
 		var config = {
 			topCalcParams:def.topCalcParams || {},
 			botCalcParams:def.bottomCalcParams || {},
 		};
-
+		
 		if(def.topCalc){
-
+			
 			switch(typeof def.topCalc){
 				case "string":
 					if(ColumnCalcs.calculations[def.topCalc]){
@@ -4679,24 +4735,24 @@ class ColumnCalcs extends Module{
 						console.warn("Column Calc Error - No such calculation found, ignoring: ", def.topCalc);
 					}
 					break;
-
+				
 				case "function":
 					config.topCalc = def.topCalc;
 					break;
-
+				
 			}
-
+			
 			if(config.topCalc){
 				column.modules.columnCalcs = config;
 				this.topCalcs.push(column);
-
+				
 				if(this.table.options.columnCalcs != "group"){
 					this.initializeTopRow();
 				}
 			}
-
+			
 		}
-
+		
 		if(def.bottomCalc){
 			switch(typeof def.bottomCalc){
 				case "string":
@@ -4706,156 +4762,156 @@ class ColumnCalcs extends Module{
 						console.warn("Column Calc Error - No such calculation found, ignoring: ", def.bottomCalc);
 					}
 					break;
-
+				
 				case "function":
 					config.botCalc = def.bottomCalc;
 					break;
-
+				
 			}
-
+			
 			if(config.botCalc){
 				column.modules.columnCalcs = config;
 				this.botCalcs.push(column);
-
+				
 				if(this.table.options.columnCalcs != "group"){
 					this.initializeBottomRow();
 				}
 			}
 		}
-
+		
 	}
-
+	
 	//dummy functions to handle being mock column manager
 	registerColumnField(){}
-
+	
 	removeCalcs(){
 		var changed = false;
-
+		
 		if(this.topInitialized){
 			this.topInitialized = false;
 			this.topElement.parentNode.removeChild(this.topElement);
 			changed = true;
 		}
-
+		
 		if(this.botInitialized){
 			this.botInitialized = false;
 			this.footerRemove(this.botElement);
 			changed = true;
 		}
-
+		
 		if(changed){
 			this.table.rowManager.adjustTableSize();
 		}
 	}
-
+	
 	initializeTopRow(){
 		if(!this.topInitialized){
-			this.table.columnManager.getElement().insertBefore(this.topElement, this.table.columnManager.headersElement.nextSibling);
+			this.table.columnManager.getContentsElement().insertBefore(this.topElement, this.table.columnManager.headersElement.nextSibling);
 			this.topInitialized = true;
 		}
 	}
-
+	
 	initializeBottomRow(){
 		if(!this.botInitialized){
 			this.footerPrepend(this.botElement);
 			this.botInitialized = true;
 		}
 	}
-
+	
 	scrollHorizontal(left){
 		if(this.botInitialized && this.botRow){
-			if(this.table.rtl){
-				this.botRow.getElement().style.marginRight = (left) + "px";
-			}else {
-				this.botRow.getElement().style.marginLeft = (-left) + "px";
-			}	
+			this.botElement.scrollLeft = left;
 		}
 	}
-
+	
 	recalc(rows){
 		var data, row;
-
-		if(this.topInitialized || this.botInitialized){
-			data = this.rowsToData(rows);
-
-			if(this.topInitialized){
-				if(this.topRow){
-					this.topRow.deleteCells();
+		
+		if(!this.blockCheck()){
+			if(this.topInitialized || this.botInitialized){
+				data = this.rowsToData(rows);
+				
+				if(this.topInitialized){
+					if(this.topRow){
+						this.topRow.deleteCells();
+					}
+					
+					row = this.generateRow("top", data);
+					this.topRow = row;
+					while(this.topElement.firstChild) this.topElement.removeChild(this.topElement.firstChild);
+					this.topElement.appendChild(row.getElement());
+					row.initialize(true);
 				}
-
-				row = this.generateRow("top", data);
-				this.topRow = row;
-				while(this.topElement.firstChild) this.topElement.removeChild(this.topElement.firstChild);
-				this.topElement.appendChild(row.getElement());
-				row.initialize(true);
-			}
-
-			if(this.botInitialized){
-				if(this.botRow){
-					this.botRow.deleteCells();
+				
+				if(this.botInitialized){
+					if(this.botRow){
+						this.botRow.deleteCells();
+					}
+					
+					row = this.generateRow("bottom", data);
+					this.botRow = row;
+					while(this.botElement.firstChild) this.botElement.removeChild(this.botElement.firstChild);
+					this.botElement.appendChild(row.getElement());
+					row.initialize(true);
 				}
-
-				row = this.generateRow("bottom", data);
-				this.botRow = row;
-				while(this.botElement.firstChild) this.botElement.removeChild(this.botElement.firstChild);
-				this.botElement.appendChild(row.getElement());
-				row.initialize(true);
-			}
-
-			this.table.rowManager.adjustTableSize();
-
-			//set resizable handles
-			if(this.table.modExists("frozenColumns")){
-				this.table.modules.frozenColumns.layout();
+				
+				this.table.rowManager.adjustTableSize();
+				
+				//set resizable handles
+				if(this.table.modExists("frozenColumns")){
+					this.table.modules.frozenColumns.layout();
+				}
 			}
 		}
 	}
-
+	
 	recalcRowGroup(row){
 		this.recalcGroup(this.table.modules.groupRows.getRowGroup(row));
 	}
-
+	
 	recalcAll(){
 		if(this.topCalcs.length || this.botCalcs.length){
 			if(this.table.options.columnCalcs !== "group"){
 				this.recalcActiveRows();
 			}
-
+			
 			if(this.table.options.groupBy && this.table.options.columnCalcs !== "table"){
-
+				
 				var groups = this.table.modules.groupRows.getChildGroups();
-
+				
 				groups.forEach((group) => {
 					this.recalcGroup(group);
 				});
 			}
 		}
 	}
-
+	
 	recalcGroup(group){
 		var data, rowData;
-
-		if(group){
-			if(group.calcs){
-				if(group.calcs.bottom){
-					data = this.rowsToData(group.rows);
-					rowData = this.generateRowData("bottom", data);
-
-					group.calcs.bottom.updateData(rowData);
-					group.calcs.bottom.reinitialize();
-				}
-
-				if(group.calcs.top){
-					data = this.rowsToData(group.rows);
-					rowData = this.generateRowData("top", data);
-
-					group.calcs.top.updateData(rowData);
-					group.calcs.top.reinitialize();
+		
+		if(!this.blockCheck()){
+			if(group){
+				if(group.calcs){
+					if(group.calcs.bottom){
+						data = this.rowsToData(group.rows);
+						rowData = this.generateRowData("bottom", data);
+						
+						group.calcs.bottom.updateData(rowData);
+						group.calcs.bottom.reinitialize();
+					}
+					
+					if(group.calcs.top){
+						data = this.rowsToData(group.rows);
+						rowData = this.generateRowData("top", data);
+						
+						group.calcs.top.updateData(rowData);
+						group.calcs.top.reinitialize();
+					}
 				}
 			}
 		}
 	}
-
+	
 	//generate top stats row
 	generateTopRow(rows){
 		return this.generateRow("top", this.rowsToData(rows));
@@ -4864,13 +4920,13 @@ class ColumnCalcs extends Module{
 	generateBottomRow(rows){
 		return this.generateRow("bottom", this.rowsToData(rows));
 	}
-
+	
 	rowsToData(rows){
 		var data = [];
 		
 		rows.forEach((row) => {
 			data.push(row.getData());
-
+			
 			if(this.table.options.dataTree && this.table.options.dataTreeChildColumnCalcs){
 				if(row.modules.dataTree && row.modules.dataTree.open){
 					var children = this.rowsToData(this.table.modules.dataTree.getFilteredTreeChildren(row));
@@ -4878,47 +4934,47 @@ class ColumnCalcs extends Module{
 				}
 			}
 		});
-
+		
 		return data;
 	}
-
+	
 	//generate stats row
 	generateRow(pos, data){
 		var rowData = this.generateRowData(pos, data),
 		row;
-
+		
 		if(this.table.modExists("mutator")){
 			this.table.modules.mutator.disable();
 		}
-
+		
 		row = new Row(rowData, this, "calc");
-
+		
 		if(this.table.modExists("mutator")){
 			this.table.modules.mutator.enable();
 		}
-
+		
 		row.getElement().classList.add("tabulator-calcs", "tabulator-calcs-" + pos);
-
+		
 		row.component = false;
-
+		
 		row.getComponent = () => {
 			if(!row.component){
 				row.component = new CalcComponent(row);
 			}
-
+			
 			return row.component;
 		};
-
+		
 		row.generateCells = () => {
-
+			
 			var cells = [];
-
+			
 			this.table.columnManager.columnsByIndex.forEach((column) => {
-
+				
 				//set field name of mock column
 				this.genColumn.setField(column.getField());
 				this.genColumn.hozAlign = column.hozAlign;
-
+				
 				if(column.definition[pos + "CalcFormatter"] && this.table.modExists("format")){
 					this.genColumn.modules.format = {
 						formatter: this.table.modules.format.getFormatter(column.definition[pos + "CalcFormatter"]),
@@ -4930,63 +4986,63 @@ class ColumnCalcs extends Module{
 						params:{}
 					};
 				}
-
+				
 				//ensure css class definition is replicated to calculation cell
 				this.genColumn.definition.cssClass = column.definition.cssClass;
-
+				
 				//generate cell and assign to correct column
 				var cell = new Cell(this.genColumn, row);
 				cell.getElement();
 				cell.column = column;
 				cell.setWidth();
-
+				
 				column.cells.push(cell);
 				cells.push(cell);
-
+				
 				if(!column.visible){
 					cell.hide();
 				}
 			});
-
+			
 			row.cells = cells;
 		};
-
+		
 		return row;
 	}
-
+	
 	//generate stats row
 	generateRowData(pos, data){
 		var rowData = {},
 		calcs = pos == "top" ? this.topCalcs : this.botCalcs,
 		type = pos == "top" ? "topCalc" : "botCalc",
 		params, paramKey;
-
+		
 		calcs.forEach(function(column){
 			var values = [];
-
+			
 			if(column.modules.columnCalcs && column.modules.columnCalcs[type]){
 				data.forEach(function(item){
 					values.push(column.getFieldValue(item));
 				});
-
+				
 				paramKey = type + "Params";
 				params = typeof column.modules.columnCalcs[paramKey] === "function" ? column.modules.columnCalcs[paramKey](values, data) : column.modules.columnCalcs[paramKey];
-
+				
 				column.setFieldValue(rowData, column.modules.columnCalcs[type](values, data, params));
 			}
 		});
-
+		
 		return rowData;
 	}
-
+	
 	hasTopCalcs(){
 		return	!!(this.topCalcs.length);
 	}
-
+	
 	hasBottomCalcs(){
 		return	!!(this.botCalcs.length);
 	}
-
+	
 	//handle table redraw
 	redraw(){
 		if(this.topRow){
@@ -4996,15 +5052,15 @@ class ColumnCalcs extends Module{
 			this.botRow.normalizeHeight(true);
 		}
 	}
-
+	
 	//return the calculated
 	getResults(){
 		var results = {},
 		groups;
-
+		
 		if(this.table.options.groupBy && this.table.modExists("groupRows")){
 			groups = this.table.modules.groupRows.getGroups(true);
-
+			
 			groups.forEach((group) => {
 				results[group.getKey()] = this.getGroupResults(group);
 			});
@@ -5014,28 +5070,38 @@ class ColumnCalcs extends Module{
 				bottom: this.botRow ? this.botRow.getData() : {},
 			};
 		}
-
+		
 		return results;
 	}
-
+	
 	//get results from a group
 	getGroupResults(group){
 		var groupObj = group._getSelf(),
 		subGroups = group.getSubGroups(),
 		subGroupResults = {},
 		results = {};
-
+		
 		subGroups.forEach((subgroup) => {
 			subGroupResults[subgroup.getKey()] = this.getGroupResults(subgroup);
 		});
-
+		
 		results = {
 			top: groupObj.calcs.top ? groupObj.calcs.top.getData() : {},
 			bottom: groupObj.calcs.bottom ? groupObj.calcs.bottom.getData() : {},
 			groups: subGroupResults,
 		};
-
+		
 		return results;
+	}
+	
+	adjustForScrollbar(width){
+		if(this.botRow){
+			if(this.table.rtl){
+				this.botElement.style.paddingLeft = width + "px";
+			}else {
+				this.botElement.style.paddingRight = width + "px";
+			}
+		}
 	}
 }
 
@@ -5855,6 +5921,7 @@ function xlsx(list, options, setFileContents){
 	sheetName = options.sheetName || "Sheet1",
 	workbook = XLSX.utils.book_new(),
 	tableFeatures = new CoreFeature(this),
+	compression =  'compress' in options ? options.compress : true,
 	output;
 
 	workbook.SheetNames = [];
@@ -5942,7 +6009,7 @@ function xlsx(list, options, setFileContents){
 		return buf;
 	}
 
-	output = XLSX.write(workbook, {bookType:'xlsx', bookSST:true, type: 'binary'});
+	output = XLSX.write(workbook, {bookType:'xlsx', bookSST:true, type: 'binary', compression });
 
 	setFileContents(s2ab(output), "application/octet-stream");
 }
@@ -6932,6 +6999,7 @@ class Edit{
 		this.listIteration = 0;
 		
 		this.lastAction="";
+		this.filterTerm="";
 		
 		this.blurable = true;
 		
@@ -8398,6 +8466,7 @@ class Edit$1 extends Module{
 		this.subscribe("column-layout", this.initializeColumnCheck.bind(this));
 		this.subscribe("column-delete", this.columnDeleteCheck.bind(this));
 		this.subscribe("row-deleting", this.rowDeleteCheck.bind(this));
+		this.subscribe("row-layout", this.rowEditableCheck.bind(this));
 		this.subscribe("data-refreshing", this.cancelEdit.bind(this));
 		
 		this.subscribe("keybinding-nav-prev", this.navigatePrev.bind(this, undefined));
@@ -8502,7 +8571,7 @@ class Edit$1 extends Module{
 				prevRow = this.table.rowManager.prevDisplayRow(cell.row, true);
 				
 				if(prevRow){
-					nextCell = this.findNextEditableCell(prevRow, prevRow.cells.length);
+					nextCell = this.findPrevEditableCell(prevRow, prevRow.cells.length);
 					
 					if(nextCell){
 						nextCell.getComponent().edit();
@@ -8692,6 +8761,14 @@ class Edit$1 extends Module{
 			this.cancelEdit();
 		}
 	}
+
+	rowEditableCheck(row){
+		row.getCells().forEach((cell) => {
+			if(cell.column.modules.edit && typeof cell.column.modules.edit.check === "function"){
+				this.updateCellClass(cell);
+			}
+		});
+	}
 	
 	//initialize column editor
 	initializeColumn(column){
@@ -8876,7 +8953,9 @@ class Edit$1 extends Module{
 		if(cell.column.modules.edit){
 			switch(typeof cell.column.modules.edit.check){
 				case "function":
-					check = cell.column.modules.edit.check(cell.getComponent());
+					if(cell.row.initialized){
+						check = cell.column.modules.edit.check(cell.getComponent());
+					}
 					break;
 
 				case "string":
@@ -10212,9 +10291,9 @@ class Filter extends Module{
 				});
 
 				editorElement.addEventListener("focus", (e) => {
-					var left = this.table.columnManager.element.scrollLeft;
+					var left = this.table.columnManager.contentsElement.scrollLeft;
 
-					var headerPos = this.table.rowManager.element.scrollLeft + parseInt(this.table.columnManager.element.style.marginLeft);
+					var headerPos = this.table.rowManager.element.scrollLeft;
 
 					if(left !== headerPos){
 						this.table.rowManager.scrollHorizontal(left);
@@ -11224,7 +11303,15 @@ function responsiveCollapse(cell, formatterParams, onRendered){
 	config = cell.getRow()._row.modules.responsiveLayout;
 
 	el.classList.add("tabulator-responsive-collapse-toggle");
-	el.innerHTML = "<span class='tabulator-responsive-collapse-toggle-open'>+</span><span class='tabulator-responsive-collapse-toggle-close'>-</span>";
+	
+	el.innerHTML = `<svg class='tabulator-responsive-collapse-toggle-open' viewbox="0 0 24 24">
+  <line x1="7" y1="12" x2="17" y2="12" fill="none" stroke-width="3" stroke-linecap="round" />
+  <line y1="7" x1="12" y2="17" x2="12" fill="none" stroke-width="3" stroke-linecap="round" />
+</svg>
+
+<svg class='tabulator-responsive-collapse-toggle-close' viewbox="0 0 24 24">
+  <line x1="7" y1="12" x2="17" y2="12"  fill="none" stroke-width="3" stroke-linecap="round" />
+</svg>`;
 
 	cell.getElement().classList.add("tabulator-row-handle");
 
@@ -11339,13 +11426,13 @@ var defaultFormatters = {
 };
 
 class Format extends Module{
-
+	
 	constructor(table){
 		super(table);
-
+		
 		this.registerColumnOption("formatter");
 		this.registerColumnOption("formatterParams");
-
+		
 		this.registerColumnOption("formatterPrint");
 		this.registerColumnOption("formatterPrintParams");
 		this.registerColumnOption("formatterClipboard");
@@ -11355,35 +11442,35 @@ class Format extends Module{
 		this.registerColumnOption("titleFormatter");
 		this.registerColumnOption("titleFormatterParams");
 	}
-
+	
 	initialize(){
 		this.subscribe("cell-format", this.formatValue.bind(this));
 		this.subscribe("cell-rendered", this.cellRendered.bind(this));
 		this.subscribe("column-layout", this.initializeColumn.bind(this));
 		this.subscribe("column-format", this.formatHeader.bind(this));
 	}
-
+	
 	//initialize column formatter
 	initializeColumn(column){
 		column.modules.format = this.lookupFormatter(column, "");
-
+		
 		if(typeof column.definition.formatterPrint !== "undefined"){
 			column.modules.format.print = this.lookupFormatter(column, "Print");
 		}
-
+		
 		if(typeof column.definition.formatterClipboard !== "undefined"){
 			column.modules.format.clipboard = this.lookupFormatter(column, "Clipboard");
 		}
-
+		
 		if(typeof column.definition.formatterHtmlOutput !== "undefined"){
 			column.modules.format.htmlOutput = this.lookupFormatter(column, "HtmlOutput");
 		}
 	}
-
+	
 	lookupFormatter(column, type){
 		var config = {params:column.definition["formatter" + type + "Params"] || {}},
 		formatter = column.definition["formatter" + type];
-
+		
 		//set column formatter
 		switch(typeof formatter){
 			case "string":
@@ -11394,97 +11481,103 @@ class Format extends Module{
 					config.formatter = Format.formatters.plaintext;
 				}
 				break;
-
+			
 			case "function":
 				config.formatter = formatter;
 				break;
-
+			
 			default:
 				config.formatter = Format.formatters.plaintext;
 				break;
 		}
-
+		
 		return config;
 	}
-
+	
 	cellRendered(cell){
 		if(cell.modules.format && cell.modules.format.renderedCallback && !cell.modules.format.rendered){
 			cell.modules.format.renderedCallback();
 			cell.modules.format.rendered = true;
 		}
 	}
-
+	
 	//return a formatted value for a column header
 	formatHeader(column, title, el){
 		var formatter, params, onRendered, mockCell;
-
+		
 		if(column.definition.titleFormatter){
 			formatter = this.getFormatter(column.definition.titleFormatter);
-
+			
 			onRendered = (callback) => {
 				column.titleFormatterRendered = callback;
 			};
-
+			
 			mockCell = {
 				getValue:function(){
 					return title;
 				},
 				getElement:function(){
 					return el;
+				},
+				getColumn:function(){
+					return column.getComponent();
+				},
+				getTable:() => {
+					return this.table;
 				}
 			};
-
+			
 			params = column.definition.titleFormatterParams || {};
-
+			
 			params = typeof params === "function" ? params() : params;
-
+			
 			return formatter.call(this, mockCell, params, onRendered);
 		}else {
 			return title;
 		}
 	}
-
-
+	
+	
 	//return a formatted value for a cell
 	formatValue(cell){
 		var component = cell.getComponent(),
 		params = typeof cell.column.modules.format.params === "function" ? cell.column.modules.format.params(component) : cell.column.modules.format.params;
-
+		
 		function onRendered(callback){
 			if(!cell.modules.format){
 				cell.modules.format = {};
 			}
-
+			
 			cell.modules.format.renderedCallback = callback;
 			cell.modules.format.rendered = false;
 		}
-
+		
 		return cell.column.modules.format.formatter.call(this, component, params, onRendered);
 	}
-
+	
 	formatExportValue(cell, type){
 		var formatter = cell.column.modules.format[type],
 		params;
-
+		
 		if(formatter){
 			params = typeof formatter.params === "function" ? formatter.params(cell.getComponent()) : formatter.params;
-
+			
 			function onRendered(callback){
 				if(!cell.modules.format){
 					cell.modules.format = {};
 				}
-
+				
 				cell.modules.format.renderedCallback = callback;
 				cell.modules.format.rendered = false;
 			}
-
+			
 			return formatter.formatter.call(this, cell.getComponent(), params, onRendered);
-
+			
 		}else {
 			return this.formatValue(cell);
 		}
 	}
-
+	
 	sanitizeHTML(value){
 		if(value){
 			var entityMap = {
@@ -11497,7 +11590,7 @@ class Format extends Module{
 				'`': '&#x60;',
 				'=': '&#x3D;'
 			};
-
+			
 			return String(value).replace(/[&<>"'`=/]/g, function (s) {
 				return entityMap[s];
 			});
@@ -11505,11 +11598,11 @@ class Format extends Module{
 			return value;
 		}
 	}
-
+	
 	emptyToSpace(value){
 		return value === null || typeof value === "undefined" || value === "" ? "&nbsp;" : value;
 	}
-
+	
 	//get formatter for cell
 	getFormatter(formatter){
 		switch(typeof formatter){
@@ -11521,16 +11614,16 @@ class Format extends Module{
 					formatter = Format.formatters.plaintext;
 				}
 				break;
-
+			
 			case "function":
-				//Custom formatter Function, do nothing
+			//Custom formatter Function, do nothing
 				break;
-
+			
 			default:
 				formatter = Format.formatters.plaintext;
 				break;
 		}
-
+		
 		return formatter;
 	}
 }
@@ -11547,9 +11640,6 @@ class FrozenColumns extends Module{
 		
 		this.leftColumns = [];
 		this.rightColumns = [];
-		this.leftMargin = 0;
-		this.rightMargin = 0;
-		this.rightPadding = 0;
 		this.initializationMode = "left";
 		this.active = false;
 		this.blocked = true;
@@ -11562,13 +11652,7 @@ class FrozenColumns extends Module{
 		this.initializationMode = "left";
 		this.leftColumns = [];
 		this.rightColumns = [];
-		this.leftMargin = 0;
-		this.rightMargin = 0;
-		this.rightMargin = 0;
 		this.active = false;
-		
-		this.table.columnManager.headersElement.style.marginLeft = 0;
-		this.table.columnManager.element.style.paddingRight = 0;
 	}
 	
 	initialize(){
@@ -11577,8 +11661,6 @@ class FrozenColumns extends Module{
 		this.subscribe("column-width", this.layout.bind(this));
 		this.subscribe("row-layout-after", this.layoutRow.bind(this));
 		this.subscribe("table-layout", this.layout.bind(this));
-		this.subscribe("scroll-horizontal", this.scrollHorizontal.bind(this));
-		this.subscribe("scroll-horizontal", this.scrollHorizontal.bind(this));
 		this.subscribe("columns-loading", this.reset.bind(this));
 		
 		this.subscribe("column-add", this.reinitializeColumns.bind(this));
@@ -11587,6 +11669,7 @@ class FrozenColumns extends Module{
 		this.subscribe("table-redraw", this.layout.bind(this));
 		this.subscribe("layout-refreshing", this.blockLayout.bind(this));
 		this.subscribe("layout-refreshed", this.unblockLayout.bind(this));
+		this.subscribe("scrollbar-vertical", this.adjustForScrollbar.bind(this));
 	}
 	
 	blockLayout(){
@@ -11646,32 +11729,6 @@ class FrozenColumns extends Module{
 		}
 	}
 	
-	//quick layout to smooth horizontal scrolling
-	scrollHorizontal(){	
-		if(this.active){		
-			this.calcMargins(true);
-			
-			this.layoutColumnPosition();
-			
-			this.layoutCalcRows();
-			
-			this.reinitializeRows();
-		}
-	}
-	
-	//calculate margins for rows
-	calcMargins(scroll){
-		
-		if(!scroll){
-			this.leftMargin = this._calcSpace(this.leftColumns, this.leftColumns.length) + "px";			
-			this.rightMargin = this._calcSpace(this.rightColumns, this.rightColumns.length) + "px";	
-			this.table.rowManager.tableElement.style.marginRight = this.rightMargin;
-		}
-		
-		//calculate right frozen columns
-		this.rightPadding = this.table.rowManager.element.clientWidth + this.table.columnManager.scrollLeft;
-	}
-	
 	//layout calculation rows
 	layoutCalcRows(){
 		if(this.table.modExists("columnCalcs")){
@@ -11712,11 +11769,8 @@ class FrozenColumns extends Module{
 		var leftMargin = 0;
 		var rightMargin = 0;
 		
-		this.table.columnManager.headersElement.style.marginLeft = this.leftMargin;
-		this.table.columnManager.element.style.paddingRight = this.rightMargin;
-		
 		this.leftColumns.forEach((column, i) => {	
-			column.modules.frozen.marginValue = leftMargin + this.table.columnManager.scrollLeft;
+			column.modules.frozen.marginValue = leftMargin;
 			column.modules.frozen.margin = column.modules.frozen.marginValue + "px";
 			
 			if(column.visible){
@@ -11752,19 +11806,18 @@ class FrozenColumns extends Module{
 		
 		this.rightColumns.forEach((column, i) => {
 			
+			column.modules.frozen.marginValue = rightMargin;
+			column.modules.frozen.margin = column.modules.frozen.marginValue + "px";
+			
 			if(column.visible){
 				rightMargin += column.getWidth();
 			}
-			
-			column.modules.frozen.marginValue = this.rightPadding - rightMargin;
-			column.modules.frozen.margin = column.modules.frozen.marginValue + "px";
 			
 			if(i == this.rightColumns.length - 1){
 				column.modules.frozen.edge = true;
 			}else {
 				column.modules.frozen.edge = false;
 			}
-			
 			
 			if(column.parent.isGroup){
 				this.layoutElement(this.getColGroupParentElement(column), column);
@@ -11787,12 +11840,10 @@ class FrozenColumns extends Module{
 	//layout columns appropriately
 	layout(){	
 		if(this.active && !this.blocked){
-			//calculate row padding
-			this.calcMargins();
-			
+		
 			//calculate left columns
 			this.layoutColumnPosition();
-
+			
 			this.reinitializeRows();
 			
 			this.layoutCalcRows();
@@ -11815,11 +11866,6 @@ class FrozenColumns extends Module{
 	}
 	
 	layoutRow(row){
-		// console.trace("row")
-		var rowEl = row.getElement();
-		
-		rowEl.style.paddingLeft = this.leftMargin;
-		
 		if(this.table.options.layout === "fitDataFill" && this.rightColumns.length){
 			this.table.rowManager.getTableElement().style.minWidth = "calc(100% - " + this.rightMargin + ")";
 		}
@@ -11842,16 +11888,30 @@ class FrozenColumns extends Module{
 	}
 	
 	layoutElement(element, column){
+		var position;
 		
 		if(column.modules.frozen){
-			element.style.position = "absolute";
-			element.style.left = column.modules.frozen.margin;
-			
+			element.style.position = "sticky";
+
+			if(this.table.rtl){
+				position = column.modules.frozen.position === "left" ? "right" : "left";
+			}else {
+				position = column.modules.frozen.position;
+			}
+		
+			element.style[position] = column.modules.frozen.margin;
+
 			element.classList.add("tabulator-frozen");
 			
 			if(column.modules.frozen.edge){
 				element.classList.add("tabulator-frozen-" + column.modules.frozen.position);
 			}
+		}
+	}
+
+	adjustForScrollbar(width){
+		if(this.rightColumns.length){
+			this.table.columnManager.getContentsElement().style.width = "calc(100% - " + width + "px)";
 		}
 	}
 	
@@ -11894,7 +11954,7 @@ class FrozenRows extends Module{
 		this.topElement.classList.add("tabulator-frozen-rows-holder");
 
 		// this.table.columnManager.element.append(this.topElement);
-		this.table.columnManager.getElement().insertBefore(this.topElement, this.table.columnManager.headersElement.nextSibling);
+		this.table.columnManager.getContentsElement().insertBefore(this.topElement, this.table.columnManager.headersElement.nextSibling);
 
 		this.subscribe("row-deleting", this.detachRow.bind(this));
 		this.subscribe("rows-visible", this.visibleRows.bind(this));
@@ -12069,7 +12129,7 @@ class GroupComponent {
 	}
 
 	isVisible(){
-		return this._group._visible;
+		return this._group.visible;
 	}
 
 	show(){
@@ -12340,38 +12400,41 @@ class Group{
 		}
 	}
 	
-	getHeadersAndRows(noCalc){
+	getHeadersAndRows(){
 		var output = [];
 		
 		output.push(this);
 		
 		this._visSet();
 		
+		
+		if(this.calcs.top){
+			this.calcs.top.detachElement();
+			this.calcs.top.deleteCells();
+		}
+		
+		if(this.calcs.bottom){
+			this.calcs.bottom.detachElement();
+			this.calcs.bottom.deleteCells();
+		}
+		
+		
+		
 		if(this.visible){
 			if(this.groupList.length){
 				this.groupList.forEach(function(group){
-					output = output.concat(group.getHeadersAndRows(noCalc));
+					output = output.concat(group.getHeadersAndRows());
 				});
 				
 			}else {
-				if(!noCalc && this.groupManager.table.options.columnCalcs != "table" && this.groupManager.table.modExists("columnCalcs") && this.groupManager.table.modules.columnCalcs.hasTopCalcs()){
-					if(this.calcs.top){
-						this.calcs.top.detachElement();
-						this.calcs.top.deleteCells();
-					}
-					
+				if(this.groupManager.table.options.columnCalcs != "table" && this.groupManager.table.modExists("columnCalcs") && this.groupManager.table.modules.columnCalcs.hasTopCalcs()){
 					this.calcs.top = this.groupManager.table.modules.columnCalcs.generateTopRow(this.rows);
 					output.push(this.calcs.top);
 				}
 				
 				output = output.concat(this.rows);
 				
-				if(!noCalc && this.groupManager.table.options.columnCalcs != "table" &&  this.groupManager.table.modExists("columnCalcs") && this.groupManager.table.modules.columnCalcs.hasBottomCalcs()){
-					if(this.calcs.bottom){
-						this.calcs.bottom.detachElement();
-						this.calcs.bottom.deleteCells();
-					}
-					
+				if(this.groupManager.table.options.columnCalcs != "table" &&  this.groupManager.table.modExists("columnCalcs") && this.groupManager.table.modules.columnCalcs.hasBottomCalcs()){
 					this.calcs.bottom = this.groupManager.table.modules.columnCalcs.generateBottomRow(this.rows);
 					output.push(this.calcs.bottom);
 				}
@@ -12380,25 +12443,14 @@ class Group{
 			if(!this.groupList.length && this.groupManager.table.options.columnCalcs != "table"){
 				
 				if(this.groupManager.table.modExists("columnCalcs")){
-					
-					if(!noCalc && this.groupManager.table.modules.columnCalcs.hasTopCalcs()){
-						if(this.calcs.top){
-							this.calcs.top.detachElement();
-							this.calcs.top.deleteCells();
-						}
-						
+					if(this.groupManager.table.modules.columnCalcs.hasTopCalcs()){
 						if(this.groupManager.table.options.groupClosedShowCalcs){
 							this.calcs.top = this.groupManager.table.modules.columnCalcs.generateTopRow(this.rows);
 							output.push(this.calcs.top);
 						}
 					}
 					
-					if(!noCalc && this.groupManager.table.modules.columnCalcs.hasBottomCalcs()){
-						if(this.calcs.bottom){
-							this.calcs.bottom.detachElement();
-							this.calcs.bottom.deleteCells();
-						}
-						
+					if(this.groupManager.table.modules.columnCalcs.hasBottomCalcs()){						
 						if(this.groupManager.table.options.groupClosedShowCalcs){
 							this.calcs.bottom = this.groupManager.table.modules.columnCalcs.generateBottomRow(this.rows);
 							output.push(this.calcs.bottom);
@@ -12509,7 +12561,7 @@ class Group{
 					prev = rowEl;
 				});
 			}
-
+			
 			this.groupManager.updateGroupRows(true);
 		}else {
 			this.groupManager.updateGroupRows(true);
@@ -13076,6 +13128,9 @@ class GroupRows extends Module{
 			this.groupList.forEach(function(group){
 				group.wipe();
 			});
+			
+			this.groupList = [];
+			this.groups = {};
 		}
 	}
 	
@@ -13162,7 +13217,12 @@ class GroupRows extends Module{
 				this.assignRowToGroup(row, oldGroups);
 			});
 		}
+		
+		Object.values(oldGroups).forEach((group) => {
+			group.wipe();
+		});	
 	}
+	
 	
 	createGroup(groupID, level, oldGroups){
 		var groupKey = level + "_" + groupID,
@@ -13977,6 +14037,8 @@ class Interaction extends Module{
 			rowMouseOver:"row-mouseover",
 			rowMouseOut:"row-mouseout",
 			rowMouseMove:"row-mousemove",
+			rowMouseDown:"row-mousedown",
+			rowMouseUp:"row-mouseup",
 			rowTap:"row",
 			rowDblTap:"row",
 			rowTapHold:"row",
@@ -13990,6 +14052,8 @@ class Interaction extends Module{
 			cellMouseOver:"cell-mouseover",
 			cellMouseOut:"cell-mouseout",
 			cellMouseMove:"cell-mousemove",
+			cellMouseDown:"cell-mousedown",
+			cellMouseUp:"cell-mouseup",
 			cellTap:"cell",
 			cellDblTap:"cell",
 			cellTapHold:"cell",
@@ -14003,6 +14067,8 @@ class Interaction extends Module{
 			headerMouseOver:"column-mouseover",
 			headerMouseOut:"column-mouseout",
 			headerMouseMove:"column-mousemove",
+			headerMouseDown:"column-mousedown",
+			headerMouseUp:"column-mouseup",
 			headerTap:"column",
 			headerDblTap:"column",
 			headerTapHold:"column",
@@ -14016,6 +14082,8 @@ class Interaction extends Module{
 			groupMouseOver:"group-mouseover",
 			groupMouseOut:"group-mouseout",
 			groupMouseMove:"group-mousemove",
+			groupMouseDown:"group-mousedown",
+			groupMouseUp:"group-mouseup",
 			groupTap:"group",
 			groupDblTap:"group",
 			groupTapHold:"group",
@@ -14058,6 +14126,8 @@ class Interaction extends Module{
 		this.registerColumnOption("headerMouseOver");
 		this.registerColumnOption("headerMouseOut");
 		this.registerColumnOption("headerMouseMove");
+		this.registerColumnOption("headerMouseDown");
+		this.registerColumnOption("headerMouseUp");
 		this.registerColumnOption("headerTap");
 		this.registerColumnOption("headerDblTap");
 		this.registerColumnOption("headerTapHold");
@@ -14070,6 +14140,8 @@ class Interaction extends Module{
 		this.registerColumnOption("cellMouseOver");
 		this.registerColumnOption("cellMouseOut");
 		this.registerColumnOption("cellMouseMove");
+		this.registerColumnOption("cellMouseDown");
+		this.registerColumnOption("cellMouseUp");
 		this.registerColumnOption("cellTap");
 		this.registerColumnOption("cellDblTap");
 		this.registerColumnOption("cellTapHold");
@@ -14584,18 +14656,22 @@ class Menu extends Module{
 		this.columnSubscribers = {};
 		
 		this.registerTableOption("menuContainer", undefined); //deprecated
-
+		
 		this.registerTableOption("rowContextMenu", false);
 		this.registerTableOption("rowClickMenu", false);
+		this.registerTableOption("rowDblClickMenu", false);
 		this.registerTableOption("groupContextMenu", false);
 		this.registerTableOption("groupClickMenu", false);
+		this.registerTableOption("groupDblClickMenu", false);
 		
 		this.registerColumnOption("headerContextMenu");
 		this.registerColumnOption("headerClickMenu");
+		this.registerColumnOption("headerDblClickMenu");
 		this.registerColumnOption("headerMenu");
 		this.registerColumnOption("headerMenuIcon");
 		this.registerColumnOption("contextMenu");
 		this.registerColumnOption("clickMenu");
+		this.registerColumnOption("dblClickMenu");
 		
 	}
 	
@@ -14606,7 +14682,7 @@ class Menu extends Module{
 		
 		this.subscribe("column-init", this.initializeColumn.bind(this));
 	}
-
+	
 	deprecatedOptionsCheck(){
 		if(!this.deprecationCheck("menuContainer", "popupContainer")){
 			this.table.options.popupContainer = this.table.options.menuContainer;
@@ -14622,6 +14698,10 @@ class Menu extends Module{
 		if(this.table.options.rowClickMenu){
 			this.subscribe("row-click", this.loadMenuEvent.bind(this, this.table.options.rowClickMenu));
 		}
+		
+		if(this.table.options.rowDblClickMenu){
+			this.subscribe("row-dblclick", this.loadMenuEvent.bind(this, this.table.options.rowDblClickMenu));
+		}
 	}
 	
 	initializeGroupWatchers(){
@@ -14632,6 +14712,10 @@ class Menu extends Module{
 		
 		if(this.table.options.groupClickMenu){
 			this.subscribe("group-click", this.loadMenuEvent.bind(this, this.table.options.groupClickMenu));
+		}
+		
+		if(this.table.options.groupDblClickMenu){
+			this.subscribe("group-dblclick", this.loadMenuEvent.bind(this, this.table.options.groupDblClickMenu));
 		}
 	}
 	
@@ -14650,6 +14734,11 @@ class Menu extends Module{
 			this.subscribe("column-click", this.columnSubscribers.headerClickMenu);
 		}
 		
+		if(def.headerDblClickMenu && !this.columnSubscribers.headerDblClickMenu){
+			this.columnSubscribers.headerDblClickMenu = this.loadMenuTableColumnEvent.bind(this, "headerDblClickMenu");
+			this.subscribe("column-dblclick", this.columnSubscribers.headerDblClickMenu);
+		}
+		
 		if(def.headerMenu){
 			this.initializeColumnHeaderMenu(column);
 		}
@@ -14665,6 +14754,11 @@ class Menu extends Module{
 			this.columnSubscribers.clickMenu = this.loadMenuTableCellEvent.bind(this, "clickMenu");
 			this.subscribe("cell-click", this.columnSubscribers.clickMenu);
 		}
+		
+		if(def.dblClickMenu && !this.columnSubscribers.dblClickMenu){
+			this.columnSubscribers.dblClickMenu = this.loadMenuTableCellEvent.bind(this, "dblClickMenu");
+			this.subscribe("cell-dblclick", this.columnSubscribers.dblClickMenu);
+		}
 	}
 	
 	initializeColumnHeaderMenu(column){
@@ -14673,12 +14767,12 @@ class Menu extends Module{
 		
 		headerMenuEl = document.createElement("span");
 		headerMenuEl.classList.add("tabulator-header-popup-button");
-
+		
 		if(icon){
 			if(typeof icon === "function"){
 				icon = icon(column.getComponent());
 			}
-
+			
 			if(icon instanceof HTMLElement){
 				headerMenuEl.appendChild(icon);
 			}else {
@@ -14821,7 +14915,9 @@ class Menu extends Module{
 		});
 		
 		menuEl.addEventListener("click", (e) => {
-			this.rootPopup.hide();
+			if(this.rootPopup){
+				this.rootPopup.hide();
+			}
 		});
 		
 		popup.show(parentEl || e);
@@ -14835,9 +14931,9 @@ class Menu extends Module{
 					this.currentComponent = null;
 				}
 			});
-
+			
 			this.currentComponent = component;
-
+			
 			this.dispatchExternal("menuOpened", component.getComponent());
 		}
 	}
@@ -15008,7 +15104,7 @@ class MoveColumns extends Module{
 	
 	startMove(e, column){
 		var element = column.getElement(),
-		headerElement = this.table.columnManager.getElement(),
+		headerElement = this.table.columnManager.getContentsElement(),
 		headersElement = this.table.columnManager.getHeadersElement();
 		
 		this.moving = column;
@@ -15027,7 +15123,7 @@ class MoveColumns extends Module{
 		this.hoverElement = element.cloneNode(true);
 		this.hoverElement.classList.add("tabulator-moving");
 		
-		this.table.columnManager.getElement().appendChild(this.hoverElement);
+		headerElement.appendChild(this.hoverElement);
 		
 		this.hoverElement.style.left = "0";
 		this.hoverElement.style.bottom = (headerElement.clientHeight - headersElement.offsetHeight) + "px";
@@ -15109,7 +15205,7 @@ class MoveColumns extends Module{
 	}
 	
 	moveHover(e){
-		var columnHolder = this.table.columnManager.getElement(),
+		var columnHolder = this.table.columnManager.getContentsElement(),
 		scrollLeft = columnHolder.scrollLeft,
 		xPos = ((this.touchMove ? e.touches[0].pageX : e.pageX) - Helpers.elOffset(columnHolder).left) + scrollLeft,
 		scrollPos;
@@ -16493,6 +16589,7 @@ class Page extends Module{
 		if(!this.initialLoad){
 			if(this.mode == "local" || force){
 				this.page = 1;
+				this.trackChanges();
 			}
 		}
 	}
@@ -17067,6 +17164,7 @@ class Persistence extends Module{
 			this.subscribe("group-changed", this.eventSave.bind(this, "group"));
 			this.subscribe("page-changed", this.eventSave.bind(this, "page"));
 			this.subscribe("column-resized", this.eventSave.bind(this, "columns"));
+			this.subscribe("column-width", this.eventSave.bind(this, "columns"));
 			this.subscribe("layout-refreshed", this.eventSave.bind(this, "columns"));
 		}
 
@@ -17389,15 +17487,24 @@ class Popup$1 extends Module{
 		
 		this.registerTableOption("rowContextPopup", false);
 		this.registerTableOption("rowClickPopup", false);
+		this.registerTableOption("rowDblClickPopup", false);
 		this.registerTableOption("groupContextPopup", false);
 		this.registerTableOption("groupClickPopup", false);
+		this.registerTableOption("groupDblClickPopup", false);
 		
 		this.registerColumnOption("headerContextPopup");
 		this.registerColumnOption("headerClickPopup");
+		this.registerColumnOption("headerDblClickPopup");
 		this.registerColumnOption("headerPopup");
 		this.registerColumnOption("headerPopupIcon");
 		this.registerColumnOption("contextPopup");
 		this.registerColumnOption("clickPopup");
+		this.registerColumnOption("dblClickPopup");
+
+		this.registerComponentFunction("cell", "popup", this._componentPopupCall.bind(this));
+		this.registerComponentFunction("column", "popup", this._componentPopupCall.bind(this));
+		this.registerComponentFunction("row", "popup", this._componentPopupCall.bind(this));
+		this.registerComponentFunction("group", "popup", this._componentPopupCall.bind(this));
 		
 	}
 	
@@ -17406,6 +17513,10 @@ class Popup$1 extends Module{
 		this.initializeGroupWatchers();
 		
 		this.subscribe("column-init", this.initializeColumn.bind(this));
+	}
+
+	_componentPopupCall(component, contents, position){
+		this.loadPopupEvent(contents, null, component, position);
 	}
 	
 	initializeRowWatchers(){
@@ -17417,6 +17528,10 @@ class Popup$1 extends Module{
 		if(this.table.options.rowClickPopup){
 			this.subscribe("row-click", this.loadPopupEvent.bind(this, this.table.options.rowClickPopup));
 		}
+
+		if(this.table.options.rowDblClickPopup){
+			this.subscribe("row-dblclick", this.loadPopupEvent.bind(this, this.table.options.rowDblClickPopup));
+		}
 	}
 	
 	initializeGroupWatchers(){
@@ -17427,6 +17542,10 @@ class Popup$1 extends Module{
 		
 		if(this.table.options.groupClickPopup){
 			this.subscribe("group-click", this.loadPopupEvent.bind(this, this.table.options.groupClickPopup));
+		}
+
+		if(this.table.options.groupDblClickPopup){
+			this.subscribe("group-dblclick", this.loadPopupEvent.bind(this, this.table.options.groupDblClickPopup));
 		}
 	}
 	
@@ -17443,6 +17562,11 @@ class Popup$1 extends Module{
 		if(def.headerClickPopup && !this.columnSubscribers.headerClickPopup){
 			this.columnSubscribers.headerClickPopup = this.loadPopupTableColumnEvent.bind(this, "headerClickPopup");
 			this.subscribe("column-click", this.columnSubscribers.headerClickPopup);
+		
+		
+		}if(def.headerDblClickPopup && !this.columnSubscribers.headerDblClickPopup){
+			this.columnSubscribers.headerDblClickPopup = this.loadPopupTableColumnEvent.bind(this, "headerDblClickPopup");
+			this.subscribe("column-dblclick", this.columnSubscribers.headerDblClickPopup);
 		}
 		
 		if(def.headerPopup){
@@ -17459,6 +17583,11 @@ class Popup$1 extends Module{
 		if(def.clickPopup && !this.columnSubscribers.clickPopup){
 			this.columnSubscribers.clickPopup = this.loadPopupTableCellEvent.bind(this, "clickPopup");
 			this.subscribe("cell-click", this.columnSubscribers.clickPopup);
+		}
+
+		if(def.dblClickPopup && !this.columnSubscribers.dblClickPopup){
+			this.columnSubscribers.dblClickPopup = this.loadPopupTableCellEvent.bind(this, "dblClickPopup");
+			this.subscribe("cell-click", this.columnSubscribers.dblClickPopup);
 		}
 	}
 	
@@ -17513,7 +17642,7 @@ class Popup$1 extends Module{
 		}
 	}
 	
-	loadPopupEvent(contents, e, component){
+	loadPopupEvent(contents, e, component, position){
 		var renderedCallback;
 
 		function onRendered(callback){
@@ -17528,10 +17657,10 @@ class Popup$1 extends Module{
 		
 		contents = typeof contents == "function" ? contents.call(this.table, e, component.getComponent(),  onRendered) : contents;
 		
-		this.loadPopup(e, component, contents, renderedCallback);
+		this.loadPopup(e, component, contents, renderedCallback, position);
 	}
 	
-	loadPopup(e, component, contents, renderedCallback){
+	loadPopup(e, component, contents, renderedCallback, position){
 		var touch = !(e instanceof MouseEvent),
 		contentsEl, popup;
 		
@@ -17557,8 +17686,15 @@ class Popup$1 extends Module{
 		if(typeof renderedCallback === "function"){
 			popup.renderCallback(renderedCallback);
 		}
+
+		if(e){
+			popup.show(e);
+		}else {
+			popup.show(component.getElement(), position || "center");
+		}
+
 		
-		popup.show(e).hideOnBlur(() => {
+		popup.hideOnBlur(() => {
 			this.dispatchExternal("popupClosed", component.getComponent());
 		});
 
@@ -18175,15 +18311,32 @@ class ResizeColumns extends Module{
 			}
 		}
 	}
+
+	frozenColumnOffset(column){
+		var offset = false;
+
+		if(column.modules.frozen){
+			offset = column.modules.frozen.marginValue; 
+
+			if(column.modules.frozen.position === "left"){
+				offset += column.getWidth() - 3;
+			}else {
+				if(offset){
+					offset -= 3;
+				}
+			}
+		}
+
+		return offset !== false ? offset + "px" : false;
+	}
 	
 	reinitializeColumn(column){
-		var frozenOffset = column.modules.frozen ? (column.modules.frozen.marginValue + column.getWidth() + "px") : false;
-		
+		var frozenOffset = this.frozenColumnOffset(column);
 		
 		column.cells.forEach((cell) => {
 			if(cell.modules.resize && cell.modules.resize.handleEl){
 				if(frozenOffset){
-					cell.modules.resize.handleEl.style.left = frozenOffset;
+					cell.modules.resize.handleEl.style[column.modules.frozen.position] = frozenOffset;
 				}
 				
 				cell.element.after(cell.modules.resize.handleEl);
@@ -18192,7 +18345,7 @@ class ResizeColumns extends Module{
 		
 		if(column.modules.resize && column.modules.resize.handleEl){
 			if(frozenOffset){
-				column.modules.resize.handleEl.style.left = frozenOffset;
+				column.modules.resize.handleEl.style[column.modules.frozen.position] = frozenOffset;
 			}
 			
 			column.element.after(column.modules.resize.handleEl);
@@ -18244,8 +18397,8 @@ class ResizeColumns extends Module{
 			});
 			
 			if(column.modules.frozen){
-				handle.style.position = "absolute";
-				handle.style.left = column.modules.frozen.marginValue + column.getWidth() + "px";
+				handle.style.position = "sticky";
+				handle.style[column.modules.frozen.position] = this.frozenColumnOffset(column);
 			}
 			
 			config.handleEl = handle;
@@ -18357,6 +18510,8 @@ class ResizeColumns extends Module{
 			self.table.element.classList.remove("tabulator-block-select");
 			
 			if(self.startWidth !== column.getWidth()){
+				self.table.columnManager.verticalAlignHeaders();
+
 				self.dispatch("column-resized", column);
 				self.table.externalEvents.dispatch("columnResized", column.getComponent());
 			}
@@ -18549,7 +18704,7 @@ class ResizeTable extends Module{
 								this.containerHeight = table.element.parentNode.clientHeight;
 								this.containerWidth = table.element.parentNode.clientWidth;
 							}
-						
+							
 							this.redrawTable();
 						}
 					}
@@ -18601,17 +18756,16 @@ class ResizeTable extends Module{
 	initializeVisibilityObserver(){
 		this.visibilityObserver = new IntersectionObserver((entries) => {
 			this.visible = entries[0].isIntersecting;
-
+			
 			if(!this.initialized){
 				this.initialized = true;
 				this.initialRedraw = !this.visible;
+			}else {
+				if(this.visible){
+					this.redrawTable(this.initialRedraw);
+					this.initialRedraw = false;
+				}
 			}
-
-			if(this.visible){
-				this.redrawTable(this.initialRedraw);
-				this.initialRedraw = false;
-			}
-			
 		});
 		
 		this.visibilityObserver.observe(this.table.element);
@@ -18832,22 +18986,21 @@ class ResponsiveLayout extends Module{
 
 	//redraw columns to fit space
 	update(){
-		var self = this,
-		working = true;
+		var working = true;
 
 		while(working){
 
-			let width = self.table.modules.layout.getMode() == "fitColumns" ? self.table.columnManager.getFlexBaseWidth() : self.table.columnManager.getWidth();
+			let width = this.table.modules.layout.getMode() == "fitColumns" ? this.table.columnManager.getFlexBaseWidth() : this.table.columnManager.getWidth();
 
-			let diff = (self.table.options.headerVisible ? self.table.columnManager.element.clientWidth : self.table.element.clientWidth) - width;
+			let diff = (this.table.options.headerVisible ? this.table.columnManager.element.clientWidth : this.table.element.clientWidth) - width;
 
 			if(diff < 0){
 				//table is too wide
-				let column = self.columns[self.index];
+				let column = this.columns[this.index];
 
 				if(column){
-					self.hideColumn(column);
-					self.index ++;
+					this.hideColumn(column);
+					this.index ++;
 				}else {
 					working = false;
 				}
@@ -18855,13 +19008,13 @@ class ResponsiveLayout extends Module{
 			}else {
 
 				//table has spare space
-				let column = self.columns[self.index -1];
+				let column = this.columns[this.index -1];
 
 				if(column){
 					if(diff > 0){
 						if(diff >= column.getWidth()){
-							self.showColumn(column);
-							self.index --;
+							this.showColumn(column);
+							this.index --;
 						}else {
 							working = false;
 						}
@@ -18873,18 +19026,17 @@ class ResponsiveLayout extends Module{
 				}
 			}
 
-			if(!self.table.rowManager.activeRowsCount){
-				self.table.rowManager.renderEmptyScroll();
+			if(!this.table.rowManager.activeRowsCount){
+				this.table.rowManager.renderEmptyScroll();
 			}
 		}
 	}
 
 	generateCollapsedContent(){
-		var self = this,
-		rows = this.table.rowManager.getDisplayRows();
+		var rows = this.table.rowManager.getDisplayRows();
 
-		rows.forEach(function(row){
-			self.generateCollapsedRowContent(row);
+		rows.forEach((row) => {
+			this.generateCollapsedRowContent(row);
 		});
 	}
 
@@ -18904,16 +19056,15 @@ class ResponsiveLayout extends Module{
 	}
 
 	generateCollapsedRowData(row){
-		var self = this,
-		data = row.getData(),
+		var data = row.getData(),
 		output = [],
 		mockCellComponent;
 
-		this.hiddenColumns.forEach(function(column){
+		this.hiddenColumns.forEach((column) => {
 			var value = column.getFieldValue(data);
 
 			if(column.definition.title && column.field){
-				if(column.modules.format && self.table.options.responsiveLayoutCollapseUseFormatters){
+				if(column.modules.format && this.table.options.responsiveLayoutCollapseUseFormatters){
 
 					mockCellComponent = {
 						value:false,
@@ -18933,6 +19084,9 @@ class ResponsiveLayout extends Module{
 						getColumn:function(){
 							return column.getComponent();
 						},
+						getTable:() => {
+							return this.table;
+						},
 					};
 
 					function onRendered(callback){
@@ -18942,7 +19096,7 @@ class ResponsiveLayout extends Module{
 					output.push({
 						field: column.field,
 						title: column.definition.title,
-						value: column.modules.format.formatter.call(self.table.modules.format, mockCellComponent, column.modules.format.params, onRendered)
+						value: column.modules.format.formatter.call(this.table.modules.format, mockCellComponent, column.modules.format.params, onRendered)
 					});
 				}else {
 					output.push({
@@ -19706,6 +19860,7 @@ class Sort extends Module{
 		this.registerTableOption("columnHeaderSortMulti", true); //multiple or single column sorting
 		this.registerTableOption("sortOrderReverse", false); //reverse internal sort ordering
 		this.registerTableOption("headerSortElement", "<div class='tabulator-arrow'></div>"); //header sort element
+		this.registerTableOption("headerSortClickElement", "header"); //element which triggers sort when clicked
 
 		this.registerColumnOption("sorter");
 		this.registerColumnOption("sorterParams");
@@ -19803,9 +19958,20 @@ class Sort extends Module{
 
 			colEl.classList.add("tabulator-sortable");
 
-
 			arrowEl = document.createElement("div");
 			arrowEl.classList.add("tabulator-col-sorter");
+
+			switch(this.table.options.headerSortClickElement){
+				case "icon":
+					arrowEl.classList.add("tabulator-col-sorter-element");
+					break;
+				case "header":
+					colEl.classList.add("tabulator-col-sorter-element");
+					break;
+				default:
+					colEl.classList.add("tabulator-col-sorter-element");
+					break;
+			}
 
 			switch(this.table.options.headerSortElement){
 				case "function":
@@ -19828,7 +19994,7 @@ class Sort extends Module{
 			this.setColumnHeaderSortIcon(column, "none");
 
 			//sort on click
-			colEl.addEventListener("click", (e) => {
+			(this.table.options.headerSortClickElement === "icon" ? arrowEl : colEl).addEventListener("click", (e) => {
 				var dir = "",
 				sorters=[],
 				match = false;
@@ -21099,7 +21265,7 @@ class VirtualDomHorizontal extends Renderer{
 		this.windowBuffer = 200; //pixel margin to make column visible before it is shown on screen
 		
 		this.visibleRows = null;
-
+		
 		this.initialized = false;
 		this.isFitData = false;
 		
@@ -21112,53 +21278,29 @@ class VirtualDomHorizontal extends Renderer{
 		this.vertScrollListen();
 	}
 	
-	compatibilityCheck(){
-		var columns = this.options("columns"),
-		frozen = false,
-		ok = true;
-		
+	compatibilityCheck(){		
 		if(this.options("layout") == "fitDataTable"){
 			console.warn("Horizontal Virtual DOM is not compatible with fitDataTable layout mode");
-			ok = false;
 		}
 		
 		if(this.options("responsiveLayout")){
 			console.warn("Horizontal Virtual DOM is not compatible with responsive columns");
-			ok = false;
 		}
 		
 		if(this.options("rtl")){
 			console.warn("Horizontal Virtual DOM is not currently compatible with RTL text direction");
-			ok = false;
 		}
-		
-		if(columns){
-			frozen = columns.find((col) => {
-				return col.frozen;
-			});
-			
-			if(frozen){
-				console.warn("Horizontal Virtual DOM is not compatible with frozen columns");
-				ok = false;
-			}
-		}
-		
-		// if(!ok){
-		// 	options.virtualDomHoz = false;
-		// }
-		
-		return ok;
 	}
 	
 	layoutCheck(){
 		this.isFitData = this.options("layout").startsWith('fitData');
 	}
-
+	
 	vertScrollListen(){
 		this.subscribe("scroll-vertical", this.clearVisRowCache.bind(this));
 		this.subscribe("data-refreshed", this.clearVisRowCache.bind(this));
 	}
-
+	
 	clearVisRowCache(){
 		this.visibleRows = null;
 	}
@@ -21170,7 +21312,7 @@ class VirtualDomHorizontal extends Renderer{
 	renderColumns(row, force){
 		this.dataChange();
 	}
-
+	
 	
 	scrollColumns(left, dir){
 		if(this.scrollLeft != left){
@@ -21204,7 +21346,6 @@ class VirtualDomHorizontal extends Renderer{
 		},
 		colPos = 0;
 		
-		
 		if(update && !this.initialized){
 			return;
 		}
@@ -21219,41 +21360,44 @@ class VirtualDomHorizontal extends Renderer{
 		this.vDomScrollPosRight = this.scrollLeft + this.elementVertical.clientWidth + this.windowBuffer;
 		
 		this.table.columnManager.columnsByIndex.forEach((column) => {
-			var config = {};
+			var config = {},
+			width;
 			
 			if(column.visible){
-				var width = column.getWidth();
-				
-				config.leftPos = colPos;
-				config.rightPos = colPos + width;
-				
-				config.width = width;
-				
-				if (this.isFitData) {
-					config.fitDataCheck = column.modules.vdomHoz ? column.modules.vdomHoz.fitDataCheck : true;
-				}
-				
-				if((colPos + width > this.vDomScrollPosLeft) && (colPos < this.vDomScrollPosRight)){
-					//column is visible
+				if(!column.modules.frozen){			
+					width = column.getWidth();
+
+					config.leftPos = colPos;
+					config.rightPos = colPos + width;
 					
-					if(this.leftCol == -1){
-						this.leftCol = this.columns.length;
-						this.vDomPadLeft = colPos;
+					config.width = width;
+					
+					if (this.isFitData) {
+						config.fitDataCheck = column.modules.vdomHoz ? column.modules.vdomHoz.fitDataCheck : true;
 					}
 					
-					this.rightCol = this.columns.length;
-				}else {
-					// column is hidden
-					if(this.leftCol !== -1){
-						this.vDomPadRight += width;
+					if((colPos + width > this.vDomScrollPosLeft) && (colPos < this.vDomScrollPosRight)){
+						//column is visible
+						
+						if(this.leftCol == -1){
+							this.leftCol = this.columns.length;
+							this.vDomPadLeft = colPos;
+						}
+						
+						this.rightCol = this.columns.length;
+					}else {
+						// column is hidden
+						if(this.leftCol !== -1){
+							this.vDomPadRight += width;
+						}
 					}
+					
+					this.columns.push(column);
+					
+					column.modules.vdomHoz = config;
+					
+					colPos += width;
 				}
-				
-				this.columns.push(column);
-				
-				column.modules.vdomHoz = config;
-				
-				colPos += width;
 			}
 		});
 		
@@ -21345,7 +21489,7 @@ class VirtualDomHorizontal extends Renderer{
 					}
 					
 					rowEl.parentNode.removeChild(rowEl);
-
+					
 					this.rerenderColumns(false, true);
 				}
 			}
@@ -21374,9 +21518,15 @@ class VirtualDomHorizontal extends Renderer{
 	}
 	
 	reinitializeRows(){
-		var rows = this.getVisibleRows();
-		rows.forEach((row) => {
+		var visibleRows = this.getVisibleRows(),
+		otherRows = this.table.rowManager.getRows().filter(row => !visibleRows.includes(row));
+
+		visibleRows.forEach((row) => {
 			this.reinitializeRow(row, true);
+		});
+
+		otherRows.forEach((row) =>{
+			row.deinitialize();
 		});
 	}
 	
@@ -21384,14 +21534,14 @@ class VirtualDomHorizontal extends Renderer{
 		if (!this.visibleRows){
 			this.visibleRows = this.table.rowManager.getVisibleRows();
 		}
-
+		
 		return this.visibleRows;	
 	}
 	
 	scroll(diff){
 		this.vDomScrollPosLeft += diff;
 		this.vDomScrollPosRight += diff;
-
+		
 		if(Math.abs(diff) > (this.windowBuffer / 2)){
 			this.rerenderColumns();
 		}else {
@@ -21421,7 +21571,7 @@ class VirtualDomHorizontal extends Renderer{
 		working = true;
 		
 		while(working){
-			
+
 			let column = this.columns[this.rightCol + 1];
 			
 			if(column){
@@ -21431,7 +21581,7 @@ class VirtualDomHorizontal extends Renderer{
 					this.getVisibleRows().forEach((row) => {
 						if(row.type !== "group"){
 							var cell = row.getCell(column);
-							row.getElement().appendChild(cell.getElement());
+							row.getElement().insertBefore(cell.getElement(), row.getCell(this.columns[this.rightCol]).getElement().nextSibling);
 							cell.cellRendered();
 						}
 					});
@@ -21439,6 +21589,12 @@ class VirtualDomHorizontal extends Renderer{
 					this.fitDataColActualWidthCheck(column);
 					
 					this.rightCol++; // Don't move this below the >= check below
+
+					this.getVisibleRows().forEach((row) => {
+						if(row.type !== "group"){
+							row.modules.vdomHoz.rightCol = this.rightCol;
+						}
+					});
 					
 					if(this.rightCol >= (this.columns.length - 1)){
 						this.vDomPadRight = 0;
@@ -21472,12 +21628,18 @@ class VirtualDomHorizontal extends Renderer{
 					this.getVisibleRows().forEach((row) => {
 						if(row.type !== "group"){
 							var cell = row.getCell(column);
-							row.getElement().prepend(cell.getElement());
+							row.getElement().insertBefore(cell.getElement(), row.getCell(this.columns[this.leftCol]).getElement());
 							cell.cellRendered();
 						}
 					});
 					
 					this.leftCol--; // don't move this below the <= check below
+
+					this.getVisibleRows().forEach((row) => {
+						if(row.type !== "group"){
+							row.modules.vdomHoz.leftCol = this.leftCol;
+						}
+					});
 					
 					if(this.leftCol <= 0){ // replicating logic in addColRight
 						this.vDomPadLeft = 0;
@@ -21530,6 +21692,12 @@ class VirtualDomHorizontal extends Renderer{
 					
 					this.vDomPadRight += column.getWidth();
 					this.rightCol --;
+
+					this.getVisibleRows().forEach((row) => {
+						if(row.type !== "group"){
+							row.modules.vdomHoz.rightCol = this.rightCol;
+						}
+					});
 				}else {
 					working = false;
 				}
@@ -21546,7 +21714,7 @@ class VirtualDomHorizontal extends Renderer{
 	removeColLeft(){
 		var changes = false,
 		working = true;
-		
+
 		while(working){
 			let column = this.columns[this.leftCol];
 			
@@ -21568,6 +21736,12 @@ class VirtualDomHorizontal extends Renderer{
 					
 					this.vDomPadLeft += column.getWidth();
 					this.leftCol ++;
+
+					this.getVisibleRows().forEach((row) => {
+						if(row.type !== "group"){
+							row.modules.vdomHoz.leftCol = this.leftCol;
+						}
+					});
 				}else {
 					working = false;
 				}
@@ -21608,26 +21782,41 @@ class VirtualDomHorizontal extends Renderer{
 				leftCol:this.leftCol,
 				rightCol:this.rightCol,
 			};
-			
-			for(let i = this.leftCol; i <= this.rightCol; i++){
-				let column = this.columns[i];
-				
-				if(column && column.visible){
-					let cell = row.getCell(column);
-					
-					row.getElement().appendChild(cell.getElement());
-					cell.cellRendered();
-				}
+
+			if(this.table.modules.frozenColumns){
+				this.table.modules.frozenColumns.leftColumns.forEach((column) => {
+					this.appendCell(row, column);
+				});
 			}
+
+			for(let i = this.leftCol; i <= this.rightCol; i++){
+				this.appendCell(row, this.columns[i]);
+			}
+
+			if(this.table.modules.frozenColumns){
+				this.table.modules.frozenColumns.rightColumns.forEach((column) => {
+					this.appendCell(row, column);
+				});
+			}
+		}
+	}
+	
+	appendCell(row, column){
+		if(column && column.visible){
+			let cell = row.getCell(column);
+			
+			row.getElement().appendChild(cell.getElement());
+			cell.cellRendered();
 		}
 	}
 	
 	reinitializeRow(row, force){
 		if(row.type !== "group"){
 			if(force || !row.modules.vdomHoz || row.modules.vdomHoz.leftCol !== this.leftCol || row.modules.vdomHoz.rightCol !== this.rightCol){
+				
 				var rowEl = row.getElement();
 				while(rowEl.firstChild) rowEl.removeChild(rowEl.firstChild);
-				
+
 				this.initializeRow(row);
 			}
 		}
@@ -21641,6 +21830,7 @@ class ColumnManager extends CoreFeature {
 		
 		this.blockHozScrollEvent = false;
 		this.headersElement = null;
+		this.contentsElement = null;
 		this.element = null ; //containing element
 		this.columns = []; // column definition object
 		this.columnsByIndex = []; //columns by index
@@ -21660,11 +21850,22 @@ class ColumnManager extends CoreFeature {
 		this.initializeRenderer();
 		
 		this.headersElement = this.createHeadersElement();
+		this.contentsElement = this.createHeaderContentsElement();
 		this.element = this.createHeaderElement();
 		
-		this.element.insertBefore(this.headersElement, this.element.firstChild);
+		this.contentsElement.insertBefore(this.headersElement, this.contentsElement.firstChild);
+		this.element.insertBefore(this.contentsElement, this.element.firstChild);
 		
 		this.subscribe("scroll-horizontal", this.scrollHorizontal.bind(this));
+		this.subscribe("scrollbar-vertical", this.padVerticalScrollbar.bind(this));
+	}
+
+	padVerticalScrollbar(width){
+		if(this.table.rtl){
+			this.headersElement.style.marginLeft = width + "px";
+		}else {
+			this.headersElement.style.marginRight = width + "px";
+		}
 	}
 	
 	initializeRenderer(){
@@ -21698,6 +21899,15 @@ class ColumnManager extends CoreFeature {
 		
 		return el;
 	}
+
+	createHeaderContentsElement (){
+		var el = document.createElement("div");
+		
+		el.classList.add("tabulator-header-contents");
+		el.setAttribute("role", "rowgroup");
+		
+		return el;
+	}
 	
 	createHeaderElement (){
 		var el = document.createElement("div");
@@ -21716,6 +21926,12 @@ class ColumnManager extends CoreFeature {
 	getElement(){
 		return this.element;
 	}
+
+	//return containing contents element
+	getContentsElement(){
+		return this.contentsElement;
+	}
+	
 	
 	//return header containing element
 	getHeadersElement(){
@@ -21724,20 +21940,8 @@ class ColumnManager extends CoreFeature {
 	
 	//scroll horizontally to match table body
 	scrollHorizontal(left){
-		var hozAdjust = 0,
-		scrollWidth = this.element.scrollWidth - this.table.element.clientWidth;
-		
-		// this.tempScrollBlock();
-		this.element.scrollLeft = left;
-		
-		//adjust for vertical scrollbar moving table when present
-		if(left > scrollWidth){
-			hozAdjust = left - scrollWidth;
-			this.element.style.marginLeft = (-(hozAdjust)) + "px";
-		}else {
-			this.element.style.marginLeft = 0;
-		}
-		
+		this.contentsElement.scrollLeft = left;
+
 		this.scrollLeft = left;
 		
 		this.renderer.scrollColumns(left);
@@ -23029,6 +23233,8 @@ class RowManager extends CoreFeature{
 		
 		this.dataPipeline = []; //hold data pipeline tasks
 		this.displayPipeline = []; //hold data display pipeline tasks
+
+		this.scrollbarWidth = 0;
 		
 		this.renderer = null;
 	}
@@ -23711,6 +23917,10 @@ class RowManager extends CoreFeature{
 				//case to handle scenario when trying to skip past end stage
 				this.regenerateRowPositions();
 		}
+
+		if(this.getDisplayRows().length){
+			this._clearPlaceholder();
+		}
 	}
 	
 	//regenerate row positions
@@ -23817,8 +24027,24 @@ class RowManager extends CoreFeature{
 			if(!this.fixedHeight){
 				this.adjustTableSize();
 			}
+
+			this.scrollBarCheck();
 			
 			this.dispatchExternal("renderComplete");
+		}
+	}
+
+	scrollBarCheck(){
+		var scrollbarWidth = 0;
+
+		//adjust for vertical scrollbar moving table when present
+		if(this.element.scrollHeight > this.element.clientHeight){
+			scrollbarWidth = this.element.offsetWidth - this.element.clientWidth;
+		}
+
+		if(scrollbarWidth !== this.scrollbarWidth){
+			this.scrollbarWidth = scrollbarWidth;
+			this.dispatch("scrollbar-vertical", scrollbarWidth);
 		}
 	}
 	
@@ -23883,6 +24109,8 @@ class RowManager extends CoreFeature{
 		if(!this.displayRowsCount){
 			this._showPlaceholder();
 		}
+
+		this.scrollBarCheck();
 		
 		this.dispatchExternal("renderComplete");
 	}
@@ -23981,6 +24209,8 @@ class RowManager extends CoreFeature{
 					this.redraw();
 				}
 			}
+
+			this.scrollBarCheck();
 		}
 		
 		this._positionPlaceholder();
@@ -24167,6 +24397,8 @@ class InteractionManager extends CoreFeature {
 			"mouseover",
 			"mouseout",
 			"mousemove",
+			"mouseup",
+			"mousedown",
 			"touchstart",
 			"touchend",
 		];
