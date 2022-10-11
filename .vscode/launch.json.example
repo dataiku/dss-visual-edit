@@ -25,9 +25,9 @@
                 "FLASK_APP": "backend.py",
                 "FLASK_ENV": "development",
                 "PYTHONPATH": "../../python-lib",
-                "DKU_CURRENT_PROJECT_KEY": "BOEING",
+                "DKU_CURRENT_PROJECT_KEY": "WEBAPP_LOUIS",
                 // choose from CATEGORIZE_TRANSACTIONS, JOIN_COMPANIES, STAKEHOLDER_OWNERSHIP, EDIT
-                "ORIGINAL_DATASET": "equipment_shifts_dates",
+                "ORIGINAL_DATASET": "test_dataset",
                 // choose from transactions_missing, matches, stakeholders_tbc_prepared, demand_stream_prepared_filtered, equipment_shifts_dates, new_parts_copy
             },
             "args": [
