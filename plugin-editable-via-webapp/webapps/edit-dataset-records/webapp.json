@@ -56,6 +56,58 @@
             "datasetParamName": "original_dataset"
         },
         {
+            "name": "sep4",
+            "label": "Linked records",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "linked_record_1_name",
+            "label": "LR #1: column name",
+            "description": "",
+            "type": "DATASET_COLUMN",
+            "datasetParamName": "original_dataset",
+            "mandatory": true
+        },
+        {
+            "name": "linked_record_1_ds_name",
+            "label": "LR #1: linked dataset name",
+            "description": "",
+            "type": "DATASET",
+            "mandatory": true
+        },
+        {
+            "name": "linked_record_1_name_linked",
+            "label": "LR #1: column name in linked dataset",
+            "description": "",
+            "type": "DATASET_COLUMN",
+            "datasetParamName": "linked_record_1_ds_name",
+            "mandatory": true
+        },
+        {
+            "name": "linked_record_1_key",
+            "label": "LR #1: primary key in linked dataset",
+            "description": "",
+            "type": "DATASET_COLUMN",
+            "datasetParamName": "linked_record_1_ds_name",
+            "mandatory": true
+        },
+        {
+            "name": "linked_record_1_label_column",
+            "label": "LR #1: label column in linked dataset",
+            "description": "",
+            "type": "DATASET_COLUMN",
+            "datasetParamName": "linked_record_1_ds_name",
+            "mandatory": true
+        },
+        {
+            "name": "linked_record_1_lookup_columns",
+            "label": "LR #1: lookup columns in linked dataset",
+            "description": "",
+            "type": "DATASET_COLUMNS",
+            "datasetParamName": "linked_record_1_ds_name",
+            "mandatory": true
+        },
+        {
             "name": "sep3",
             "label": "Advanced",
             "type": "SEPARATOR"
