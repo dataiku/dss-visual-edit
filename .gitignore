@@ -14,3 +14,4 @@ react-tabulator/lib
 **/.build_cache
 **/node_modules
 *.log
+.vscode/launch.json
