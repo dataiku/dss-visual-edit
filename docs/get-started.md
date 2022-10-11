@@ -18,13 +18,15 @@ The webapp should look like this:
 
 ![](webapp.png)
 
-Here are the datasets that the webapp backend creates automatically upon starting up (if they don't already exist):
+Here are the datasets that the webapp backend creates automatically upon starting up, if they don't already exist:
 
  1. **_editlog_**, which is the raw record of all edits made via the webapp.
  2. **_editlog\_pivoted_**, which is the output of a _pivot-editlog_ recipe and the user-friendly view of edits. Its schema is a subset of that of the original dataset (it just doesn't have columns that are display-only, but it has the same key columns and the same editable columns).
  3. **_edited_**, which is the output of a _merge-edits_ recipe that feeds from the original dataset and the _editlog\_pivoted_.
 
 ![](new_datasets.png)
+
+These datasets are created on the same connection as the original dataset. For edits to be recorded by the webapp, this has to be a write connection. If that's not the case, you can change the connection of these datasets as soon as they've been added to the Flow.
 
 ## Use the webapp to make some edits
 
@@ -47,32 +49,4 @@ Data table features:
 Depending on your use case, you would add recipes downstream of _editlog\_pivoted_ or of _edited_. For instance, you may only need access to edited rows, so to _editlog\_pivoted_, instead of _edited_ which also contains rows that weren't edited.
 
 You decide when to build the datasets downstream of the _editlog_ (including _editlog\_pivoted_ and _edited_).
-
-## FAQ
-
-### What happens if my source dataset changes?
-
-The webapp automatically detects changes in the original dataset, in which case it shows a button to refresh the data. This detection is carried out by periodically checking the last build date of the dataset.
-
-![](refresh_data.png)
-
-As a consequence, it only works if this isn't a "source" dataset, i.e. there are recipes/datasets upstream. If you want to refresh the webapp upon changes of a source dataset, please create a Scenario with a "Restart webapp" step and a "Trigger on dataset change" or a "Trigger on sql query change".
-
-### What happens if I change primary keys or editable columns in the webapp settings?
-
-* Primary key:
-  * Add:
-    * If this primary key had already been in use in the past (and you're adding it back), there may be rows in the editlog that contain a value for this key, and these rows will be taken into account.
-    * Otherwise, previous edits won't be taken into account by the webapp / the recipes.
-  * Remove:
-    * If the remaining keys allow to uniquely identify a row in the dataset, then there is no impact.
-    * Otherwise, many rows could be impacted by a single row of the editlog (instead of a single row).
-* Editable column:
-  * Add: no impact.
-  * Remove: previous edits on this column won't be taken into account by the webapp / the recipes, and they won't appear in _editlog\_pivoted_ (but they will still be in the editlog).
-
-## Troubleshooting
-
-If the webapp backend started successfully but the webapp itself isn't functioning as expected, clear the browser's cached images and files.
-
 ## Next: [Going further](going-further)
