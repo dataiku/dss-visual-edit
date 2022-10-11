@@ -1,0 +1,6 @@
+dataiku-api-client
+$DKU_DSS_URL/public/packages/dataiku-internal-client.tar.gz
+pandas
+dash
+dash_extensions
+json5
