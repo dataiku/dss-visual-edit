@@ -56,48 +56,118 @@
             "datasetParamName": "original_dataset"
         },
         {
-            "name": "sep4",
+            "name": "sep-linked-record",
             "label": "Linked records",
             "type": "SEPARATOR"
         },
         {
-            "name": "linked_record_1_name",
+            "name": "number_of_linked_records",
+            "label": "How many linked records do you have?",
+            "description": "For now only 2 linked records can be setup",
+            "type": "INT",
+            "minI": 0,
+            "maxI": 2
+
+        },
+        {
+            "name": "sep-linked-records-1",
+            "label": "Linked records",
+            "type": "SEPARATOR",
+            "visibilityCondition": "model.number_of_linked_records > 0"
+        },
+        {
+            "name": "linked_record_name_1",
             "label": "LR #1: column name",
             "description": "",
             "type": "DATASET_COLUMN",
             "datasetParamName": "original_dataset",
-            "mandatory": true
+            "mandatory": true,
+            "visibilityCondition": "model.number_of_linked_records > 0"
         },
         {
-            "name": "linked_record_1_ds_name",
+            "name": "linked_record_ds_name_1",
             "label": "LR #1: linked dataset name",
             "description": "",
             "type": "DATASET",
-            "mandatory": true
+            "mandatory": true,
+            "visibilityCondition": "model.number_of_linked_records > 0"
         },
         {
-            "name": "linked_record_1_key",
+            "name": "linked_record_key_1",
             "label": "LR #1: primary key in linked dataset",
             "description": "",
             "type": "DATASET_COLUMN",
-            "datasetParamName": "linked_record_1_ds_name",
-            "mandatory": true
+            "datasetParamName": "linked_record_ds_name_1",
+            "mandatory": true,
+            "visibilityCondition": "model.number_of_linked_records > 0"
         },
         {
-            "name": "linked_record_1_label_column",
+            "name": "linked_record_label_column_1",
             "label": "LR #1: label column in linked dataset",
             "description": "",
             "type": "DATASET_COLUMN",
-            "datasetParamName": "linked_record_1_ds_name",
-            "mandatory": true
+            "datasetParamName": "linked_record_ds_name_1",
+            "mandatory": true,
+            "visibilityCondition": "model.number_of_linked_records > 0"
         },
         {
-            "name": "linked_record_1_lookup_columns",
+            "name": "linked_record_lookup_columns_1",
             "label": "LR #1: lookup columns in linked dataset",
             "description": "",
             "type": "DATASET_COLUMNS",
-            "datasetParamName": "linked_record_1_ds_name",
-            "mandatory": true
+            "datasetParamName": "linked_record_ds_name_1",
+            "mandatory": true,
+            "visibilityCondition": "model.number_of_linked_records > 0"
+        },
+        {
+            "name": "sep-linked-records-2",
+            "label": "Linked records",
+            "type": "SEPARATOR",
+            "visibilityCondition": "model.number_of_linked_records > 1"
+        },
+        {
+            "name": "linked_record_name_2",
+            "label": "LR #1: column name",
+            "description": "",
+            "type": "DATASET_COLUMN",
+            "datasetParamName": "original_dataset",
+            "mandatory": true,
+            "visibilityCondition": "model.number_of_linked_records > 1"
+        },
+        {
+            "name": "linked_record_ds_name_2",
+            "label": "LR #1: linked dataset name",
+            "description": "",
+            "type": "DATASET",
+            "mandatory": true,
+            "visibilityCondition": "model.number_of_linked_records > 1"
+        },
+        {
+            "name": "linked_record_key_2",
+            "label": "LR #1: primary key in linked dataset",
+            "description": "",
+            "type": "DATASET_COLUMN",
+            "datasetParamName": "linked_record_ds_name_2",
+            "mandatory": true,
+            "visibilityCondition": "model.number_of_linked_records > 1"
+        },
+        {
+            "name": "linked_record_label_column_2",
+            "label": "LR #1: label column in linked dataset",
+            "description": "",
+            "type": "DATASET_COLUMN",
+            "datasetParamName": "linked_record_ds_name_2",
+            "mandatory": true,
+            "visibilityCondition": "model.number_of_linked_records > 1"
+        },
+        {
+            "name": "linked_record_lookup_columns_2",
+            "label": "LR #1: lookup columns in linked dataset",
+            "description": "",
+            "type": "DATASET_COLUMNS",
+            "datasetParamName": "linked_record_ds_name_2",
+            "mandatory": true,
+            "visibilityCondition": "model.number_of_linked_records > 1"
         },
         {
             "name": "sep3",
