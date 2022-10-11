@@ -3,7 +3,7 @@ from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
 from pandas import DataFrame
-from commons import get_primary_keys, get_editable_column_names, merge_edits, pivot_editlog, tabulator_row_key_values, find_webapp_id, get_webapp_json, get_values_from_linked_df
+from commons import get_primary_keys, get_editable_column_names, merge_edits, pivot_editlog, tabulator_row_key_values, find_webapp_id, get_webapp_json, get_values_from_linked_df, get_editlog_df
 from os import getenv
 from json5 import loads
 from datetime import datetime
@@ -143,6 +143,7 @@ class EditableEventSourced:
                 connection=self.__connection_name__)
             editlog_ds_creator.create()
             self.editlog_ds = Dataset(self.editlog_ds_name, self.project_key)
+            editlog_df = get_editlog_df(self.editlog_ds) # when the editlog doesn't exist yet, this makes sure to write an empty dataframe with the correct schema
             logging.debug("Done.")
 
         # make sure that editlog is in append mode
