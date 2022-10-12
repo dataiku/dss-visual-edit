@@ -83,7 +83,6 @@ from datetime import datetime
 from commons import get_user_details, get_last_build_date
 
 columns = ees.get_columns_tabulator(freeze_editable_columns)
-data = ees.get_data_tabulator()
 
 try:
     last_build_date_initial = get_last_build_date(original_ds_name, project)
@@ -93,6 +92,7 @@ except:
     last_build_date_ok = False
 
 def serve_layout():
+    # This function is called upon loading/refreshing the page in the browser
     return html.Div(children=[
         html.Div(id="refresh-div", children=[
             html.Div(id="data-refresh-message", children="The original dataset has changed. Do you want to refresh? (Your edits are safe.)", style={"display": "inline"}),
@@ -110,7 +110,7 @@ def serve_layout():
         dash_tabulator.DashTabulator(
             id="datatable",
             columns=columns,
-            data=data,
+            data=ees.get_data_tabulator(), # this gets the most up-to-date edited data
             groupBy=group_column_names
         ),
 
