@@ -12,15 +12,6 @@ from dash_extensions.javascript import Namespace
 from urllib.parse import urlparse
 from re import sub
 
-# TODO: clean up - this isn't used anymore
-# def get_lookup_column_names(linked_record):
-#     lookup_column_names = []
-#     lookup_column_names_in_linked_ds = []
-#     for lookup_column in linked_record["lookup_columns"]:
-#         lookup_column_names.append(lookup_column["name"])
-#         lookup_column_names_in_linked_ds.append(lookup_column["linked_ds_column_name"])
-#     return lookup_column_names, lookup_column_names_in_linked_ds
-
 
 def recipe_already_exists(recipe_name, project):
     try:
@@ -52,64 +43,6 @@ class EditableEventSourced:
         except:
             self.webapp_url = None
             self.webapp_url_public = "/"
-
-    def __setup_linked_records__(self):
-        self.linked_records = []
-        self.linked_record_names = []
-        for col in self.editschema_manual:
-            if col.get("editable_type") == "linked_record":
-                linked_ds_key = col.get("linked_ds_key")
-                linked_ds_label = col.get("linked_ds_label")
-                linked_ds_lookup_columns = col.get("linked_ds_lookup_columns")
-                if not linked_ds_key: linked_ds_key = col.get("name")
-                if not linked_ds_label: linked_ds_label = linked_ds_key
-                if not linked_ds_lookup_columns: linked_ds_lookup_columns = []
-                self.linked_records.append(
-                    {
-                        "name": col.get("name"),
-                        "ds_name": col.get("linked_ds_name"),
-                        "ds_key": linked_ds_key,
-                        "ds_label": linked_ds_label,
-                        "ds_lookup_columns": linked_ds_lookup_columns
-                    }
-                )
-                self.linked_record_names.append(col.get("name"))
-        if (len(self.linked_records) > 0):
-            self.linked_records_df = DataFrame(
-                data=self.linked_records).set_index("name")
-
-        # TODO: clean up
-        # Second pass to create the lookup columns for each linked record
-        # for col in self.editschema_manual:
-        #     if col.get("editable_type")=="lookup_column":
-        #         for linked_record in self.linked_records:
-        #             if linked_record["name"]==col.get("linked_record_col"):
-        #                 linked_record["lookup_columns"].append({
-        #                     "name": col.get("name"),
-        #                     "linked_ds_column_name": col.get("linked_ds_column_name")
-        #                 })
-
-    # TODO: clean up - this isn't used anymore
-    # def __extend_with_lookup_columns__(self, df):
-    #     for linked_record in self.linked_records:
-    #         lookup_column_names, lookup_column_names_in_linked_ds = get_lookup_column_names(linked_record)
-    #         linked_ds = Dataset(linked_record["ds_name"], self.project_key)
-    #         linked_df = linked_ds.get_dataframe().set_index(linked_record["ds_key"])[lookup_column_names_in_linked_ds]
-    #         df = df.join(linked_df, on=linked_record["name"])
-    #         for c in range(0, len(lookup_column_names)):
-    #             df.rename(columns={lookup_column_names_in_linked_ds[c]: lookup_column_names[c]}, inplace=True)
-    #     return df
-
-    # TODO: clean up - this isn't used anymore
-    # def __get_lookup_values__(self, linked_record, linked_record_value):
-    #     _, lookup_column_names_in_linked_ds = get_lookup_column_names(linked_record)
-    #     linked_ds = Dataset(linked_record["ds_name"], self.project_key)
-    #     linked_df = linked_ds.get_dataframe().set_index(linked_record["ds_key"])[lookup_column_names_in_linked_ds]
-    #     # value_cast = linked_record_value
-    #     # if (linked_record["type"] == "int"):
-    #     #    value_cast = int(linked_record_value)
-    #     return linked_df.loc[linked_df.index==linked_record_value]
-    #     # IDEA: add linked_record["linked_key"] as an INDEX to speed up the query
 
     def __get_editlog_pivoted_ds_schema__(self):
         # see commons.get_editlog_ds_schema
@@ -239,7 +172,7 @@ class EditableEventSourced:
         # index makes it easier to id values in the DataFrame
         self.__edited_df_indexed__.set_index(self.primary_keys, inplace=True)
 
-    def __init__(self, original_ds_name, primary_keys=None, editable_column_names=None, editschema_manual={}, project_key=None, editschema=None):
+    def __init__(self, original_ds_name, primary_keys=None, editable_column_names=None, linked_records={}, editschema_manual={}, project_key=None, editschema=None):
 
         self.original_ds_name = original_ds_name
         if (project_key is None):
@@ -268,6 +201,11 @@ class EditableEventSourced:
         # else: it's in the custom field
         if (editable_column_names):
             self.editable_column_names = editable_column_names
+        if (linked_records):
+            self.linked_records = linked_records
+            if (len(self.linked_records) > 0):
+                self.linked_records_df = DataFrame(
+                    data=self.linked_records).set_index("name")
         self.editschema_manual = editschema_manual
         if (editschema):
             self.primary_keys = get_primary_keys(editschema)
@@ -287,7 +225,6 @@ class EditableEventSourced:
 
         # make sure that original dataset has up-to-date custom fields (editlog and datasets/recipes that follow may not - TODO: change this?)
         self.__save_custom_fields__(self.original_ds_name)
-        self.__setup_linked_records__()
         self.__setup_editlog__()
         self.__setup_editlog_downstream__()
 
@@ -437,6 +374,8 @@ class EditableEventSourced:
     def get_columns_tabulator(self, freeze_editable_columns=False):
         # Columns' settings for tabulator
 
+        linked_record_names = self.linked_records_df.index.values.tolist()
+
         t_cols = []
         for col_name in self.edited_df_cols:
 
@@ -454,7 +393,7 @@ class EditableEventSourced:
             if col_name in self.editable_column_names:
                 if (freeze_editable_columns):
                     t_col["frozen"] = True  # freeze to the right
-                if col_name in self.linked_record_names:
+                if col_name in linked_record_names:
                     t_col.update(
                         self.__get_column_tabulator_editor_linked_record__(col_name))
                 else:

@@ -61,13 +61,12 @@
             "type": "SEPARATOR"
         },
         {
-            "name": "number_of_linked_records",
+            "name": "linked_records_count",
             "label": "How many columns to configure as linked records?",
             "description": "For now only 2 can be setup",
             "type": "INT",
             "minI": 0,
             "maxI": 2
-
         },
         {
             "name": "sep-linked-records-1",
@@ -107,7 +106,6 @@
             "description": "In case you would prefer to display a label rather than a key to make it easier to identify the linked record",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
-            "mandatory": true,
             "visibilityCondition": "model.number_of_linked_records > 0"
         },
         {
@@ -116,7 +114,6 @@
             "description": "",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "linked_record_ds_name_1",
-            "mandatory": true,
             "visibilityCondition": "model.number_of_linked_records > 0"
         },
         {
