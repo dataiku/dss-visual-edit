@@ -157,22 +157,6 @@ class EditableEventSourced:
             merge_settings.save()
             logging.debug("Done.")
 
-    def load_data(self):
-        self.__original_df__ = self.original_ds.get_dataframe()[
-            self.edited_df_cols]
-        self.__edited_df_indexed__ = merge_edits(
-            self.__original_df__,
-            pivot_editlog(
-                self.editlog_ds,
-                self.primary_keys,
-                self.editable_column_names
-            ),
-            self.primary_keys
-        )
-        # self.__edited_df_indexed__ = self.__extend_with_lookup_columns__(self.__edited_df_indexed__)
-        # index makes it easier to id values in the DataFrame
-        self.__edited_df_indexed__.set_index(self.primary_keys, inplace=True)
-
     def __init__(self, original_ds_name, primary_keys=None, editable_column_names=None, linked_records={}, editschema_manual={}, project_key=None, editschema=None):
 
         self.original_ds_name = original_ds_name
@@ -229,18 +213,37 @@ class EditableEventSourced:
         self.__setup_editlog__()
         self.__setup_editlog_downstream__()
 
-        self.load_data()
-
         # used to reference javascript functions in custom_tabulator.js
         self.__ns__ = Namespace("myNamespace", "tabulator")
 
     def get_edited_df_indexed(self):
-        return self.__edited_df_indexed__
+        # Note: index makes it easier to id values in the DataFrame
+        
+        # Load original dataset
+        original_df = self.original_ds.get_dataframe()[
+            self.edited_df_cols]
+        
+        # Load editlog and pivot it
+        editlog_pivoted_df = pivot_editlog(
+                self.editlog_ds,
+                self.primary_keys,
+                self.editable_column_names
+            )
+        
+        # Replay edits
+        return merge_edits(
+            original_df,
+            editlog_pivoted_df,
+            self.primary_keys
+        ).set_index(self.primary_keys)
+
+        # self.__edited_df_indexed__ = self.__extend_with_lookup_columns__(self.__edited_df_indexed__)
 
     def get_edited_df(self):
         return self.get_edited_df_indexed().reset_index()
 
     def get_data_tabulator(self):
+        # This loads the original dataset, the editlog, and replays edits
         return self.get_edited_df().to_dict('records')
 
     def __get_column_tabulator_type__(self, col_name):
@@ -428,12 +431,6 @@ class EditableEventSourced:
             "user": [user]
         }))
 
-        # Note: do we want ees to maintain a live, up-to-date copy of the editlog, or the editlog pivoted, or the edited dataset? Here we choose the latter, but this may change if the original dataset doesn't fit in memory.
-
-        # Update live copy of the edited dataset
-        # Might need to change primary_key_values from a list to a tuple — see this example: df.loc[('cobra', 'mark i'), 'shield'] from https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.loc.html ?
-        self.__edited_df_indexed__.loc[primary_key_values, column_name] = value
-
         # Update lookup columns if a linked record was edited
         # for linked_record in self.linked_records:
         #     if (column_name==linked_record["name"]):
@@ -441,6 +438,7 @@ class EditableEventSourced:
         #         lookup_values = self.__get_lookup_values__(linked_record, value)
 
         #         # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
+        #         # Might need to change primary_key_values from a list to a tuple — see this example: df.loc[('cobra', 'mark i'), 'shield'] from https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.loc.html ?
         #         for lookup_column in linked_record["lookup_columns"]:
         #             self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0]
 

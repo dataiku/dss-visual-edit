@@ -129,7 +129,7 @@ window["dash_tabulator"] =
 /******/ 	        var srcFragments = src.split('/');
 /******/ 	        var fileFragments = srcFragments.slice(-1)[0].split('.');
 /******/
-/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1665416554");
+/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1665580125");
 /******/ 	        srcFragments.splice(-1, 1, fileFragments.join('.'))
 /******/
 /******/ 	        return srcFragments.join('/');
@@ -27039,15 +27039,10 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
 
       try {
         window.parent.WT1SVC.event("lca-datatable-viewed");
-      } catch (e) {}
+      } catch (e) {} // const {id, data, columns, groupBy, cellEdited} = this.props;
+      // if (this.tabulator) this.tabulator.setData(data)
 
-      var _this$props2 = this.props,
-          id = _this$props2.id,
-          data = _this$props2.data,
-          columns = _this$props2.columns,
-          groupBy = _this$props2.groupBy,
-          cellEdited = _this$props2.cellEdited;
-      if (this.tabulator) this.tabulator.setData(data);
+
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         ref: function ref(el) {
           return _this3.el = el;

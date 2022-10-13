@@ -106,7 +106,7 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
             index=primary_keys,
             columns="column_name",
             values="value",
-            aggfunc="last" # for each named column, we only keep the last value
+            aggfunc=lambda values: values.iloc[-1] # for each named column, we only keep the last value
         ).join(
             editlog_df[primary_keys + ["last_edit_date"]].groupby(primary_keys).last(), # join the last edit date for each key
             on=primary_keys
