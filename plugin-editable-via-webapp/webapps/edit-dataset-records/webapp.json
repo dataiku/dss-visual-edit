@@ -10,7 +10,7 @@
     "standardWebAppLibraries": null,
     "params": [
         {
-            "name": "sep1",
+            "name": "sep-data",
             "label": "Data",
             "type": "SEPARATOR"
         },
@@ -38,7 +38,7 @@
             "mandatory": true
         },
         {
-            "name": "sep2",
+            "name": "sep-layout",
             "label": "Layout",
             "type": "SEPARATOR"
         },
@@ -57,13 +57,13 @@
         },
         {
             "name": "sep-linked-record",
-            "label": "Linked records",
+            "label": "Linked Records & Lookup Columns",
             "type": "SEPARATOR"
         },
         {
             "name": "number_of_linked_records",
-            "label": "How many linked records do you have?",
-            "description": "For now only 2 linked records can be setup",
+            "label": "How many columns to configure as linked records?",
+            "description": "For now only 2 can be setup",
             "type": "INT",
             "minI": 0,
             "maxI": 2
@@ -71,13 +71,13 @@
         },
         {
             "name": "sep-linked-records-1",
-            "label": "Linked records",
+            "label": "Linked Record #1",
             "type": "SEPARATOR",
             "visibilityCondition": "model.number_of_linked_records > 0"
         },
         {
             "name": "linked_record_name_1",
-            "label": "LR #1: column name",
+            "label": "Column",
             "description": "",
             "type": "DATASET_COLUMN",
             "datasetParamName": "original_dataset",
@@ -86,7 +86,7 @@
         },
         {
             "name": "linked_record_ds_name_1",
-            "label": "LR #1: linked dataset name",
+            "label": "Linked Dataset",
             "description": "",
             "type": "DATASET",
             "mandatory": true,
@@ -94,7 +94,7 @@
         },
         {
             "name": "linked_record_key_1",
-            "label": "LR #1: primary key in linked dataset",
+            "label": "Primary Key in Linked Dataset",
             "description": "",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
@@ -103,8 +103,8 @@
         },
         {
             "name": "linked_record_label_column_1",
-            "label": "LR #1: label column in linked dataset",
-            "description": "",
+            "label": "Label in Linked Dataset",
+            "description": "In case you would prefer to display a label rather than a key to make it easier to identify the linked record",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
             "mandatory": true,
@@ -112,7 +112,7 @@
         },
         {
             "name": "linked_record_lookup_columns_1",
-            "label": "LR #1: lookup columns in linked dataset",
+            "label": "Lookup Columns in Linked Dataset",
             "description": "",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "linked_record_ds_name_1",
@@ -170,7 +170,7 @@
             "visibilityCondition": "model.number_of_linked_records > 1"
         },
         {
-            "name": "sep3",
+            "name": "sep-advanced",
             "label": "Advanced",
             "type": "SEPARATOR"
         },
