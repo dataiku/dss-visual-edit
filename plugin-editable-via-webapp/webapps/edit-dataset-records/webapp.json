@@ -38,26 +38,9 @@
             "mandatory": true
         },
         {
-            "name": "sep-layout",
-            "label": "Layout",
-            "type": "SEPARATOR"
-        },
-        {
-            "name": "freeze_editable_columns",
-            "label": "Freeze editable columns",
-            "description": "Freezing to the right-hand side",
-            "type": "BOOLEAN",
-            "defaultValue": false
-        },
-        {
-            "name": "group_column_names",
-            "label": "Group data by column(s)",
-            "type": "DATASET_COLUMNS",
-            "datasetParamName": "original_dataset"
-        },
-        {
             "name": "sep-linked-record",
             "label": "Linked Records",
+            "description": "A linked record (aka foreign key) is a column whose values correspond to primary key values of another dataset, referred to as the linked dataset.",
             "type": "SEPARATOR"
         },
         {
@@ -165,6 +148,24 @@
             "datasetParamName": "linked_record_ds_name_2",
             "mandatory": true,
             "visibilityCondition": "model.linked_records_count > 1"
+        },
+        {
+            "name": "sep-layout",
+            "label": "Layout",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "freeze_editable_columns",
+            "label": "Freeze editable columns",
+            "description": "Freezing to the right-hand side",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "name": "group_column_names",
+            "label": "Group data by column(s)",
+            "type": "DATASET_COLUMNS",
+            "datasetParamName": "original_dataset"
         },
         {
             "name": "sep-advanced",
