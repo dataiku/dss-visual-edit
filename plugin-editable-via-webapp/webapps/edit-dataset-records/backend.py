@@ -3,12 +3,10 @@
 # Dash webapp to edit dataset records
 #
 # This code is structured as follows:
-# - Get webapp parameters (original dataset, primary keys and editable columns)
-# - Instantiate editable event-sourced dataset
-# - Define webapp layout and components
+# 1. Get webapp parameters (original dataset, primary keys, editable columns, linked records...)
+# 2. Instantiate editable event-sourced dataset
+# 3. Define webapp layout and components
 
-#%%
-# Get original dataset name and editschema
 
 import logging
 from dataiku import api_client
@@ -22,6 +20,10 @@ client = api_client()
 project_key = getenv("DKU_CURRENT_PROJECT_KEY")
 project = client.get_project(project_key)
 
+
+#%%
+# Get webapp parameters
+
 if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     logging.info("Webapp is being run in Dataiku")
     run_context = "dataiku"
@@ -30,13 +32,11 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     info_display = "none"
 
     from dataiku.customwebapp import get_webapp_config
-    from json5 import loads
     original_ds_name = get_webapp_config().get("original_dataset")
-    primary_keys = get_webapp_config().get("primary_keys")
-    editable_column_names = get_webapp_config().get("editable_column_names")
-    freeze_editable_columns = get_webapp_config().get("freeze_editable_columns")
-    group_column_names = get_webapp_config().get("group_column_names")
-    editschema_manual_raw = get_webapp_config().get("editschema")
+    params = get_webapp_config()
+
+    from json5 import loads
+    editschema_manual_raw = params.get("editschema")
     if (editschema_manual_raw and editschema_manual_raw!=""):
         editschema_manual = loads(editschema_manual_raw)
     else:
@@ -53,15 +53,10 @@ else:
     # Get primary keys and editable column names from the custom fields of that dataset
     from json5 import load
     original_ds_name = getenv("ORIGINAL_DATASET")
-    settings = project.get_dataset(original_ds_name).get_settings()
-    primary_keys = settings.custom_fields.get("primary_keys")
-    editable_column_names = settings.custom_fields.get("editable_column_names")
-    freeze_editable_columns = False
-    group_column_names = []
-    try:
-        editschema_manual = load(open("../../../example-editschemas/" + original_ds_name + ".json"))
-    except:
-        editschema_manual = {}
+    params = load(open("../../../example-settings/" + original_ds_name + ".json"))
+    
+    editschema_manual = params.get("editschema")
+    if (not editschema_manual): editschema_manual = {}
     
     from flask import Flask
     server = Flask(__name__)
@@ -71,9 +66,33 @@ else:
 app.config.external_stylesheets = stylesheets
 app.config.external_scripts = scripts
 
+primary_keys = params.get("primary_keys")
+editable_column_names = params.get("editable_column_names")
+freeze_editable_columns = params.get("freeze_editable_columns")
+group_column_names = params.get("group_column_names")
+linked_records_count = params.get("linked_records_count")
+linked_records = []
+if (linked_records_count>0):
+    name = params.get("linked_record_name_1")
+    ds_name = params.get("linked_record_ds_name_1")
+    ds_key = params.get("linked_record_key_1")
+    ds_label = params.get("linked_record_label_column_1")
+    ds_lookup_columns = params.get("linked_record_lookup_columns_1")
+    if not ds_label: ds_label = ds_key
+    if not ds_lookup_columns: ds_lookup_columns = []
+    linked_records.append(
+        {
+            "name": name,
+            "ds_name": ds_name,
+            "ds_key": ds_key,
+            "ds_label": ds_label,
+            "ds_lookup_columns": ds_lookup_columns
+        }
+    )
+
 #%%
 from EditableEventSourced import EditableEventSourced
-ees = EditableEventSourced(original_ds_name, primary_keys, editable_column_names, editschema_manual)
+ees = EditableEventSourced(original_ds_name, primary_keys, editable_column_names, linked_records, editschema_manual)
 
 #%%
 # Define the webapp layout and components
@@ -92,6 +111,7 @@ except:
     last_build_date_ok = False
 
 def serve_layout():
+    # This function is called upon loading/refreshing the page in the browser
     return html.Div(children=[
         html.Div(id="refresh-div", children=[
             html.Div(id="data-refresh-message", children="The original dataset has changed, please refresh this page to load it here. (Your edits are safe.)", style={"display": "inline"}),
@@ -107,7 +127,7 @@ def serve_layout():
         dash_tabulator.DashTabulator(
             id="datatable",
             columns=columns,
-            data=ees.get_data_tabulator(),
+            data=ees.get_data_tabulator(), # this gets the most up-to-date edited data
             groupBy=group_column_names
         ),
 
