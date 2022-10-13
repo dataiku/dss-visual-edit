@@ -10,7 +10,7 @@
     "standardWebAppLibraries": null,
     "params": [
         {
-            "name": "sep1",
+            "name": "sep-data",
             "label": "Data",
             "type": "SEPARATOR"
         },
@@ -24,7 +24,7 @@
         {
             "name": "primary_keys",
             "label": "Primary Keys",
-            "description": "Columns that are used to identify a record.\n\nIMPORTANT: make sure that the type and meaning of these columns is set correctly before starting the webapp.",
+            "description": "Columns used to identify a record.\n\nIMPORTANT: make sure that the type and meaning of these columns is set correctly before starting the webapp.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset",
             "mandatory": true
@@ -38,7 +38,119 @@
             "mandatory": true
         },
         {
-            "name": "sep2",
+            "name": "sep-linked-record",
+            "label": "Linked Records",
+            "description": "A linked record (aka foreign key) is a column whose values correspond to primary key values of another dataset, referred to as the linked dataset.",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "linked_records_count",
+            "label": "How many are there?",
+            "description": "For now this is capped at 1",
+            "type": "INT",
+            "minI": 0,
+            "maxI": 1
+        },
+        {
+            "name": "sep-linked-records-1",
+            "label": "Linked Record #1",
+            "type": "SEPARATOR",
+            "visibilityCondition": "model.linked_records_count > 0"
+        },
+        {
+            "name": "linked_record_name_1",
+            "label": "Column",
+            "description": "",
+            "type": "DATASET_COLUMN",
+            "datasetParamName": "original_dataset",
+            "mandatory": true,
+            "visibilityCondition": "model.linked_records_count > 0"
+        },
+        {
+            "name": "linked_record_ds_name_1",
+            "label": "Linked Dataset",
+            "description": "",
+            "type": "DATASET",
+            "mandatory": true,
+            "visibilityCondition": "model.linked_records_count > 0"
+        },
+        {
+            "name": "linked_record_key_1",
+            "label": "↳ Primary Key",
+            "description": "Column used to identify a record.",
+            "type": "DATASET_COLUMN",
+            "datasetParamName": "linked_record_ds_name_1",
+            "mandatory": true,
+            "visibilityCondition": "model.linked_records_count > 0"
+        },
+        {
+            "name": "linked_record_label_column_1",
+            "label": "↳ Label",
+            "description": "Column used for display purposes, instead of the primary key.",
+            "type": "DATASET_COLUMN",
+            "datasetParamName": "linked_record_ds_name_1",
+            "visibilityCondition": "model.linked_records_count > 0"
+        },
+        {
+            "name": "linked_record_lookup_columns_1",
+            "label": "↳ Lookup Columns",
+            "description": "",
+            "type": "DATASET_COLUMNS",
+            "datasetParamName": "linked_record_ds_name_1",
+            "visibilityCondition": "model.linked_records_count > 0"
+        },
+        {
+            "name": "sep-linked-records-2",
+            "label": "Linked records",
+            "type": "SEPARATOR",
+            "visibilityCondition": "model.linked_records_count > 1"
+        },
+        {
+            "name": "linked_record_name_2",
+            "label": "LR #1: column name",
+            "description": "",
+            "type": "DATASET_COLUMN",
+            "datasetParamName": "original_dataset",
+            "mandatory": true,
+            "visibilityCondition": "model.linked_records_count > 1"
+        },
+        {
+            "name": "linked_record_ds_name_2",
+            "label": "LR #1: linked dataset name",
+            "description": "",
+            "type": "DATASET",
+            "mandatory": true,
+            "visibilityCondition": "model.linked_records_count > 1"
+        },
+        {
+            "name": "linked_record_key_2",
+            "label": "LR #1: primary key in linked dataset",
+            "description": "",
+            "type": "DATASET_COLUMN",
+            "datasetParamName": "linked_record_ds_name_2",
+            "mandatory": true,
+            "visibilityCondition": "model.linked_records_count > 1"
+        },
+        {
+            "name": "linked_record_label_column_2",
+            "label": "LR #1: label column in linked dataset",
+            "description": "",
+            "type": "DATASET_COLUMN",
+            "datasetParamName": "linked_record_ds_name_2",
+            "mandatory": true,
+            "visibilityCondition": "model.linked_records_count > 1"
+        },
+        {
+            "name": "linked_record_lookup_columns_2",
+            "label": "LR #1: lookup columns in linked dataset",
+            "description": "",
+            "type": "DATASET_COLUMNS",
+            "datasetParamName": "linked_record_ds_name_2",
+            "mandatory": true,
+            "visibilityCondition": "model.linked_records_count > 1"
+        },
+        {
+            "name": "sep-layout",
             "label": "Layout",
             "type": "SEPARATOR"
         },
@@ -56,7 +168,7 @@
             "datasetParamName": "original_dataset"
         },
         {
-            "name": "sep3",
+            "name": "sep-advanced",
             "label": "Advanced",
             "type": "SEPARATOR"
         },
