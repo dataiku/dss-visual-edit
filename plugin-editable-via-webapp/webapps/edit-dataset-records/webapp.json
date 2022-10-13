@@ -24,7 +24,7 @@
         {
             "name": "primary_keys",
             "label": "Primary Keys",
-            "description": "Columns that are used to identify a record.\n\nIMPORTANT: make sure that the type and meaning of these columns is set correctly before starting the webapp.",
+            "description": "Columns used to identify a record.\n\nIMPORTANT: make sure that the type and meaning of these columns is set correctly before starting the webapp.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset",
             "mandatory": true
@@ -93,8 +93,8 @@
         },
         {
             "name": "linked_record_key_1",
-            "label": "Primary Key in Linked Dataset",
-            "description": "",
+            "label": "|__ Primary Key",
+            "description": "Column used to identify a record.",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
             "mandatory": true,
@@ -102,15 +102,15 @@
         },
         {
             "name": "linked_record_label_column_1",
-            "label": "Label in Linked Dataset",
-            "description": "In case you would prefer to display a label rather than a key to make it easier to identify the linked record",
+            "label": "|__ Label",
+            "description": "Column used for display purposes, instead of the primary key",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
             "visibilityCondition": "model.linked_records_count > 0"
         },
         {
             "name": "linked_record_lookup_columns_1",
-            "label": "Lookup Columns in Linked Dataset",
+            "label": "|__ Lookup Columns",
             "description": "",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "linked_record_ds_name_1",
