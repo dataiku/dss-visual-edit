@@ -46,10 +46,10 @@
         {
             "name": "linked_records_count",
             "label": "How many are there?",
-            "description": "For now this is capped at 2",
+            "description": "For now this is capped at 1",
             "type": "INT",
             "minI": 0,
-            "maxI": 2
+            "maxI": 1
         },
         {
             "name": "sep-linked-records-1",
