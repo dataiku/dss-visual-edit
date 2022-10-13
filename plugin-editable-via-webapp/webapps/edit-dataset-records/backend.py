@@ -83,7 +83,6 @@ from datetime import datetime
 from commons import get_user_details, get_last_build_date
 
 columns = ees.get_columns_tabulator(freeze_editable_columns)
-data = ees.get_data_tabulator()
 
 try:
     last_build_date_initial = get_last_build_date(original_ds_name, project)
@@ -110,7 +109,7 @@ def serve_layout():
         dash_tabulator.DashTabulator(
             id="datatable",
             columns=columns,
-            data=data,
+            data=ees.get_data_tabulator(),
             groupBy=group_column_names
         ),
 
