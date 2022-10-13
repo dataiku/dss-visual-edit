@@ -272,6 +272,8 @@ class EditableEventSourced:
                     t_type = "boolean"
                 if schema_meaning == "DoubleMeaning" or schema_meaning == "LongMeaning" or schema_meaning == "IntMeaning":
                     t_type = "number"
+                if schema_meaning == "Date":
+                    t_type = "date"
             else:
                 # type coming from schema
                 schema_type = self.__schema_df__.loc[col_name, "type"]
@@ -279,6 +281,8 @@ class EditableEventSourced:
                     t_type = "boolean"
                 if schema_type in ["tinyint", "smallint", "int", "bigint", "float", "double"]:
                     t_type = "number"
+                if schema_type == "date":
+                    t_type = "date"
 
         return t_type
 
@@ -299,6 +303,12 @@ class EditableEventSourced:
             t_col["headerFilter"] = self.__ns__("minMaxFilterEditor")
             t_col["headerFilterFunc"] = self.__ns__("minMaxFilterFunction")
             t_col["headerFilterLiveFilter"] = False
+        elif t_type == "date":
+            t_col["formatter"] = "datetime"
+            t_col["formatterParams"] = {
+                "inputFormat": "iso",
+                "outputFormat": "MM/dd/yy"
+            }
         return t_col
 
     def __get_column_tabulator_editor__(self, t_type):
@@ -316,6 +326,8 @@ class EditableEventSourced:
             t_col["editor"] = "tickCross"
         elif t_type == "number":
             t_col["editor"] = "number"
+        elif t_type == "date":
+            t_col["editor"] = "date"
         else:
             t_col["editor"] = "input"
         return t_col
@@ -378,7 +390,10 @@ class EditableEventSourced:
     def get_columns_tabulator(self, freeze_editable_columns=False):
         # Columns' settings for tabulator
 
-        linked_record_names = self.linked_records_df.index.values.tolist()
+        try:
+            linked_record_names = self.linked_records_df.index.values.tolist()
+        except:
+            linked_record_names = []
 
         t_cols = []
         for col_name in self.edited_df_cols:
