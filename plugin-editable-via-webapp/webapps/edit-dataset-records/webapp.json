@@ -76,7 +76,7 @@
         },
         {
             "name": "linked_record_key_1",
-            "label": "|-- Primary Key",
+            "label": "↳ Primary Key",
             "description": "Column used to identify a record.",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
@@ -85,7 +85,7 @@
         },
         {
             "name": "linked_record_label_column_1",
-            "label": "|-- Label",
+            "label": "↳ Label",
             "description": "Column used for display purposes, instead of the primary key.",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
@@ -93,7 +93,7 @@
         },
         {
             "name": "linked_record_lookup_columns_1",
-            "label": "|-- Lookup Columns",
+            "label": "↳ Lookup Columns",
             "description": "",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "linked_record_ds_name_1",
