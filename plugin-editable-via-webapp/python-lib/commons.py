@@ -144,17 +144,20 @@ def merge_edits(original_df, editlog_pivoted_df, primary_keys):
 
         # Change types of primary keys to match original_df
         for col in primary_keys:  # or editlog_pivoted_df.columns.tolist() ?
-            editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(
-                original_df[col].dtypes.name)
+            try:
+                editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(
+                    original_df[col].dtypes.name)
+            except:
+                original_df[col] = original_df[col].astype(
+                    editlog_pivoted_df[col].dtypes.name)
 
         # Join -> this adds _value_last columns
-        original_df.set_index(primary_keys, inplace=True)
-        editlog_pivoted_df.set_index(primary_keys, inplace=True)
         edited_df = original_df.join(
             editlog_pivoted_df, on=primary_keys, rsuffix="_value_last")
 
         # "Merge" -> this creates _original columns
         # "last_edit_date" column has already been dropped
+        editlog_pivoted_df.set_index(primary_keys, inplace=True)
         editable_column_names = editlog_pivoted_df.columns.tolist()
         for col in editable_column_names:
             # copy col to a new column whose name is suffixed by "_original"
