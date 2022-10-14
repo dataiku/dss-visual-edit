@@ -309,8 +309,9 @@ class EditableEventSourced:
             t_col["formatter"] = "datetime"
             t_col["formatterParams"] = {
                 "inputFormat": "iso",
-                "outputFormat": "MM/dd/yy"
+                "outputFormat": "yyyy-MM-dd"
             }
+            t_col["headerFilterParams"] = {"format": "yyyy-MM-dd"}
         return t_col
 
     def __get_column_tabulator_editor__(self, t_type):
@@ -330,6 +331,7 @@ class EditableEventSourced:
             t_col["editor"] = "number"
         elif t_type == "date":
             t_col["editor"] = "date"
+            t_col["editorParams"] = {"format": "yyyy-MM-dd"}
         else:
             t_col["editor"] = "input"
         return t_col
