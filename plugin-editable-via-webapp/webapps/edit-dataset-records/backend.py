@@ -8,7 +8,7 @@
 # 2. Instantiate editable event-sourced dataset
 # 3. Define webapp layout and components
 
-#%% 0. Imports and variable initializations
+# %% 0. Imports and variable initializations
 ###
 
 from flask import current_app
@@ -124,15 +124,16 @@ ees = EditableEventSourced(original_ds_name, primary_keys,
 
 columns = ees.get_columns_tabulator(freeze_editable_columns)
 
-try:
-    last_build_date_initial = get_last_build_date(original_ds_name, project)
-    last_build_date_ok = True
-except:
-    last_build_date_initial = ""
-    last_build_date_ok = False
-
 
 def serve_layout():
+    try:
+        last_build_date_initial = get_last_build_date(
+            original_ds_name, project)
+        last_build_date_ok = True
+    except:
+        last_build_date_initial = ""
+        last_build_date_ok = False
+
     # This function is called upon loading/refreshing the page in the browser
     return html.Div(children=[
         html.Div(id="refresh-div", children=[
