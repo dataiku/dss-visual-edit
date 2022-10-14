@@ -1,0 +1,7 @@
+{
+    "primary_keys": ["Stakeholder Id", "Security Id", "Report Date"],
+    "editable_column_names": ["Free float?", "If not, Shares correct?", "If not, Shares value?"],
+    "freeze_editable_columns": false,
+    "group_column_names": [],
+    "linked_records_count": 0
+}
