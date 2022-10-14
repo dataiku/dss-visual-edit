@@ -124,6 +124,8 @@ ees = EditableEventSourced(original_ds_name, primary_keys,
 
 columns = ees.get_columns_tabulator(freeze_editable_columns)
 
+last_build_date_initial = ""
+last_build_date_ok = False
 
 def serve_layout():
     try:
@@ -196,6 +198,8 @@ def toggle_refresh_div_visibility(n_intervals, refresh_div_style, last_build_dat
                 f"""Last build date: {last_build_date_new} ({last_build_date_new_fmtd}) — previously {last_build_date} ({last_build_date_fmtd})""")
             style_new["display"] = "block"
             data_fresh = False
+    else:
+        last_build_date_new = last_build_date
     return style_new, last_build_date_new
 
 
