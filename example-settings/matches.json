@@ -8,5 +8,8 @@
     "linked_record_ds_name_1": "companies_ext",
     "linked_record_key_1": "id",
     "linked_record_label_column_1": "name",
-    "linked_record_lookup_columns_1": ["city", "country"]
+    "linked_record_lookup_columns_1": ["city", "country"],
+    "editschema": [
+        {"name": "reviewed", "type": "boolean_tick"}
+    ]
 }
