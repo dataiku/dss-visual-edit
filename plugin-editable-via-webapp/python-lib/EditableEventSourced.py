@@ -76,7 +76,8 @@ class EditableEventSourced:
                 connection=self.__connection_name__)
             editlog_ds_creator.create()
             self.editlog_ds = Dataset(self.editlog_ds_name, self.project_key)
-            editlog_df = get_editlog_df(self.editlog_ds) # when the editlog doesn't exist yet, this makes sure to write an empty dataframe with the correct schema
+            # when the editlog doesn't exist yet, this makes sure to write an empty dataframe with the correct schema
+            editlog_df = get_editlog_df(self.editlog_ds)
             logging.debug("Done.")
 
         # make sure that editlog is in append mode
@@ -113,7 +114,8 @@ class EditableEventSourced:
             logging.debug("Found recipe to create editlog pivoted")
             pivot_recipe = self.project.get_recipe(pivot_recipe_name)
         else:
-            logging.debug("No recipe to create editlog pivoted, creating it...")
+            logging.debug(
+                "No recipe to create editlog pivoted, creating it...")
             pivot_recipe = pivot_recipe_creator.create()
             pivot_settings = pivot_recipe.get_settings()
             pivot_settings.add_input("editlog", self.editlog_ds_name)
@@ -218,18 +220,18 @@ class EditableEventSourced:
 
     def get_edited_df_indexed(self):
         # Note: index makes it easier to id values in the DataFrame
-        
+
         # Load original dataset
         original_df = self.original_ds.get_dataframe()[
             self.edited_df_cols]
-        
+
         # Load editlog and pivot it
         editlog_pivoted_df = pivot_editlog(
-                self.editlog_ds,
-                self.primary_keys,
-                self.editable_column_names
-            )
-        
+            self.editlog_ds,
+            self.primary_keys,
+            self.editable_column_names
+        )
+
         # Replay edits
         return merge_edits(
             original_df,
@@ -356,19 +358,22 @@ class EditableEventSourced:
         # Define possible values in the list
         linked_ds_name = self.linked_records_df.loc[linked_record_name, "ds_name"]
         linked_ds = self.project.get_dataset(linked_ds_name)
-        metrics = linked_ds.compute_metrics(metric_ids=["records:COUNT_RECORDS"])["result"]["computed"]
+        metrics = linked_ds.compute_metrics(metric_ids=["records:COUNT_RECORDS"])[
+            "result"]["computed"]
         for m in metrics:
             if (m["metric"]["metricType"] == "COUNT_RECORDS"):
                 count_records = int(m["value"])
         if (count_records > 1000):
             # ds_key and ds_label would normally be used, when loading the linked dataset in memory, but here they will be fetched by the API endpoint who has access to an EditableEventSourced dataset and who's given linked_ds_name in the URL
-            logging.debug(f"Using API to lookup values in {linked_ds_name} since this dataset has {count_records} rows")
+            logging.debug(
+                f"Using API to lookup values in {linked_ds_name} since this dataset has {count_records} rows")
             t_col["editorParams"]["filterRemote"] = True
             t_col["editorParams"]["valuesURL"] = "lookup/" + linked_ds_name
 
         else:
             # The dataset can be loaded in memory
-            logging.debug(f"Loading {linked_ds_name} in memory since this dataset has {count_records} rows")
+            logging.debug(
+                f"Loading {linked_ds_name} in memory since this dataset has {count_records} rows")
             linked_ds_key = self.linked_records_df.loc[linked_record_name, "ds_key"]
             linked_ds_label = self.linked_records_df.loc[linked_record_name, "ds_label"]
             linked_df = Dataset(linked_ds_name).get_dataframe()
