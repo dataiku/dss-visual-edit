@@ -3,10 +3,13 @@
 # Dash webapp to edit dataset records
 #
 # This code is structured as follows:
+# 0. Imports and variable initializations
 # 1. Get webapp parameters (original dataset, primary keys, editable columns, linked records...)
 # 2. Instantiate editable event-sourced dataset
 # 3. Define webapp layout and components
 
+#%% 0. Imports and variable initializations
+###
 
 from flask import current_app
 from commons import get_values_from_linked_df
@@ -33,7 +36,7 @@ project_key = getenv("DKU_CURRENT_PROJECT_KEY")
 project = client.get_project(project_key)
 
 
-# %% Get webapp parameters
+# %% 1. Get webapp parameters
 ###
 
 if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
@@ -89,32 +92,33 @@ group_column_names = params.get("group_column_names")
 linked_records_count = params.get("linked_records_count")
 linked_records = []
 if (linked_records_count > 0):
-    name = params.get("linked_record_name_1")
-    ds_name = params.get("linked_record_ds_name_1")
-    ds_key = params.get("linked_record_key_1")
-    ds_label = params.get("linked_record_label_column_1")
-    ds_lookup_columns = params.get("linked_record_lookup_columns_1")
-    if not ds_label:
-        ds_label = ds_key
-    if not ds_lookup_columns:
-        ds_lookup_columns = []
-    linked_records.append(
-        {
-            "name": name,
-            "ds_name": ds_name,
-            "ds_key": ds_key,
-            "ds_label": ds_label,
-            "ds_lookup_columns": ds_lookup_columns
-        }
-    )
+    for c in range(1, linked_records_count+1):
+        name = params.get(f"linked_record_name_{c}")
+        ds_name = params.get(f"linked_record_ds_name_{c}")
+        ds_key = params.get(f"linked_record_key_{c}")
+        ds_label = params.get(f"linked_record_label_column_{c}")
+        ds_lookup_columns = params.get(f"linked_record_lookup_columns_{c}")
+        if not ds_label:
+            ds_label = ds_key
+        if not ds_lookup_columns:
+            ds_lookup_columns = []
+        linked_records.append(
+            {
+                "name": name,
+                "ds_name": ds_name,
+                "ds_key": ds_key,
+                "ds_label": ds_label,
+                "ds_lookup_columns": ds_lookup_columns
+            }
+        )
 
-# %% Instantiate editable event-sourced dataset
+# %% 2. Instantiate editable event-sourced dataset
 ###
 
 ees = EditableEventSourced(original_ds_name, primary_keys,
                            editable_column_names, linked_records, editschema_manual)
 
-# %% Define the webapp layout and components
+# %% 3. Define webapp layout and components
 ###
 
 

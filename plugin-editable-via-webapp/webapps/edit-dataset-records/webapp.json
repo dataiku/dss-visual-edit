@@ -46,10 +46,10 @@
         {
             "name": "linked_records_count",
             "label": "How many are there?",
-            "description": "For now this is capped at 1",
+            "description": "For now this is capped at 2",
             "type": "INT",
             "minI": 0,
-            "maxI": 1
+            "maxI": 2
         },
         {
             "name": "sep-linked-records-1",
@@ -101,14 +101,13 @@
         },
         {
             "name": "sep-linked-records-2",
-            "label": "Linked records",
+            "label": "Linked Record #2",
             "type": "SEPARATOR",
             "visibilityCondition": "model.linked_records_count > 1"
         },
         {
             "name": "linked_record_name_2",
-            "label": "LR #1: column name",
-            "description": "",
+            "label": "Column",
             "type": "DATASET_COLUMN",
             "datasetParamName": "original_dataset",
             "mandatory": true,
@@ -116,16 +115,14 @@
         },
         {
             "name": "linked_record_ds_name_2",
-            "label": "LR #1: linked dataset name",
-            "description": "",
+            "label": "Linked Dataset",
             "type": "DATASET",
             "mandatory": true,
             "visibilityCondition": "model.linked_records_count > 1"
         },
         {
             "name": "linked_record_key_2",
-            "label": "LR #1: primary key in linked dataset",
-            "description": "",
+            "label": "↳ Primary Key",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_2",
             "mandatory": true,
@@ -133,20 +130,16 @@
         },
         {
             "name": "linked_record_label_column_2",
-            "label": "LR #1: label column in linked dataset",
-            "description": "",
+            "label": "↳ Label",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_2",
-            "mandatory": true,
             "visibilityCondition": "model.linked_records_count > 1"
         },
         {
             "name": "linked_record_lookup_columns_2",
-            "label": "LR #1: lookup columns in linked dataset",
-            "description": "",
+            "label": "↳ Lookup Columns",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "linked_record_ds_name_2",
-            "mandatory": true,
             "visibilityCondition": "model.linked_records_count > 1"
         },
         {
