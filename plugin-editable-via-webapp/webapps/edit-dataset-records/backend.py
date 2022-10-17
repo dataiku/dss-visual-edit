@@ -128,6 +128,7 @@ last_build_date_initial = ""
 last_build_date_ok = False
 
 def serve_layout():
+    global last_build_date_initial, last_build_date_ok
     try:
         last_build_date_initial = get_last_build_date(
             original_ds_name, project)
@@ -184,6 +185,7 @@ def toggle_refresh_div_visibility(n_intervals, refresh_div_style, last_build_dat
     """
     Toggle visibility of refresh div, when the interval component fires: check last build date of original dataset and if it's more recent than what we had, display the refresh div
     """
+    global last_build_date_ok
     style_new = refresh_div_style
     if last_build_date_ok:
         last_build_date_new = str(
