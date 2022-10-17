@@ -13,9 +13,9 @@ def get_editlog_ds_schema():
         # not using date type, in case the editlog is CSV
         {"name": "date", "type": "string", "meaning": "DateSource"},
         {"name": "user", "type": "string", "meaning": "Text"},
-        {"name": "key", "type": "string"},
+        {"name": "key", "type": "string", "meaning": "Text"},
         {"name": "column_name", "type": "string", "meaning": "Text"},
-        {"name": "value", "type": "string"}
+        {"name": "value", "type": "string", "meaning": "Text"}
     ]
 
 
@@ -26,14 +26,35 @@ def get_editlog_columns():
 def get_editlog_df(editlog_ds):
     # Try to get dataframe from editlog dataset, if it's not empty. Otherwise, create empty dataframe.
     try:
-        editlog_df = editlog_ds.get_dataframe(infer_with_pandas=False)
+        editlog_df = editlog_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True)
     except:
         print("Editlog is empty. Writing schema and empty dataframe...")
         editlog_df = DataFrame(columns=get_editlog_columns())
         editlog_ds.write_schema(get_editlog_ds_schema())
-        editlog_ds.write_dataframe(editlog_df)
+        editlog_ds.write_dataframe(editlog_df, infer_schema=False)
         print("Done.")
     return editlog_df
+
+
+def get_editlog_pivoted_ds_schema(original_schema, primary_keys, editable_column_names):
+    editlog_pivoted_ds_schema = []
+    edited_ds_schema = []
+    for col in original_schema:
+        new_col = {}
+        new_col["name"] = col.get("name")
+        type = col.get("type")
+        if (type):
+            new_col["type"] = type
+        meaning = col.get("meaning")
+        if (meaning):
+            new_col["meaning"] = meaning
+        edited_ds_schema.append(new_col)
+        if (col.get("name") in primary_keys + editable_column_names):
+            editlog_pivoted_ds_schema.append(new_col)
+    editlog_pivoted_ds_schema.append(
+        {"name": "last_edit_date", "type": "string", "meaning": "DateSource"})
+    return editlog_pivoted_ds_schema, edited_ds_schema
+
 
 # Recipe utils
 
