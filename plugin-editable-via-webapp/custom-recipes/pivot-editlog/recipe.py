@@ -27,9 +27,6 @@ editlog_pivoted_ds = editlog_pivoted_datasets[0]
 #%% Compute output data
 ###
 
-original_ds_name = editlog_ds.get_config()["customFields"]["original_ds"]
-original_ds = dataiku.Dataset(original_ds_name)
-original_schema = original_ds.read_schema()
 primary_keys = editlog_ds.get_config()["customFields"]["primary_keys"]
 editable_column_names = editlog_ds.get_config()["customFields"]["editable_column_names"]
 editlog_pivoted_df = pivot_editlog(editlog_ds, primary_keys, editable_column_names)
@@ -38,7 +35,4 @@ editlog_pivoted_df = pivot_editlog(editlog_ds, primary_keys, editable_column_nam
 #%% Write output data
 ###
 
-# Write schema explicitly, instead of inferring it when writing the dataframe
-editlog_pivoted_ds_schema, edited_ds_schema = get_editlog_pivoted_ds_schema(original_schema, primary_keys, editable_column_names)
-editlog_pivoted_ds.write_schema(editlog_pivoted_ds_schema, dropAndCreate=True)
-editlog_pivoted_ds.write_dataframe(editlog_pivoted_df, infer_schema=False)
+editlog_pivoted_ds.write_dataframe(editlog_pivoted_df, infer_schema=True, dropAndCreate=True) # the schema could be different from that of the original dataset
