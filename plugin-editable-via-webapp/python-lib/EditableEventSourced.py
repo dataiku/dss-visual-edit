@@ -3,7 +3,7 @@ from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
 from pandas import DataFrame
-from commons import get_primary_keys, get_editable_column_names, merge_edits, pivot_editlog, tabulator_row_key_values, find_webapp_id, get_webapp_json, get_values_from_linked_df, get_editlog_df
+from commons import get_primary_keys, get_editable_column_names, merge_edits, pivot_editlog, tabulator_row_key_values, find_webapp_id, get_webapp_json, get_values_from_linked_df, get_editlog_df, get_editlog_pivoted_ds_schema
 from os import getenv
 from json5 import loads
 from datetime import datetime
@@ -44,25 +44,7 @@ class EditableEventSourced:
             self.webapp_url = None
             self.webapp_url_public = "/"
 
-    def __get_editlog_pivoted_ds_schema__(self):
-        # see commons.get_editlog_ds_schema
-        editlog_pivoted_ds_schema = []
-        edited_ds_schema = []
-        for col in self.__schema__:
-            new_col = {}
-            new_col["name"] = col.get("name")
-            type = col.get("type")
-            if (type):
-                new_col["type"] = type
-            meaning = col.get("meaning")
-            if (meaning):
-                new_col["meaning"] = meaning
-            edited_ds_schema.append(new_col)
-            if (col.get("name") in self.primary_keys + self.editable_column_names):
-                editlog_pivoted_ds_schema.append(new_col)
-        editlog_pivoted_ds_schema.append(
-            {"name": "last_edit_date", "type": "string", "meaning": "DateSource"})
-        return editlog_pivoted_ds_schema, edited_ds_schema
+    
 
     def __setup_editlog__(self):
         editlog_ds_creator = DSSManagedDatasetCreationHelper(
@@ -87,7 +69,7 @@ class EditableEventSourced:
         self.__save_custom_fields__(self.editlog_ds_name)
 
     def __setup_editlog_downstream__(self):
-        editlog_pivoted_ds_schema, edited_ds_schema = self.__get_editlog_pivoted_ds_schema__()
+        editlog_pivoted_ds_schema, edited_ds_schema = get_editlog_pivoted_ds_schema(self.__schema__, self.primary_keys, self.editable_column_names)
         editlog_pivoted_ds_creator = DSSManagedDatasetCreationHelper(
             self.project, self.editlog_pivoted_ds_name)
         if (editlog_pivoted_ds_creator.already_exists()):
@@ -104,7 +86,7 @@ class EditableEventSourced:
                 self.editable_column_names + ["last_edit_date"]
             editlog_pivoted_df = DataFrame(columns=cols)
             self.editlog_pivoted_ds.write_schema(editlog_pivoted_ds_schema)
-            self.editlog_pivoted_ds.write_dataframe(editlog_pivoted_df)
+            self.editlog_pivoted_ds.write_dataframe(editlog_pivoted_df, infer_schema=False)
             logging.debug("Done.")
 
         pivot_recipe_name = "compute_" + self.editlog_pivoted_ds_name
@@ -138,7 +120,7 @@ class EditableEventSourced:
             self.edited_ds = Dataset(self.edited_ds_name, self.project_key)
             edited_df = DataFrame(columns=self.edited_df_cols)
             self.edited_ds.write_schema(edited_ds_schema)
-            self.edited_ds.write_dataframe(edited_df)
+            self.edited_ds.write_dataframe(edited_df, infer_schema=False)
             logging.debug("Done.")
 
         merge_recipe_name = "compute_" + self.edited_ds_name
@@ -444,7 +426,7 @@ class EditableEventSourced:
         if (value != None):
             value = str(value)
 
-        # add to the editlog
+        # add to the editlog (since it's in append mode)
         self.editlog_ds.write_dataframe(DataFrame(data={
             "key": [str(primary_key_values)],
             "column_name": [column_name],
