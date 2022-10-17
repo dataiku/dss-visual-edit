@@ -26,7 +26,7 @@ def get_editlog_columns():
 def get_editlog_df(editlog_ds):
     # Try to get dataframe from editlog dataset, if it's not empty. Otherwise, create empty dataframe.
     try:
-        editlog_df = editlog_ds.get_dataframe()
+        editlog_df = editlog_ds.get_dataframe(infer_with_pandas=False)
     except:
         print("Editlog is empty. Writing schema and empty dataframe...")
         editlog_df = DataFrame(columns=get_editlog_columns())
