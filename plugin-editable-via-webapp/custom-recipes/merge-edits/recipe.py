@@ -30,8 +30,8 @@ edited_ds = edited_datasets[0]
 #%% Read input data
 ###
 
-original_df = original_ds.get_dataframe(infer_with_pandas=False)
-editlog_pivoted_df = pivoted_ds.get_dataframe(infer_with_pandas=False)
+original_df = original_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True)
+editlog_pivoted_df = pivoted_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True)
 
 
 #%% Compute output data

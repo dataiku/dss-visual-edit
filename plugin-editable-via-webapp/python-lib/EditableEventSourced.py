@@ -204,7 +204,7 @@ class EditableEventSourced:
         # Note: index makes it easier to id values in the DataFrame
 
         # Load original dataset
-        original_df = self.original_ds.get_dataframe(infer_with_pandas=False)[
+        original_df = self.original_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True)[
             self.edited_df_cols]
 
         # Load editlog and pivot it
