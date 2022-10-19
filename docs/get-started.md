@@ -4,11 +4,14 @@ If you haven't, [install the _Editable via Webapp_ plugin](install-plugin) first
 
 ## Create the webapp
 
-* As a preliminary step, have a look at the schema of the dataset to edit and make sure that the type or the meaning of each column is set correctly: they will be used by the webapp to show data (or let you edit it) in the best way.
-* Go to Webapps, create New Visual Webapp, pick Data Editing
+* As a preliminary step, please review the schema of the dataset to edit.
+  * The webapp uses column meanings to show data (or let you edit it) in the best way. If the meaning wasn't defined explicitly, the webapp uses the storage type instead.
+  * It's best to use "string" as storage type for any column that has missing values.
+* Go to Webapps, create New Visual Webapp, pick Data Editing.
   * ![](new_visual_webapp.png)
   * ![](new_visual_webapp_2.png)
 * The webapp settings interface allows to choose a dataset, list key columns (used to identify rows) and editable columns, within the "Data" section. ![](data_editing_webapp_params_full.png)
+  * The "Linked Records" section allows to specify editable columns whose values correspond to primary key values of another dataset.
   * In the "Layout" section you can choose to freeze editable columns to the right-hand side (which is useful when there are many columns), and to group rows by one or more columns.
   * Additional settings can be provided via the ["editschema" in JSON](editschema).
 
@@ -20,17 +23,15 @@ The webapp should look like this:
 
 Here are the datasets that the webapp backend creates automatically upon starting up, if they don't already exist:
 
- 1. **_editlog_**, which is the raw record of all edits made via the webapp.
- 2. **_editlog\_pivoted_**, which is the output of a _pivot-editlog_ recipe and the user-friendly view of edits. Its schema is a subset of that of the original dataset (it just doesn't have columns that are display-only, but it has the same key columns and the same editable columns).
- 3. **_edited_**, which is the output of a _merge-edits_ recipe that feeds from the original dataset and the _editlog\_pivoted_.
-
 ![](new_datasets.png)
+
+ 1. **_editlog_** is the raw record of all edits made via the webapp. The schema is always the same. Here is an example: ![](editlog.png)
+ 2. **_editlog\_pivoted_** is the output of a _pivot-editlog_ recipe and the user-friendly view of edits. Its schema is a subset of that of the original dataset (it just doesn't have columns that are display-only, but it has the same key columns and the same editable columns). Here it is in the previous example: ![](editlog_pivoted.png).
+ 3. **_edited_** is the output of a _merge-edits_ recipe that feeds from the original dataset and the _editlog\_pivoted_. It corresponds to the edited data that you are seeing via the webapp; however, it is not in sync with the webapp: it's up to you to decide when to build it in the Flow.
 
 These datasets are created on the same connection as the original dataset. For edits to be recorded by the webapp, this has to be a write connection. If that's not the case, you can change the connection of these datasets as soon as they've been added to the Flow.
 
 ## Use the webapp to make some edits
-
-Only one user at a time.
 
 Edits made via the webapp will instantly add rows to the _editlog_.
 
