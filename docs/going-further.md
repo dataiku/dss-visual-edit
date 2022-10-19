@@ -4,7 +4,7 @@
 
 The best way to make this webapp accessible to end-users is by publishing it to a Dashboard. From there you can add "tiles", such as a Text one with instructions, or a Scenario tile, and adjust the layout. The Scenario tile is displayed as a button to run a chosen scenario; this is a great way to let the end-user run computations that take edits into account.
 
-![](webapp_in_dashboard.png)
+![](dashboard_edit.png)
 
 ## FAQ
 

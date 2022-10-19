@@ -5,10 +5,10 @@ If you haven't, [install the _Editable via Webapp_ plugin](install-plugin) first
 ## Create the webapp
 
 * As a preliminary step, have a look at the schema of the dataset to edit and make sure that the type or the meaning of each column is set correctly: they will be used by the webapp to show data (or let you edit it) in the best way.
-* Go to Webapps, create New Visual Webapp, pick Edit dataset records
+* Go to Webapps, create New Visual Webapp, pick Data Editing
   * ![](new_visual_webapp.png)
   * ![](new_visual_webapp_2.png)
-* The webapp settings interface allows to choose a dataset, list key columns (used to identify rows) and editable columns, within the "Data" section. ![](new_visual_webapp_3.png)
+* The webapp settings interface allows to choose a dataset, list key columns (used to identify rows) and editable columns, within the "Data" section. ![](data_editing_webapp_params_full.png)
   * In the "Layout" section you can choose to freeze editable columns to the right-hand side (which is useful when there are many columns), and to group rows by one or more columns.
   * Additional settings can be provided via the ["editschema" in JSON](editschema).
 
