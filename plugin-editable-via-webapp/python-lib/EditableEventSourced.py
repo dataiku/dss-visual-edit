@@ -3,7 +3,7 @@ from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
 from pandas import DataFrame
-from commons import get_primary_keys, get_editable_column_names, merge_edits, pivot_editlog, tabulator_row_key_values, find_webapp_id, get_webapp_json, get_values_from_linked_df, get_editlog_df, get_editlog_pivoted_ds_schema
+from commons import get_primary_keys, get_editable_column_names, merge_edits_from_log_pivoted_df, pivot_editlog, tabulator_row_key_values, find_webapp_id, get_webapp_json, get_values_from_linked_df, get_editlog_df, get_editlog_pivoted_ds_schema
 from os import getenv
 from json5 import loads
 from datetime import datetime
@@ -201,11 +201,6 @@ class EditableEventSourced:
         self.__ns__ = Namespace("myNamespace", "tabulator")
 
     def get_edited_df_indexed(self):
-        # Note: index makes it easier to id values in the DataFrame
-
-        # Load original dataset
-        original_df = self.original_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True)[
-            self.edited_df_cols]
 
         # Load editlog and pivot it
         editlog_pivoted_df = pivot_editlog(
@@ -215,11 +210,7 @@ class EditableEventSourced:
         )
 
         # Replay edits
-        return merge_edits(
-            original_df,
-            editlog_pivoted_df,
-            self.primary_keys
-        ).set_index(self.primary_keys)
+        return merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df)
 
         # self.__edited_df_indexed__ = self.__extend_with_lookup_columns__(self.__edited_df_indexed__)
 

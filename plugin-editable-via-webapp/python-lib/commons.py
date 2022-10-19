@@ -26,7 +26,7 @@ def get_editlog_columns():
 def get_editlog_df(editlog_ds):
     # Try to get dataframe from editlog dataset, if it's not empty. Otherwise, create empty dataframe.
     try:
-        editlog_df = editlog_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True)
+        editlog_df = editlog_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True) # the schema was specified upon creation of the dataset, so let's use it
     except:
         print("Editlog is empty. Writing schema and empty dataframe...")
         editlog_df = DataFrame(columns=get_editlog_columns())
@@ -34,6 +34,26 @@ def get_editlog_df(editlog_ds):
         editlog_ds.write_dataframe(editlog_df, infer_schema=False)
         print("Done.")
     return editlog_df
+
+
+def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
+    try:
+        original_df = self.original_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True)[
+            self.edited_df_cols] # the dataset schema is likely to have been reviewed by the end-user, so let's use it!
+    except:
+        logging.warning("""Couldn't use the original dataset's schema when loading its contents as a dataframe. Letting Pandas infer the schema.
+        
+        This is likely due to a column with missing values and 'int' storage type; this can be fixed by changing its storage type to 'string'.""")
+        original_df = self.original_ds.get_dataframe()[self.edited_df_cols]
+
+    primary_keys = original_ds.get_config()["customFields"]["primary_keys"]
+
+    # Replay edits
+    return merge_edits(
+        original_df,
+        editlog_pivoted_df,
+        primary_keys
+    ).set_index(primary_keys)
 
 
 def get_editlog_pivoted_ds_schema(original_schema, primary_keys, editable_column_names):
@@ -161,7 +181,8 @@ def merge_edits(original_df, editlog_pivoted_df, primary_keys):
         edited_df = original_df
     else:
         # We don't need the date column in the rest
-        editlog_pivoted_df.drop(columns=["last_edit_date"], inplace=True)
+        if ("last_edit_date" in editlog_pivoted_df.columns):
+            editlog_pivoted_df.drop(columns=["last_edit_date"], inplace=True)
 
         # Change types of primary keys to match original_df
         for col in primary_keys:

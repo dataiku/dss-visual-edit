@@ -8,7 +8,7 @@ from dataiku.customrecipe import get_input_names_for_role, get_output_names_for_
 # import sys
 # sys.path.append('../../python-lib')
 
-from commons import merge_edits
+from commons import merge_edits_from_log_pivoted_df
 
 
 #%% Get recipe parameters
@@ -30,15 +30,13 @@ edited_ds = edited_datasets[0]
 #%% Read input data
 ###
 
-original_df = original_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True)
-editlog_pivoted_df = pivoted_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True)
+editlog_pivoted_df = pivoted_ds.get_dataframe() # this dataframe was written by the pivot-editlog recipe which inferred the schema upon writing, so we stay with the default infer_with_pandas=True
 
 
 #%% Compute output data
 ###
 
-primary_keys = original_ds.get_config()["customFields"]["primary_keys"]
-edited_df = merge_edits(original_df, editlog_pivoted_df, primary_keys)
+edited_df = merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df).reset_index()
 
 
 #%% Write output data
