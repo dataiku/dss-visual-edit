@@ -4,6 +4,7 @@ from json import loads
 from os import getenv
 import requests
 from flask import request
+import logging
 
 
 # Editlog utils
