@@ -210,7 +210,7 @@ class EditableEventSourced:
         )
 
         # Replay edits
-        return merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df)
+        return merge_edits_from_log_pivoted_df(self.original_ds, editlog_pivoted_df)
 
         # self.__edited_df_indexed__ = self.__extend_with_lookup_columns__(self.__edited_df_indexed__)
 
