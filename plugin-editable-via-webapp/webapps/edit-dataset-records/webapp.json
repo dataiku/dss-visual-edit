@@ -40,7 +40,7 @@
         {
             "name": "sep-linked-record",
             "label": "Linked Records",
-            "description": "A linked record (aka foreign key) is a column whose values correspond to primary key values of another dataset, referred to as the linked dataset.",
+            "description": "A linked record (aka foreign key) is an editable column whose values correspond to primary key values of another dataset, referred to as the linked dataset.",
             "type": "SEPARATOR"
         },
         {
@@ -93,7 +93,7 @@
         },
         {
             "name": "linked_record_lookup_columns_1",
-            "label": "↳ Lookup Columns",
+            "label": "↳ Additional Lookups",
             "description": "",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "linked_record_ds_name_1",
@@ -137,7 +137,7 @@
         },
         {
             "name": "linked_record_lookup_columns_2",
-            "label": "↳ Lookup Columns",
+            "label": "↳ Additional Lookups",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "linked_record_ds_name_2",
             "visibilityCondition": "model.linked_records_count > 1"
