@@ -11,13 +11,11 @@
 # %% 0. Imports and variable initializations
 ###
 
-from flask import current_app
-from commons import get_values_from_linked_df
-from json import dumps
-from flask import request, jsonify
+from commons import get_values_from_linked_df, get_user_details, get_last_build_date
+from json5 import dumps
+from flask import Flask, request, jsonify, current_app
 from pandas import DataFrame
 from dataikuapi.utils import DataikuStreamedHttpUTF8CSVReader
-from commons import get_user_details, get_last_build_date
 from datetime import datetime
 import dash_tabulator
 from EditableEventSourced import EditableEventSourced
@@ -77,7 +75,6 @@ else:
     if (not editschema_manual):
         editschema_manual = {}
 
-    from flask import Flask
     server = Flask(__name__)
     app = Dash(__name__, server=server)
     app.enable_dev_tools(debug=True, dev_tools_ui=True)
