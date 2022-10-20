@@ -39,13 +39,12 @@ def get_editlog_df(editlog_ds):
 
 def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
     try:
-        original_df = self.original_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True)[
-            self.edited_df_cols] # the dataset schema is likely to have been reviewed by the end-user, so let's use it!
+        original_df = original_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True) # the dataset schema is likely to have been reviewed by the end-user, so let's use it!
     except:
         logging.warning("""Couldn't use the original dataset's schema when loading its contents as a dataframe. Letting Pandas infer the schema.
         
         This is likely due to a column with missing values and 'int' storage type; this can be fixed by changing its storage type to 'string'.""")
-        original_df = self.original_ds.get_dataframe()[self.edited_df_cols]
+        original_df = original_ds.get_dataframe()
 
     primary_keys = original_ds.get_config()["customFields"]["primary_keys"]
 

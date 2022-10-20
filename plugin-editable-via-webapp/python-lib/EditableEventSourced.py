@@ -210,7 +210,8 @@ class EditableEventSourced:
         )
 
         # Replay edits
-        return merge_edits_from_log_pivoted_df(self.original_ds, editlog_pivoted_df)
+        edited_df_indexed = merge_edits_from_log_pivoted_df(self.original_ds, editlog_pivoted_df) # this is indexed by the primary keys
+        return edited_df_indexed[self.display_column_names + self.editable_column_names] # we make sure to return a dataframe where editable columns are last
 
         # self.__edited_df_indexed__ = self.__extend_with_lookup_columns__(self.__edited_df_indexed__)
 
