@@ -1,5 +1,5 @@
 {
-    "primary_keys": ["Stakeholder Id", "Security Id", "Report Date"],
+    "primary_keys": ["Security Id", "Stakeholder Id", "Report Date"],
     "editable_column_names": ["Free float?", "If not, Shares correct?", "If not, Shares value?"],
     "freeze_editable_columns": false,
     "group_column_names": [],
