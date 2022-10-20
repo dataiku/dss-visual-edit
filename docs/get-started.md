@@ -10,14 +10,14 @@ If you haven't, [install the _Editable via Webapp_ plugin](install-plugin) first
 * Go to Webapps, create New Visual Webapp, pick Data Editing.
   * ![](new_visual_webapp.png)
   * ![](new_visual_webapp_2.png)
-* The webapp settings interface allows to choose a dataset, list key columns (used to identify rows) and editable columns, within the "Data" section. ![](data_editing_webapp_params_full.png)
+* The webapp settings interface allows to choose a dataset, list primary keys and editable columns, within the "Data" section. ![](data_editing_webapp_params_full.png)
   * The "Linked Records" section allows to specify editable columns whose values correspond to primary key values of another dataset.
   * In the "Layout" section you can choose to freeze editable columns to the right-hand side (which is useful when there are many columns), and to group rows by one or more columns.
   * Additional settings can be provided via the ["editschema" in JSON](editschema).
 
 ## Start the webapp
 
-The webapp should look like this:
+Here is an example of what a data editing webapp would look like:
 
 ![](webapp.png)
 

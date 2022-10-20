@@ -10,11 +10,9 @@ The best way to make this webapp accessible to end-users is by publishing it to 
 
 ### What happens if my source dataset changes?
 
-The webapp automatically detects changes in the original dataset, in which case it shows a button to refresh the data. This detection is carried out by periodically checking the last build date of the dataset.
+The webapp automatically detects changes in the original dataset, by periodically checking the last build date of the dataset. As a consequence, it only works if this isn't a "source" dataset but the output of a recipe.
 
 ![](refresh_data.png)
-
-As a consequence, it only works if this isn't a "source" dataset, i.e. there are recipes/datasets upstream. If you want to refresh the webapp upon changes of a source dataset, please create a Scenario with a "Restart webapp" step and a "Trigger on dataset change" or a "Trigger on sql query change".
 
 ### What happens if I change primary keys or editable columns in the webapp settings?
 
