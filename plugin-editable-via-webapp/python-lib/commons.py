@@ -37,25 +37,6 @@ def get_editlog_df(editlog_ds):
     return editlog_df
 
 
-def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
-    try:
-        original_df = original_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True) # the dataset schema is likely to have been reviewed by the end-user, so let's use it!
-    except:
-        logging.warning("""Couldn't use the original dataset's schema when loading its contents as a dataframe. Letting Pandas infer the schema.
-        
-        This is likely due to a column with missing values and 'int' storage type; this can be fixed by changing its storage type to 'string'.""")
-        original_df = original_ds.get_dataframe()
-
-    primary_keys = original_ds.get_config()["customFields"]["primary_keys"]
-
-    # Replay edits
-    return merge_edits(
-        original_df,
-        editlog_pivoted_df,
-        primary_keys
-    ).set_index(primary_keys)
-
-
 def get_editlog_pivoted_ds_schema(original_schema, primary_keys, editable_column_names):
     editlog_pivoted_ds_schema = []
     edited_ds_schema = []
@@ -87,12 +68,8 @@ def get_primary_keys(schema):
     return keys
 
 
-def get_display_column_names(editschema):
-    display_column_names = []
-    for col in editschema:
-        if not col.get("editable") and col.get("editable_type") != "key":
-            display_column_names.append(col.get("name"))
-    return display_column_names
+def get_display_column_names(schema, primary_keys, editable_column_names):
+    return [col.get("name") for col in schema if col.get("name") not in primary_keys + editable_column_names]
 
 
 def get_editable_column_names(schema):
@@ -176,20 +153,51 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
     return editlog_pivoted_df
 
 
-def merge_edits(original_df, editlog_pivoted_df, primary_keys):
+def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
+    
+    # Load and prepare original_df
+    ###
+
+    try:
+        original_df = original_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True) # the dataset schema is likely to have been reviewed by the end-user, so let's use it!
+    except:
+        logging.warning("""Couldn't use the original dataset's schema when loading its contents as a dataframe. Letting Pandas infer the schema.
+        
+        This is likely due to a column with missing values and 'int' storage type; this can be fixed by changing its storage type to 'string'.""")
+        original_df = original_ds.get_dataframe()
+
+    original_ds_config = original_ds.get_config()
+    primary_keys = original_ds_config["customFields"]["primary_keys"]
+    editable_column_names = original_ds_config["customFields"]["editable_column_names"]
+    schema = original_ds_config.get("schema").get("columns")
+    display_column_names = get_display_column_names(schema, primary_keys, editable_column_names)
+    
+    # make sure that primary keys will be in the same order for original_df and editlog_pivoted_df, and that we'll return a dataframe where editable columns are last
+    original_df = original_df[primary_keys + display_column_names + editable_column_names]
+
+    
     if (not editlog_pivoted_df.size):  # i.e. if empty editlog
         edited_df = original_df
     else:
-        # We don't need the date column in the rest
+
+        # Prepare editlog_pivoted_df
+        ###
+
+        # We don't need the date column here
         if ("last_edit_date" in editlog_pivoted_df.columns):
             editlog_pivoted_df.drop(columns=["last_edit_date"], inplace=True)
 
-        # Change types of primary keys to match original_df
-        for col in primary_keys:
+        # Change types to match those of original_df
+        for col in editlog_pivoted_df.columns:
             editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(
                      original_df[col].dtypes.name)
+
         original_df.set_index(primary_keys, inplace=True)
         editlog_pivoted_df.set_index(primary_keys, inplace=True)
+
+
+        # "Replay" edits: Join and Merge
+        ###
 
         # Join -> this adds _value_last columns
         edited_df = original_df.join(
@@ -212,7 +220,6 @@ def merge_edits(original_df, editlog_pivoted_df, primary_keys):
     return edited_df
 
 # Other utils
-
 
 def get_user_details():
     client = dataiku.api_client()

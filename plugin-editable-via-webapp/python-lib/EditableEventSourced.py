@@ -3,7 +3,7 @@ from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
 from pandas import DataFrame
-from commons import get_primary_keys, get_editable_column_names, merge_edits_from_log_pivoted_df, pivot_editlog, tabulator_row_key_values, find_webapp_id, get_webapp_json, get_values_from_linked_df, get_editlog_df, get_editlog_pivoted_ds_schema
+from commons import *
 from os import getenv
 from json5 import loads
 from datetime import datetime
@@ -187,10 +187,8 @@ class EditableEventSourced:
             self.editschema_manual_df = DataFrame(
                 data=self.editschema_manual)  # this will be an empty dataframe
 
-        self.display_column_names = [col.get("name") for col in self.__schema__ if col.get(
-            "name") not in self.primary_keys + self.editable_column_names]
-        self.edited_df_cols = self.primary_keys + \
-            self.display_column_names + self.editable_column_names
+        display_column_names = get_display_column_names(self.__schema__, self.primary_keys, self.editable_column_names)
+        self.edited_df_cols = self.primary_keys + display_column_names + self.editable_column_names
 
         # make sure that original dataset has up-to-date custom fields (editlog and datasets/recipes that follow may not - TODO: change this?)
         self.__save_custom_fields__(self.original_ds_name)
@@ -201,22 +199,18 @@ class EditableEventSourced:
         self.__ns__ = Namespace("myNamespace", "tabulator")
 
     def get_edited_df_indexed(self):
-
+        return self.get_edited_df().set_index(self.primary_keys)
+        
+    def get_edited_df(self):
         # Load editlog and pivot it
         editlog_pivoted_df = pivot_editlog(
             self.editlog_ds,
             self.primary_keys,
             self.editable_column_names
         )
-
         # Replay edits
-        edited_df_indexed = merge_edits_from_log_pivoted_df(self.original_ds, editlog_pivoted_df) # this is indexed by the primary keys
-        return edited_df_indexed[self.display_column_names + self.editable_column_names] # we make sure to return a dataframe where editable columns are last
-
-        # self.__edited_df_indexed__ = self.__extend_with_lookup_columns__(self.__edited_df_indexed__)
-
-    def get_edited_df(self):
-        return self.get_edited_df_indexed().reset_index()
+        return merge_edits_from_log_pivoted_df(self.original_ds, editlog_pivoted_df)
+        # old version: also call self.__extend_with_lookup_columns__(self.__edited_df_indexed__)
 
     def get_data_tabulator(self):
         # This loads the original dataset, the editlog, and replays edits
