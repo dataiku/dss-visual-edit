@@ -169,9 +169,9 @@ def get_original_df(original_ds):
     display_column_names = get_display_column_names(schema, primary_keys, editable_column_names)
     
     # make sure that primary keys will be in the same order for original_df and editlog_pivoted_df, and that we'll return a dataframe where editable columns are last
-    return original_df[primary_keys + display_column_names + editable_column_names]
+    return original_df[primary_keys + display_column_names + editable_column_names], primary_keys
 
-def merge_edits_from_all_df(original_df, editlog_pivoted_df):
+def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
 
     if (not editlog_pivoted_df.size):  # i.e. if empty editlog
         edited_df = original_df
@@ -218,8 +218,8 @@ def merge_edits_from_all_df(original_df, editlog_pivoted_df):
 
 
 def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
-    original_df = get_original_df(original_ds)
-    return merge_edits_from_all_df(original_df, editlog_pivoted_df)
+    original_df, primary_keys = get_original_df(original_ds)
+    return merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys)
 
 
 # Other utils
