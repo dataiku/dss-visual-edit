@@ -8,7 +8,7 @@ from dataiku.customrecipe import get_input_names_for_role, get_output_names_for_
 # import sys
 # sys.path.append('../../python-lib')
 
-from commons import merge_edits_from_log_pivoted_df
+from commons import update_ds_with_edits
 
 
 #%% Get recipe parameters
@@ -36,7 +36,7 @@ editlog_pivoted_df = pivoted_ds.get_dataframe() # this dataframe was written by 
 #%% Compute output data
 ###
 
-edited_df = merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df)
+edited_df = update_ds_with_edits(original_ds, editlog_pivoted_df)
 
 
 #%% Write output data

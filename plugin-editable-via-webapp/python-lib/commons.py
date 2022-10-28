@@ -171,55 +171,65 @@ def get_original_df(original_ds):
     # make sure that primary keys will be in the same order for original_df and editlog_pivoted_df, and that we'll return a dataframe where editable columns are last
     return original_df[primary_keys + display_column_names + editable_column_names], primary_keys
 
-def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
+def update_df_with_edits(df, edits_df, primary_keys, join="left"):
+    """
+    Update values of `df` with those found in `edits_df`.
 
-    if (not editlog_pivoted_df.size):  # i.e. if empty editlog
-        edited_df = original_df
+    Exception: If a value was edited to NA but wasn't NA in the input dataset, the original value will be kept. This is similar to the behaviour of pandas' DataFrame.update(). 
+
+    Parameters:
+
+    - df (DataFrame) : Input dataset.
+    - edits_df (DataFrame) : Contains edited values. Columns must be a subset of `df`'s columns.
+    - primary_keys (list) : Names of columns that act as (multi-)index in `df` _and_ in `edits_df`.
+    - join ({"left", "outer"}, default "left"): How to combine the two DataFrames...
+
+       - left: use `df`'s index (this makes sense when `edits_df` is a subset of `df`)
+       - outer: union of `df`'s index and `edits_df`'s index
+
+    Returns:
+    DataFrame: Edited dataset
+    """
+
+    if (not edits_df.size):
+        edited_df = df
+
     else:
 
-        # Prepare editlog_pivoted_df
-        ###
-
-        # We don't need the date column here
-        if ("last_edit_date" in editlog_pivoted_df.columns):
-            editlog_pivoted_df.drop(columns=["last_edit_date"], inplace=True)
-
-        # Change types to match those of original_df
-        for col in editlog_pivoted_df.columns:
-            editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(
-                     original_df[col].dtypes.name)
-
-        original_df.set_index(primary_keys, inplace=True)
-        editlog_pivoted_df.set_index(primary_keys, inplace=True)
-
-
-        # "Replay" edits: Join and Merge
-        ###
-
-        # Join -> this adds _value_last columns
-        edited_df = original_df.join(
-            editlog_pivoted_df, rsuffix="_value_last")
-
-        # "Merge" -> this creates _original columns
-        # "last_edit_date" column has already been dropped
-        editable_column_names = editlog_pivoted_df.columns.tolist()
+        # Align types of editable columns in editlog_pivoted_df on those of original_df
+        if ("last_edit_date" in edits_df.columns):
+            edits_df.drop(columns=["last_edit_date"], inplace=True)
+        editable_column_names = edits_df.columns.tolist()
         for col in editable_column_names:
-            # copy col to a new column whose name is suffixed by "_original"
-            edited_df[col + "_original"] = edited_df[col]
-            # merge original and last edited values
-            edited_df.loc[:, col] = edited_df[col + "_value_last"].where(
-                edited_df[col + "_value_last"].notnull(), edited_df[col + "_original"])
+            edits_df[col] = edits_df[col].astype(
+                     df[col].dtypes.name)
 
-        # Drop the _original and _value_last columns -> this gets us back to the original schema
+        # Join
+        # Note: this adds "_value_last" columns
+        df.set_index(primary_keys, inplace=True)
+        edits_df.set_index(primary_keys, inplace=True)
+        edited_df = df.join(
+            edits_df, rsuffix="_value_last", how=join)
+
+        # Update values in editable columns
+        # - Copy original values to "_original" columns
+        # - Replace values with those coming from "_value_last" columns (when they exist)
+        for col in editable_column_names:
+            edited_df[col + "_original"] = edited_df[col]
+            edited_df.loc[:, col] = edited_df[col + "_value_last"].where(
+                edited_df[col + "_value_last"].notnull(), # where this is True, keep the original value; where False, replace with corresponding value from "other" (defined below)
+                other=edited_df[col + "_original"])
+
+        # Drop the "_original" and "_value_last" columns -> this gets us back to the original schema
         edited_df = edited_df[edited_df.columns[:-2 *
                                                 len(editable_column_names)]].reset_index()
 
     return edited_df
 
 
-def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
-    original_df, primary_keys = get_original_df(original_ds)
-    return merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys)
+def update_ds_with_edits(ds, edits_df):
+    original_df, primary_keys = get_original_df(ds)
+    return update_df_with_edits(original_df, edits_df, primary_keys)
 
 
 # Other utils

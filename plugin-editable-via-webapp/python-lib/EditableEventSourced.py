@@ -207,9 +207,9 @@ class EditableEventSourced:
             self.editlog_ds,
             self.primary_keys,
             self.editable_column_names
-        )
+        ))
         # Replay edits
-        return merge_edits_from_log_pivoted_df(self.original_ds, editlog_pivoted_df)
+        return update_ds_with_edits(self.original_ds, editlog_pivoted_df)
         # old version: also call self.__extend_with_lookup_columns__(self.__edited_df_indexed__)
 
     def get_data_tabulator(self):
