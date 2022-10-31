@@ -58,9 +58,10 @@ class EditableEventSourced:
                 connection=self.__connection_name__)
             editlog_ds_creator.create()
             self.editlog_ds = Dataset(self.editlog_ds_name, self.project_key)
-            # when the editlog doesn't exist yet, this makes sure to write an empty dataframe with the correct schema
-            editlog_df = get_editlog_df(self.editlog_ds)
             logging.debug("Done.")
+
+        # when the editlog doesn't exist yet, this makes sure to write an empty dataframe with the correct schema
+        editlog_df = get_editlog_df(self.editlog_ds)
 
         # make sure that editlog is in append mode
         self.editlog_ds.spec_item["appendMode"] = True
