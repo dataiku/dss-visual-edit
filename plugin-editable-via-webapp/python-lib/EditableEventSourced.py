@@ -5,7 +5,7 @@ from dataikuapi.dss.recipe import DSSRecipeCreator
 from pandas import DataFrame
 from commons import *
 from os import getenv
-from json5 import loads
+from json import loads
 from datetime import datetime
 from pytz import timezone
 from dash_extensions.javascript import Namespace
