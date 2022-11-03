@@ -1,0 +1,15 @@
+{
+    "meta" : {
+        "label": "Empty editlog",
+        "description": "DO NOT USE IN PRODUCTION. Delete all rows of the editlog.",
+        "icon": "icon-file-alt"
+    },
+    "params": [
+        {
+            "name": "editlog_ds_name",
+            "label": "Editlog",
+            "type": "DATASET",
+            "mandatory": true
+        }
+    ]
+}
