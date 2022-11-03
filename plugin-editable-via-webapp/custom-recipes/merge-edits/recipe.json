@@ -1,7 +1,7 @@
 {
     "meta": {
         "label": "Merge edits",
-        "description": "Merge values edited via the webapp, into the original dataset",
+        "description": "Merge values edited via the webapp, into the original dataset.",
         "icon": "icon-plus"
     },
     "kind": "PYTHON",

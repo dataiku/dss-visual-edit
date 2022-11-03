@@ -1,7 +1,7 @@
 {
     "meta": {
         "label": "Data Editing",
-        "description": "Webapp to edit records of a dataset and maintain an editlog dataset",
+        "description": "Webapp to edit records of a dataset and maintain an editlog dataset.",
         "icon": "icon-edit-sign"
     },
     "baseType": "DASH",
