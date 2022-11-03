@@ -1,3 +1,2 @@
 dash>=2.4.0
 dash_extensions
-json5

@@ -12,7 +12,7 @@
 ###
 
 from commons import get_values_from_linked_df, get_user_details, get_last_build_date
-from json5 import dumps
+from json import dumps
 from flask import Flask, request, jsonify, current_app
 from pandas import DataFrame
 from dataikuapi.utils import DataikuStreamedHttpUTF8CSVReader
@@ -50,7 +50,7 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     original_ds_name = get_webapp_config().get("original_dataset")
     params = get_webapp_config()
 
-    from json5 import loads
+    from json import loads
     editschema_manual_raw = params.get("editschema")
     if (editschema_manual_raw and editschema_manual_raw != ""):
         editschema_manual = loads(editschema_manual_raw)
@@ -66,7 +66,7 @@ else:
 
     # Get original dataset name as an environment variable
     # Get primary keys and editable column names from the custom fields of that dataset
-    from json5 import load
+    from json import load
     original_ds_name = getenv("ORIGINAL_DATASET")
     params = load(open("../../../example-settings/" +
                   original_ds_name + ".json"))

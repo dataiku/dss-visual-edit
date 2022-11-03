@@ -6,6 +6,12 @@ The best way to make this webapp accessible to end-users is by publishing it to 
 
 ![](dashboard_edit.png)
 
+## Deploying to Automation
+
+Make sure that the version of the plugin installed on the Automation node is the same as on the Design node.
+
+Upon deploying the project bundle for the first time, please start the webapp immediately as a way to initialize the editlog dataset properly — before any dataset downstream of the editlog gets built. Indeed, after deploying the bundle for the first time, the editlog dataset will exist and it will have a schema, but it may appear as having an invalid configuration; this would be the case with a SQL connection different from the one used in the design node, as the table won't have been created upon bundle deployment.
+
 ## FAQ
 
 ### What happens if my source dataset changes?
