@@ -35,7 +35,7 @@ def get_editlog_df(editlog_ds):
         editlog_ds.write_schema(get_editlog_ds_schema())
         write_empty_editlog(editlog_ds)
         print("Done.")
-    if (editlog_df.empty()): # TODO: check this
+    if (editlog_df.empty):
         # make sure that the dataset will be ready (e.g. table has been created) by writing to it
         write_empty_editlog(editlog_ds)
     return editlog_df
