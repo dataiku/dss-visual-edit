@@ -52,16 +52,20 @@ class EditableEventSourced:
         if (editlog_ds_creator.already_exists()):
             logging.debug("Found editlog")
             self.editlog_ds = Dataset(self.editlog_ds_name, self.project_key)
+            editlog_df = get_editlog_df(self.editlog_ds)
+            if (editlog_df.empty):
+                # Make sure that the dataset's configuration is valid by writing an empty dataframe.
+                # (The editlog dataset might already exist and have a schema, but its configuration might be invalid, for instance when the project was exported to a bundle and deployed to automation, and when using a SQL connection: the dataset exists but no table was created.)
+                write_empty_editlog(editlog_ds)
         else:
             logging.debug("No editlog found, creating it...")
             editlog_ds_creator.with_store_into(
                 connection=self.__connection_name__)
             editlog_ds_creator.create()
             self.editlog_ds = Dataset(self.editlog_ds_name, self.project_key)
+            self.editlog_ds.write_schema(get_editlog_ds_schema())
+            write_empty_editlog(self.editlog_ds)
             logging.debug("Done.")
-
-        # when the editlog doesn't exist yet, this makes sure to write an empty dataframe with the correct schema
-        editlog_df = get_editlog_df(self.editlog_ds)
 
         # make sure that editlog is in append mode
         self.editlog_ds.spec_item["appendMode"] = True
