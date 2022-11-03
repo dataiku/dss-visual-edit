@@ -23,6 +23,8 @@ def get_editlog_ds_schema():
 def get_editlog_columns():
     return ["date", "user", "key", "column_name", "value"]
 
+def write_empty_editlog(editlog_ds):
+    editlog_ds.write_dataframe(DataFrame(columns=get_editlog_columns()), infer_schema=False)
 
 def get_editlog_df(editlog_ds):
     # Try to get dataframe from editlog dataset, if it's not empty. Otherwise, create empty dataframe.
@@ -30,10 +32,12 @@ def get_editlog_df(editlog_ds):
         editlog_df = editlog_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True) # the schema was specified upon creation of the dataset, so let's use it
     except:
         print("Editlog is empty. Writing schema and empty dataframe...")
-        editlog_df = DataFrame(columns=get_editlog_columns())
         editlog_ds.write_schema(get_editlog_ds_schema())
-        editlog_ds.write_dataframe(editlog_df, infer_schema=False)
+        write_empty_editlog(editlog_ds)
         print("Done.")
+    if (editlog_df.empty()): # TODO: check this
+        # make sure that the dataset will be ready (e.g. table has been created) by writing to it
+        write_empty_editlog(editlog_ds)
     return editlog_df
 
 
