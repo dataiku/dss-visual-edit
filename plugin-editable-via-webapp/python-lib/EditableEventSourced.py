@@ -56,7 +56,7 @@ class EditableEventSourced:
             if (editlog_df.empty):
                 # Make sure that the dataset's configuration is valid by writing an empty dataframe.
                 # (The editlog dataset might already exist and have a schema, but its configuration might be invalid, for instance when the project was exported to a bundle and deployed to automation, and when using a SQL connection: the dataset exists but no table was created.)
-                write_empty_editlog(editlog_ds)
+                write_empty_editlog(self.editlog_ds)
         else:
             logging.debug("No editlog found, creating it...")
             editlog_ds_creator.with_store_into(
