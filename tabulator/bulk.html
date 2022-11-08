@@ -1,0 +1,89 @@
+<script
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+  crossorigin="anonymous"></script>
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.4.2/dist/js/tabulator.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css">
+<link href="https://unpkg.com/tabulator-tables@5.4.2/dist/css/tabulator.min.css" rel="stylesheet">
+
+<h1>Bulk Editing</h1>
+
+<div>
+    
+    <button class="ui button" id="bulk-edit-show-button">Edit Selected Rows</button>
+
+    <div class="ui tiny modal" id="bulk-edit-modal">
+        <i class="close icon"></i>
+        <div class="header">Edit Selected Rows</div>
+        <div class="content">
+            <form class="ui form">
+                <div class="field">
+                    <label>Column to edit</label>
+                    <div class="ui dropdown" id="bulk-edit-modal-column-name">
+                        <div class="text"></div>
+                        <i class="dropdown icon"></i>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Value to assign</label>
+                    <input type="text" id="bulk-edit-modal-value" placeholder=""/>
+                </div>
+                <div class="actions">
+                    <div class="ui approve button" id="bulk-edit-modal-ok">OK</div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="example-table"></div>
+</div>
+
+<script type="text/javascript">
+    //define data array
+    var tabledata = [
+        {id:1, name:"Oli Bob", progress:12, gender:"male", rating:1, col:"red", dob:"19/02/1984", car:1},
+        {id:2, name:"Mary May", progress:1, gender:"female", rating:2, col:"blue", dob:"14/05/1982", car:true},
+        {id:3, name:"Christine Lobowski", progress:42, gender:"female", rating:0, col:"green", dob:"22/05/1982", car:"true"},
+        {id:4, name:"Brendon Philips", progress:100, gender:"male", rating:1, col:"orange", dob:"01/08/1980"},
+        {id:5, name:"Margret Marmajuke", progress:16, gender:"female", rating:5, col:"yellow", dob:"31/01/1999"},
+        {id:6, name:"Frank Harbours", progress:38, gender:"male", rating:4, col:"red", dob:"12/05/1966", car:1},
+    ];
+
+    //initialize table
+    var table = new Tabulator("#example-table", {
+        data: tabledata, //assign data to table
+        autoColumns: true, //create columns from data field names
+        selectable: true
+    });
+
+    $("#bulk-edit-show-button").on("click", function () {
+        $('#bulk-edit-modal')
+            .modal('show')
+        ;
+    });
+
+    $("#bulk-edit-modal-ok").on("click", function () {
+        console.log("Bulk editing!")
+        var rows = table.getSelectedRows()
+        colName = $("#bulk-edit-modal-column-name").dropdown("get value")
+        val = $("#bulk-edit-modal-value")[0].value
+        table.blockRedraw()
+        d = {}
+        d[colName] = val
+        rows.forEach((row) => {
+            row.update(d)
+        })
+        table.restoreRedraw()
+    })
+
+    dropdownValues = []
+    columns = table.getColumns();
+    columns.forEach((col) => {
+        dropdownValues.push({"value": col.getField(), "name": col.getField()})
+    });
+    $("#bulk-edit-modal-column-name")
+        .dropdown({ values: dropdownValues })
+    ;
+</script>
