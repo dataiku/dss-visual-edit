@@ -1,4 +1,4 @@
-import dash_tabulator
+from dash_tabulator.DashTabulator import DashTabulator
 import dash
 from dash.dependencies import Input, Output
 from dash import html
@@ -17,11 +17,10 @@ cols = DataFrame(df.columns, columns=["field"])
 columns = cols.to_dict('records')
 
 app.layout = html.Div([
-    dash_tabulator.DashTabulator(
+    DashTabulator(
         id="tabulator",
         columns=columns,
-        data=data,
-        renderHorizontal="virtual"
+        data=data
     ),
     dcc.Interval(
                 id='interval-component-iu',
