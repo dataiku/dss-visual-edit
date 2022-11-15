@@ -42,15 +42,16 @@ export default class DashTabulator extends React.Component {
             "reactiveData": true,
             "columns": columns,
             "groupBy": groupBy,
-            "selectable": 1,
+            "selectable": true,
             "layout": "fitDataTable",
+            "renderHorizontal": "virtual",
             "pagination": "local",
             "paginationSize": 20,
             "paginationSizeSelector": [10, 20, 50, 100],
             "movableColumns": true,
             "persistence": true,
-            "footerElement":"<button class='tabulator-page' onclick='localStorage.clear(); window.location.reload();'>Reset View</button>"
-        });
+            "footerElement": "<button class='tabulator-page' onclick='localStorage.clear(); window.location.reload();'>Reset View</button>"
+        })
 
         this.tabulator.on("cellEdited", (cell) => { 
             console.log("Cell edited!")
@@ -68,6 +69,34 @@ export default class DashTabulator extends React.Component {
                 });
             } catch (e) { }
         })
+
+        dropdownValues = []
+        columns.forEach((col) => {
+            dropdownValues.push({"value": col.get("field"), "name": col.get("field")})
+        });
+        $("#bulk-edit-modal-column-name")
+            .dropdown({ values: dropdownValues })
+        ;
+
+        $("#bulk-edit-show-button").on("click", function () {
+            $('#bulk-edit-modal')
+                .modal('show')
+            ;
+        });
+
+        $("#bulk-edit-modal-ok").on("click", function () {
+            console.log("Bulk editing!")
+            var rows = table.getSelectedRows()
+            colName = $("#bulk-edit-modal-column-name").dropdown("get value")
+            val = $("#bulk-edit-modal-value")[0].value
+            table.blockRedraw()
+            d = {}
+            d[colName] = val
+            rows.forEach((row) => {
+                row.update(d)
+            })
+            table.restoreRedraw()
+        })
     }
 
     constructor(props) {
@@ -84,7 +113,32 @@ export default class DashTabulator extends React.Component {
         // if (this.tabulator) this.tabulator.setData(data)
 
         return (
-            <div ref={el => (this.el = el)} />
+            <div>
+                <button class="ui button" id="bulk-edit-show-button">Edit Selected Rows</button>
+                <div class="ui tiny modal" id="bulk-edit-modal">
+                    <i class="close icon"></i>
+                    <div class="header">Edit Selected Rows</div>
+                    <div class="content">
+                        <form class="ui form">
+                            <div class="field">
+                                <label>Column to edit</label>
+                                <div class="ui dropdown" id="bulk-edit-modal-column-name">
+                                    <div class="text"></div>
+                                    <i class="dropdown icon"></i>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Value to assign</label>
+                                <input type="text" id="bulk-edit-modal-value" placeholder=""/>
+                            </div>
+                            <div class="actions">
+                                <div class="ui approve button" id="bulk-edit-modal-ok">OK</div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div ref={el => (this.el = el)} />
+            </div>
         )
     }
 }
