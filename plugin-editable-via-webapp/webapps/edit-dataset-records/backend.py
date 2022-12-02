@@ -236,7 +236,7 @@ def get_dataframe_filtered(ds_name, filter_column, filter_term, n_results):
         "GET", f"/projects/{project_key}/datasets/{ds_name}/data/",
         params={
             "format": "tsv-excel-header",
-            "filter": f"""contains(toLowercase(strval("{filter_column}")), toLowercase("{filter_term}"))""",
+            "filter": f"""startsWith(toLowercase(strval("{filter_column}")), "{filter_term}")""",
             "sampling": dumps({
                 "samplingMethod": "HEAD_SEQUENTIAL",
                 "maxRecords": n_results
@@ -268,7 +268,7 @@ def my_flask_endpoint(linked_ds_name):
         linked_ds_key = linked_record_row["ds_key"][0]
         linked_ds_label = linked_record_row["ds_label"][0]
         linked_df_filtered = get_dataframe_filtered(
-            linked_ds_name, linked_ds_label, term, 10)
+            linked_ds_name, linked_ds_label, term.strip().lower(), 10)
         editor_values_param = get_values_from_linked_df(
             linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns)
         response = jsonify(editor_values_param)
