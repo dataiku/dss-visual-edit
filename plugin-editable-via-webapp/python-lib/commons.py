@@ -183,7 +183,8 @@ def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
                      original_df[col].dtypes.name)
 
         original_df.set_index(primary_keys, inplace=True)
-        editlog_pivoted_df.set_index(primary_keys, inplace=True)
+        if (not editlog_pivoted_df.index.name): # if index has no name, i.e. it's a range index
+            editlog_pivoted_df.set_index(primary_keys, inplace=True)
 
 
         # "Replay" edits: Join and Merge

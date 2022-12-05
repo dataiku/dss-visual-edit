@@ -203,19 +203,17 @@ class EditableEventSourced:
         # used to reference javascript functions in custom_tabulator.js
         self.__ns__ = Namespace("myNamespace", "tabulator")
 
-    def get_edited_df_indexed(self):
-        return self.get_edited_df().set_index(self.primary_keys)
-        
-    def get_edited_df(self):
-        # Load editlog and pivot it
-        editlog_pivoted_df = pivot_editlog(
+        self.edited_cells_df = pivot_editlog(
             self.editlog_ds,
             self.primary_keys,
             self.editable_column_names
         )
-        # Replay edits
-        return merge_edits_from_log_pivoted_df(self.original_ds, editlog_pivoted_df)
-        # old version: also call self.__extend_with_lookup_columns__(self.__edited_df_indexed__)
+
+    def get_edited_df_indexed(self):
+        return self.get_edited_df().set_index(self.primary_keys)
+        
+    def get_edited_df(self):
+        return merge_edits_from_log_pivoted_df(self.original_ds, self.edited_cells_df)
 
     def get_data_tabulator(self):
         # This loads the original dataset, the editlog, and replays edits
@@ -413,6 +411,8 @@ class EditableEventSourced:
                         value = str(loads(value.lower()))
                 break
 
+        self.edited_cells_df.loc[primary_key_values, column_name] = value
+
         # store value as a string, unless it's None
         if (value != None):
             value = str(value)
@@ -425,6 +425,7 @@ class EditableEventSourced:
             "date": [datetime.now(timezone("UTC")).isoformat()],
             "user": [user]
         }))
+        
 
         # Update lookup columns if a linked record was edited
         # for linked_record in self.linked_records:
