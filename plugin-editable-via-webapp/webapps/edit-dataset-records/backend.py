@@ -250,9 +250,37 @@ def get_dataframe_filtered(ds_name, filter_column, filter_term, n_results):
         rows.append(row)
     return DataFrame(columns=rows[0], data=rows[1:])
 
+@server.route("/read", methods=['GET', 'POST'])
+def read_endpoint():
+    if request.method == 'POST':
+        key = request.get_json().get("key")
+    else:
+        key = request.args.get('key', '')
+    response = ees.edited_cells_df.loc[key].to_json()
+    return response
+
+@server.route("/update", methods=['GET', 'POST'])
+def update_endpoint():
+    if request.method == 'POST':
+        key = request.get_json().get("key")
+        column = request.get_json().get("column")
+        value = request.get_json().get("value")
+    else:
+        key = request.args.get('key', '')
+        column = request.args.get('column', '')
+        value = request.args.get('value', '')
+    user = "API"
+    info = ees.add_edit(key, column, value, user)
+    response = jsonify({"msg": info})
+    return response
+
+@server.route("/edited-cells", methods=['GET'])
+def edited_cells_endpoint():
+    response = ees.edited_cells_df.to_csv()
+    return response
 
 @server.route("/lookup/<linked_ds_name>", methods=['GET', 'POST'])
-def my_flask_endpoint(linked_ds_name):
+def lookup_endpoint(linked_ds_name):
     if request.method == 'POST':
         term = request.get_json().get("term")
     else:
