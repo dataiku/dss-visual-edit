@@ -192,7 +192,7 @@ def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
 
         # Join -> this adds _value_last columns
         edited_df = original_df.join(
-            editlog_pivoted_df, rsuffix="_value_last")
+            editlog_pivoted_df, how="outer", rsuffix="_value_last")
 
         # "Merge" -> this creates _original columns
         # "last_edit_date" column has already been dropped
