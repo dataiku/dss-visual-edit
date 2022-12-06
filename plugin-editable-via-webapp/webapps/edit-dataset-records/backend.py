@@ -24,7 +24,6 @@ from dataiku import api_client
 from os import getenv
 from dash import Dash, html, dcc, Input, Output, State, callback_context
 
-logging.basicConfig(level=logging.INFO)
 stylesheets = [
     "https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
 scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js",
@@ -263,7 +262,7 @@ def my_flask_endpoint(linked_ds_name):
     else:
         term = request.args.get('term', '')
     logging.info(
-        f"""Received a request for dataset "{linked_ds_name}", term "{term}" """)
+        f"""Received a request for dataset "{linked_ds_name}", term "{term}" ({len(term)} characters)""")
     response = jsonify({})
 
     # Return data only when it's a linked dataset
@@ -273,10 +272,13 @@ def my_flask_endpoint(linked_ds_name):
         linked_ds_key = linked_record_row["ds_key"][0]
         linked_ds_label = linked_record_row["ds_label"][0]
         linked_df_filtered = get_dataframe_filtered(
-            linked_ds_name, linked_ds_label, term.strip().lower(), 10)
+            linked_ds_name, linked_ds_label, term.strip().lower(), 50)
+        logging.debug(f"Found {linked_df_filtered.size} entries")
         editor_values_param = get_values_from_linked_df(
             linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns)
         response = jsonify(editor_values_param)
+    else:
+        logging.info(f"""Dataset {linked_ds_name} is not a linked dataset!""")
 
     return response
 
