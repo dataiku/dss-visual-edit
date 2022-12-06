@@ -38,6 +38,7 @@ project = client.get_project(project_key)
 ###
 
 if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
+    logging.basicConfig(level=logging.INFO)
     logging.info("Webapp is being run in Dataiku")
     run_context = "dataiku"
     # this points to a copy of assets/style.css (which is ignored by Dataiku's Dash)
@@ -60,6 +61,7 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     server = app.server
 
 else:
+    logging.basicConfig(level=logging.DEBUG)
     logging.info("Webapp is being run outside of Dataiku")
     run_context = "local"
     info_display = "block"
@@ -232,6 +234,7 @@ def dummy_endpoint():
 
 
 def get_dataframe_filtered(ds_name, filter_column, filter_term, n_results):
+    logging.debug("Passing request to Dataiku's `data` API endpoint")
     csv_stream = client._perform_raw(
         "GET", f"/projects/{project_key}/datasets/{ds_name}/data/",
         params={
@@ -246,8 +249,10 @@ def get_dataframe_filtered(ds_name, filter_column, filter_term, n_results):
     csv_reader = DataikuStreamedHttpUTF8CSVReader(
         ds.get_schema()["columns"], csv_stream)
     rows = []
+    logging.debug("Reading streamed CSV")
     for row in csv_reader.iter_rows():
         rows.append(row)
+    logging.debug("Done")
     return DataFrame(columns=rows[0], data=rows[1:])
 
 
