@@ -49,6 +49,8 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     from dataiku.customwebapp import get_webapp_config
     original_ds_name = get_webapp_config().get("original_dataset")
     params = get_webapp_config()
+    if params.get("debug_mode"):
+        logging.basicConfig(level=logging.DEBUG)
 
     from json import loads
     editschema_manual_raw = params.get("editschema")
