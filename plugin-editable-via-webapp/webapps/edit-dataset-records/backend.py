@@ -37,8 +37,6 @@ project = client.get_project(project_key)
 ###
 
 if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
-    logging.basicConfig(level=logging.INFO)
-    logging.info("Webapp is being run in Dataiku")
     run_context = "dataiku"
     # this points to a copy of assets/style.css (which is ignored by Dataiku's Dash)
     stylesheets += ["https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/style.css"]
@@ -49,8 +47,11 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     from dataiku.customwebapp import get_webapp_config
     original_ds_name = get_webapp_config().get("original_dataset")
     params = get_webapp_config()
-    if params.get("debug_mode"):
+    if bool(params.get("debug_mode")):
         logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+    logging.info("Webapp is being run in Dataiku")
 
     from json import loads
     editschema_manual_raw = params.get("editschema")
