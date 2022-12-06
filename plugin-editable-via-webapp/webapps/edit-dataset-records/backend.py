@@ -24,7 +24,6 @@ from dataiku import api_client
 from os import getenv
 from dash import Dash, html, dcc, Input, Output, State, callback_context
 
-logging.basicConfig(level=logging.INFO)
 stylesheets = [
     "https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
 scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js",
@@ -38,6 +37,7 @@ project = client.get_project(project_key)
 ###
 
 if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
+    logging.basicConfig(level=logging.INFO)
     logging.info("Webapp is being run in Dataiku")
     run_context = "dataiku"
     # this points to a copy of assets/style.css (which is ignored by Dataiku's Dash)
@@ -60,6 +60,7 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     server = app.server
 
 else:
+    logging.basicConfig(level=logging.DEBUG)
     logging.info("Webapp is being run outside of Dataiku")
     run_context = "local"
     info_display = "block"
@@ -232,11 +233,12 @@ def dummy_endpoint():
 
 
 def get_dataframe_filtered(ds_name, filter_column, filter_term, n_results):
+    logging.debug("Passing request to Dataiku's `data` API endpoint")
     csv_stream = client._perform_raw(
         "GET", f"/projects/{project_key}/datasets/{ds_name}/data/",
         params={
             "format": "tsv-excel-header",
-            "filter": f"""contains(toLowercase(strval("{filter_column}")), toLowercase("{filter_term}"))""",
+            "filter": f"""startsWith(toLowercase(strval("{filter_column}")), "{filter_term}")""",
             "sampling": dumps({
                 "samplingMethod": "HEAD_SEQUENTIAL",
                 "maxRecords": n_results
@@ -246,8 +248,10 @@ def get_dataframe_filtered(ds_name, filter_column, filter_term, n_results):
     csv_reader = DataikuStreamedHttpUTF8CSVReader(
         ds.get_schema()["columns"], csv_stream)
     rows = []
+    logging.debug("Reading streamed CSV")
     for row in csv_reader.iter_rows():
         rows.append(row)
+    logging.debug("Done")
     return DataFrame(columns=rows[0], data=rows[1:])
 
 
@@ -258,7 +262,7 @@ def my_flask_endpoint(linked_ds_name):
     else:
         term = request.args.get('term', '')
     logging.info(
-        f"""Received a request for dataset "{linked_ds_name}", term "{term}" """)
+        f"""Received a request for dataset "{linked_ds_name}", term "{term}" ({len(term)} characters)""")
     response = jsonify({})
 
     # Return data only when it's a linked dataset
@@ -268,10 +272,13 @@ def my_flask_endpoint(linked_ds_name):
         linked_ds_key = linked_record_row["ds_key"][0]
         linked_ds_label = linked_record_row["ds_label"][0]
         linked_df_filtered = get_dataframe_filtered(
-            linked_ds_name, linked_ds_label, term, 10)
+            linked_ds_name, linked_ds_label, term.strip().lower(), 50)
+        logging.debug(f"Found {linked_df_filtered.size} entries")
         editor_values_param = get_values_from_linked_df(
             linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns)
         response = jsonify(editor_values_param)
+    else:
+        logging.info(f"""Dataset {linked_ds_name} is not a linked dataset!""")
 
     return response
 
