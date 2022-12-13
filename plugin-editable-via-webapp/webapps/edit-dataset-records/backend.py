@@ -252,6 +252,9 @@ def get_dataframe_filtered(ds_name, filter_column, filter_term, n_results):
 
 @server.route("/read", methods=['GET', 'POST'])
 def read_endpoint():
+    """
+    Read rows that were created or edited via webapp or API
+    """
     if request.method == 'POST':
         key = request.get_json().get("key")
     else:
