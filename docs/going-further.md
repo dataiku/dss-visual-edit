@@ -12,6 +12,10 @@ Make sure that the version of the plugin installed on the Automation node is the
 
 Upon deploying the project bundle for the first time, please build the dataset to edit via the webapp, then start the webapp, before any dataset downstream of the editlog gets built. This will make sure that the editlog is properly initialized on the Automation node. Indeed, after deploying the bundle for the first time, the editlog dataset will exist and it will have a schema, but it may appear as having an invalid configuration; this would be the case with a SQL connection different from the one used in the design node, as the table won't have been created upon bundle deployment. The reason for this is that, unlike most datasets managed by Dataiku, this one is a source dataset (with no recipe upstream).
 
+## Feedback loops
+
+In some use cases the data to review/edit in the webapp depends on previous edits. Check out our [sample project](sample-project-join-companies) that demonstrates this.
+
 ## FAQ
 
 ### What happens if my source dataset changes?

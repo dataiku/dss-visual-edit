@@ -1,4 +1,4 @@
-# _Editable via Webapp_ plugin
+# Data Editing plugin
 
 * Requirements:
   * Dataiku 9 or more recent
