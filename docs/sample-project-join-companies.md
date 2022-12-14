@@ -2,6 +2,8 @@
 
 This project demonstrates a case of feedback loop, where the data to review/edit in the webapp depends on previous edits. This data is in dataset `matches_uncertain` and edits can be found in `matches_uncertain_editlog_pivoted`. The Python recipe which produces `matches_uncertain` feeds from `matches` and from `matches_uncertain_editlog_pivoted` — see its code in the standard recipe code editor or in a notebook, in particular the section named "Apply edits to matches with distance > 0 or undefined".
 
+[Download project bundle](dss-bundle-JOIN_COMPANIES_SIMPLE-webapp-based.zip). Note: the project uses the Managed Snowflake data connection provided on Dataiku Online — you may have to remap to one of your own data connections.
+
 How to use this sample project:
 
 * Build dataset `companies_joined_prepared_edited` (recursive build)
