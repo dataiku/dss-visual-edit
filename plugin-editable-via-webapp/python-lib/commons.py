@@ -14,6 +14,8 @@ def get_editlog_ds_schema():
         # not using date type, in case the editlog is CSV
         {"name": "date", "type": "string", "meaning": "DateSource"},
         {"name": "user", "type": "string", "meaning": "Text"},
+        # action can be "update", "create", or "delete"
+        {"name": "action", "type": "string", "meaning": "Text"},
         {"name": "key", "type": "string", "meaning": "Text"},
         {"name": "column_name", "type": "string", "meaning": "Text"},
         {"name": "value", "type": "string", "meaning": "Text"}
@@ -21,7 +23,7 @@ def get_editlog_ds_schema():
 
 
 def get_editlog_columns():
-    return ["date", "user", "key", "column_name", "value"]
+    return ["date", "user", "action", "key", "column_name", "value"]
 
 def write_empty_editlog(editlog_ds):
     editlog_ds.write_dataframe(DataFrame(columns=get_editlog_columns()), infer_schema=False)

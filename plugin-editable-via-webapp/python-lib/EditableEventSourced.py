@@ -400,7 +400,7 @@ class EditableEventSourced:
 
         return t_cols
 
-    def add_edit(self, primary_key_values, column_name, value, user):
+    def add_edit(self, primary_key_values, column_name, value, user, action="update"):
         # if the type of column_name is a boolean, make sure we read it correctly
         for col in self.__schema__:
             if (col["name"] == column_name):
@@ -419,6 +419,7 @@ class EditableEventSourced:
 
         # add to the editlog (since it's in append mode)
         self.editlog_ds.write_dataframe(DataFrame(data={
+            "action": [action],
             "key": [str(primary_key_values)],
             "column_name": [column_name],
             "value": [value],

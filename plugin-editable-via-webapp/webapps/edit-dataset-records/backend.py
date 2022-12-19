@@ -273,7 +273,8 @@ def update_endpoint():
         column = request.args.get('column', '')
         value = request.args.get('value', '')
     user = "API"
-    info = ees.add_edit(key, column, value, user)
+    action = "update"
+    info = ees.add_edit(key, column, value, user, action)
     response = jsonify({"msg": info})
     return response
 
