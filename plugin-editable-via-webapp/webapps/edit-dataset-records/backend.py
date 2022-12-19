@@ -250,10 +250,58 @@ def get_dataframe_filtered(ds_name, filter_column, filter_term, n_results):
         rows.append(row)
     return DataFrame(columns=rows[0], data=rows[1:])
 
+import copy
+
+def make_hash(o):
+  """
+  Makes a hash from a dictionary, list, tuple or set to any level, that contains
+  only other hashable types (including any lists, tuples, sets, and
+  dictionaries).
+
+  From https://stackoverflow.com/questions/5884066/hashing-a-dictionary
+  """
+  if isinstance(o, (set, tuple, list)):
+    return tuple([make_hash(e) for e in o])    
+  elif not isinstance(o, dict):
+    return hash(o)
+  new_o = copy.deepcopy(o)
+  for k, v in new_o.items():
+    new_o[k] = make_hash(v)
+  return hash(tuple(frozenset(sorted(new_o.items())))) % 1000000
+
+@server.route("/create", methods=['POST'])
+def create_endpoint():
+    """
+    Create a new row
+
+    Params:
+    - key? or is this automatically set?
+    - columnValues: dict containing column names and values? Example:
+        ```json
+        {
+            "col1": "hey",
+            "col2": 42,
+            "col3": true
+        }
+        ```
+    """
+    key = request.get_json().get("key")
+    column_values = request.get_json().get("columnValues")
+    id = make_hash(column_values)
+    for col in column_values.keys():
+        ees.add_edit(key=id, column=k, value=column_values.get(col), user="API", action="create")
+    response = jsonify({"msg": "New row created"})
+    return response
+
 @server.route("/read", methods=['GET', 'POST'])
 def read_endpoint():
     """
-    Read rows that were created or edited via webapp or API
+    Read a row that was created or edited via webapp or API
+
+    Params:
+    - key: value(s) of the primary key(s) identifying the row to read
+
+    Example response: TODO:
     """
     if request.method == 'POST':
         key = request.get_json().get("key")
@@ -262,8 +310,28 @@ def read_endpoint():
     response = ees.edited_cells_df.loc[key].to_json()
     return response
 
+@server.route("/read-all", methods=['GET'])
+def read_all_endpoint():
+    """
+    Read all edited cells
+
+    Output: CSV-formatted dataset
+    """
+    response = ees.edited_cells_df.to_csv()
+    return response
+
 @server.route("/update", methods=['GET', 'POST'])
 def update_endpoint():
+    """
+    Update a row
+
+    Params:
+    - key: value(s) of the primary key(s) identifying the row to update
+    - column: name of the column to update
+    - value: value to set for the cell identified by key and column
+
+    Example response: TODO:
+    """
     if request.method == 'POST':
         key = request.get_json().get("key")
         column = request.get_json().get("column")
@@ -276,11 +344,6 @@ def update_endpoint():
     action = "update"
     info = ees.add_edit(key, column, value, user, action)
     response = jsonify({"msg": info})
-    return response
-
-@server.route("/edited-cells", methods=['GET'])
-def edited_cells_endpoint():
-    response = ees.edited_cells_df.to_csv()
     return response
 
 @server.route("/lookup/<linked_ds_name>", methods=['GET', 'POST'])
