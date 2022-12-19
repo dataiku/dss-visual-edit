@@ -99,6 +99,7 @@ if (linked_records_count > 0):
         ds_key = params.get(f"linked_record_key_{c}")
         ds_label = params.get(f"linked_record_label_column_{c}")
         ds_lookup_columns = params.get(f"linked_record_lookup_columns_{c}")
+        filter_behavior = params.get(f"linked_record_editing_filter_behavior_{c}")
         if not ds_label:
             ds_label = ds_key
         if not ds_lookup_columns:
@@ -109,7 +110,8 @@ if (linked_records_count > 0):
                 "ds_name": ds_name,
                 "ds_key": ds_key,
                 "ds_label": ds_label,
-                "ds_lookup_columns": ds_lookup_columns
+                "ds_lookup_columns": ds_lookup_columns,
+                "filter_behavior": filter_behavior
             }
         )
 
@@ -235,13 +237,21 @@ def dummy_endpoint():
     return jsonify([term])
 
 
-def get_dataframe_filtered(ds_name, filter_column, filter_term, n_results):
+def get_dataframe_filtered(ds_name, filter_column, filter_term, filter_behavior, n_results):
     logging.debug("Passing request to Dataiku's `data` API endpoint")
+    if (filter_behavior=="exact"):
+        filter_param_string = f"""
+        toLowercase(strval("{filter_column}")) == "{filter_term}"
+        """
+    else:
+        filter_param_string = f"""
+        startsWith(toLowercase(strval("{filter_column}")), "{filter_term}")
+        """
     csv_stream = client._perform_raw(
         "GET", f"/projects/{project_key}/datasets/{ds_name}/data/",
         params={
             "format": "tsv-excel-header",
-            "filter": f"""startsWith(toLowercase(strval("{filter_column}")), "{filter_term}")""",
+            "filter": filter_param_string,
             "sampling": dumps({
                 "samplingMethod": "HEAD_SEQUENTIAL",
                 "maxRecords": n_results
@@ -274,8 +284,13 @@ def my_flask_endpoint(linked_ds_name):
         linked_ds_lookup_columns = linked_record_row["ds_lookup_columns"][0]
         linked_ds_key = linked_record_row["ds_key"][0]
         linked_ds_label = linked_record_row["ds_label"][0]
+        filter_behavior = linked_record_row["filter_behavior"][0]
         linked_df_filtered = get_dataframe_filtered(
-            linked_ds_name, linked_ds_label, term.strip().lower(), 50)
+            ds_name=linked_ds_name,
+            filter_column=linked_ds_label,
+            filter_term=term.strip().lower(),
+            filter_behavior=filter_behavior,
+            n_results=50)
         logging.debug(f"Found {linked_df_filtered.size} entries")
         editor_values_param = get_values_from_linked_df(
             linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns)

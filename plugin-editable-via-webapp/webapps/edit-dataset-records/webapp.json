@@ -100,6 +100,16 @@
             "visibilityCondition": "model.linked_records_count > 0"
         },
         {
+            "name": "linked_record_editing_filter_behavior_1", // TODO: same for linked record #2
+            "label": "Filter when editing",
+            "description": "Default behavior: show linked records whose label starts with the search term entered by the user. Exact match: only show the linked record that matches exactly the search term (if it exists).",
+            "type": "SELECT",
+            "selectChoices": [
+                {"value": "default", "label": "Default behavior"},
+                {"value": "exact", "label": "Exact match"}
+            ]
+        },
+        {
             "name": "sep-linked-records-2",
             "label": "Linked Record #2",
             "type": "SEPARATOR",
