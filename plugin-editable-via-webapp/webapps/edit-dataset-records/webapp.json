@@ -101,13 +101,14 @@
         },
         {
             "name": "linked_record_editing_filter_behavior_1", // TODO: same for linked record #2
-            "label": "Filter when editing",
-            "description": "Default behavior: show linked records whose label starts with the search term entered by the user. Exact match: only show the linked record that matches exactly the search term (if it exists).",
+            "label": "Editor behavior",
+            "description": "Default: show dropdown with linked records whose labels start with the search term entered by the user. Exact match: only show the linked record that matches exactly the search term (if it exists).",
             "type": "SELECT",
             "selectChoices": [
-                {"value": "default", "label": "Default behavior"},
+                {"value": "default", "label": "Default"},
                 {"value": "exact", "label": "Exact match"}
-            ]
+            ],
+            "defaultValue": "default"
         },
         {
             "name": "sep-linked-records-2",
