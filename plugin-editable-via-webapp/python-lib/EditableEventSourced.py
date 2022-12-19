@@ -411,21 +411,23 @@ class EditableEventSourced:
                         value = str(loads(value.lower()))
                 break
 
-        self.edited_cells_df.loc[primary_key_values, column_name] = value
-
         # store value as a string, unless it's None
         if (value != None):
-            value = str(value)
+            value_string = str(value)
+        else:
+            value_string = value
 
         # add to the editlog (since it's in append mode)
         self.editlog_ds.write_dataframe(DataFrame(data={
             "action": [action],
             "key": [str(primary_key_values)],
             "column_name": [column_name],
-            "value": [value],
+            "value": [value_string],
             "date": [datetime.now(timezone("UTC")).isoformat()],
             "user": [user]
         }))
+
+        self.edited_cells_df.loc[primary_key_values, column_name] = value
         
 
         # Update lookup columns if a linked record was edited
