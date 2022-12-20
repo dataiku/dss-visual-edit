@@ -10,7 +10,13 @@ The best way to make this webapp accessible to end-users is by publishing it to 
 
 Make sure that the version of the plugin installed on the Automation node is the same as on the Design node.
 
-Upon deploying the project bundle for the first time, please build the dataset to edit via the webapp, then start the webapp, before any dataset downstream of the editlog gets built. This will make sure that the editlog is properly initialized on the Automation node. Indeed, after deploying the bundle for the first time, the editlog dataset will exist and it will have a schema, but it may appear as having an invalid configuration; this would be the case with a SQL connection different from the one used in the design node, as the table won't have been created upon bundle deployment. The reason for this is that, unlike most datasets managed by Dataiku, this one is a source dataset (with no recipe upstream).
+Upon deploying the project bundle for the first time, please...
+
+* Build the dataset used by the webapp as the "original dataset" to edit
+* Start the webapp
+* Build datasets downstream of the editlog, if any.
+
+This will make sure that the editlog is properly initialized on the Automation node. Indeed, after deploying the bundle for the first time, the editlog dataset will exist and it will have a schema, but it may appear as having an invalid configuration; this would be the case with a SQL connection different from the one used in the design node, as the table won't have been created upon bundle deployment. The reason for this is that, unlike most datasets managed by Dataiku, this one is a source dataset (with no recipe upstream).
 
 ## Feedback loops
 
