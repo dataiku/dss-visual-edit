@@ -275,7 +275,6 @@ def create_endpoint():
     Create a new row
 
     Params:
-    - key? or is this automatically set?
     - columnValues: dict containing column names and values? Example:
         ```json
         {
@@ -284,13 +283,22 @@ def create_endpoint():
             "col3": true
         }
         ```
+    
+    Returns:
+    - id: identifier of the new row
+
+    Note: this method doesn't implement data validation / it doesn't check that the values are allowed for the specified columns.
     """
     key = request.get_json().get("key")
     column_values = request.get_json().get("columnValues")
-    id = make_hash(column_values)
+    id = make_hash(column_values) # this to generate a new and unique id
     for col in column_values.keys():
+        # TODO: make sure col exists in the columns of the data model
         ees.add_edit(key=id, column=k, value=column_values.get(col), user="API", action="create")
-    response = jsonify({"msg": "New row created"})
+    response = jsonify({
+        "msg": "New row created",
+        "id": id
+    })
     return response
 
 @server.route("/read", methods=['GET', 'POST'])
@@ -331,6 +339,8 @@ def update_endpoint():
     - value: value to set for the cell identified by key and column
 
     Example response: TODO:
+
+    Note: this method doesn't implement data validation / it doesn't check that the value is allowed for the specified column.
     """
     if request.method == 'POST':
         key = request.get_json().get("key")
@@ -342,6 +352,7 @@ def update_endpoint():
         value = request.args.get('value', '')
     user = "API"
     action = "update"
+    # TODO: make sure column exists
     info = ees.add_edit(key, column, value, user, action)
     response = jsonify({"msg": info})
     return response
