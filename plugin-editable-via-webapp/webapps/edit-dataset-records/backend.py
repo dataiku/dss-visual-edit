@@ -23,6 +23,7 @@ import logging
 from dataiku import api_client
 from os import getenv
 from dash import Dash, html, dcc, Input, Output, State, callback_context
+from copy import deepcopy
 
 logging.basicConfig(level=logging.INFO)
 stylesheets = [
@@ -217,56 +218,24 @@ def add_edit(cell):
     return ees.add_edit_tabulator(cell, user)
 
 
-@server.route("/dash")
-def my_dash_app():
-    return app.index()
+# CRUD endpoints
+###
 
-
-@server.route("/flask", methods=['GET', 'POST'])
-def dummy_endpoint():
-    if request.method == 'POST':
-        term = request.get_json().get("term")
-    else:
-        term = request.args.get('term', '')
-    return jsonify([term])
-
-
-def get_dataframe_filtered(ds_name, filter_column, filter_term, n_results):
-    csv_stream = client._perform_raw(
-        "GET", f"/projects/{project_key}/datasets/{ds_name}/data/",
-        params={
-            "format": "tsv-excel-header",
-            "filter": f"""contains(toLowercase(strval("{filter_column}")), toLowercase("{filter_term}"))""",
-            "sampling": dumps({
-                "samplingMethod": "HEAD_SEQUENTIAL",
-                "maxRecords": n_results
-            })
-        })
-    ds = project.get_dataset(ds_name)
-    csv_reader = DataikuStreamedHttpUTF8CSVReader(
-        ds.get_schema()["columns"], csv_stream)
-    rows = []
-    for row in csv_reader.iter_rows():
-        rows.append(row)
-    return DataFrame(columns=rows[0], data=rows[1:])
-
-import copy
-
-def make_hash(o):
+def make_id(o):
   """
-  Makes a hash from a dictionary, list, tuple or set to any level, that contains
-  only other hashable types (including any lists, tuples, sets, and
-  dictionaries).
+  Generate a new and unique id, as a hash of the object given as parameter.
+  
+  Param: dictionary, list, tuple or set to any level, that contains only other hashable types (including any lists, tuples, sets, and dictionaries).
 
   From https://stackoverflow.com/questions/5884066/hashing-a-dictionary
   """
   if isinstance(o, (set, tuple, list)):
-    return tuple([make_hash(e) for e in o])    
+    return tuple([make_id(e) for e in o])    
   elif not isinstance(o, dict):
     return hash(o)
-  new_o = copy.deepcopy(o)
+  new_o = deepcopy(o)
   for k, v in new_o.items():
-    new_o[k] = make_hash(v)
+    new_o[k] = make_id(v)
   return hash(tuple(frozenset(sorted(new_o.items())))) % 1000000
 
 @server.route("/create", methods=['POST'])
@@ -275,7 +244,7 @@ def create_endpoint():
     Create a new row
 
     Params:
-    - columnValues: dict containing column names and values? Example:
+    - columnValues: dict containing column names and values. Example:
         ```json
         {
             "col1": "hey",
@@ -289,9 +258,10 @@ def create_endpoint():
 
     Note: this method doesn't implement data validation / it doesn't check that the values are allowed for the specified columns.
     """
+    # TODO: check primary key value is unique?
     key = request.get_json().get("key")
     column_values = request.get_json().get("columnValues")
-    id = make_hash(column_values) # this to generate a new and unique id
+    id = make_id(column_values)
     for col in column_values.keys():
         # TODO: make sure col exists in the columns of the data model
         ees.add_edit(key=id, column=k, value=column_values.get(col), user="API", action="create")
@@ -305,11 +275,27 @@ def create_endpoint():
 def read_endpoint():
     """
     Read a row that was created or edited via webapp or API
+    TODO: read row that was not edited too!
 
     Params:
     - key: value(s) of the primary key(s) identifying the row to read
 
-    Example response: TODO:
+    Returns: JSON representation of the values of primary key and editable columns
+    - If some rows of the dataset were created:
+        - All columns (including primary keys) are editable by definition
+        - There is only one primary key which is "id" and its value was set upon row creation
+    - If no row was created:
+        - Primary keys and editable columns are those defined by the user in the initial data editing setup
+    - Example API response:
+        ```json
+        {
+            "key1": "cat",
+            "key2": "2022-12-21",
+            "col1": "hey",
+            "col2": 42,
+            "col3": true
+        }
+        ```
     """
     if request.method == 'POST':
         key = request.get_json().get("key")
@@ -321,9 +307,9 @@ def read_endpoint():
 @server.route("/read-all", methods=['GET'])
 def read_all_endpoint():
     """
-    Read all edited cells
+    Read all rows that were created or edited via webapp or API
 
-    Output: CSV-formatted dataset
+    Returns: CSV-formatted dataset with primary key and editable columns. See remarks of the `read` endpoint.
     """
     response = ees.edited_cells_df.to_csv()
     return response
@@ -357,6 +343,29 @@ def update_endpoint():
     response = jsonify({"msg": info})
     return response
 
+
+# Lookup endpoint
+###
+
+def get_dataframe_filtered(ds_name, filter_column, filter_term, n_results):
+    csv_stream = client._perform_raw(
+        "GET", f"/projects/{project_key}/datasets/{ds_name}/data/",
+        params={
+            "format": "tsv-excel-header",
+            "filter": f"""contains(toLowercase(strval("{filter_column}")), toLowercase("{filter_term}"))""",
+            "sampling": dumps({
+                "samplingMethod": "HEAD_SEQUENTIAL",
+                "maxRecords": n_results
+            })
+        })
+    ds = project.get_dataset(ds_name)
+    csv_reader = DataikuStreamedHttpUTF8CSVReader(
+        ds.get_schema()["columns"], csv_stream)
+    rows = []
+    for row in csv_reader.iter_rows():
+        rows.append(row)
+    return DataFrame(columns=rows[0], data=rows[1:])
+
 @server.route("/lookup/<linked_ds_name>", methods=['GET', 'POST'])
 def lookup_endpoint(linked_ds_name):
     if request.method == 'POST':
@@ -381,6 +390,21 @@ def lookup_endpoint(linked_ds_name):
 
     return response
 
+
+# Dummy endpoints
+###
+
+@server.route("/dash")
+def my_dash_app():
+    return app.index()
+
+@server.route("/flask", methods=['GET', 'POST'])
+def dummy_endpoint():
+    if request.method == 'POST':
+        term = request.get_json().get("term")
+    else:
+        term = request.args.get('term', '')
+    return jsonify([term])
 
 @server.route('/test')
 def test_page():
