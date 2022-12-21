@@ -221,53 +221,42 @@ def add_edit(cell):
 # CRUD endpoints
 ###
 
-def make_id(o):
-  """
-  Generate a new and unique id, as a hash of the object given as parameter.
-  
-  Param: dictionary, list, tuple or set to any level, that contains only other hashable types (including any lists, tuples, sets, and dictionaries).
-
-  From https://stackoverflow.com/questions/5884066/hashing-a-dictionary
-  """
-  if isinstance(o, (set, tuple, list)):
-    return tuple([make_id(e) for e in o])    
-  elif not isinstance(o, dict):
-    return hash(o)
-  new_o = deepcopy(o)
-  for k, v in new_o.items():
-    new_o[k] = make_id(v)
-  return hash(tuple(frozenset(sorted(new_o.items())))) % 1000000
-
 @server.route("/create", methods=['POST'])
 def create_endpoint():
     """
-    Create a new row
+    Create a new row.
 
     Params:
-    - columnValues: dict containing column names and values. Example:
-        ```json
-        {
+    - primaryKeys: dict containing values for all primary keys defined in the initial data editing setup; the set of values must be unique.
+    - columnValues: dict containing values for all other columns.
+    
+    Example request JSON:
+    ```json
+    {
+        "primaryKeys": {
+            "id": "My new unique id"
+        },
+        "columnValues": {
             "col1": "hey",
             "col2": 42,
             "col3": true
         }
-        ```
+    }
+    ```
     
-    Returns:
-    - id: identifier of the new row
+    Returns a message confirming row creation.
 
     Note: this method doesn't implement data validation / it doesn't check that the values are allowed for the specified columns.
     """
-    # TODO: check primary key value is unique?
-    key = request.get_json().get("key")
+    primary_keys = request.get_json().get("primaryKeys")
     column_values = request.get_json().get("columnValues")
-    id = make_id(column_values)
+    # TODO: check set of primary key values is unique?
+    # TODO: construct `id`: it's a tuple of values in a particular order
     for col in column_values.keys():
         # TODO: make sure col exists in the columns of the data model
-        ees.add_edit(key=id, column=k, value=column_values.get(col), user="API", action="create")
+        ees.add_edit(key=id, column=col, value=column_values.get(col), user="API", action="create")
     response = jsonify({
-        "msg": "New row created",
-        "id": id
+        "msg": "New row created"
     })
     return response
 
@@ -278,24 +267,31 @@ def read_endpoint():
     TODO: read row that was not edited too!
 
     Params:
-    - key: value(s) of the primary key(s) identifying the row to read
+    - primaryKeys: value(s) of the primary key(s) identifying the row to read
 
-    Returns: JSON representation of the values of primary key and editable columns
-    - If some rows of the dataset were created:
-        - All columns (including primary keys) are editable by definition
-        - There is only one primary key which is "id" and its value was set upon row creation
-    - If no row was created:
-        - Primary keys and editable columns are those defined by the user in the initial data editing setup
-    - Example API response:
-        ```json
-        {
+    Example request JSON:
+    ```json
+    {
+        "primaryKeys": {
             "key1": "cat",
             "key2": "2022-12-21",
+        }
+    }
+    ```
+
+    Returns: JSON representation of the values of editable columns.
+    - If some rows of the dataset were created, then by definition all columns are editable (including primary keys) .
+    - If no row was created, editable columns are those defined in the initial data editing setup.
+    - Example API response:
+    ```json
+    {
+        "columnValues": {
             "col1": "hey",
             "col2": 42,
             "col3": true
         }
-        ```
+    }
+    ```
     """
     if request.method == 'POST':
         key = request.get_json().get("key")
@@ -304,12 +300,12 @@ def read_endpoint():
     response = ees.edited_cells_df.loc[key].to_json()
     return response
 
-@server.route("/read-all", methods=['GET'])
-def read_all_endpoint():
+@server.route("/read-all-edits", methods=['GET'])
+def read_all_edits_endpoint():
     """
-    Read all rows that were created or edited via webapp or API
+    Read all edits made via webapp or API: rows that were created or edited
 
-    Returns: CSV-formatted dataset with primary key and editable columns. See remarks of the `read` endpoint.
+    Returns: CSV-formatted dataset with rows that were created or edited, and values of primary key and editable columns. See remarks of the `read` endpoint.
     """
     response = ees.edited_cells_df.to_csv()
     return response
@@ -320,7 +316,7 @@ def update_endpoint():
     Update a row
 
     Params:
-    - key: value(s) of the primary key(s) identifying the row to update
+    - primaryKeys: value(s) of the primary key(s) identifying the row to update (see read endpoint)
     - column: name of the column to update
     - value: value to set for the cell identified by key and column
 
