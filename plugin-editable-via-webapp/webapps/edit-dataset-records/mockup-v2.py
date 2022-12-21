@@ -1,15 +1,15 @@
-# TODO: import EES
+import DataTableAIO
 
-ees = EditableEventSourced(original_ds_name)
+project_key = getenv("DKU_CURRENT_PROJECT_KEY")
+component_id = "xxx" # component_id would be the id of the Data Editing Visual Webapp, such that the webapp can be viewed at http(s)://{DSS_URL}/public-webapps/{project_key}/{component_id}/
 
 def serve_layout():
-    # This function is called upon loading/refreshing the page in the browser
     return html.Div(children=[
-        lca.DataTable(id="datatable", component_id=COMPONENT_ID),
+        html.Div(id="hello", children="Hello!"),
+        DataTableAIO(id="datatable", component_id=component_id), 
         lca.TextInput(id="company_name"), # TODO: change for an actual component
         lca.Button(id="save") # TODO: change for an actual component
     ])
-
 app.layout = serve_layout
 
 @app.callback(
@@ -18,8 +18,8 @@ app.layout = serve_layout
     State("company_name", "value"),
     prevent_initial_call=True)
 def save_form(value):
-    client._perform_raw(
-        "POST", f"/public-webapps/{COMPONENT_ID}/update-row", # TODO: check URL of public webapp
+    client._perform_raw( # TODO: not sure this will work
+        "POST", f"/public-webapps/{project_key}/{component_id}/update-row",
         params={
             "key": "123",
             "column": "company_name",
