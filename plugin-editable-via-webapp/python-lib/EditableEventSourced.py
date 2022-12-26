@@ -400,10 +400,10 @@ class EditableEventSourced:
 
         return t_cols
 
-    def add_edit(self, primary_key_values, column_name, value, user, action="update"):
+    def add_edit(self, key, column, value, user, action="update"):
         # if the type of column_name is a boolean, make sure we read it correctly
         for col in self.__schema__:
-            if (col["name"] == column_name):
+            if (col["name"] == column):
                 if type(value) == str and col.get("type") == "boolean":
                     if (value == ""):
                         value = None
@@ -417,31 +417,37 @@ class EditableEventSourced:
         else:
             value_string = value
 
-        # add to the editlog (since it's in append mode)
-        self.editlog_ds.write_dataframe(DataFrame(data={
-            "action": [action],
-            "key": [str(primary_key_values)],
-            "column_name": [column_name],
-            "value": [value_string],
-            "date": [datetime.now(timezone("UTC")).isoformat()],
-            "user": [user]
-        }))
+        if column in self.editable_column_names:
 
-        self.edited_cells_df.loc[primary_key_values, column_name] = value
+            # add to the editlog (since it's in append mode)
+            self.editlog_ds.write_dataframe(DataFrame(data={
+                "action": [action],
+                "key": [str(key)],
+                "column_name": [column],
+                "value": [value_string],
+                "date": [datetime.now(timezone("UTC")).isoformat()],
+                "user": [user]
+            }))
+
+            self.edited_cells_df.loc[key, column] = value
+
+            # Update lookup columns if a linked record was edited
+            # for linked_record in self.linked_records:
+            #     if (column_name==linked_record["name"]):
+            #         # Retrieve values of the lookup columns from the linked dataset, for the row corresponding to the edited value (linked_record["ds_key"]==value)
+            #         lookup_values = self.__get_lookup_values__(linked_record, value)
+
+            #         # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
+            #         # Might need to change primary_key_values from a list to a tuple — see this example: df.loc[('cobra', 'mark i'), 'shield'] from https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.loc.html ?
+            #         for lookup_column in linked_record["lookup_columns"]:
+            #             self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0]
+
+            info = f"""Updated column {column} where {self.primary_keys} is {key}. New value: {value}."""
         
+        else:
 
-        # Update lookup columns if a linked record was edited
-        # for linked_record in self.linked_records:
-        #     if (column_name==linked_record["name"]):
-        #         # Retrieve values of the lookup columns from the linked dataset, for the row corresponding to the edited value (linked_record["ds_key"]==value)
-        #         lookup_values = self.__get_lookup_values__(linked_record, value)
+            info = f"""{column} isn't an editable column"""
 
-        #         # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
-        #         # Might need to change primary_key_values from a list to a tuple — see this example: df.loc[('cobra', 'mark i'), 'shield'] from https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.loc.html ?
-        #         for lookup_column in linked_record["lookup_columns"]:
-        #             self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0]
-
-        info = f"""Updated column {column_name} where {self.primary_keys} is {primary_key_values}. New value: {value}."""
         logging.info(info)
         return info
 
