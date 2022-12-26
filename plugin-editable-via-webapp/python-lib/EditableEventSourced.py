@@ -453,8 +453,8 @@ class EditableEventSourced:
 
     def add_edit_tabulator(self, cell, user):
         return self.add_edit(
-            tabulator_row_key_values(cell["row"], self.primary_keys),
-            cell["column"],
-            cell["value"],
-            user
+            key=get_key_values_from_dict(cell["row"], self.primary_keys),
+            column=cell["column"],
+            value=cell["value"],
+            user=user
         )

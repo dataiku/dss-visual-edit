@@ -14,7 +14,7 @@ def get_editlog_ds_schema():
         # not using date type, in case the editlog is CSV
         {"name": "date", "type": "string", "meaning": "DateSource"},
         {"name": "user", "type": "string", "meaning": "Text"},
-        # action can be "update", "create", or "delete"
+        # action can be "update", "create", or "delete"; currently it's ignored by the pivot method
         {"name": "action", "type": "string", "meaning": "Text"},
         {"name": "key", "type": "string", "meaning": "Text"},
         {"name": "column_name", "type": "string", "meaning": "Text"},
@@ -230,8 +230,21 @@ def get_user_details():
     return auth_info_browser["authIdentifier"]
 
 
-def tabulator_row_key_values(row, primary_keys):
-    """Get values for a given row coming from Tabulator and a list of columns that are primary keys"""
+def get_key_values_from_dict(row, primary_keys):
+    """
+    Get values for a given row provided as a dict and a list of primary key column names
+
+    Example params:
+    - row:
+    ```
+    {
+        "key1": "cat",
+        "key2": "2022-12-21"
+    }
+    ```
+    - primary_keys: `["key1", "key2"]`
+    """
+    # we create a dataframe containing this single row, set the columns to use as index (i.e. primary key(s)), then get the value of the index for the first (and only) row
     return DataFrame(data=row, index=[0]).set_index(primary_keys).index[0]
 
 

@@ -11,7 +11,7 @@
 # %% 0. Imports and variable initializations
 ###
 
-from commons import get_values_from_linked_df, get_user_details, get_last_build_date
+from commons import get_values_from_linked_df, get_user_details, get_last_build_date, get_key_values_from_dict
 from json import dumps
 from flask import Flask, request, jsonify, current_app
 from pandas import DataFrame
@@ -248,13 +248,12 @@ def create_endpoint():
 
     Note: this method doesn't implement data validation / it doesn't check that the values are allowed for the specified columns.
     """
-    primary_keys = request.get_json().get("primaryKeys")
+    primary_keys_values = request.get_json().get("primaryKeys")
     column_values = request.get_json().get("columnValues")
     # TODO: check set of primary key values is unique?
-    # TODO: construct `id`: it's a tuple of values in a particular order
+    key = get_key_values_from_dict(primary_keys_values, ees.primary_keys)
     for col in column_values.keys():
-        # TODO: make sure col exists in the columns of the data model
-        ees.add_edit(key=id, column=col, value=column_values.get(col), user="API", action="create")
+        ees.add_edit(key=key, column=col, value=column_values.get(col), user="API", action="create")
     response = jsonify({
         "msg": "New row created"
     })
@@ -264,7 +263,7 @@ def create_endpoint():
 def read_endpoint():
     """
     Read a row that was created or edited via webapp or API
-    TODO: read row that was not edited too!
+    TODO: read row that was not edited too! This can be done via Dataiku API
 
     Params:
     - primaryKeys: value(s) of the primary key(s) identifying the row to read
@@ -294,9 +293,10 @@ def read_endpoint():
     ```
     """
     if request.method == 'POST':
-        key = request.get_json().get("key")
+        primary_keys_values = request.get_json().get("primaryKeys")
     else:
-        key = request.args.get('key', '')
+        primary_keys_values = request.args.get("primaryKeys", "")
+    key = get_key_values_from_dict(primary_keys_values, ees.primary_keys)
     response = ees.edited_cells_df.loc[key].to_json()
     return response
 
@@ -320,22 +320,28 @@ def update_endpoint():
     - column: name of the column to update
     - value: value to set for the cell identified by key and column
 
-    Example response: TODO:
+    Example responses:
+    - if column is an editable column:
+    ```json
+    { "msg": "Updated column _column_ where _list of primary key names_ is _primaryKeys_. New value: _value_." }
+    ````
+    - otherwise:
+    ```json
+    { "msg": "_column_ isn't an editable column" }
+    ```
 
     Note: this method doesn't implement data validation / it doesn't check that the value is allowed for the specified column.
     """
     if request.method == 'POST':
-        key = request.get_json().get("key")
+        primary_keys = request.get_json().get("primaryKeys")
         column = request.get_json().get("column")
         value = request.get_json().get("value")
     else:
-        key = request.args.get('key', '')
-        column = request.args.get('column', '')
-        value = request.args.get('value', '')
-    user = "API"
-    action = "update"
-    # TODO: make sure column exists
-    info = ees.add_edit(key, column, value, user, action)
+        primary_keys = request.args.get("primaryKeys", "")
+        column = request.args.get("column", "")
+        value = request.args.get("value", "")
+    key = get_key_values_from_dict(primary_keys_values, ees.primary_keys)
+    info = ees.add_edit(key=key, column=column, value=value, user="API", action="update")
     response = jsonify({"msg": info})
     return response
 
