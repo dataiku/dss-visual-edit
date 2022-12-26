@@ -13,7 +13,7 @@
 
 from commons import get_values_from_linked_df, get_user_details, get_last_build_date, get_key_values_from_dict
 from json import dumps
-from flask import Flask, request, jsonify, current_app
+from flask import Flask, request, jsonify, current_app, make_response
 from pandas import DataFrame
 from dataikuapi.utils import DataikuStreamedHttpUTF8CSVReader
 from datetime import datetime
@@ -307,7 +307,9 @@ def read_all_edits_endpoint():
 
     Returns: CSV-formatted dataset with rows that were created or edited, and values of primary key and editable columns. See remarks of the `read` endpoint.
     """
-    response = ees.edited_cells_df.to_csv()
+    response = make_response(ees.edited_cells_df.to_csv())
+    response.headers["Content-Disposition"] = "attachment; filename=edits.csv"
+    response.headers["Content-Type"] = "text/csv"
     return response
 
 @server.route("/update", methods=['GET', 'POST'])
