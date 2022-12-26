@@ -308,7 +308,7 @@ def read_all_edits_endpoint():
     Returns: CSV-formatted dataset with rows that were created or edited, and values of primary key and editable columns. See remarks of the `read` endpoint.
     """
     response = make_response(ees.edited_cells_df.to_csv())
-    response.headers["Content-Disposition"] = "attachment; filename=edits.csv"
+    response.headers["Content-Disposition"] = "attachment; filename=" + original_ds_name + "_edits.csv"
     response.headers["Content-Type"] = "text/csv"
     return response
 
