@@ -88,7 +88,7 @@ class EditableEventSourced:
             self.editlog_pivoted_ds = Dataset(
                 self.editlog_pivoted_ds_name, self.project_key)
             cols = self.primary_keys + \
-                self.editable_column_names + ["last_edit_date"]
+                self.editable_column_names + ["last_edit_date", "last_action", "first_action"]
             editlog_pivoted_df = DataFrame(columns=cols)
             self.editlog_pivoted_ds.write_schema(editlog_pivoted_ds_schema)
             self.editlog_pivoted_ds.write_dataframe(editlog_pivoted_df, infer_schema=False)
