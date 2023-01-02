@@ -1,5 +1,5 @@
 {
-    "primary_keys": ["match_id"],
+    "primary_keys": ["id_companies_ref"],
     "editable_column_names": ["id_companies_ext", "reviewed", "comments"],
     "freeze_editable_columns": false,
     "group_column_names": [],
