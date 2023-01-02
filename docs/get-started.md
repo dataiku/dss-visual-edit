@@ -6,7 +6,7 @@ If you haven't, [install the _Editable via Webapp_ plugin](install-plugin) first
 
 * As a preliminary step, please review the schema of the dataset to edit.
   * The webapp uses column meanings to show data (or let you edit it) in the best way. If the meaning wasn't defined explicitly, the webapp uses the storage type instead.
-  * It's best to use "string" as storage type for any column that has missing values.
+  * If a column has missing values (which is typically the case for an editable column), make sure to use an appropriate storage type (e.g. not "integer"). When in doubt, use "string".
 * Go to Webapps, create New Visual Webapp, pick Data Editing.
   * ![](new_visual_webapp.png)
   * ![](new_visual_webapp_2.png)
