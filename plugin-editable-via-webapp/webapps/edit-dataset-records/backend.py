@@ -347,6 +347,25 @@ def update_endpoint():
     response = jsonify({"msg": info})
     return response
 
+@server.route("/delete", methods=['GET', 'POST'])
+def delete_endpoint():
+    """
+    Delete a row
+
+    Params:
+    - primaryKeys: value(s) of the primary key(s) identifying the row to delete (see read endpoint)
+
+    Returns a message confirming row deletion.
+    """
+    if request.method == 'POST':
+        primary_keys = request.get_json().get("primaryKeys")
+    else:
+        primary_keys = request.args.get("primaryKeys", "")
+    key = get_key_values_from_dict(primary_keys_values, ees.primary_keys)
+    info = ees.add_edit(key=key, user="API", action="delete")
+    response = jsonify({"msg": f"Row {key} deleted"})
+    return response
+
 
 # Lookup endpoint
 ###
