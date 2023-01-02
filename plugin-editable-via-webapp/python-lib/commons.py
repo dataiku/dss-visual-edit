@@ -185,12 +185,23 @@ def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
         edited_df = original_df
     else:
 
+        created = editlog_pivoted_df["first_action"]=="create"
+        created_df = editlog_pivoted_df[created]
+
+
         # Prepare editlog_pivoted_df
         ###
 
-        # We don't need the date column here
+        not_deleted = editlog_pivoted_df["last_action"]!="delete"
+        editlog_pivoted_df = editlog_pivoted_df[not_deleted && not created]
+
+        # Drop columns which are not primary keys nor editable columns
         if ("last_edit_date" in editlog_pivoted_df.columns):
             editlog_pivoted_df.drop(columns=["last_edit_date"], inplace=True)
+        if ("last_action" in editlog_pivoted_df.columns):
+            editlog_pivoted_df.drop(columns=["last_action"], inplace=True)
+        if ("first_action" in editlog_pivoted_df.columns):
+            editlog_pivoted_df.drop(columns=["first_action"], inplace=True)
 
         # Change types to match those of original_df
         for col in editlog_pivoted_df.columns:
@@ -210,7 +221,7 @@ def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
             editlog_pivoted_df, rsuffix="_value_last")
 
         # "Merge" -> this creates _original columns
-        # "last_edit_date" column has already been dropped
+        # all last_ and first_ columns have already been dropped
         editable_column_names = editlog_pivoted_df.columns.tolist()
         for col in editable_column_names:
             # copy col to a new column whose name is suffixed by "_original"
@@ -222,6 +233,13 @@ def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
         # Drop the _original and _value_last columns -> this gets us back to the original schema
         edited_df = edited_df[edited_df.columns[:-2 *
                                                 len(editable_column_names)]].reset_index()
+
+
+        # Stack created rows
+        ###
+
+        if (created_df.size):
+            edited_df = concat([created_df, edited_df])
 
     return edited_df
 
