@@ -1,10 +1,30 @@
 # Sample project: Join Companies
 
-This project demonstrates a case of feedback loop, where the data to review/edit in the webapp depends on previous edits. This data is in dataset `matches_uncertain` and edits can be found in `matches_uncertain_editlog_pivoted`. The Python recipe which produces `matches_uncertain` feeds from `matches` and from `matches_uncertain_editlog_pivoted` — see its code in the standard recipe code editor or in a notebook, in particular the section named "Apply edits to matches with distance > 0 or undefined".
+## Introduction
 
-[Download project bundle](dss-bundle-JOIN_COMPANIES_SIMPLE-webapp-based.zip). Note: the project uses the Managed Snowflake data connection provided on Dataiku Online — you may have to remap to one of your own data connections.
+In this project we match companies found in a reference dataset (left-hand side) with companies found in an external dataset (right-hand side). We want to create a dataset which has all columns: name, city, country, notes _and_ fte_count.
 
-How to use this sample project:
+![](sample-project-join-companies-datasets.png)
+
+As you can see, comparing company names can work in some cases but not all (e.g. "TheFacebook" and "Meta"). We set up a data editing webapp to have a human assign matches that the machine couldn't find.
+
+![](lookup_columns_dropdown_menu.png)
+
+Flow:
+
+![](sample-project-join-companies-flow.png)
+
+This project demonstrates a case of feedback loop, where the data to review/edit in the webapp depends on previous edits. The data for review is in `matches_uncertain` and edits can be found in `matches_uncertain_editlog_pivoted`, which is upstream. The loop is highlighted in green:
+
+![](sample-project-join-companies-flow-tags.png)
+
+You can find more information about the datasets and recipes in their descriptions within the project.
+
+## Usage
+
+**[Download project bundle](dss-bundle-JOIN_COMPANIES_SIMPLE-webapp-based.zip)**. Note: the project uses the managed Amazon S3 data connection provided on Dataiku Online — you may have to remap to one of your own data connections.
+
+How to use:
 
 * Build dataset `companies_joined_prepared_edited` (recursive build)
 * Go to Webapps and start "Edit Matches Uncertain"
@@ -43,7 +63,7 @@ Reviewing could be made in a spreadsheet program. It involves:
 
 ### Usage of the plugin's Visual Webapp component
 
-* Set up the webapp:
+* Set up the webapp (You can find screenshots in the [Getting started guide](https://dataiku.github.io/lca/get-started)):
   * Create new Visual Webapp and edit its settings:
     * The dataset to edit is `matches_uncertain`.
     * `id_companies_ext` is an editable column and is set to be a "linked record" (linking to the `id` column of `companies_ext`). It contains values set from the Fuzzy Join but also missing values (when no match was found).
@@ -57,4 +77,4 @@ Reviewing could be made in a spreadsheet program. It involves:
     * Marking a match as approved doesn't automatically move it from `matches_uncertain` to `matches_certain`. We need to rebuild these datasets. For this, we need to make sure that the editlog_pivoted dataset has been rebuilt.
   * Steps:
     * Create an Update scenario with a force-rebuild of `matches_uncertain_editlog_pivoted` and a rebuild of `matches_uncertain`.
-    * Create a dashboard which embeds the webapp and has a button to run that scenario.
+    * Create a dashboard which embeds the webapp and has a button to run that scenario (see screenshot in [Going further > Adding the webapp to a Dashboard](https://dataiku.github.io/lca/going-further#adding-the-webapp-to-a-dashboard)).
