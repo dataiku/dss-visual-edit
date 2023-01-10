@@ -193,7 +193,7 @@ def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
         ###
 
         not_deleted = editlog_pivoted_df["last_action"]!="delete"
-        editlog_pivoted_df = editlog_pivoted_df[not_deleted && not created]
+        editlog_pivoted_df = editlog_pivoted_df[not_deleted & ~created]
 
         # Drop columns which are not primary keys nor editable columns
         if ("last_edit_date" in editlog_pivoted_df.columns):

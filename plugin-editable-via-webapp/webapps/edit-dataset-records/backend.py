@@ -259,7 +259,7 @@ def create_endpoint():
     })
     return response
 
-@server.route("/read", methods=['GET', 'POST'])
+@server.route("/read", methods=['POST'])
 def read_endpoint():
     """
     Read a row that was created or edited via webapp or API
@@ -292,10 +292,7 @@ def read_endpoint():
     }
     ```
     """
-    if request.method == 'POST':
-        primary_keys_values = request.get_json().get("primaryKeys")
-    else:
-        primary_keys_values = request.args.get("primaryKeys", "")
+    primary_keys_values = request.get_json().get("primaryKeys")
     key = get_key_values_from_dict(primary_keys_values, ees.primary_keys)
     response = ees.edited_cells_df.loc[key].to_json()
     return response
@@ -363,6 +360,7 @@ def delete_endpoint():
         primary_keys = request.args.get("primaryKeys", "")
     key = get_key_values_from_dict(primary_keys_values, ees.primary_keys)
     info = ees.add_edit(key=key, user="API", action="delete")
+    # TODO: drop from dataframe
     response = jsonify({"msg": f"Row {key} deleted"})
     return response
 
