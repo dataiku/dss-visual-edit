@@ -1,0 +1,7 @@
+{
+    "primary_keys": ["name"],
+    "editable_column_names": ["address", "machine_type", "household"],
+    "freeze_editable_columns": false,
+    "group_column_names": [],
+    "linked_records_count": 0
+}
