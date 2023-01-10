@@ -20,3 +20,8 @@ venv
 !.vscode/settings.json
 !.vscode/launch.json.example
 .history/*
+
+
+# editable
+plugin-editable-via-webapp/editable-datasets-settings/*
+!plugin-editable-via-webapp/editable-datasets-settings/simple_example.json
