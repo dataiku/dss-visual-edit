@@ -23,5 +23,5 @@ venv
 
 
 # editable
-plugin-editable-via-webapp/editable-datasets-settings/*
-!plugin-editable-via-webapp/editable-datasets-settings/simple_example.json
+plugin-editable-via-webapp/webapp-settings/*
+!plugin-editable-via-webapp/webapp-settings/simple_example.json
