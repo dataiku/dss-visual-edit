@@ -22,7 +22,7 @@ from EditableEventSourced import EditableEventSourced
 import logging
 from dataiku import api_client
 from os import getenv
-from dash import Dash, html, dcc, Input, Output, State, callback_context
+from dash import Dash, html, dcc, Input, Output, State, ctx
 
 stylesheets = [
     "https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
@@ -138,36 +138,218 @@ def serve_layout():
         last_build_date_initial = ""
         last_build_date_ok = False
 
-    # This function is called upon loading/refreshing the page in the browser
-    return html.Div(children=[
-        html.Div(id="refresh-div", children=[
-            html.Div(id="data-refresh-message",
-                     children="The original dataset has changed, please refresh this page to load it here. (Your edits are safe.)", style={"display": "inline"}),
-            html.Div(id="last-build-date", children=str(last_build_date_initial),
-                     style={"display": "none"})  # when the original dataset was last built
-        ], className="ui compact warning message", style={"display": "none"}),
 
-        dcc.Interval(
-            id="interval-component-iu",
-            interval=10*1000,  # in milliseconds
-            n_intervals=0
-        ),
+    main_tabulator = dash_tabulator.DashTabulator(
+        id="datatable",
+        columns=columns,
+        data=ees.get_data_tabulator(),  # this gets the most up-to-date edited data
+        groupBy=group_column_names
+    )
 
-        dash_tabulator.DashTabulator(
-            id="datatable",
-            columns=columns,
-            data=ees.get_data_tabulator(),  # this gets the most up-to-date edited data
-            groupBy=group_column_names
-        ),
+    rows_selected = getattr(main_tabulator, "multiRowsClicked", [])
+    bulk_edit_dialog = get_bulk_edit_dialog([])
 
-        html.Div(id="edit-info", children="Info zone for tabulator",
-                 style={"display": info_display})
+    print(rows_selected)
+
+    layout = html.Div(
+        id="main-container",
+        children=[
+            html.Div(
+                id="main-tabulator",
+                children=[
+                    html.Div(id="refresh-div", children=[
+                        html.Div(id="data-refresh-message",
+                                children="The original dataset has changed, please refresh this page to load it here. (Your edits are safe.)", style={"display": "inline"}),
+                        html.Div(id="last-build-date", children=str(last_build_date_initial),
+                                style={"display": "none"})  # when the original dataset was last built
+                    ], className="ui compact warning message", style={"display": "none"}),
+
+                    dcc.Interval(
+                        id="interval-component-iu",
+                        interval=10*1000,  # in milliseconds
+                        n_intervals=0
+                    ),
+
+                    html.Button(
+                        children="Edit 0 items",
+                        disabled=True,
+                        id="bulk-edit-btn",
+                        n_clicks=0,
+                        style={
+                            'marginBottom': '15px',
+                        }
+                    ),
+
+                    main_tabulator,
+
+                    html.Div(id="edit-info", children="Info zone for tabulator",
+                            style={"display": info_display}),
+
+                ]
+            ),
+            bulk_edit_dialog
     ])
+    # This function is called upon loading/refreshing the page in the browser
+    
+    return layout
+
+def get_bulk_edit_tabulator_data(selected_rows):
+    editable_columns = []
+    for c in columns:
+        if c.get("editor"):
+            editable_columns.append(c)
+
+    values_per_columns = {}
+
+    for c in editable_columns:
+        column_name = c["field"]
+        if not column_name in values_per_columns:
+            values_per_columns[column_name] = set()
+
+        for r in selected_rows:
+            values_per_columns[column_name].add(
+                r.get(column_name)
+            )
+
+    bulk_edit_tabulator_data = []
+ 
+    for c in editable_columns:
+        n_fields = len(values_per_columns[c["field"]])
+        if n_fields == 0:
+            new_row_value = "No value"
+        elif n_fields == 1:
+            new_row_value = list(values_per_columns[c["field"]])[0]
+        else:
+            new_row_value = "Multiple values"
+
+        new_row = {
+            "field": c["title"],
+            "new_value": new_row_value
+        }
+        bulk_edit_tabulator_data.append(new_row)
+    
+    return bulk_edit_tabulator_data
+
+
+def build_bulk_edit_tabulator(selected_rows=None) -> dash_tabulator.DashTabulator:
+    if selected_rows is None:
+        selected_rows = []
+
+    bulk_edit_columns = [
+        {
+            "field": "field", 
+            "title": "Field",
+        },
+        {
+            "field": "new_value", 
+            "title": "New Value"
+        },
+    ]
+
+    print("Getting from here")
+
+    bulk_edit_data = get_bulk_edit_tabulator_data([])
+
+    bulk_edit_tabulator = dash_tabulator.DashTabulator(
+        id="bulk-edit-datatable",
+        columns=bulk_edit_columns,
+        data=bulk_edit_data,
+    )
+
+    return bulk_edit_tabulator
+    
+
+def get_bulk_edit_dialog(items_to_edit):
+    bulk_edit_tabulator = build_bulk_edit_tabulator()
+    return html.Div(
+        id="bulk-edit-dialog-wrapper",
+        children=[
+            html.Dialog(
+                id="bulk-edit-dialog",
+                children=[
+                    html.H3(
+                        id="bulk-edit-dialog-title",
+                        children=f"Edit 0 elements"
+                    ),
+                    bulk_edit_tabulator,
+                    html.Button(
+                        children="Apply",
+                        id="apply-bulk-edit",
+                        n_clicks=0,
+                        style={
+                            'marginTop': '15px',
+                        }
+                    ),
+                ],
+                open=False,
+                style={
+                    "top": "50%",
+                    "transform": "translate(0, -50%)",
+                    "zIndex": "11",
+                    "cursor": "default"
+                },
+                n_clicks=0
+            )
+        ],
+        style={
+            "position": "absolute",
+            "top": "0px",
+            "left": "0px",
+            "zIndex": "10",
+            "width": "100vw",
+            "height": "100vh",
+            "margin": "0",
+            "backgroundColor": "#00000040",
+            "cursor": "pointer"
+        },
+        n_clicks=0,
+    )
 
 
 app.layout = serve_layout
 
 data_fresh = True
+
+@app.callback([
+    Output("bulk-edit-btn", "disabled"),
+    Output("bulk-edit-btn", "children"),
+    Output("bulk-edit-datatable", "data"),
+    Output("bulk-edit-dialog-title", "children"),
+    [
+        Input('datatable', 'multiRowsClicked')
+    ]
+    ]
+)
+def editBulkEditButton(multiRowsClicked):
+    rows_selected = multiRowsClicked or []
+    rows_selected_count = len(multiRowsClicked)
+
+    bulk_edit_data = get_bulk_edit_tabulator_data(rows_selected)
+    print(bulk_edit_data)
+    return (
+        rows_selected_count == 0,
+        f"Edit {rows_selected_count} items",
+        bulk_edit_data,
+        f"Edit {rows_selected_count} items",
+    )
+
+@app.callback([
+    Output("bulk-edit-dialog-wrapper", "hidden"),
+    Output("bulk-edit-dialog", "open"),
+    Input('bulk-edit-btn', 'n_clicks'),
+    Input('bulk-edit-dialog-wrapper', 'n_clicks'),
+    Input('bulk-edit-dialog', 'n_clicks'),
+])
+def openBulkEditDialog(*args):
+    trigger_id = ctx.triggered_id
+    is_dialog_opened = False
+    if trigger_id == "bulk-edit-btn":
+        is_dialog_opened = True
+    elif trigger_id == "bulk-edit-dialog-wrapper":
+        is_dialog_opened = False
+    elif trigger_id == "bulk-edit-dialog":
+        is_dialog_opened = True
+    return not is_dialog_opened, is_dialog_opened
 
 
 @app.callback(

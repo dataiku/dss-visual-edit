@@ -22,23 +22,23 @@ Keyword arguments:
     Data to display in the table.
 
 - groupBy (list; optional):
-    Columns to group by."""
+    Columns to group by.
+
+- multiRowsClicked (list; optional):
+    multiRowsClicked, when multiple rows are clicked."""
     _children_props = []
     _base_nodes = ['children']
     _namespace = 'dash_tabulator'
     _type = 'DashTabulator'
     @_explicitize_args
-    def __init__(self, id=Component.UNDEFINED, data=Component.UNDEFINED, columns=Component.UNDEFINED, groupBy=Component.UNDEFINED, cellEdited=Component.UNDEFINED, **kwargs):
-        self._prop_names = ['id', 'cellEdited', 'columns', 'data', 'groupBy']
+    def __init__(self, id=Component.UNDEFINED, data=Component.UNDEFINED, columns=Component.UNDEFINED, groupBy=Component.UNDEFINED, cellEdited=Component.UNDEFINED, multiRowsClicked=Component.UNDEFINED, **kwargs):
+        self._prop_names = ['id', 'cellEdited', 'columns', 'data', 'groupBy', 'multiRowsClicked']
         self._valid_wildcard_attributes =            []
-        self.available_properties = ['id', 'cellEdited', 'columns', 'data', 'groupBy']
+        self.available_properties = ['id', 'cellEdited', 'columns', 'data', 'groupBy', 'multiRowsClicked']
         self.available_wildcard_properties =            []
         _explicit_args = kwargs.pop('_explicit_args')
         _locals = locals()
         _locals.update(kwargs)  # For wildcard attrs and excess named props
-        args = {k: _locals[k] for k in _explicit_args if k != 'children'}
-        for k in []:
-            if k not in args:
-                raise TypeError(
-                    'Required argument `' + k + '` was not specified.')
+        args = {k: _locals[k] for k in _explicit_args}
+
         super(DashTabulator, self).__init__(**args)

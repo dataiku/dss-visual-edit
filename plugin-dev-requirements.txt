@@ -1,3 +1,4 @@
 dataiku-api-client
-$DKU_DSS_URL/public/packages/dataiku-internal-client.tar.gz
+http://localhost:25200/public/packages/dataiku-internal-client.tar.gz
 ipykernel
+pandas

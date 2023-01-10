@@ -12,7 +12,7 @@ export default class DashTabulator extends React.Component {
     componentDidMount() {
         // Instantiate Tabulator when element is mounted
 
-        const {id, data, columns, groupBy, cellEdited} = this.props;
+        const {id, data, columns, groupBy, cellEdited, multiRowsClicked} = this.props;
 
         // Interpret column formatters as function handles.
         for(let i=0; i < columns.length; i++){
@@ -42,7 +42,6 @@ export default class DashTabulator extends React.Component {
             "reactiveData": true,
             "columns": columns,
             "groupBy": groupBy,
-            "selectable": 1,
             "layout": "fitDataTable",
             "pagination": "local",
             "paginationSize": 20,
@@ -67,6 +66,12 @@ export default class DashTabulator extends React.Component {
                     "column_name": edited.column
                 });
             } catch (e) { }
+        })
+
+        this.tabulator.on("rowSelectionChanged", (data, rows) => {
+            console.log("Selection has changed. Params are: ", {data, rows})
+            this.props.setProps({multiRowsClicked: data})
+
         })
     }
 
@@ -126,4 +131,9 @@ DashTabulator.propTypes = {
      * cellEdited captures the cell that was clicked on
      */
     cellEdited: PropTypes.object,
+
+    /**
+     * multiRowsClicked, when multiple rows are clicked
+     */
+    multiRowsClicked: PropTypes.array,
 };

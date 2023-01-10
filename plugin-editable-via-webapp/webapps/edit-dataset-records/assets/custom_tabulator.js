@@ -187,7 +187,11 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
             container.appendChild(end);
         
             return container;
-         }
+        },
+        selectCellClicked(e, cell) {
+            console.log("Cell Clicked")
+            cell.getRow().toggleSelect();
+        }
 
     }
 

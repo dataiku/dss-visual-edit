@@ -13,9 +13,10 @@ Keyword arguments:
 - `columns` (Array; optional): Column definitions.
 - `data` (Array; optional): Data to display in the table.
 - `groupBy` (Array; optional): Columns to group by.
+- `multiRowsClicked` (Array; optional): multiRowsClicked, when multiple rows are clicked
 """
 function dashtabulator(; kwargs...)
-        available_props = Symbol[:id, :cellEdited, :columns, :data, :groupBy]
+        available_props = Symbol[:id, :cellEdited, :columns, :data, :groupBy, :multiRowsClicked]
         wild_props = Symbol[]
         return Component("dashtabulator", "DashTabulator", "dash_tabulator", available_props, wild_props; kwargs...)
 end

@@ -14,20 +14,7 @@ function __init__()
             resources_path,
             version = version,
             [
-                DashBase.Resource(
-    relative_package_path = "dash_tabulator.dev.js",
-    external_url = nothing,
-    dynamic = nothing,
-    async = nothing,
-    type = :js
-),
-DashBase.Resource(
-    relative_package_path = "dash_tabulator.dev.js.map",
-    external_url = nothing,
-    dynamic = true,
-    async = nothing,
-    type = :js
-)
+                
             ]
         )
 

@@ -367,6 +367,20 @@ class EditableEventSourced:
 
         return t_col
 
+    def get_multiple_selection_column(self):
+        selection_column = {
+            "titleFormatter":"rowSelection",
+            "formatter": "rowSelection",
+            "headerSort": False,
+            "hozAlign":"center",
+            "titleFormatterParams": {
+                "rowRange": "active" 
+            },
+            # "cellClick": self.__ns__("selectCellClicked")
+
+        }
+        return selection_column
+
     def get_columns_tabulator(self, freeze_editable_columns=False):
         # Columns' settings for tabulator
 
@@ -376,6 +390,10 @@ class EditableEventSourced:
             linked_record_names = []
 
         t_cols = []
+
+        selection_column = self.get_multiple_selection_column()
+        t_cols.append(selection_column)
+
         for col_name in self.edited_df_cols:
 
             # Properties to be shared by all columns

@@ -1,9 +1,9 @@
 # AUTO GENERATED FILE - DO NOT EDIT
 
 #' @export
-dashTabulator <- function(id=NULL, cellEdited=NULL, columns=NULL, data=NULL, groupBy=NULL) {
+dashTabulator <- function(id=NULL, cellEdited=NULL, columns=NULL, data=NULL, groupBy=NULL, multiRowsClicked=NULL) {
     
-    props <- list(id=id, cellEdited=cellEdited, columns=columns, data=data, groupBy=groupBy)
+    props <- list(id=id, cellEdited=cellEdited, columns=columns, data=data, groupBy=groupBy, multiRowsClicked=multiRowsClicked)
     if (length(props) > 0) {
         props <- props[!vapply(props, is.null, logical(1))]
     }
@@ -11,7 +11,7 @@ dashTabulator <- function(id=NULL, cellEdited=NULL, columns=NULL, data=NULL, gro
         props = props,
         type = 'DashTabulator',
         namespace = 'dash_tabulator',
-        propNames = c('id', 'cellEdited', 'columns', 'data', 'groupBy'),
+        propNames = c('id', 'cellEdited', 'columns', 'data', 'groupBy', 'multiRowsClicked'),
         package = 'dashTabulator'
         )
 

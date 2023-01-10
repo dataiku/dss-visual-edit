@@ -57,6 +57,13 @@
         },
         "required": false,
         "description": "cellEdited captures the cell that was clicked on"
+      },
+      "multiRowsClicked": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "multiRowsClicked, when multiple rows are clicked"
       }
     }
   }

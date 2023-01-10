@@ -129,7 +129,7 @@ window["dash_tabulator"] =
 /******/ 	        var srcFragments = src.split('/');
 /******/ 	        var fileFragments = srcFragments.slice(-1)[0].split('.');
 /******/
-/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1666692982");
+/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1673357612");
 /******/ 	        srcFragments.splice(-1, 1, fileFragments.join('.'))
 /******/
 /******/ 	        return srcFragments.join('/');
@@ -26991,7 +26991,8 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
           data = _this$props.data,
           columns = _this$props.columns,
           groupBy = _this$props.groupBy,
-          cellEdited = _this$props.cellEdited; // Interpret column formatters as function handles.
+          cellEdited = _this$props.cellEdited,
+          multiRowsClicked = _this$props.multiRowsClicked; // Interpret column formatters as function handles.
 
       for (var i = 0; i < columns.length; i++) {
         var header = columns[i];
@@ -27024,7 +27025,6 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
         "reactiveData": true,
         "columns": columns,
         "groupBy": groupBy,
-        "selectable": 1,
         "layout": "fitDataTable",
         "pagination": "local",
         "paginationSize": 20,
@@ -27052,6 +27052,22 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
             "column_name": edited.column
           });
         } catch (e) {}
+      });
+      this.tabulator.on("rowSelected", function (row) {
+        console.log("Row Selected");
+      });
+      this.tabulator.on("rowDeselected", function (row) {
+        console.log("Row Deselected");
+      });
+      this.tabulator.on("rowSelectionChanged", function (data, rows) {
+        console.log("Selection has changed. Params are: ", {
+          data: data,
+          rows: rows
+        });
+
+        _this2.props.setProps({
+          multiRowsClicked: data
+        });
       });
     }
   }, {
@@ -27114,7 +27130,12 @@ DashTabulator.propTypes = {
   /**
    * cellEdited captures the cell that was clicked on
    */
-  cellEdited: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object
+  cellEdited: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object,
+
+  /**
+   * multiRowsClicked, when multiple rows are clicked
+   */
+  multiRowsClicked: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.array
 };
 
 /***/ }),
