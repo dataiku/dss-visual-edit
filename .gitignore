@@ -1,4 +1,3 @@
-.gitignore
 .journal
 .mainlock
 .wlock
@@ -14,4 +13,10 @@ react-tabulator/lib
 **/.build_cache
 **/node_modules
 *.log
-.vscode/launch.json
+venv
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json.example
+.history/*
