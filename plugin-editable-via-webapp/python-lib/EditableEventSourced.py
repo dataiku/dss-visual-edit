@@ -198,7 +198,6 @@ class EditableEventSourced:
         # make sure that original dataset has up-to-date custom fields (editlog and datasets/recipes that follow may not - TODO: change this?)
         self.__save_custom_fields__(self.original_ds_name)
         self.__setup_editlog__()
-        self.__setup_editlog_downstream__()
 
         # used to reference javascript functions in custom_tabulator.js
         self.__ns__ = Namespace("myNamespace", "tabulator")
