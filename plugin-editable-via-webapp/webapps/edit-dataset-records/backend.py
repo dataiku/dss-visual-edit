@@ -72,7 +72,7 @@ else:
     # Get primary keys and editable column names from the custom fields of that dataset
     from json import load
     original_ds_name = getenv("ORIGINAL_DATASET")
-    params = load(open("../../../example-settings/" +
+    params = load(open("../../editable-datasets-settings/" +
                   original_ds_name + ".json"))
 
     editschema_manual = params.get("editschema")
