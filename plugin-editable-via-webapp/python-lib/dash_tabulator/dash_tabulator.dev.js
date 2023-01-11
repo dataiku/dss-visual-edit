@@ -129,7 +129,7 @@ window["dash_tabulator"] =
 /******/ 	        var srcFragments = src.split('/');
 /******/ 	        var fileFragments = srcFragments.slice(-1)[0].split('.');
 /******/
-/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1673357612");
+/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1673451912");
 /******/ 	        srcFragments.splice(-1, 1, fileFragments.join('.'))
 /******/
 /******/ 	        return srcFragments.join('/');
@@ -26980,10 +26980,49 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
   }
 
   _createClass(DashTabulator, [{
-    key: "componentDidMount",
+    key: "bulkEditEditor",
     value: //variable to hold your table
-    function componentDidMount() {
+    function bulkEditEditor(cell, onRendered, success, cancel, editorParams) {
+      var editorByColumnName = editorParams.editorByColumnName;
+      var cellRow = cell.getRow();
+      var editedColumn = cellRow.getData().field;
+      var editedColumnEditor = editorByColumnName[editedColumn];
+      var editor = tabulator_tables__WEBPACK_IMPORTED_MODULE_3__["EditModule"].editors[editedColumnEditor.editor];
+      var realEditorParams = editedColumnEditor.editorParams;
+      return editor.call(this, cell, onRendered, success, cancel, realEditorParams);
+    }
+  }, {
+    key: "getProcessedColumns",
+    value: function getProcessedColumns() {
       var _this2 = this;
+
+      var propsColumns = this.props.columns;
+      var processedColumns = propsColumns.map(function (c) {
+        if (c.editor === "customColumnBased") {
+          c.editor = _this2.bulkEditEditor;
+        }
+
+        return c;
+      });
+      return processedColumns;
+    }
+  }, {
+    key: "resolvePropRec",
+    value: function resolvePropRec(prop) {
+      if (!(prop instanceof Object)) {
+        return Object(dash_extensions__WEBPACK_IMPORTED_MODULE_2__["resolveProp"])(prop, this);
+      }
+
+      for (var key in prop) {
+        prop[key] = Object(dash_extensions__WEBPACK_IMPORTED_MODULE_2__["resolveProp"])(this.resolvePropRec(prop[key]));
+      }
+
+      return prop;
+    }
+  }, {
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var _this3 = this;
 
       // Instantiate Tabulator when element is mounted
       var _this$props = this.props,
@@ -26992,38 +27031,12 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
           columns = _this$props.columns,
           groupBy = _this$props.groupBy,
           cellEdited = _this$props.cellEdited,
-          multiRowsClicked = _this$props.multiRowsClicked; // Interpret column formatters as function handles.
-
-      for (var i = 0; i < columns.length; i++) {
-        var header = columns[i];
-
-        for (var key in header) {
-          var o = header[key];
-          console.log(key);
-          console.log(o);
-
-          if (o instanceof Object) {
-            header[key] = Object(dash_extensions__WEBPACK_IMPORTED_MODULE_2__["resolveProp"])(o, this);
-
-            if (!o.variable && !o.arrow) {
-              for (var key2 in o) {
-                var o2 = o[key2];
-                console.log(key2);
-                console.log(o2);
-
-                if (o2 instanceof Object) {
-                  o[key2] = Object(dash_extensions__WEBPACK_IMPORTED_MODULE_2__["resolveProp"])(o2, this);
-                }
-              }
-            }
-          }
-        }
-      }
-
+          multiRowsClicked = _this$props.multiRowsClicked;
+      this.resolvePropRec(columns);
       this.tabulator = new tabulator_tables__WEBPACK_IMPORTED_MODULE_3__["TabulatorFull"](this.el, {
         "data": data,
         "reactiveData": true,
-        "columns": columns,
+        "columns": this.getProcessedColumns(),
         "groupBy": groupBy,
         "layout": "fitDataTable",
         "pagination": "local",
@@ -27034,8 +27047,6 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
         "footerElement": "<button class='tabulator-page' onclick='localStorage.clear(); window.location.reload();'>Reset View</button>"
       });
       this.tabulator.on("cellEdited", function (cell) {
-        console.log("Cell edited!");
-        console.log('cellEdited', cell);
         var edited = new Object();
         edited.column = cell.getField();
         edited.initialValue = cell.getInitialValue();
@@ -27043,7 +27054,7 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
         edited.value = cell.getValue();
         edited.row = cell.getData();
 
-        _this2.props.setProps({
+        _this3.props.setProps({
           cellEdited: edited
         });
 
@@ -27053,39 +27064,31 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
           });
         } catch (e) {}
       });
-      this.tabulator.on("rowSelected", function (row) {
-        console.log("Row Selected");
-      });
-      this.tabulator.on("rowDeselected", function (row) {
-        console.log("Row Deselected");
-      });
       this.tabulator.on("rowSelectionChanged", function (data, rows) {
-        console.log("Selection has changed. Params are: ", {
-          data: data,
-          rows: rows
-        });
-
-        _this2.props.setProps({
+        _this3.props.setProps({
           multiRowsClicked: data
         });
       });
     }
   }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate(prevProps, prevState) {
+      if (this.props.data && prevProps.data !== this.props.data) {
+        this.tabulator.replaceData(this.props.data);
+      }
+    }
+  }, {
     key: "render",
     value: function render() {
-      var _this3 = this;
-
-      console.log("Rendering!");
+      var _this4 = this;
 
       try {
         window.parent.WT1SVC.event("lca-datatable-viewed");
-      } catch (e) {} // const {id, data, columns, groupBy, cellEdited} = this.props;
-      // if (this.tabulator) this.tabulator.setData(data)
-
+      } catch (e) {}
 
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         ref: function ref(el) {
-          return _this3.el = el;
+          return _this4.el = el;
         }
       });
     }

@@ -146,10 +146,7 @@ def serve_layout():
         groupBy=group_column_names
     )
 
-    rows_selected = getattr(main_tabulator, "multiRowsClicked", [])
     bulk_edit_dialog = get_bulk_edit_dialog([])
-
-    print(rows_selected)
 
     layout = html.Div(
         id="main-container",
@@ -230,24 +227,30 @@ def get_bulk_edit_tabulator_data(selected_rows):
     
     return bulk_edit_tabulator_data
 
-
-def build_bulk_edit_tabulator(selected_rows=None) -> dash_tabulator.DashTabulator:
-    if selected_rows is None:
-        selected_rows = []
+def get_bulk_edit_tabulator_columns():
+    new_value_editor = ees.__get_bulk_edit_column_editor__(columns)
+    new_value_column = {
+        "field": "new_value", 
+        "title": "New value",
+    }
+    new_value_column.update(new_value_editor)
 
     bulk_edit_columns = [
         {
             "field": "field", 
             "title": "Field",
         },
-        {
-            "field": "new_value", 
-            "title": "New Value"
-        },
+        new_value_column
     ]
 
-    print("Getting from here")
+    return bulk_edit_columns
 
+
+def build_bulk_edit_tabulator(selected_rows=None) -> dash_tabulator.DashTabulator:
+    if selected_rows is None:
+        selected_rows = []
+
+    bulk_edit_columns = get_bulk_edit_tabulator_columns()
     bulk_edit_data = get_bulk_edit_tabulator_data([])
 
     bulk_edit_tabulator = dash_tabulator.DashTabulator(
@@ -269,7 +272,7 @@ def get_bulk_edit_dialog(items_to_edit):
                 children=[
                     html.H3(
                         id="bulk-edit-dialog-title",
-                        children=f"Edit 0 elements"
+                        children=f"Editing 0 rows"
                     ),
                     bulk_edit_tabulator,
                     html.Button(
@@ -322,15 +325,14 @@ data_fresh = True
 )
 def editBulkEditButton(multiRowsClicked):
     rows_selected = multiRowsClicked or []
-    rows_selected_count = len(multiRowsClicked)
+    rows_selected_count = len(rows_selected)
 
     bulk_edit_data = get_bulk_edit_tabulator_data(rows_selected)
-    print(bulk_edit_data)
     return (
         rows_selected_count == 0,
-        f"Edit {rows_selected_count} items",
+        f"Edit {rows_selected_count} rows",
         bulk_edit_data,
-        f"Edit {rows_selected_count} items",
+        f"Editing {rows_selected_count} rows",
     )
 
 @app.callback([

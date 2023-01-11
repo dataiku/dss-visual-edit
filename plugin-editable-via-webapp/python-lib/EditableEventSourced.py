@@ -8,7 +8,7 @@ from os import getenv
 from json import loads
 from datetime import datetime
 from pytz import timezone
-from dash_extensions.javascript import Namespace
+from dash_extensions.javascript import Namespace, assign
 from urllib.parse import urlparse
 from re import sub
 
@@ -287,6 +287,17 @@ class EditableEventSourced:
             t_col["headerFilterParams"] = {"format": "yyyy-MM-dd"}
         return t_col
 
+    def __get_bulk_edit_column_editor__(self, columns):
+        t_col = {}
+        editor_per_column_name = {
+            c["field"]: {"editor": c["editor"], "editorParams": c.get("editorParams", {}), "test_ns": self.__ns__("filterFunc")} for c in columns if "editor" in c
+        }
+        t_col["editor"] = "customColumnBased"
+        t_col["editorParams"] = {"editorByColumnName": editor_per_column_name}
+        t_col["editorParams"]["test_ns"] = {"test": self.__ns__("filterFunc")}
+        
+        return t_col
+
     def __get_column_tabulator_editor__(self, t_type):
         t_col = {}
         if t_type == "boolean":
@@ -364,7 +375,7 @@ class EditableEventSourced:
                 t_col["formatterParams"] = formatter_lookup_param
             t_col["editorParams"]["values"] = editor_values_param
             t_col["editorParams"]["filterFunc"] = self.__ns__("filterFunc")
-
+    
         return t_col
 
     def get_multiple_selection_column(self):

@@ -1,46 +1,59 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {resolveProp} from 'dash-extensions';
-import {TabulatorFull as Tabulator} from "tabulator-tables"; //import Tabulator library
+import {TabulatorFull as Tabulator, EditModule} from "tabulator-tables"; //import Tabulator library
 import "tabulator-tables/dist/css/tabulator.min.css";
 import "tabulator-tables/dist/css/tabulator_semanticui.min.css";
+
+
+
 
 export default class DashTabulator extends React.Component {
     el = React.createRef();
     tabulator = null; //variable to hold your table
 
+    bulkEditEditor(cell, onRendered, success, cancel, editorParams) {
+        const editorByColumnName = editorParams.editorByColumnName;
+        const cellRow = cell.getRow();
+        const editedColumn = cellRow.getData().field;
+        const editedColumnEditor = editorByColumnName[editedColumn]
+        const editor = EditModule.editors[editedColumnEditor.editor]
+        const realEditorParams = editedColumnEditor.editorParams
+        return editor.call(this, cell, onRendered, success, cancel, realEditorParams)
+    };
+
+    getProcessedColumns() {
+        const propsColumns = this.props.columns;
+        const processedColumns = propsColumns.map((c) => {
+            if (c.editor === "customColumnBased") {
+                c.editor = this.bulkEditEditor
+            }
+            return c
+        })
+        return processedColumns
+    }
+
+    resolvePropRec(prop) {
+        if (!(prop instanceof Object)) {
+            return resolveProp(prop, this);
+        }
+        
+        for (let key in prop){
+            prop[key] = resolveProp(this.resolvePropRec(prop[key]));
+        }
+        return prop
+    }
+
     componentDidMount() {
         // Instantiate Tabulator when element is mounted
 
         const {id, data, columns, groupBy, cellEdited, multiRowsClicked} = this.props;
-
-        // Interpret column formatters as function handles.
-        for(let i=0; i < columns.length; i++){
-            let header = columns[i];
-            for (let key in header){ 
-                let o = header[key];
-                console.log(key);
-                console.log(o);
-                if (o instanceof Object) { 
-                    header[key] = resolveProp(o, this);
-                    if (!o.variable && !o.arrow) {
-                        for (let key2 in o){
-                            let o2 = o[key2]
-                            console.log(key2);
-                            console.log(o2);
-                            if (o2 instanceof Object) { 
-                                o[key2] = resolveProp(o2, this);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        this.resolvePropRec(columns);
 
         this.tabulator = new Tabulator(this.el, {
             "data": data,
             "reactiveData": true,
-            "columns": columns,
+            "columns": this.getProcessedColumns(),
             "groupBy": groupBy,
             "layout": "fitDataTable",
             "pagination": "local",
@@ -51,9 +64,7 @@ export default class DashTabulator extends React.Component {
             "footerElement":"<button class='tabulator-page' onclick='localStorage.clear(); window.location.reload();'>Reset View</button>"
         });
 
-        this.tabulator.on("cellEdited", (cell) => { 
-            console.log("Cell edited!")
-            console.log('cellEdited', cell)
+        this.tabulator.on("cellEdited", (cell) => {
             var edited = new Object() 
             edited.column = cell.getField()
             edited.initialValue = cell.getInitialValue()
@@ -69,10 +80,15 @@ export default class DashTabulator extends React.Component {
         })
 
         this.tabulator.on("rowSelectionChanged", (data, rows) => {
-            console.log("Selection has changed. Params are: ", {data, rows})
             this.props.setProps({multiRowsClicked: data})
 
         })
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (this.props.data && prevProps.data !== this.props.data) {
+            this.tabulator.replaceData(this.props.data);
+        }
     }
 
     constructor(props) {
@@ -81,12 +97,8 @@ export default class DashTabulator extends React.Component {
     }
 
     render() {
-        console.log("Rendering!")
         try { window.parent.WT1SVC.event("lca-datatable-viewed"); }
         catch (e) { }
-
-        // const {id, data, columns, groupBy, cellEdited} = this.props;
-        // if (this.tabulator) this.tabulator.setData(data)
 
         return (
             <div ref={el => (this.el = el)} />

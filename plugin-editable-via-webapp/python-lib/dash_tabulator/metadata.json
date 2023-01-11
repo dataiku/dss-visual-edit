@@ -2,7 +2,55 @@
   "src/lib/components/DashTabulator.react.js": {
     "description": "",
     "displayName": "DashTabulator",
-    "methods": [],
+    "methods": [
+      {
+        "name": "bulkEditEditor",
+        "docblock": null,
+        "modifiers": [],
+        "params": [
+          {
+            "name": "cell",
+            "type": null
+          },
+          {
+            "name": "onRendered",
+            "type": null
+          },
+          {
+            "name": "success",
+            "type": null
+          },
+          {
+            "name": "cancel",
+            "type": null
+          },
+          {
+            "name": "editorParams",
+            "type": null
+          }
+        ],
+        "returns": null
+      },
+      {
+        "name": "getProcessedColumns",
+        "docblock": null,
+        "modifiers": [],
+        "params": [],
+        "returns": null
+      },
+      {
+        "name": "resolvePropRec",
+        "docblock": null,
+        "modifiers": [],
+        "params": [
+          {
+            "name": "prop",
+            "type": null
+          }
+        ],
+        "returns": null
+      }
+    ],
     "props": {
       "id": {
         "type": {
