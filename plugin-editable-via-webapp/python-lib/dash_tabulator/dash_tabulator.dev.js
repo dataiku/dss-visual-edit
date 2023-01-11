@@ -129,7 +129,7 @@ window["dash_tabulator"] =
 /******/ 	        var srcFragments = src.split('/');
 /******/ 	        var fileFragments = srcFragments.slice(-1)[0].split('.');
 /******/
-/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1673451912");
+/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1673457862");
 /******/ 	        srcFragments.splice(-1, 1, fileFragments.join('.'))
 /******/
 /******/ 	        return srcFragments.join('/');
@@ -27031,7 +27031,8 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
           columns = _this$props.columns,
           groupBy = _this$props.groupBy,
           cellEdited = _this$props.cellEdited,
-          multiRowsClicked = _this$props.multiRowsClicked;
+          multiRowsClicked = _this$props.multiRowsClicked,
+          applyBulkEdit = _this$props.applyBulkEdit;
       this.resolvePropRec(columns);
       this.tabulator = new tabulator_tables__WEBPACK_IMPORTED_MODULE_3__["TabulatorFull"](this.el, {
         "data": data,
@@ -27071,10 +27072,33 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
       });
     }
   }, {
+    key: "applyBulkEdit",
+    value: function applyBulkEdit(dataToUpdate) {
+      var selectedRows = this.tabulator.getSelectedRows();
+      selectedRows.forEach(function (r) {
+        dataToUpdate.forEach(function (d) {
+          var cell = r.getCell(d["field"]);
+          var old_value = cell.getValue();
+          var new_value = d["new_value"];
+
+          if (old_value !== new_value) {
+            console.log("Updating ".concat(d["field"], " to ").concat(d["new_value"]));
+            r.update(_defineProperty({}, d["field"], d["new_value"]));
+          }
+        });
+      });
+      this.tabulator.deselectRow();
+    }
+  }, {
     key: "componentDidUpdate",
     value: function componentDidUpdate(prevProps, prevState) {
       if (this.props.data && prevProps.data !== this.props.data) {
         this.tabulator.replaceData(this.props.data);
+      }
+
+      if (this.props.applyBulkEdit && this.props.applyBulkEdit !== prevProps.applyBulkEdit) {
+        console.log("Applying bulk edit with ", this.props.applyBulkEdit);
+        this.applyBulkEdit(this.props.applyBulkEdit);
       }
     }
   }, {
@@ -27138,7 +27162,12 @@ DashTabulator.propTypes = {
   /**
    * multiRowsClicked, when multiple rows are clicked
    */
-  multiRowsClicked: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.array
+  multiRowsClicked: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.array,
+
+  /**
+   * applyBulkEdit, apply bulk edit that has happened
+   */
+  applyBulkEdit: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.array
 };
 
 /***/ }),

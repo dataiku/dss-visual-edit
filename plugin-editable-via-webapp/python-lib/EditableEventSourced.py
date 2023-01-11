@@ -476,4 +476,21 @@ class EditableEventSourced:
             cell["column"],
             cell["value"],
             user
-        )
+        ), None
+
+    def bulk_edit_rows(self, selected_rows, edited_data, old_data, user):
+        actually_edited_data = []
+        for i, d in enumerate(edited_data):
+            if d["new_value"] != old_data[i]["new_value"]:
+                for r in selected_rows:
+                    new_id = tabulator_row_key_values(r, self.primary_keys)
+                    _ = self.add_edit(
+                        new_id,
+                        d["field"],
+                        d["new_value"],
+                        user
+                    )
+                actually_edited_data.append(d)
+        info = f"""Updated {len(selected_rows)} rows."""
+        return (info, actually_edited_data)
+

@@ -338,6 +338,7 @@ def editBulkEditButton(multiRowsClicked):
 @app.callback([
     Output("bulk-edit-dialog-wrapper", "hidden"),
     Output("bulk-edit-dialog", "open"),
+    Input("apply-bulk-edit", "n_clicks"),
     Input('bulk-edit-btn', 'n_clicks'),
     Input('bulk-edit-dialog-wrapper', 'n_clicks'),
     Input('bulk-edit-dialog', 'n_clicks'),
@@ -351,6 +352,8 @@ def openBulkEditDialog(*args):
         is_dialog_opened = False
     elif trigger_id == "bulk-edit-dialog":
         is_dialog_opened = True
+    elif trigger_id == "apply-bulk-edit":
+        is_dialog_opened = False
     return not is_dialog_opened, is_dialog_opened
 
 
@@ -392,9 +395,15 @@ def toggle_refresh_div_visibility(n_intervals, refresh_div_style, last_build_dat
 
 @app.callback(
     Output("edit-info", "children"),
+    Output("datatable", "applyBulkEdit"),
+    Input("apply-bulk-edit", "n_clicks"),
+    Input("bulk-edit-datatable", "data"),
+    Input('datatable', 'multiRowsClicked'),
     Input("datatable", "cellEdited"),
     prevent_initial_call=True)
-def add_edit(cell):
+def apply_edit(n_clicks, bulk_edit_datatable_data, rows_selected, cell_edited):
+    trigger_id = ctx.triggered_id
+    triggered_prop_ids = ctx.triggered_prop_ids
     """
     Record edit in editlog, once a cell has been edited
     """
@@ -402,8 +411,14 @@ def add_edit(cell):
         user = "local"
     else:
         user = get_user_details()
-    return ees.add_edit_tabulator(cell, user)
 
+    if trigger_id == "datatable" and "cellEdited" in triggered_prop_ids:
+        return ees.add_edit_tabulator(cell_edited, user)
+    elif trigger_id == "apply-bulk-edit":
+        old_data = get_bulk_edit_tabulator_data(rows_selected)
+        return ees.bulk_edit_rows(rows_selected, bulk_edit_datatable_data, old_data, user)
+    else:
+        return "", None
 
 @server.route("/dash")
 def my_dash_app():

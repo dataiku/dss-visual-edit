@@ -49,6 +49,18 @@
           }
         ],
         "returns": null
+      },
+      {
+        "name": "applyBulkEdit",
+        "docblock": null,
+        "modifiers": [],
+        "params": [
+          {
+            "name": "dataToUpdate",
+            "type": null
+          }
+        ],
+        "returns": null
       }
     ],
     "props": {
@@ -112,6 +124,13 @@
         },
         "required": false,
         "description": "multiRowsClicked, when multiple rows are clicked"
+      },
+      "applyBulkEdit": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "applyBulkEdit, apply bulk edit that has happened"
       }
     }
   }

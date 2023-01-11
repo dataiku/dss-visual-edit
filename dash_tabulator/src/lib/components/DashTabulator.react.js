@@ -47,7 +47,7 @@ export default class DashTabulator extends React.Component {
     componentDidMount() {
         // Instantiate Tabulator when element is mounted
 
-        const {id, data, columns, groupBy, cellEdited, multiRowsClicked} = this.props;
+        const {id, data, columns, groupBy, cellEdited, multiRowsClicked, applyBulkEdit} = this.props;
         this.resolvePropRec(columns);
 
         this.tabulator = new Tabulator(this.el, {
@@ -85,9 +85,31 @@ export default class DashTabulator extends React.Component {
         })
     }
 
+    applyBulkEdit(dataToUpdate) {
+        const selectedRows = this.tabulator.getSelectedRows();
+        selectedRows.forEach((r) => {
+            dataToUpdate.forEach((d) => {
+                const cell = r.getCell(d["field"]);
+                const old_value = cell.getValue()
+                const new_value = d["new_value"];
+                if (old_value !== new_value) {
+                    console.log(`Updating ${d["field"]} to ${d["new_value"]}`)
+                    r.update({
+                        [d["field"]]: d["new_value"]
+                    })
+                }
+            })
+        })
+        this.tabulator.deselectRow();
+    }
+
     componentDidUpdate(prevProps, prevState) {
         if (this.props.data && prevProps.data !== this.props.data) {
             this.tabulator.replaceData(this.props.data);
+        }
+        if (this.props.applyBulkEdit && this.props.applyBulkEdit !== prevProps.applyBulkEdit) {
+            console.log("Applying bulk edit with ", this.props.applyBulkEdit);
+            this.applyBulkEdit(this.props.applyBulkEdit);
         }
     }
 
@@ -148,4 +170,9 @@ DashTabulator.propTypes = {
      * multiRowsClicked, when multiple rows are clicked
      */
     multiRowsClicked: PropTypes.array,
+
+    /**
+     * applyBulkEdit, apply bulk edit that has happened
+     */
+    applyBulkEdit: PropTypes.array,
 };

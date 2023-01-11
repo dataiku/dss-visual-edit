@@ -10,12 +10,14 @@
 }
 
 \usage{
-dashTabulator(id=NULL, cellEdited=NULL, columns=NULL, data=NULL,
-groupBy=NULL, multiRowsClicked=NULL)
+dashTabulator(id=NULL, applyBulkEdit=NULL, cellEdited=NULL, columns=NULL,
+data=NULL, groupBy=NULL, multiRowsClicked=NULL)
 }
 
 \arguments{
 \item{id}{Character. ID used to identify this component in Dash callbacks.}
+
+\item{applyBulkEdit}{Unnamed list. applyBulkEdit, apply bulk edit that has happened}
 
 \item{cellEdited}{Named list. cellEdited captures the cell that was clicked on}
 

@@ -9,6 +9,7 @@ A DashTabulator component.
 
 Keyword arguments:
 - `id` (String; optional): ID used to identify this component in Dash callbacks.
+- `applyBulkEdit` (Array; optional): applyBulkEdit, apply bulk edit that has happened
 - `cellEdited` (Dict; optional): cellEdited captures the cell that was clicked on
 - `columns` (Array; optional): Column definitions.
 - `data` (Array; optional): Data to display in the table.
@@ -16,7 +17,7 @@ Keyword arguments:
 - `multiRowsClicked` (Array; optional): multiRowsClicked, when multiple rows are clicked
 """
 function dashtabulator(; kwargs...)
-        available_props = Symbol[:id, :cellEdited, :columns, :data, :groupBy, :multiRowsClicked]
+        available_props = Symbol[:id, :applyBulkEdit, :cellEdited, :columns, :data, :groupBy, :multiRowsClicked]
         wild_props = Symbol[]
         return Component("dashtabulator", "DashTabulator", "dash_tabulator", available_props, wild_props; kwargs...)
 end
