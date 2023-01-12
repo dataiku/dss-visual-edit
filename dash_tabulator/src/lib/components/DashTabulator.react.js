@@ -47,7 +47,7 @@ export default class DashTabulator extends React.Component {
     componentDidMount() {
         // Instantiate Tabulator when element is mounted
 
-        const {id, data, columns, groupBy, cellEdited, multiRowsClicked, applyBulkEdit} = this.props;
+        const {id, data, columns, groupBy, cellEdited, multiRowsClicked, applyBulkEdit, options} = this.props;
         this.resolvePropRec(columns);
 
         this.tabulator = new Tabulator(this.el, {
@@ -55,13 +55,7 @@ export default class DashTabulator extends React.Component {
             "reactiveData": true,
             "columns": this.getProcessedColumns(),
             "groupBy": groupBy,
-            "layout": "fitDataTable",
-            "pagination": "local",
-            "paginationSize": 20,
-            "paginationSizeSelector": [10, 20, 50, 100],
-            "movableColumns": true,
-            "persistence": true,
-            "footerElement":"<button class='tabulator-page' onclick='localStorage.clear(); window.location.reload();'>Reset View</button>"
+            ...options
         });
 
         this.tabulator.on("cellEdited", (cell) => {
@@ -131,7 +125,8 @@ export default class DashTabulator extends React.Component {
 DashTabulator.defaultProps = {
     data: [],
     columns : [],
-    groupBy : []
+    groupBy : [],
+    options: {}
 };
 
 DashTabulator.propTypes = {
@@ -175,4 +170,9 @@ DashTabulator.propTypes = {
      * applyBulkEdit, apply bulk edit that has happened
      */
     applyBulkEdit: PropTypes.array,
+
+    /**
+     * options, rows options passed to tabulator
+     */
+    options: PropTypes.object,
 };

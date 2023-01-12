@@ -11,7 +11,7 @@
 
 \usage{
 dashTabulator(id=NULL, applyBulkEdit=NULL, cellEdited=NULL, columns=NULL,
-data=NULL, groupBy=NULL, multiRowsClicked=NULL)
+data=NULL, groupBy=NULL, multiRowsClicked=NULL, options=NULL)
 }
 
 \arguments{
@@ -28,6 +28,8 @@ data=NULL, groupBy=NULL, multiRowsClicked=NULL)
 \item{groupBy}{Unnamed list. Columns to group by.}
 
 \item{multiRowsClicked}{Unnamed list. multiRowsClicked, when multiple rows are clicked}
+
+\item{options}{Named list. options, rows options passed to tabulator}
 }
 
 \value{named list of JSON elements corresponding to React.js properties and their values}

@@ -131,6 +131,17 @@
         },
         "required": false,
         "description": "applyBulkEdit, apply bulk edit that has happened"
+      },
+      "options": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": "options, rows options passed to tabulator",
+        "defaultValue": {
+          "value": "{}",
+          "computed": false
+        }
       }
     }
   }

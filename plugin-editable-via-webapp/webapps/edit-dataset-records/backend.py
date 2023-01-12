@@ -128,6 +128,25 @@ columns = ees.get_columns_tabulator(freeze_editable_columns)
 last_build_date_initial = ""
 last_build_date_ok = False
 
+def get_main_tabulator():
+    main_tabulator = dash_tabulator.DashTabulator(
+        id="datatable",
+        columns=columns,
+        data=ees.get_data_tabulator(),  # this gets the most up-to-date edited data
+        groupBy=group_column_names,
+        options={
+            "layout": "fitDataTable",
+            "pagination": "local",
+            "paginationSize": 20,
+            "paginationSizeSelector": [10, 20, 50, 100],
+            "movableColumns": True,
+            "persistence": True,
+            "footerElement":"<button class='tabulator-page' onclick='localStorage.clear(); window.location.reload();'>Reset View</button>",
+        }
+    )
+    return main_tabulator
+
+
 def serve_layout():
     global last_build_date_initial, last_build_date_ok
     try:
@@ -139,13 +158,7 @@ def serve_layout():
         last_build_date_ok = False
 
 
-    main_tabulator = dash_tabulator.DashTabulator(
-        id="datatable",
-        columns=columns,
-        data=ees.get_data_tabulator(),  # this gets the most up-to-date edited data
-        groupBy=group_column_names
-    )
-
+    main_tabulator = get_main_tabulator()
     bulk_edit_dialog = get_bulk_edit_dialog([])
 
     layout = html.Div(

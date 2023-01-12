@@ -129,7 +129,7 @@ window["dash_tabulator"] =
 /******/ 	        var srcFragments = src.split('/');
 /******/ 	        var fileFragments = srcFragments.slice(-1)[0].split('.');
 /******/
-/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1673457862");
+/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1673522412");
 /******/ 	        srcFragments.splice(-1, 1, fileFragments.join('.'))
 /******/
 /******/ 	        return srcFragments.join('/');
@@ -26929,6 +26929,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var tabulator_tables_dist_css_tabulator_semanticui_min_css__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(tabulator_tables_dist_css_tabulator_semanticui_min_css__WEBPACK_IMPORTED_MODULE_5__);
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -27032,21 +27036,15 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
           groupBy = _this$props.groupBy,
           cellEdited = _this$props.cellEdited,
           multiRowsClicked = _this$props.multiRowsClicked,
-          applyBulkEdit = _this$props.applyBulkEdit;
+          applyBulkEdit = _this$props.applyBulkEdit,
+          options = _this$props.options;
       this.resolvePropRec(columns);
-      this.tabulator = new tabulator_tables__WEBPACK_IMPORTED_MODULE_3__["TabulatorFull"](this.el, {
+      this.tabulator = new tabulator_tables__WEBPACK_IMPORTED_MODULE_3__["TabulatorFull"](this.el, _objectSpread({
         "data": data,
         "reactiveData": true,
         "columns": this.getProcessedColumns(),
-        "groupBy": groupBy,
-        "layout": "fitDataTable",
-        "pagination": "local",
-        "paginationSize": 20,
-        "paginationSizeSelector": [10, 20, 50, 100],
-        "movableColumns": true,
-        "persistence": true,
-        "footerElement": "<button class='tabulator-page' onclick='localStorage.clear(); window.location.reload();'>Reset View</button>"
-      });
+        "groupBy": groupBy
+      }, options));
       this.tabulator.on("cellEdited", function (cell) {
         var edited = new Object();
         edited.column = cell.getField();
@@ -27125,7 +27123,8 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
 DashTabulator.defaultProps = {
   data: [],
   columns: [],
-  groupBy: []
+  groupBy: [],
+  options: {}
 };
 DashTabulator.propTypes = {
   /**
@@ -27167,7 +27166,12 @@ DashTabulator.propTypes = {
   /**
    * applyBulkEdit, apply bulk edit that has happened
    */
-  applyBulkEdit: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.array
+  applyBulkEdit: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.array,
+
+  /**
+   * options, rows options passed to tabulator
+   */
+  options: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object
 };
 
 /***/ }),
