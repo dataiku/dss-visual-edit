@@ -294,7 +294,6 @@ class EditableEventSourced:
         }
         t_col["editor"] = "customColumnBased"
         t_col["editorParams"] = {"editorByColumnName": editor_per_column_name}
-        t_col["editorParams"]["test_ns"] = {"test": self.__ns__("filterFunc")}
         
         return t_col
 

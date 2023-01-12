@@ -226,15 +226,16 @@ def get_bulk_edit_tabulator_data(selected_rows):
     for c in editable_columns:
         n_fields = len(values_per_columns[c["field"]])
         if n_fields == 0:
-            new_row_value = "No value"
+            current_value = "No value"
         elif n_fields == 1:
-            new_row_value = list(values_per_columns[c["field"]])[0]
+            current_value = list(values_per_columns[c["field"]])[0]
         else:
-            new_row_value = "Multiple values"
+            current_value = "Multiple values"
 
         new_row = {
             "field": c["title"],
-            "new_value": new_row_value
+            "current_value": current_value,
+            "new_value": ""
         }
         bulk_edit_tabulator_data.append(new_row)
     
@@ -245,6 +246,7 @@ def get_bulk_edit_tabulator_columns():
     new_value_column = {
         "field": "new_value", 
         "title": "New value",
+        "responsive": 0
     }
     new_value_column.update(new_value_editor)
 
@@ -252,6 +254,12 @@ def get_bulk_edit_tabulator_columns():
         {
             "field": "field", 
             "title": "Field",
+            "responsive": 0
+        },
+        {
+            "field": "current_value", 
+            "title": "Current Value",
+            "responsive": 1
         },
         new_value_column
     ]
@@ -270,6 +278,10 @@ def build_bulk_edit_tabulator(selected_rows=None) -> dash_tabulator.DashTabulato
         id="bulk-edit-datatable",
         columns=bulk_edit_columns,
         data=bulk_edit_data,
+        options={
+            "layout": "fitDataStretch",
+            "responsiveLayout":"collapse",
+        }
     )
 
     return bulk_edit_tabulator
@@ -302,7 +314,8 @@ def get_bulk_edit_dialog(items_to_edit):
                     "top": "50%",
                     "transform": "translate(0, -50%)",
                     "zIndex": "11",
-                    "cursor": "default"
+                    "cursor": "default",
+                    "width": "80%"
                 },
                 n_clicks=0
             )
