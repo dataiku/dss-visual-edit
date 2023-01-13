@@ -300,7 +300,7 @@ def read_endpoint():
 @server.route("/read-all-edits", methods=['GET'])
 def read_all_edits_endpoint():
     """
-    Read all edits made via webapp or API: rows that were created or edited
+    Read all rows edited or created via webapp or API
 
     Returns: CSV-formatted dataset with rows that were created or edited, and values of primary key and editable columns. See remarks of the `read` endpoint.
     """
