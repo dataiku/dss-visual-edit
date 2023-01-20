@@ -37,20 +37,22 @@ How to use:
 
 ### Initial flow
 
-* We started with a Fuzzy Join between `companies_ref` and `companies_ext` based on `id`, and specified that we wanted to output matching details.
+* We started with a left Fuzzy Join between `companies_ref` and `companies_ext` based on `id`, and specified that we wanted to output matching details.
 * We needed additional colums to store reviewing information, such as the approval of a match (boolean) and comments (string). These were created as empty columns in a Prepare recipe. We also extracted the distance information found in the `meta` column of the Fuzzy Join output (where matching details are stored).
-* We added a Group recipe to deal with cases where several matches were found in `companies_ext` for the same company in `companies_ref`, and only keep the closest match.
-* We created a `corrections` folder that could hold data uploaded as CSV files. For testing purposes, we uploaded a tiny file containing:
+* We added a Group recipe to deal with cases where several matches were found in `companies_ext` for the same company in `companies_ref`, so that we only keep the closest match. As a result, rows in the output dataset (named `matches`) are uniquely identified by their value of `id_companies_ref`.
+* We created a `corrections` folder that could hold data uploaded as CSV files, and turns them into a dataset named `corrected_data` (as an alternative, you could also create an Editable dataset).
+  * Its columns should include `id_companies_ref` which acts as primary key, and columns whose values can be overriden by the end-user reviewing company matches: `id_companies_ext`, `reviewed` and `comments`.
+  * For testing purposes, we uploaded a tiny file containing:
 
 ```csv
-id_companies_ref,id_companies_ext,reviewed
-208628,XB40,True
-114233,MEIZ,True
+id_companies_ref,id_companies_ext,reviewed,comments
+208628,XB40,True,""
+114233,MEIZ,True,""
 ```
 
 * We used the plugin's Merge recipe with `matches` and `corrected_data` as inputs, and created `matches_edited`. This required to set the “primary_keys” custom field of `matches`, so that the Merge recipe knows how to join its inputs.
 * We added a `to_be_reviewed` column computed by a Prepare recipe, and used it to Split `matches_edited` into two datasets, for certain and uncertain matches.
-* Finally, a 3-way join between the `companies_ref`, `companies_ext` and `matches_certain`, produces the output we were looking for: a dataset of companies that has both the `notes` and `fte_count` columns.
+* Finally, a 3-way join between the `companies_ref`, `companies_ext` and `matches_certain` produces the output we were looking for: a dataset of companies that has both the `notes` and `fte_count` columns.
 
 ### Reviewing and updating
 
