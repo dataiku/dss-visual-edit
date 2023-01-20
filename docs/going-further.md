@@ -16,7 +16,11 @@ The best way to make this webapp accessible to end-users is by publishing it to 
    * You can then open the dataset and make sure that you see an empty editlog that looks like this: ![](empty_editlog.png)
    * You can then delete the scenario, to make sure that it won't be used accidentally in the future (which would cause losing all edits).
 4. Build the dataset used by the webapp as the "original dataset" to edit.
-5. Start the webapp.
+5. (Stop and) Start the webapp.
+
+Demo videos:
+* [Deploy to production](https://www.loom.com/share/e47c5d09871741c48062e3547108bb39)
+* [Update in production](https://www.loom.com/share/8b806a65e50a4406b9ec3d4a31495205)
 
 ## Feedback loops
 
