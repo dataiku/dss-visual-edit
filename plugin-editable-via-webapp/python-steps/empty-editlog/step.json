@@ -1,7 +1,7 @@
 {
     "meta" : {
-        "label": "Empty editlog",
-        "description": "DO NOT USE IN PRODUCTION. Delete all rows of the editlog.",
+        "label": "Initialize editlog",
+        "description": "USE WITH CAUTION: this will delete all rows of the editlog.",
         "icon": "icon-file-alt"
     },
     "params": [
