@@ -6,21 +6,21 @@ The best way to make this webapp accessible to end-users is by publishing it to 
 
 ![](dashboard_edit.png)
 
-## Deploying to Automation
+## Deploying to production (automation node)
 
-Make sure that the version of the plugin installed on the Automation node is the same as on the Design node.
-
-Upon deploying the project bundle for the first time, please...
-
-* Build the dataset used by the webapp as the "original dataset" to edit
-* Start the webapp
-* Build datasets downstream of the editlog, if any.
-
-This will make sure that the editlog is properly initialized on the Automation node. Indeed, after deploying the bundle for the first time, the editlog dataset will exist and it will have a schema, but it may appear as having an invalid configuration; this would be the case with a SQL connection different from the one used in the design node, as the table won't have been created upon bundle deployment. The reason for this is that, unlike most datasets managed by Dataiku, this one is a source dataset (with no recipe upstream).
+1. Make sure that the version of the plugin installed on the Automation node is the same as on the Design node.
+2. Create a new bundle (do not include the contents of the editlog in the bundle, as it would replace edits made in production with those made on the design node).
+3. If this isn't a first deployment of your project but an update, go straight to step 4. Otherwise, initialize the editlog:
+   * Some context and motivation: upon deploying the project bundle for the first time, the editlog dataset will exist and it will have a schema, but it may appear as having an invalid configuration; this would be the case with a SQL connection different from the one used in the design node, as the table won't have been created upon bundle deployment. The reason for this is that, unlike most datasets managed by Dataiku, this one is a source dataset (with no recipe upstream).
+   * Please create and run a scenario with an "Initialize editlog" step, to ensure that the editlog is properly initialized. ![](scenario_step.png)
+   * You can then open the dataset and make sure that you see an empty editlog that looks like this: ![](empty_editlog.png)
+   * You can then delete the scenario, to make sure that it won't be used accidentally in the future (which would cause losing all edits).
+4. Build the dataset used by the webapp as the "original dataset" to edit.
+5. Start the webapp.
 
 ## Feedback loops
 
-In some use cases the data to review/edit in the webapp depends on previous edits. Check out our [sample project](sample-project-join-companies) that demonstrates this.
+In some use cases the data to review/edit in the webapp depends on previous edits. Check out our [sample project](sample-project-join-companies) that demonstrates this and shares best practices.
 
 ## FAQ
 
@@ -46,4 +46,3 @@ The webapp automatically detects changes in the original dataset, by periodicall
 ## Troubleshooting
 
 If the webapp backend started successfully but the webapp itself isn't functioning as expected, clear the browser's cached images and files.
-
