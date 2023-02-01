@@ -10,8 +10,12 @@ The best way to make this webapp accessible to end-users is by publishing it to 
 
 1. Make sure that the version of the plugin installed on the Automation node is the same as on the Design node.
 2. Create a new bundle (do not include the contents of the editlog in the bundle, as it would replace edits made in production with those made on the design node).
-3. If this isn't a first deployment of your project but an update, go straight to step 4. Otherwise, initialize the editlog:
-   * Some context and motivation: upon deploying the project bundle for the first time, the editlog dataset will exist and it will have a schema, but it may appear as having an invalid configuration; this would be the case with a SQL connection different from the one used in the design node, as the table won't have been created upon bundle deployment. The reason for this is that, unlike most datasets managed by Dataiku, this one is a source dataset (with no recipe upstream).
+3. If this isn't a first deployment of your project but an update, go straight to step 4. Otherwise, initialize the editlog used on the Automation node:
+   * ⚠️ Preliminary remarks and motivation:
+     * Unlike most datasets managed by Dataiku, editlogs are source datasets (with no recipe upstream).
+     * For a given data editing webapp, you would want to have two different editlog datasets: one on the Design node, one on the Automation node. This way, edits made on the Design node won't have any impact in production.
+     * These two editlog datasets would have the same name, but they should be on different data connections.
+     * Upon deploying the project bundle for the first time on the Automation node, the editlog dataset will exist and it will have a schema, but it may appear as having an invalid configuration. This would be the case when using a SQL connection, as the table used for the editlog in Automation won't be automatically created by the bundle deployment process.
    * Please create and run a scenario with an "Initialize editlog" step, to ensure that the editlog is properly initialized. ![](scenario_step.png)
    * You can then open the dataset and make sure that you see an empty editlog that looks like this: ![](empty_editlog.png)
    * You can then delete the scenario, to make sure that it won't be used accidentally in the future (which would cause losing all edits).
