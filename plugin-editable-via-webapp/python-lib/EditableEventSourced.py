@@ -206,13 +206,16 @@ class EditableEventSourced:
             self.editlog_ds,
             self.primary_keys,
             self.editable_column_names
-        )
+        ).set_index(self.primary_keys)
 
     def get_edited_df_indexed(self):
         return self.get_edited_df().set_index(self.primary_keys)
         
     def get_edited_df(self):
-        return merge_edits_from_log_pivoted_df(self.original_ds, self.edited_cells_df)
+        return merge_edits_from_log_pivoted_df(
+            self.original_ds,
+            self.edited_cells_df.reset_index()
+        )
 
     def get_data_tabulator(self):
         # This loads the original dataset, the editlog, and replays edits
