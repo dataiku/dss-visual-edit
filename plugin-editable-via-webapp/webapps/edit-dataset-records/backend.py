@@ -307,6 +307,7 @@ def read_all_edits_endpoint():
     response = make_response(ees.edited_cells_df.to_csv())
     response.headers["Content-Disposition"] = "attachment; filename=" + original_ds_name + "_edits.csv"
     response.headers["Content-Type"] = "text/csv"
+    response.headers["Cache-Control"] = "no-store"
     return response
 
 @server.route("/update", methods=['GET', 'POST'])
