@@ -332,11 +332,11 @@ def update_endpoint():
     Note: this method doesn't implement data validation / it doesn't check that the value is allowed for the specified column.
     """
     if request.method == 'POST':
-        primary_keys = request.get_json().get("primaryKeys")
+        primary_keys_values = request.get_json().get("primaryKeys")
         column = request.get_json().get("column")
         value = request.get_json().get("value")
     else:
-        primary_keys = request.args.get("primaryKeys", "")
+        primary_keys_values = request.args.get("primaryKeys", "")
         column = request.args.get("column", "")
         value = request.args.get("value", "")
     key = get_key_values_from_dict(primary_keys_values, ees.primary_keys)
