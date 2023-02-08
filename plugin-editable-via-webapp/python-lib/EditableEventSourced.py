@@ -11,6 +11,7 @@ from pytz import timezone
 from dash_extensions.javascript import Namespace
 from urllib.parse import urlparse
 from re import sub
+from numpy import isnan
 
 
 def recipe_already_exists(recipe_name, project):
@@ -402,6 +403,8 @@ class EditableEventSourced:
             }))
 
             self.edited_cells_df.loc[key, column] = value
+            if (action=="create" and isnan(self.edited_cells_df.loc[key, "first_action"])):
+                self.edited_cells_df.loc[key, "first_action"] = "create"
             self.edited_cells_df.loc[key, "last_action"] = action
 
             # Update lookup columns if a linked record was edited
