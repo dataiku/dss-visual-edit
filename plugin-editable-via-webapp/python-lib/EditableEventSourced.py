@@ -402,6 +402,7 @@ class EditableEventSourced:
             }))
 
             self.edited_cells_df.loc[key, column] = value
+            self.edited_cells_df.loc[key, "last_action"] = action
 
             # Update lookup columns if a linked record was edited
             # for linked_record in self.linked_records:
