@@ -20,7 +20,7 @@
     "build:backends-activated": "(. venv/bin/activate || venv\\scripts\\activate && npm run build:py_and_r)",
     "build": "npm run build:js && npm run build:backends",
     "build:activated": "npm run build:js && npm run build:backends-activated",
-    "postbuild": "cp -R ./dash_tabulator/ ../plugin-editable-via-webapp/python-lib/dash_tabulator/"
+    "postbuild": "cp -R ./dash_tabulator/ ../plugin-webapp-data/python-lib/dash_tabulator/"
   },
   "author": "Louis Dorard <louis.dorard@dataiku.com>",
   "license": "",

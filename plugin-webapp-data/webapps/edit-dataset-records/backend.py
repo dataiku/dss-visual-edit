@@ -42,9 +42,9 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     logging.info("Webapp is being run in Dataiku")
     run_context = "dataiku"
     # this points to a copy of assets/style.css (which is ignored by Dataiku's Dash)
-    stylesheets += ["https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/style.css"]
+    stylesheets += ["https://plugin-webapp-data.s3.eu-west-1.amazonaws.com/style.css"]
     # same for assets/custom_tabulator.js
-    scripts += ["https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/custom_tabulator.js"]
+    scripts += ["https://plugin-webapp-data.s3.eu-west-1.amazonaws.com/custom_tabulator.js"]
     info_display = "none"
 
     from dataiku.customwebapp import get_webapp_config

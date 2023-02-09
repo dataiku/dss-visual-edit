@@ -9,4 +9,4 @@
 * [Install the plugin](install-plugin)
 * [Get started](get-started)
 
-![Demo](editable-via-webapp-demo.gif)
+![Demo](webapp-data-demo.gif)
