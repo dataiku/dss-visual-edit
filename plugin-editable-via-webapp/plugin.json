@@ -1,13 +1,13 @@
 {
-    "id": "editable-via-webapp",
-    "version": "1.7.3-crud-api",
+    "id": "webapp-data",
+    "version": "2.0.0-alpha",
     "meta": {
-        "label": "Editable via webapp",
-        "description": "Edit dataset records via a webapp and replay edits in the Flow",
+        "label": "Webapp Data",
+        "description": "Data table component with editable columns and CRUD API for webapps",
         "author": "Dataiku (Louis Dorard, Julien Hobeika)",
         "icon": "icon-edit-sign",
         "tags": [],
-        "url": "http://dataiku.github.io/lca/get-started",
+        "url": "",
         "licenseInfo": "Apache Software License",
         "supportLevel": "NOT_SUPPORTED"
     }
