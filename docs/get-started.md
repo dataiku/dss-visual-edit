@@ -26,9 +26,15 @@ Here are the datasets that the webapp backend creates automatically upon startin
 
 ![](new_datasets.png)
 
- 1. **_editlog_** is the raw record of all edits made via the webapp. The schema is always the same. Here is an example: ![](editlog.png)
- 2. **_editlog\_pivoted_** is the output of a _pivot-editlog_ recipe and the user-friendly view of edits. Its schema is a subset of that of the original dataset (it just doesn't have columns that are display-only, but it has the same key columns and the same editable columns). Here it is in the previous example: ![](editlog_pivoted.png).
- 3. **_edited_** is the output of a _merge-edits_ recipe that feeds from the original dataset and the _editlog\_pivoted_. It corresponds to the edited data that you are seeing via the webapp; however, it is not in sync with the webapp: it's up to you to decide when to build it in the Flow.
+ 1. **_editlog_** is the raw record of all edit events captured by the webapp. The schema is always the same. Here is an example: ![](editlog.png)
+ 2. **_editlog\_pivoted_** is the output of the _pivot-editlog_ recipe and the user-friendly view of edits. In the previous example: ![](editlog_pivoted.png)
+     * Its schema is a subset of the original dataset's: it doesn't have columns that are display-only, but it has the same key columns and the same editable columns.
+     * You can think of it as...
+       * A "diff" between edited and original data.
+       * A dataset of overrides to apply to the original dataset.
+       * The result of "replaying" edit events stored in the log: we only see the last edited values.
+       
+ 3. **_edited_** is the output of the _merge-edits_ recipe that feeds from the original dataset and the _editlog\_pivoted_. It corresponds to the edited data that you are seeing via the webapp; however, it is not in sync with the webapp: it's up to you to decide when to build it in the Flow.
 
 These datasets are created on the same connection as the original dataset. For edits to be recorded by the webapp, this has to be a write connection. If that's not the case, you can change the connection of these datasets as soon as they've been added to the Flow.
 
