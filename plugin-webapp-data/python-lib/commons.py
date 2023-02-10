@@ -32,8 +32,8 @@ def get_editlog_df(editlog_ds):
     # the schema was specified upon creation of the dataset, so let's use it
     return editlog_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True)
 
-def get_editlog_pivoted_ds_schema(original_schema, primary_keys, editable_column_names):
-    editlog_pivoted_ds_schema = []
+def get_overrides_ds_schema(original_schema, primary_keys, editable_column_names):
+    overrides_ds_schema = []
     edited_ds_schema = []
     for col in original_schema:
         new_col = {}
@@ -46,14 +46,14 @@ def get_editlog_pivoted_ds_schema(original_schema, primary_keys, editable_column
             new_col["meaning"] = meaning
         edited_ds_schema.append(new_col)
         if (col.get("name") in primary_keys + editable_column_names):
-            editlog_pivoted_ds_schema.append(new_col)
-    editlog_pivoted_ds_schema.append(
+            overrides_ds_schema.append(new_col)
+    overrides_ds_schema.append(
         {"name": "last_edit_date", "type": "string", "meaning": "DateSource"})
-    editlog_pivoted_ds_schema.append(
+    overrides_ds_schema.append(
         {"name": "last_action", "type": "string", "meaning": "Text"})
-    editlog_pivoted_ds_schema.append(
+    overrides_ds_schema.append(
         {"name": "first_action", "type": "string", "meaning": "Text"})
-    return editlog_pivoted_ds_schema, edited_ds_schema
+    return overrides_ds_schema, edited_ds_schema
 
 
 # Recipe utils
@@ -104,7 +104,7 @@ def unpack_keys(df, new_key_names, old_key_name="key"):
             keys_df = concat([keys_df, DataFrame(data=d, index=[i1])])
             i1 += 1
 
-        # 3. Add a column to editlog_pivoted for each key listed in primary_keys
+        # 3. Add a column to overrides for each key listed in primary_keys
         df[new_key_names] = keys_df
 
         # 4. Remove the old key column
@@ -115,7 +115,7 @@ def unpack_keys(df, new_key_names, old_key_name="key"):
 
 def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
 
-    # Create empty dataframe with the proper editlog pivoted schema: all primary keys, all editable columns, and "date" column
+    # Create empty dataframe with the proper overrides schema: all primary keys, all editable columns, and "date" column
     # This helps ensure that the dataframe we return always has the right schema
     # (even if some columns of the input dataset were never edited)
     cols = primary_keys + editable_column_names + ["last_edit_date", "last_action", "first_action"]
@@ -123,7 +123,7 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
 
     editlog_df = get_editlog_df(editlog_ds)
     if (not editlog_df.size): # i.e. if empty editlog
-        editlog_pivoted_df = all_columns_df
+        overrides_df = all_columns_df
     else:
         editlog_df.rename(
             columns={"date": "edit_date"},
@@ -137,7 +137,7 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
                        ].groupby(primary_keys).first().add_prefix("first_")
         editlog_grouped_df = editlog_grouped_last.join(editlog_grouped_first, on=primary_keys)
 
-        editlog_pivoted_df = pivot_table(
+        overrides_df = pivot_table(
             editlog_df.sort_values("edit_date"),  # ordering by edit date
             index=primary_keys,
             columns="column_name",
@@ -150,15 +150,15 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
         )
         
         # Drop any columns from the pivot that may not be one of the editable_column_names
-        for col in editlog_pivoted_df.columns:
+        for col in overrides_df.columns:
             if not col in cols:
-                editlog_pivoted_df.drop(columns=[col], inplace=True)
+                overrides_df.drop(columns=[col], inplace=True)
 
-        editlog_pivoted_df.reset_index(inplace=True)
+        overrides_df.reset_index(inplace=True)
         # this makes sure that all (editable) columns are here and in the right order
-        editlog_pivoted_df = concat([all_columns_df, editlog_pivoted_df])
+        overrides_df = concat([all_columns_df, overrides_df])
 
-    return editlog_pivoted_df
+    return overrides_df
 
 def get_original_df(original_ds):
 
@@ -176,41 +176,41 @@ def get_original_df(original_ds):
     schema = original_ds_config.get("schema").get("columns")
     display_column_names = get_display_column_names(schema, primary_keys, editable_column_names)
     
-    # make sure that primary keys will be in the same order for original_df and editlog_pivoted_df, and that we'll return a dataframe where editable columns are last
+    # make sure that primary keys will be in the same order for original_df and overrides_df, and that we'll return a dataframe where editable columns are last
     return original_df[primary_keys + display_column_names + editable_column_names], primary_keys
 
-def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
+def merge_edits_from_all_df(original_df, overrides_df, primary_keys):
 
-    if (not editlog_pivoted_df.size):  # i.e. if empty editlog
+    if (not overrides_df.size):  # i.e. if empty editlog
         edited_df = original_df
     else:
 
-        created = editlog_pivoted_df["first_action"]=="create"
-        created_df = editlog_pivoted_df[created]
+        created = overrides_df["first_action"]=="create"
+        created_df = overrides_df[created]
 
 
-        # Prepare editlog_pivoted_df
+        # Prepare overrides_df
         ###
 
-        not_deleted = editlog_pivoted_df["last_action"]!="delete"
-        editlog_pivoted_df = editlog_pivoted_df[not_deleted & ~created]
+        not_deleted = overrides_df["last_action"]!="delete"
+        overrides_df = overrides_df[not_deleted & ~created]
 
         # Drop columns which are not primary keys nor editable columns
-        if ("last_edit_date" in editlog_pivoted_df.columns):
-            editlog_pivoted_df.drop(columns=["last_edit_date"], inplace=True)
-        if ("last_action" in editlog_pivoted_df.columns):
-            editlog_pivoted_df.drop(columns=["last_action"], inplace=True)
-        if ("first_action" in editlog_pivoted_df.columns):
-            editlog_pivoted_df.drop(columns=["first_action"], inplace=True)
+        if ("last_edit_date" in overrides_df.columns):
+            overrides_df.drop(columns=["last_edit_date"], inplace=True)
+        if ("last_action" in overrides_df.columns):
+            overrides_df.drop(columns=["last_action"], inplace=True)
+        if ("first_action" in overrides_df.columns):
+            overrides_df.drop(columns=["first_action"], inplace=True)
 
         # Change types to match those of original_df
-        for col in editlog_pivoted_df.columns:
-            editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(
+        for col in overrides_df.columns:
+            overrides_df[col] = overrides_df[col].astype(
                      original_df[col].dtypes.name)
 
         original_df.set_index(primary_keys, inplace=True)
-        if (not editlog_pivoted_df.index.name): # if index has no name, i.e. it's a range index
-            editlog_pivoted_df.set_index(primary_keys, inplace=True)
+        if (not overrides_df.index.name): # if index has no name, i.e. it's a range index
+            overrides_df.set_index(primary_keys, inplace=True)
 
 
         # "Replay" edits: Join and Merge
@@ -218,11 +218,11 @@ def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
 
         # Join -> this adds _value_last columns
         edited_df = original_df.join(
-            editlog_pivoted_df, rsuffix="_value_last")
+            overrides_df, rsuffix="_value_last")
 
         # "Merge" -> this creates _original columns
         # all last_ and first_ columns have already been dropped
-        editable_column_names = editlog_pivoted_df.columns.tolist()
+        editable_column_names = overrides_df.columns.tolist()
         for col in editable_column_names:
             # copy col to a new column whose name is suffixed by "_original"
             edited_df[col + "_original"] = edited_df[col]
@@ -244,9 +244,9 @@ def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
     return edited_df
 
 
-def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
+def merge_edits_from_overrides_df(original_ds, overrides_df):
     original_df, primary_keys = get_original_df(original_ds)
-    return merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys)
+    return merge_edits_from_all_df(original_df, overrides_df, primary_keys)
 
 
 # Other utils

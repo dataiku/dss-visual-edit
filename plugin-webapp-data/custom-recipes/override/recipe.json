@@ -1,7 +1,7 @@
 {
     "meta": {
-        "label": "Merge edits",
-        "description": "Merge values edited via the webapp, into the original dataset.",
+        "label": "Override values",
+        "description": "Replace values in an Original dataset with values coming from an Overrides dataset",
         "icon": "icon-plus"
     },
     "kind": "PYTHON",
@@ -9,15 +9,15 @@
         {
             "name": "original",
             "label": "Original dataset",
-            "description": "Contains the data to be made editable via webapp",
+            "description": "This can be the same as used in a Data Editing webapp",
             "arity": "UNARY",
             "required": true,
             "acceptsDataset": true
         },
         {
-            "name": "editlog_pivoted",
-            "label": "Pivoted edit log",
-            "description": "Created by webapp and associated pivot recipe",
+            "name": "overrides",
+            "label": "Overrides dataset",
+            "description": "This can be the result of the Replay recipe on an editlog maintained by a Data Editing webapp",
             "arity": "UNARY",
             "required": true,
             "acceptsDataset": true
@@ -35,12 +35,7 @@
         }
     ],
     "params": [
-        {
-            "name": "sep",
-            "label": "⚠️ DO NOT EDIT THIS RECIPE",
-            "description": "This recipe is controlled by a data editing webapp (see URL in the recipe details, by clicking on the (i) icon in the vertical menu bar on the right-hand side).",
-            "type": "SEPARATOR"
-        }
+        {}
     ],
     "resourceKeys": []
 }

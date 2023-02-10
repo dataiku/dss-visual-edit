@@ -8,7 +8,7 @@ from dataiku.customrecipe import get_input_names_for_role, get_output_names_for_
 # import sys
 # sys.path.append('../../python-lib')
 
-from commons import merge_edits_from_log_pivoted_df
+from commons import merge_edits_from_overrides_df
 
 
 #%% Get recipe parameters
@@ -18,9 +18,9 @@ original_names = get_input_names_for_role('original')
 original_datasets = [dataiku.Dataset(name) for name in original_names]
 original_ds = original_datasets[0]
 
-pivoted_names = get_input_names_for_role('editlog_pivoted')
-pivoted_datasets = [dataiku.Dataset(name) for name in pivoted_names]
-pivoted_ds = pivoted_datasets[0]
+overrides_names = get_input_names_for_role('overrides')
+overrides_datasets = [dataiku.Dataset(name) for name in overrides_names]
+overrides_ds = overrides_datasets[0]
 
 edited_names = get_output_names_for_role('edited')
 edited_datasets = [dataiku.Dataset(name) for name in edited_names]
@@ -30,13 +30,13 @@ edited_ds = edited_datasets[0]
 #%% Read input data
 ###
 
-editlog_pivoted_df = pivoted_ds.get_dataframe() # this dataframe was written by the pivot-editlog recipe which inferred the schema upon writing, so we stay with the default infer_with_pandas=True
+overrides_df = overrides_ds.get_dataframe() # this dataframe was written by the replay recipe which inferred the schema upon writing, so we stay with the default infer_with_pandas=True
 
 
 #%% Compute output data
 ###
 
-edited_df = merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df)
+edited_df = merge_edits_from_overrides_df(original_ds, overrides_df)
 
 
 #%% Write output data

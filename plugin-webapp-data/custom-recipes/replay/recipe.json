@@ -1,0 +1,32 @@
+{
+    "meta": {
+        "label": "Replay edits",
+        "description": "Create a dataset of overrides: rows correspond to unique keys from the editlog, columns are the original dataset's editable columns, and values are the last edits.",
+        "icon": "icon-repeat"
+    },
+    "kind": "PYTHON",
+    "inputRoles": [
+        {
+            "name": "editlog",
+            "label": "Editlog",
+            "description": "Managed by webapp",
+            "arity": "UNARY",
+            "required": true,
+            "acceptsDataset": true
+        }
+    ],
+    "outputRoles": [
+        {
+            "name": "overrides",
+            "label": "Overrides dataset",
+            "description": "",
+            "arity": "UNARY",
+            "required": true,
+            "acceptsDataset": true
+        }
+    ],
+    "params": [
+        {}
+    ],
+    "resourceKeys": []
+}

@@ -74,40 +74,40 @@ class EditableEventSourced:
         self.__save_custom_fields__(self.editlog_ds_name)
 
     def __setup_editlog_downstream__(self):
-        editlog_pivoted_ds_schema, edited_ds_schema = get_editlog_pivoted_ds_schema(self.__schema__, self.primary_keys, self.editable_column_names)
-        editlog_pivoted_ds_creator = DSSManagedDatasetCreationHelper(
-            self.project, self.editlog_pivoted_ds_name)
-        if (editlog_pivoted_ds_creator.already_exists()):
-            logging.debug("Found editlog pivoted")
+        overrides_ds_schema, edited_ds_schema = get_overrides_ds_schema(self.__schema__, self.primary_keys, self.editable_column_names)
+        overrides_ds_creator = DSSManagedDatasetCreationHelper(
+            self.project, self.overrides_ds_name)
+        if (overrides_ds_creator.already_exists()):
+            logging.debug("Found overrides dataset")
             unused_variable = None
         else:
-            logging.debug("No editlog pivoted found, creating it...")
-            editlog_pivoted_ds_creator.with_store_into(
+            logging.debug("No overrides dataset found, creating it...")
+            overrides_ds_creator.with_store_into(
                 connection=self.__connection_name__)
-            editlog_pivoted_ds_creator.create()
-            self.editlog_pivoted_ds = Dataset(
-                self.editlog_pivoted_ds_name, self.project_key)
+            overrides_ds_creator.create()
+            self.overrides_ds = Dataset(
+                self.overrides_ds_name, self.project_key)
             cols = self.primary_keys + \
                 self.editable_column_names + ["last_edit_date", "last_action", "first_action"]
-            editlog_pivoted_df = DataFrame(columns=cols)
-            self.editlog_pivoted_ds.write_schema(editlog_pivoted_ds_schema)
-            self.editlog_pivoted_ds.write_dataframe(editlog_pivoted_df, infer_schema=False)
+            overrides_df = DataFrame(columns=cols)
+            self.overrides_ds.write_schema(overrides_ds_schema)
+            self.overrides_ds.write_dataframe(overrides_df, infer_schema=False)
             logging.debug("Done.")
 
-        pivot_recipe_name = "compute_" + self.editlog_pivoted_ds_name
+        pivot_recipe_name = "compute_" + self.overrides_ds_name
         pivot_recipe_creator = DSSRecipeCreator(
-            "CustomCode_pivot-editlog", pivot_recipe_name, self.project)
+            "CustomCode_replay", pivot_recipe_name, self.project)
         if (recipe_already_exists(pivot_recipe_name, self.project)):
-            logging.debug("Found recipe to create editlog pivoted")
+            logging.debug("Found recipe to create overrides dataset")
             pivot_recipe = self.project.get_recipe(pivot_recipe_name)
         else:
             logging.debug(
-                "No recipe to create editlog pivoted, creating it...")
+                "No recipe to create overrides dataset, creating it...")
             pivot_recipe = pivot_recipe_creator.create()
             pivot_settings = pivot_recipe.get_settings()
             pivot_settings.add_input("editlog", self.editlog_ds_name)
             pivot_settings.add_output(
-                "editlog_pivoted", self.editlog_pivoted_ds_name)
+                "overrides", self.overrides_ds_name)
             pivot_settings.custom_fields["webapp_url"] = self.webapp_url
             pivot_settings.save()
             logging.debug("Done.")
@@ -130,7 +130,7 @@ class EditableEventSourced:
 
         merge_recipe_name = "compute_" + self.edited_ds_name
         merge_recipe_creator = DSSRecipeCreator(
-            "CustomCode_merge-edits", merge_recipe_name, self.project)
+            "CustomCode_override", merge_recipe_name, self.project)
         if (recipe_already_exists(merge_recipe_name, self.project)):
             logging.debug("Found recipe to create edited dataset")
             merge_recipe = self.project.get_recipe(merge_recipe_name)
@@ -140,7 +140,7 @@ class EditableEventSourced:
             merge_settings = merge_recipe.get_settings()
             merge_settings.add_input("original", self.original_ds_name)
             merge_settings.add_input(
-                "editlog_pivoted", self.editlog_pivoted_ds_name)
+                "overrides", self.overrides_ds_name)
             merge_settings.add_output("edited", self.edited_ds_name)
             merge_settings.custom_fields["webapp_url"] = self.webapp_url
             merge_settings.save()
@@ -159,7 +159,7 @@ class EditableEventSourced:
         self.original_ds = Dataset(self.original_ds_name, self.project_key)
 
         self.editlog_ds_name = self.original_ds_name + "_editlog"
-        self.editlog_pivoted_ds_name = self.editlog_ds_name + "_pivoted"
+        self.overrides_ds_name = self.editlog_ds_name + "_overrides"
         self.edited_ds_name = self.original_ds_name + "_edited"
 
         self.__connection_name__ = self.original_ds.get_config().get(
@@ -212,7 +212,7 @@ class EditableEventSourced:
         return self.get_edited_df().set_index(self.primary_keys)
         
     def get_edited_df(self):
-        return merge_edits_from_log_pivoted_df(
+        return merge_edits_from_overrides_df(
             self.original_ds,
             self.edited_cells_df.reset_index()
         )
