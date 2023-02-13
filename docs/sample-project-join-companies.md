@@ -8,7 +8,7 @@ This project demonstrates a case of feedback loop, where the data to review/edit
 
 [Join Companies #1: End-User Experience](https://www.loom.com/share/7b79e45e755544f8baf1ff3ed1bf60ee)
 
-<div style="position: relative; padding-bottom: NaN%; height: 0;"><iframe src="https://www.loom.com/share/7b79e45e755544f8baf1ff3ed1bf60ee" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
+<div style="position: relative; padding-bottom: NaN%; height: 0;"><iframe src="https://www.loom.com/embed/7b79e45e755544f8baf1ff3ed1bf60ee" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
 
 How to replicate:
 
