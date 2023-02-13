@@ -111,11 +111,11 @@ Reviewing could be made in a spreadsheet program. It involves:
 
 Once the project has been built and successfully tested on a Design node, you would deploy it to an Automation node.
 
-[Deploy to production](https://www.loom.com/share/e47c5d09871741c48062e3547108bb39).
+<iframe src="https://www.loom.com/embed/e47c5d09871741c48062e3547108bb39" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
 The matching algorithm may change in time. Here is a demo where we update one of its parameters, deploy a new version of the project to Automation node, and see the impact.
 
-[Update in production](https://www.loom.com/share/8b806a65e50a4406b9ec3d4a31495205).
+<iframe src="https://www.loom.com/embed/8b806a65e50a4406b9ec3d4a31495205" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
 ### Live data ingestion
 

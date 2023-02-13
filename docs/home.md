@@ -1,27 +1,27 @@
 # Plugin: Data Editing | Dataiku
 
-Enable “human in the loop” analytics & AI. No-code data editing webapp and integration in production pipelines.
+No-code webapps for “human in the loop” analytics & AI.
 
 <iframe src="https://www.loom.com/embed/7b79e45e755544f8baf1ff3ed1bf60ee" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
-Use cases: entity reconciliation, forecast override, AI feedback loop, data correctioning, business rules exception handling.
+Check out our library of [demo videos](https://loom.com/share/folder/b5e96d5672da4a58883b3b05a35445fa): webapp setup, integrating edits into the flow, feedback loop, deployment in production.
 
-Check out our library of [demo videos](https://loom.com/share/folder/b5e96d5672da4a58883b3b05a35445fa): webapp setup, integrating edits into the flow, feedback loop, deployment in production. 
+## Use cases
 
-## Benefits
-
-Problems we solve
-Eliminate Excel-based workflows.
+* Entity reconciliation
+* Forecast override
+* AI feedback loop
+* Data correctioning
+* Business rules exception handling
 
 ## Features
 
-* No-code setup: focus on your data pipeline, not on webapp programming.
-* Continuous update mechanisms: seamless integration of new source data into the webapp and of new edits into production data pipelines.
-* Governance: audit trail of all edits made by end-users.
 * Feature-rich data table with editable columns:
   * Filter, sort and group data
   * Formatters and editors for different data types (boolean, numerical, textual, date)
   * Support for linked records (aka foreign keys) and lookup columns.
+* Continuous update mechanisms: seamless integration of new source data into the webapp and of new edits into production data pipelines.
+* Governance: audit trail of all edits made by end-users.
 
 ## Contents
 
