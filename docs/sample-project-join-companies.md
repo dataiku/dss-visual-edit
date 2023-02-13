@@ -6,9 +6,7 @@ _In this article we introduce the Join Companies use case via a demo and we expl
 
 This project demonstrates a case of feedback loop, where the data to review/edit in the webapp depends on previous edits. It also demonstrates usage of linked records and lookup columns.
 
-[Join Companies #1: End-User Experience](https://www.loom.com/share/7b79e45e755544f8baf1ff3ed1bf60ee)
-
-<div style="position: relative; padding-bottom: NaN%; height: 0;"><iframe src="https://www.loom.com/embed/7b79e45e755544f8baf1ff3ed1bf60ee" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
+<iframe src="https://www.loom.com/embed/7b79e45e755544f8baf1ff3ed1bf60ee" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
 How to replicate:
 
@@ -34,7 +32,7 @@ This section presents how the project works in its current state. Alternatively,
 
 As you can see in the datasets above, comparing company names can work in some cases but not all (e.g. "TheFacebook" and "Meta"). We set up a data editing webapp to have a human assign matches that the machine couldn't find.
 
-[Join Companies #2: Webapp Setup](https://www.loom.com/share/d28df84ca26b49a2a25f802c92cfbb5e)
+<iframe src="https://www.loom.com/embed/d28df84ca26b49a2a25f802c92cfbb5e" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
 ### Flow
 
@@ -44,18 +42,20 @@ Here is an overview of the project's Flow:
 
 #### Editlog
 
-The Flow includes an editlog dataset and recipes provided by the Data Editing plugin (those in red). If you're not familiar with them, check out this video for a live demonstration: [Join Companies #3: Integrating Edits into the Flow](https://www.loom.com/share/17b4c5bf685f4f30a00a51c53d4d006f).
+The Flow includes an editlog dataset and recipes provided by the Data Editing plugin (those in red). If you're not familiar with them, check out this video for a live demonstration:
+
+<iframe src="https://www.loom.com/embed/17b4c5bf685f4f30a00a51c53d4d006f" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
+
 
 #### Walkthrough
 
-[Join Companies #4: Project Walkthrough](https://www.loom.com/share/532c66806723419f9161614b94b749b1)
+<iframe src="https://www.loom.com/embed/532c66806723419f9161614b94b749b1" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
 #### Feedback Loop
 
 The Flow implements a feedback loop: the data for review is in `matches_uncertain` and edits can be found in `matches_uncertain_editlog_pivoted`, which is upstream.
 
-<div style="position: relative; padding-bottom: NaN%; height: 0;"><iframe src="https://www.loom.com/embed/7f51ae7c61f14da28f449c3b7d1f478e" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
-
+<iframe src="https://www.loom.com/embed/7f51ae7c61f14da28f449c3b7d1f478e" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
 ## Making of
 
