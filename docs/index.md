@@ -4,15 +4,15 @@ No-code webapps for “human in the loop” analytics & AI.
 
 <iframe src="https://www.loom.com/embed/7b79e45e755544f8baf1ff3ed1bf60ee" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
-Check out our library of [demo videos](https://loom.com/share/folder/b5e96d5672da4a58883b3b05a35445fa): webapp setup, integrating edits into the flow, feedback loop, deployment in production.
+Check out our library of [demo videos](https://loom.com/share/folder/b5e96d5672da4a58883b3b05a35445fa): webapp setup, integrating edits into the Flow, feedback loops, usage in Design vs Automation.
 
 ## Use cases
 
-* Entity reconciliation
-* Forecast override
-* AI feedback loop
-* Data correctioning
-* Business rules exception handling
+* **Entity reconciliation**: 2 or more datasets represent the same entities and need to be merged. However, common properties of a given entity may have different values from one dataset to the other. See our ["join companies" sample project](sample-project-join-companies) where we manually review and correct matches between company entities whose names differ.
+* **Forecast override**: machine-made sales forecasts need to be adjusted by a human, to take into account contextual information that wasn't available to the machine, or to correct low-confidence predictions.
+* **AI feedback loop**: human feedback on AI-powered predictions is ingested back into the AI's training data.
+* **Business rules exception handling**: manually filling in missing values in the output of classification rules.
+* **Data correctioning**.
 
 ## Features
 
@@ -26,7 +26,7 @@ Check out our library of [demo videos](https://loom.com/share/folder/b5e96d5672d
 ## Contents
 
 * [Installation](install-plugin): Dataiku v9 and above
-* [Getting started](get-started): Key Concepts
+* [Getting started](get-started): Overview of plugin components and key concepts
 * [Going further](going-further): Deployment, FAQ
 * [Sample project: join companies](sample-project-join-companies)
 * [Sample project: ML feedback loop](sample-project-ml-feedback-loop)

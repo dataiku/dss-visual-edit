@@ -1,16 +1,22 @@
 # Sample project: Join Companies
 
-_In this article we introduce the Join Companies use case via a demo and we explain how to replicate with our sample project. We also explain how the project works behind the scenes, the steps to build it from scratch, then we discuss deployment and lifecycle._
+In this entity reconciliation project, 2 datasets representing the same companies need to be merged. We manually review and correct matches between company entities whose names differ.
 
-## Introduction
+We start this article with a demonstration and we explain how to replicate it using an export of our Dataiku project. We also explain how the project works behind the scenes, the steps to build it from scratch, then we discuss deployment and lifecycle._
 
-This project demonstrates a case of feedback loop, where the data to review/edit in the webapp depends on previous edits. It also demonstrates usage of linked records and lookup columns.
+## Demonstration
+
+This project demonstrates:
+
+* a case of feedback loop, where the data to review/edit in the webapp depends on previous edits
+* usage of linked records and lookup columns.
 
 <iframe src="https://www.loom.com/embed/7b79e45e755544f8baf1ff3ed1bf60ee" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
 How to replicate:
 
-* [Download project bundle](dss-bundle-JOIN_COMPANIES_SIMPLE-webapp-based.zip). Note: the project uses the managed Amazon S3 data connection provided on Dataiku Online — you may have to remap to one of your own data connections.
+* [Install the Data Editing plugin](install-plugin).
+* [Download project bundle](dss-bundle-JOIN_COMPANIES_SIMPLE-webapp-based.zip) and import on your instance. Note: the project uses the managed Amazon S3 data connection provided on Dataiku Online — you may have to remap to one of your own data connections.
 * Build dataset `companies_joined_prepared_edited` (recursive build).
 * Go to Webapps and start "Edit Matches Uncertain".
 * Go to Dashboards and to "Company Matches":
@@ -33,6 +39,8 @@ This section presents how the project works in its current state. Alternatively,
 As you can see in the datasets above, comparing company names can work in some cases but not all (e.g. "TheFacebook" and "Meta"). We set up a data editing webapp to have a human assign matches that the machine couldn't find.
 
 <iframe src="https://www.loom.com/embed/d28df84ca26b49a2a25f802c92cfbb5e" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
+
+The special role of the `reviewed` column, which we saw in the 1st video when clicking on the "Update" button, isn't defined in the webapp settings but in the Flow that generates the `matches_uncertain` dataset.
 
 ### Flow
 
@@ -109,7 +117,7 @@ Reviewing could be made in a spreadsheet program. It involves:
 
 ### Project deployment and update in production
 
-Once the project has been built and successfully tested on a Design node, you would deploy it to an Automation node.
+Once the project has been built and successfully tested on a Design node, you would deploy it to an Automation node. This requires proper initialization of the editlog on the latter, as shown in the video below.
 
 <iframe src="https://www.loom.com/embed/e47c5d09871741c48062e3547108bb39" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 

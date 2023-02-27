@@ -2,9 +2,23 @@
 
 ## Adding the webapp to a Dashboard
 
-The best way to make this webapp accessible to end-users is by publishing it to a Dashboard. From there you can add "tiles", such as a Text one with instructions, or a Scenario tile, and adjust the layout. The Scenario tile is displayed as a button to run a chosen scenario; this is a great way to let the end-user run computations that take edits into account.
+The best way to make this webapp accessible to end-users is by publishing it to a Dashboard (from the webapp view, click on the Actions button of the menu at the top, on the right-hand side).
+
+![](publish_dashboard.png)
+
+You can then add other "tiles" to your Dashboard, such as a Text tile with instructions on how to use the webapp, or a Scenario tile, and adjust the layout.
 
 ![](dashboard_edit.png)
+
+The Scenario tile is displayed as a button to run a chosen scenario. This is a great way to let the end-user run computations that take edits into account. An example is provided in our [sample project: join companies](sample-project-join-companies).
+
+## Resetting edits on a design node
+
+Create and run a scenario with an "Initialize editlog" Step. This type of scenario step is provided by the plugin and can be found toward the end of the list of available steps.
+
+![](scenario_initialize_editlog.png)
+
+You can also add a step to run a scenario dedicated to building datasets downstream of the editlog.
 
 ## Deploying to production (automation node)
 
