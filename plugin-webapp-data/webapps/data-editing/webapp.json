@@ -166,6 +166,11 @@
             "type": "SEPARATOR"
         },
         {
+            "name": "debug_mode",
+            "label": "Debug mode",
+            "type": "BOOLEAN"
+        },
+        {
             "name": "editschema",
             "label": "Editschema (optional)",
             "description": "Additional column settings to provide as an array of dictionaries in JSON format (example: [ {'name': 'col1'}, {'name': 'col2'} ]",
