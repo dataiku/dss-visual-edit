@@ -1,7 +1,0 @@
-{
-    "primary_keys": ["name"],
-    "editable_column_names": ["description", "is_modern"],
-    "freeze_editable_columns": false,
-    "group_column_names": [],
-    "linked_records_count": 0
-}

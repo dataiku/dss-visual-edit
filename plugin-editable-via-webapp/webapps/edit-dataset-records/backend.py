@@ -23,7 +23,6 @@ import logging
 from dataiku import api_client
 from os import getenv
 from dash import Dash, html, dcc, Input, Output, State, callback_context
-from copy import deepcopy
 
 stylesheets = [
     "https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
@@ -298,7 +297,7 @@ def read_endpoint():
     """
     primary_keys_values = request.get_json().get("primaryKeys")
     key = get_key_values_from_dict(primary_keys_values, ees.primary_keys)
-    response = ees.edited_cells_df.loc[key].to_json()
+    response = ees.get_edited_cells_df_indexed().loc[key].to_json()
     return response
 
 @server.route("/read-all-edits", methods=['GET'])
@@ -308,7 +307,7 @@ def read_all_edits_endpoint():
 
     Returns: CSV-formatted dataset with rows that were created or edited, and values of primary key and editable columns. See remarks of the `read` endpoint.
     """
-    response = make_response(ees.edited_cells_df.to_csv())
+    response = make_response(ees.get_edited_cells_df_indexed().to_csv())
     response.headers["Content-Disposition"] = "attachment; filename=" + original_ds_name + "_edits.csv"
     response.headers["Content-Type"] = "text/csv"
     response.headers["Cache-Control"] = "no-store"
@@ -430,16 +429,16 @@ def lookup_endpoint(linked_ds_name):
 def my_dash_app():
     return app.index()
 
-@server.route("/flask", methods=['GET', 'POST'])
-def dummy_endpoint():
+@server.route("/echo", methods=['GET', 'POST'])
+def echo_endpoint():
     if request.method == 'POST':
         term = request.get_json().get("term")
     else:
         term = request.args.get('term', '')
     return jsonify([term])
 
-@server.route('/test')
-def test_page():
+@server.route('/static')
+def static_page():
     return current_app.send_static_file('values_url.html')
 
 

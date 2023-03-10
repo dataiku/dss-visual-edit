@@ -198,15 +198,10 @@ class EditableEventSourced:
         # make sure that original dataset has up-to-date custom fields (editlog and datasets/recipes that follow may not - TODO: change this?)
         self.__save_custom_fields__(self.original_ds_name)
         self.__setup_editlog__()
+        self.__setup_editlog_downstream__()
 
         # used to reference javascript functions in custom_tabulator.js
         self.__ns__ = Namespace("myNamespace", "tabulator")
-
-        self.edited_cells_df = pivot_editlog(
-            self.editlog_ds,
-            self.primary_keys,
-            self.editable_column_names
-        ).set_index(self.primary_keys)
 
     def get_edited_df_indexed(self):
         return self.get_edited_df().set_index(self.primary_keys)
@@ -214,7 +209,17 @@ class EditableEventSourced:
     def get_edited_df(self):
         return merge_edits_from_log_pivoted_df(
             self.original_ds,
-            self.edited_cells_df.reset_index()
+            self.get_edited_cells_df()
+        )
+
+    def get_edited_cells_df_indexed(self):
+        return self.get_edited_cells_df().set_index(self.primary_keys)
+
+    def get_edited_cells_df(self):
+        return pivot_editlog(
+            self.editlog_ds,
+            self.primary_keys,
+            self.editable_column_names
         )
 
     def get_data_tabulator(self):
@@ -332,8 +337,38 @@ class EditableEventSourced:
 
         # Define possible values in the list
         linked_ds_name = self.linked_records_df.loc[linked_record_name, "ds_name"]
-        t_col["editorParams"]["filterRemote"] = True
-        t_col["editorParams"]["valuesURL"] = "lookup/" + linked_ds_name
+        linked_ds = self.project.get_dataset(linked_ds_name)
+        metrics = linked_ds.compute_metrics(metric_ids=["records:COUNT_RECORDS"])[
+            "result"]["computed"]
+        for m in metrics:
+            if (m["metric"]["metricType"] == "COUNT_RECORDS"):
+                count_records = int(m["value"])
+        if (count_records > 1000):
+            # ds_key and ds_label would normally be used, when loading the linked dataset in memory, but here they will be fetched by the API endpoint who has access to an EditableEventSourced dataset and who's given linked_ds_name in the URL
+            logging.debug(
+                f"Using API to lookup values in {linked_ds_name} since this dataset has {count_records} rows")
+            t_col["editorParams"]["filterRemote"] = True
+            t_col["editorParams"]["valuesURL"] = "lookup/" + linked_ds_name
+
+        else:
+            # The dataset can be loaded in memory
+            logging.debug(
+                f"Loading {linked_ds_name} in memory since this dataset has {count_records} rows")
+            linked_ds_key = self.linked_records_df.loc[linked_record_name, "ds_key"]
+            linked_ds_label = self.linked_records_df.loc[linked_record_name, "ds_label"]
+            linked_df = Dataset(linked_ds_name).get_dataframe()
+            editor_values_param = get_values_from_linked_df(
+                linked_df, linked_ds_key, linked_ds_label, linked_ds_lookup_columns)
+            if (linked_ds_label != linked_ds_key):
+                # A label column was provided: use labels in the formatter, instead of the keys; for this we provide a "lookup" parameter which looks like this: {"key1": "label1", "key2": "label2", "null": ""}
+                t_col["formatter"] = "lookup"
+                formatter_lookup_param = linked_df.set_index(
+                    linked_ds_key)[linked_ds_label].to_dict()
+                # use empty label when key is missing
+                formatter_lookup_param["null"] = ""
+                t_col["formatterParams"] = formatter_lookup_param
+            t_col["editorParams"]["values"] = editor_values_param
+            t_col["editorParams"]["filterFunc"] = self.__ns__("filterFunc")
 
         return t_col
 
@@ -401,11 +436,6 @@ class EditableEventSourced:
                 "user": [user]
             }))
 
-            self.edited_cells_df.loc[key, column] = value
-            if (action=="create" and not self.edited_cells_df.loc[key, "first_action"] == self.edited_cells_df.loc[key, "first_action"]):
-                self.edited_cells_df.loc[key, "first_action"] = "create"
-            self.edited_cells_df.loc[key, "last_action"] = action
-
             # Update lookup columns if a linked record was edited
             # for linked_record in self.linked_records:
             #     if (column_name==linked_record["name"]):
@@ -422,14 +452,14 @@ class EditableEventSourced:
         else:
 
             info = f"""{column} isn't an editable column"""
-
+        
         logging.info(info)
         return info
 
     def add_edit_tabulator(self, cell, user):
         return self.add_edit(
-            key=get_key_values_from_dict(cell["row"], self.primary_keys),
-            column=cell["column"],
-            value=cell["value"],
-            user=user
+            tabulator_row_key_values(cell["row"], self.primary_keys),
+            cell["column"],
+            cell["value"],
+            user
         )
