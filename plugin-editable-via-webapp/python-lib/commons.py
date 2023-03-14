@@ -14,6 +14,8 @@ def get_editlog_ds_schema():
         # not using date type, in case the editlog is CSV
         {"name": "date", "type": "string", "meaning": "DateSource"},
         {"name": "user", "type": "string", "meaning": "Text"},
+        # action can be "update", "create", or "delete"; currently it's ignored by the pivot method
+        {"name": "action", "type": "string", "meaning": "Text"},
         {"name": "key", "type": "string", "meaning": "Text"},
         {"name": "column_name", "type": "string", "meaning": "Text"},
         {"name": "value", "type": "string", "meaning": "Text"}
@@ -21,7 +23,7 @@ def get_editlog_ds_schema():
 
 
 def get_editlog_columns():
-    return ["date", "user", "key", "column_name", "value"]
+    return ["date", "user", "action", "key", "column_name", "value"]
 
 def write_empty_editlog(editlog_ds):
     editlog_ds.write_dataframe(DataFrame(columns=get_editlog_columns()), infer_schema=False)
@@ -47,6 +49,10 @@ def get_editlog_pivoted_ds_schema(original_schema, primary_keys, editable_column
             editlog_pivoted_ds_schema.append(new_col)
     editlog_pivoted_ds_schema.append(
         {"name": "last_edit_date", "type": "string", "meaning": "DateSource"})
+    editlog_pivoted_ds_schema.append(
+        {"name": "last_action", "type": "string", "meaning": "Text"})
+    editlog_pivoted_ds_schema.append(
+        {"name": "first_action", "type": "string", "meaning": "Text"})
     return editlog_pivoted_ds_schema, edited_ds_schema
 
 
@@ -112,28 +118,37 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
     # Create empty dataframe with the proper editlog pivoted schema: all primary keys, all editable columns, and "date" column
     # This helps ensure that the dataframe we return always has the right schema
     # (even if some columns of the input dataset were never edited)
-    cols = primary_keys + editable_column_names + ["last_edit_date"]
+    cols = primary_keys + editable_column_names + ["last_edit_date", "last_action", "first_action"]
     all_columns_df = DataFrame(columns=cols)
 
     editlog_df = get_editlog_df(editlog_ds)
-    if (not editlog_df.size):  # i.e. if empty editlog
+    if (not editlog_df.size): # i.e. if empty editlog
         editlog_pivoted_df = all_columns_df
     else:
-        editlog_df.rename(columns={"date": "last_edit_date"}, inplace=True)
+        editlog_df.rename(
+            columns={"date": "edit_date"},
+            inplace=True)
         editlog_df = unpack_keys(editlog_df, primary_keys)
+
+        # for each key, compute last edit date, last action and first action
+        editlog_grouped_last = editlog_df[primary_keys + ["edit_date", "action"]
+                       ].groupby(primary_keys).last().add_prefix("last_")
+        editlog_grouped_first = editlog_df[primary_keys + ["action"]
+                       ].groupby(primary_keys).first().add_prefix("first_")
+        editlog_grouped_df = editlog_grouped_last.join(editlog_grouped_first, on=primary_keys)
+
         editlog_pivoted_df = pivot_table(
-            editlog_df.sort_values("last_edit_date"),  # ordering by edit date
+            editlog_df.sort_values("edit_date"),  # ordering by edit date
             index=primary_keys,
             columns="column_name",
             values="value",
             # for each named column, we only keep the last value
             aggfunc=lambda values: values.iloc[-1] if not values.empty else None
         ).join(
-            # join the last edit date for each key
-            editlog_df[primary_keys + ["last_edit_date"]
-                       ].groupby(primary_keys).last(),
+            editlog_grouped_df,
             on=primary_keys
         )
+        
         # Drop any columns from the pivot that may not be one of the editable_column_names
         for col in editlog_pivoted_df.columns:
             if not col in cols:
@@ -170,12 +185,23 @@ def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
         edited_df = original_df
     else:
 
+        created = editlog_pivoted_df["first_action"]=="create"
+        created_df = editlog_pivoted_df[created]
+
+
         # Prepare editlog_pivoted_df
         ###
 
-        # We don't need the date column here
+        not_deleted = editlog_pivoted_df["last_action"]!="delete"
+        editlog_pivoted_df = editlog_pivoted_df[not_deleted & ~created]
+
+        # Drop columns which are not primary keys nor editable columns
         if ("last_edit_date" in editlog_pivoted_df.columns):
             editlog_pivoted_df.drop(columns=["last_edit_date"], inplace=True)
+        if ("last_action" in editlog_pivoted_df.columns):
+            editlog_pivoted_df.drop(columns=["last_action"], inplace=True)
+        if ("first_action" in editlog_pivoted_df.columns):
+            editlog_pivoted_df.drop(columns=["first_action"], inplace=True)
 
         # Change types to match those of original_df
         for col in editlog_pivoted_df.columns:
@@ -183,7 +209,8 @@ def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
                      original_df[col].dtypes.name)
 
         original_df.set_index(primary_keys, inplace=True)
-        editlog_pivoted_df.set_index(primary_keys, inplace=True)
+        if (not editlog_pivoted_df.index.name): # if index has no name, i.e. it's a range index
+            editlog_pivoted_df.set_index(primary_keys, inplace=True)
 
 
         # "Replay" edits: Join and Merge
@@ -194,7 +221,7 @@ def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
             editlog_pivoted_df, rsuffix="_value_last")
 
         # "Merge" -> this creates _original columns
-        # "last_edit_date" column has already been dropped
+        # all last_ and first_ columns have already been dropped
         editable_column_names = editlog_pivoted_df.columns.tolist()
         for col in editable_column_names:
             # copy col to a new column whose name is suffixed by "_original"
@@ -206,6 +233,13 @@ def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
         # Drop the _original and _value_last columns -> this gets us back to the original schema
         edited_df = edited_df[edited_df.columns[:-2 *
                                                 len(editable_column_names)]].reset_index()
+
+
+        # Stack created rows
+        ###
+
+        if (created_df.size):
+            edited_df = concat([created_df, edited_df])
 
     return edited_df
 
@@ -227,8 +261,21 @@ def get_user_details():
     return auth_info_browser["authIdentifier"]
 
 
-def tabulator_row_key_values(row, primary_keys):
-    """Get values for a given row coming from Tabulator and a list of columns that are primary keys"""
+def get_key_values_from_dict(row, primary_keys):
+    """
+    Get values for a given row provided as a dict and a list of primary key column names
+
+    Example params:
+    - row:
+    ```
+    {
+        "key1": "cat",
+        "key2": "2022-12-21"
+    }
+    ```
+    - primary_keys: `["key1", "key2"]`
+    """
+    # we create a dataframe containing this single row, set the columns to use as index (i.e. primary key(s)), then get the value of the index for the first (and only) row
     return DataFrame(data=row, index=[0]).set_index(primary_keys).index[0]
 
 

@@ -88,7 +88,7 @@ class EditableEventSourced:
             self.editlog_pivoted_ds = Dataset(
                 self.editlog_pivoted_ds_name, self.project_key)
             cols = self.primary_keys + \
-                self.editable_column_names + ["last_edit_date"]
+                self.editable_column_names + ["last_edit_date", "last_action", "first_action"]
             editlog_pivoted_df = DataFrame(columns=cols)
             self.editlog_pivoted_ds.write_schema(editlog_pivoted_ds_schema)
             self.editlog_pivoted_ds.write_dataframe(editlog_pivoted_df, infer_schema=False)
@@ -207,15 +207,20 @@ class EditableEventSourced:
         return self.get_edited_df().set_index(self.primary_keys)
         
     def get_edited_df(self):
-        # Load editlog and pivot it
-        editlog_pivoted_df = pivot_editlog(
+        return merge_edits_from_log_pivoted_df(
+            self.original_ds,
+            self.get_edited_cells_df()
+        )
+
+    def get_edited_cells_df_indexed(self):
+        return self.get_edited_cells_df().set_index(self.primary_keys)
+
+    def get_edited_cells_df(self):
+        return pivot_editlog(
             self.editlog_ds,
             self.primary_keys,
             self.editable_column_names
         )
-        # Replay edits
-        return merge_edits_from_log_pivoted_df(self.original_ds, editlog_pivoted_df)
-        # old version: also call self.__extend_with_lookup_columns__(self.__edited_df_indexed__)
 
     def get_data_tabulator(self):
         # This loads the original dataset, the editlog, and replays edits
@@ -402,10 +407,10 @@ class EditableEventSourced:
 
         return t_cols
 
-    def add_edit(self, primary_key_values, column_name, value, user):
+    def add_edit(self, key, column, value, user, action="update"):
         # if the type of column_name is a boolean, make sure we read it correctly
         for col in self.__schema__:
-            if (col["name"] == column_name):
+            if (col["name"] == column):
                 if type(value) == str and col.get("type") == "boolean":
                     if (value == ""):
                         value = None
@@ -415,29 +420,39 @@ class EditableEventSourced:
 
         # store value as a string, unless it's None
         if (value != None):
-            value = str(value)
+            value_string = str(value)
+        else:
+            value_string = value
 
-        # add to the editlog (since it's in append mode)
-        self.editlog_ds.write_dataframe(DataFrame(data={
-            "key": [str(primary_key_values)],
-            "column_name": [column_name],
-            "value": [value],
-            "date": [datetime.now(timezone("UTC")).isoformat()],
-            "user": [user]
-        }))
+        if column in self.editable_column_names:
 
-        # Update lookup columns if a linked record was edited
-        # for linked_record in self.linked_records:
-        #     if (column_name==linked_record["name"]):
-        #         # Retrieve values of the lookup columns from the linked dataset, for the row corresponding to the edited value (linked_record["ds_key"]==value)
-        #         lookup_values = self.__get_lookup_values__(linked_record, value)
+            # add to the editlog (since it's in append mode)
+            self.editlog_ds.write_dataframe(DataFrame(data={
+                "action": [action],
+                "key": [str(key)],
+                "column_name": [column],
+                "value": [value_string],
+                "date": [datetime.now(timezone("UTC")).isoformat()],
+                "user": [user]
+            }))
 
-        #         # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
-        #         # Might need to change primary_key_values from a list to a tuple — see this example: df.loc[('cobra', 'mark i'), 'shield'] from https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.loc.html ?
-        #         for lookup_column in linked_record["lookup_columns"]:
-        #             self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0]
+            # Update lookup columns if a linked record was edited
+            # for linked_record in self.linked_records:
+            #     if (column_name==linked_record["name"]):
+            #         # Retrieve values of the lookup columns from the linked dataset, for the row corresponding to the edited value (linked_record["ds_key"]==value)
+            #         lookup_values = self.__get_lookup_values__(linked_record, value)
 
-        info = f"""Updated column {column_name} where {self.primary_keys} is {primary_key_values}. New value: {value}."""
+            #         # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
+            #         # Might need to change primary_key_values from a list to a tuple — see this example: df.loc[('cobra', 'mark i'), 'shield'] from https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.loc.html ?
+            #         for lookup_column in linked_record["lookup_columns"]:
+            #             self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0]
+
+            info = f"""Updated column {column} where {self.primary_keys} is {key}. New value: {value}."""
+        
+        else:
+
+            info = f"""{column} isn't an editable column"""
+        
         logging.info(info)
         return info
 
