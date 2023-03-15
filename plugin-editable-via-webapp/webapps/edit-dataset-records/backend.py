@@ -11,7 +11,7 @@
 # %% 0. Imports and variable initializations
 ###
 
-from commons import get_values_from_linked_df, get_user_details, get_last_build_date, get_key_values_from_dict
+from commons import get_values_from_linked_df, get_user_details, get_last_build_date
 from json import dumps
 from flask import Flask, request, jsonify, current_app, make_response
 from pandas import DataFrame
@@ -218,7 +218,7 @@ def add_edit(cell):
         user = "local"
     else:
         user = get_user_details()
-    return ees.add_edit_tabulator(cell, user)
+    return ees.log_edit_tabulator(cell, user)
 
 
 # CRUD endpoints
@@ -254,9 +254,7 @@ def create_endpoint():
     primary_keys_values = request.get_json().get("primaryKeys")
     column_values = request.get_json().get("columnValues")
     # TODO: check set of primary key values is unique?
-    key = get_key_values_from_dict(primary_keys_values, ees.primary_keys)
-    for col in column_values.keys():
-        ees.add_edit(key=key, column=col, value=column_values.get(col), user="API", action="create")
+    ees.create_row(primary_keys_values, column_values, user="API")
     response = jsonify({
         "msg": "New row created"
     })
@@ -266,7 +264,6 @@ def create_endpoint():
 def read_endpoint():
     """
     Read a row that was created or edited via webapp or API
-    TODO: read row that was not edited too! This can be done via Dataiku API
 
     Params:
     - primaryKeys: value(s) of the primary key(s) identifying the row to read
@@ -296,8 +293,7 @@ def read_endpoint():
     ```
     """
     primary_keys_values = request.get_json().get("primaryKeys")
-    key = get_key_values_from_dict(primary_keys_values, ees.primary_keys)
-    response = ees.get_edited_cells_df_indexed().loc[key].to_json()
+    response = ees.get_row(primary_keys_values).to_json()
     return response
 
 @server.route("/read-all-edits", methods=['GET'])
@@ -343,8 +339,7 @@ def update_endpoint():
         primary_keys_values = request.args.get("primaryKeys", "")
         column = request.args.get("column", "")
         value = request.args.get("value", "")
-    key = get_key_values_from_dict(primary_keys_values, ees.primary_keys)
-    info = ees.add_edit(key=key, column=column, value=value, user="API", action="update")
+    info = ees.update_row(primary_keys_values, column, value, user="API")
     response = jsonify({"msg": info})
     return response
 
@@ -362,10 +357,8 @@ def delete_endpoint():
         primary_keys = request.get_json().get("primaryKeys")
     else:
         primary_keys = request.args.get("primaryKeys", "")
-    key = get_key_values_from_dict(primary_keys_values, ees.primary_keys)
-    info = ees.add_edit(key=key, user="API", action="delete")
-    # TODO: drop from dataframe
-    response = jsonify({"msg": f"Row {key} deleted"})
+    info = ees.delete_row(primary_keys_values, user="API")
+    response = jsonify({"msg": f"Row deleted"})
     return response
 
 

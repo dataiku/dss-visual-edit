@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 from re import sub
 
 
-def recipe_already_exists(recipe_name, project):
+def __recipe_already_exists__(recipe_name, project):
     try:
         project.get_recipe(recipe_name).get_status()
         return True
@@ -43,8 +43,6 @@ class EditableEventSourced:
         except:
             self.webapp_url = None
             self.webapp_url_public = "/"
-
-    
 
     def __setup_editlog__(self):
         editlog_ds_creator = DSSManagedDatasetCreationHelper(
@@ -97,7 +95,7 @@ class EditableEventSourced:
         pivot_recipe_name = "compute_" + self.editlog_pivoted_ds_name
         pivot_recipe_creator = DSSRecipeCreator(
             "CustomCode_pivot-editlog", pivot_recipe_name, self.project)
-        if (recipe_already_exists(pivot_recipe_name, self.project)):
+        if (__recipe_already_exists__(pivot_recipe_name, self.project)):
             logging.debug("Found recipe to create editlog pivoted")
             pivot_recipe = self.project.get_recipe(pivot_recipe_name)
         else:
@@ -131,7 +129,7 @@ class EditableEventSourced:
         merge_recipe_name = "compute_" + self.edited_ds_name
         merge_recipe_creator = DSSRecipeCreator(
             "CustomCode_merge-edits", merge_recipe_name, self.project)
-        if (recipe_already_exists(merge_recipe_name, self.project)):
+        if (__recipe_already_exists__(merge_recipe_name, self.project)):
             logging.debug("Found recipe to create edited dataset")
             merge_recipe = self.project.get_recipe(merge_recipe_name)
         else:
@@ -221,6 +219,133 @@ class EditableEventSourced:
             self.primary_keys,
             self.editable_column_names
         )
+
+    def get_row(self, primary_keys):
+        """
+        Read a row that was created or edited (as indicated by the editlog)
+
+        Params:
+        - primary_keys: dictionary containing values for all primary keys defined in the initial data editing setup; the set of values must be unique. Example:
+            ```python
+            {
+                "key1": "cat",
+                "key2": "2022-12-21",
+            }
+            ```
+
+        Returns: single-row dataframe containing the values of editable columns.
+        
+        Notes:
+        - If some rows of the dataset were created, then by definition all columns are editable (including primary keys) .
+        - If no row was created, editable columns are those defined in the initial data editing setup.
+        """
+        key = get_key_values_from_dict(primary_keys, self.primary_keys)
+        # TODO: implementation can be optimized, so that we only load one row of the original dataset, and only load rows of the editlog that match the provided primary key values
+        # TODO: read row that was not edited too! This can be done via Dataiku API
+        return self.get_edited_cells_df_indexed().loc[key]
+
+    def __log_edit__(self, key, column, value, user, action="update"):
+        # if the type of column_name is a boolean, make sure we read it correctly
+        for col in self.__schema__:
+            if (col["name"] == column):
+                if type(value) == str and col.get("type") == "boolean":
+                    if (value == ""):
+                        value = None
+                    else:
+                        value = str(loads(value.lower()))
+                break
+
+        # store value as a string, unless it's None
+        if (value != None):
+            value_string = str(value)
+        else:
+            value_string = value
+
+        if column in self.editable_column_names:
+
+            # add to the editlog (since it's in append mode)
+            self.editlog_ds.write_dataframe(DataFrame(data={
+                "action": [action],
+                "key": [str(key)],
+                "column_name": [column],
+                "value": [value_string],
+                "date": [datetime.now(timezone("UTC")).isoformat()],
+                "user": [user]
+            }))
+
+            # Update lookup columns if a linked record was edited
+            # for linked_record in self.linked_records:
+            #     if (column_name==linked_record["name"]):
+            #         # Retrieve values of the lookup columns from the linked dataset, for the row corresponding to the edited value (linked_record["ds_key"]==value)
+            #         lookup_values = self.__get_lookup_values__(linked_record, value)
+
+            #         # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
+            #         # Might need to change primary_key_values from a list to a tuple — see this example: df.loc[('cobra', 'mark i'), 'shield'] from https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.loc.html ?
+            #         for lookup_column in linked_record["lookup_columns"]:
+            #             self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0]
+
+            info = f"""Updated column {column} where {self.primary_keys} is {key}. New value: {value}."""
+        
+        else:
+
+            info = f"""{column} isn't an editable column"""
+        
+        logging.info(info)
+        return info
+
+    def create_row(self, primary_keys, column_values, user):
+        """
+        Create a new row.
+
+        Params:
+        - primary_keys: dictionary containing values for all primary keys (the set of values must be unique). Example:
+            ```python
+            {
+                "id": "My new unique id"
+            }
+            ```
+        - column_values: dictionary containing values for all other columns. Example:
+            ```python
+            {
+                "col1": "hey",
+                "col2": 42,
+                "col3": true
+            }
+            ```
+
+        Note: this method doesn't implement data validation / it doesn't check that the values are allowed for the specified columns.
+        """
+        key = get_key_values_from_dict(primary_keys, self.primary_keys)
+        for col in column_values.keys():
+            self.__log_edit__(key=key, column=col, value=column_values.get(col), user=user, action="create")
+
+    def update_row(self, primary_keys, column, value, user):
+        """
+        Update a row
+
+        Params:
+        - primary_keys: dictionary containing primary key(s) value(s) that identify the row to update (see get_row method)
+        - column: name of the column to update
+        - value: value to set for the cell identified by key and column
+        ```
+
+        Note: this method doesn't implement data validation / it doesn't check that the value is allowed for the specified column.
+        """
+        key = get_key_values_from_dict(primary_keys, self.primary_keys)
+        return self.__log_edit__(key, column, value, user, action="update")
+
+    def delete_row(self, primary_keys):
+        """
+        Delete a row
+
+        Params:
+        - primary_keys: dictionary containing primary key(s) value(s) that identify the row to delete (see get_row method)
+        """
+        key = get_key_values_from_dict(primary_keys, self.primary_keys)
+        return self.__log_edit__(key, column, value, user, action="delete")
+
+    # Methods for Tabulator
+    ###
 
     def get_data_tabulator(self):
         # This loads the original dataset, the editlog, and replays edits
@@ -407,59 +532,8 @@ class EditableEventSourced:
 
         return t_cols
 
-    def add_edit(self, key, column, value, user, action="update"):
-        # if the type of column_name is a boolean, make sure we read it correctly
-        for col in self.__schema__:
-            if (col["name"] == column):
-                if type(value) == str and col.get("type") == "boolean":
-                    if (value == ""):
-                        value = None
-                    else:
-                        value = str(loads(value.lower()))
-                break
-
-        # store value as a string, unless it's None
-        if (value != None):
-            value_string = str(value)
-        else:
-            value_string = value
-
-        if column in self.editable_column_names:
-
-            # add to the editlog (since it's in append mode)
-            self.editlog_ds.write_dataframe(DataFrame(data={
-                "action": [action],
-                "key": [str(key)],
-                "column_name": [column],
-                "value": [value_string],
-                "date": [datetime.now(timezone("UTC")).isoformat()],
-                "user": [user]
-            }))
-
-            # Update lookup columns if a linked record was edited
-            # for linked_record in self.linked_records:
-            #     if (column_name==linked_record["name"]):
-            #         # Retrieve values of the lookup columns from the linked dataset, for the row corresponding to the edited value (linked_record["ds_key"]==value)
-            #         lookup_values = self.__get_lookup_values__(linked_record, value)
-
-            #         # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
-            #         # Might need to change primary_key_values from a list to a tuple — see this example: df.loc[('cobra', 'mark i'), 'shield'] from https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.loc.html ?
-            #         for lookup_column in linked_record["lookup_columns"]:
-            #             self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0]
-
-            info = f"""Updated column {column} where {self.primary_keys} is {key}. New value: {value}."""
-        
-        else:
-
-            info = f"""{column} isn't an editable column"""
-        
-        logging.info(info)
-        return info
-
-    def add_edit_tabulator(self, cell, user):
-        return self.add_edit(
-            tabulator_row_key_values(cell["row"], self.primary_keys),
-            cell["column"],
-            cell["value"],
-            user
-        )
+    def log_edit_tabulator(self, cell, user):
+        key = get_key_values_from_dict(cell["row"], self.primary_keys)
+        column = cell["column"]
+        value = cell["value"]
+        return self.__log_edit__(key, column, value, user, "update")

@@ -9,6 +9,8 @@ import logging
 
 # Editlog utils
 
+# Used by EES for initialization of editlog
+# TODO: move to EES
 def get_editlog_ds_schema():
     return [
         # not using date type, in case the editlog is CSV
@@ -21,17 +23,15 @@ def get_editlog_ds_schema():
         {"name": "value", "type": "string", "meaning": "Text"}
     ]
 
-
-def get_editlog_columns():
+# Used by write_empty_editlog method below
+def __get_editlog_columns__():
     return ["date", "user", "action", "key", "column_name", "value"]
 
+# Used by Empty Editlog step and by EES for initialization of editlog
 def write_empty_editlog(editlog_ds):
-    editlog_ds.write_dataframe(DataFrame(columns=get_editlog_columns()), infer_schema=False)
+    editlog_ds.write_dataframe(DataFrame(columns=__get_editlog_columns__()), infer_schema=False)
 
-def get_editlog_df(editlog_ds):
-    # the schema was specified upon creation of the dataset, so let's use it
-    return editlog_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True)
-
+# Used by Pivot recipe and by EES for initialization of editlog pivoted dataset
 def get_editlog_pivoted_ds_schema(original_schema, primary_keys, editable_column_names):
     editlog_pivoted_ds_schema = []
     edited_ds_schema = []
@@ -56,30 +56,10 @@ def get_editlog_pivoted_ds_schema(original_schema, primary_keys, editable_column
     return editlog_pivoted_ds_schema, edited_ds_schema
 
 
-# Recipe utils
+# Utils for EES and plugin components (recipes and scenario steps)
 
-
-def get_primary_keys(schema):
-    keys = []
-    for col in schema:
-        if col.get("editable_type") == "key":
-            keys.append(col["name"])
-    return keys
-
-
-def get_display_column_names(schema, primary_keys, editable_column_names):
-    return [col.get("name") for col in schema if col.get("name") not in primary_keys + editable_column_names]
-
-
-def get_editable_column_names(schema):
-    editable_column_names = []
-    for col in schema:
-        if col.get("editable"):
-            editable_column_names.append(col.get("name"))
-    return editable_column_names
-
-
-def unpack_keys(df, new_key_names, old_key_name="key"):
+# Used by pivot_editlog method below
+def __unpack_keys__(df, new_key_names, old_key_name="key"):
     if (len(new_key_names) == 1):
         df.rename(columns={old_key_name: new_key_names[0]}, inplace=True)
     else:
@@ -112,7 +92,12 @@ def unpack_keys(df, new_key_names, old_key_name="key"):
 
     return df
 
+# Used by pivot_editlog method below, and by EES when checking for status of editlog 
+def get_editlog_df(editlog_ds):
+    # the schema was specified upon creation of the dataset, so let's use it
+    return editlog_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True)
 
+# Used by Pivot recipe and by EES for getting edited cells
 def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
 
     # Create empty dataframe with the proper editlog pivoted schema: all primary keys, all editable columns, and "date" column
@@ -128,7 +113,7 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
         editlog_df.rename(
             columns={"date": "edit_date"},
             inplace=True)
-        editlog_df = unpack_keys(editlog_df, primary_keys)
+        editlog_df = __unpack_keys__(editlog_df, primary_keys)
 
         # for each key, compute last edit date, last action and first action
         editlog_grouped_last = editlog_df[primary_keys + ["edit_date", "action"]
@@ -160,7 +145,12 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
 
     return editlog_pivoted_df
 
-def get_original_df(original_ds):
+# Used by get_original_df below and by EES for init
+def get_display_column_names(schema, primary_keys, editable_column_names):
+    return [col.get("name") for col in schema if col.get("name") not in primary_keys + editable_column_names]
+
+# Used by merge_edits_from_log_pivoted_df method below
+def __get_original_df__(original_ds):
 
     try:
         original_df = original_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True) # the dataset schema is likely to have been reviewed by the end-user, so let's use it!
@@ -243,14 +233,15 @@ def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
 
     return edited_df
 
-
+# Used by Merge recipe and by EES for getting edited data
 def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
-    original_df, primary_keys = get_original_df(original_ds)
+    original_df, primary_keys = __get_original_df__(original_ds)
     return merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys)
 
 
-# Other utils
+# Utils for webapp backend
 
+# Used by backend for the edit callback
 def get_user_details():
     client = dataiku.api_client()
     # from https://doc.dataiku.com/dss/latest/webapps/security.html#identifying-users-from-within-a-webapp
@@ -260,7 +251,7 @@ def get_user_details():
         request_headers)
     return auth_info_browser["authIdentifier"]
 
-
+# Used by backend's for CRUD methods
 def get_key_values_from_dict(row, primary_keys):
     """
     Get values for a given row provided as a dict and a list of primary key column names
@@ -278,11 +269,11 @@ def get_key_values_from_dict(row, primary_keys):
     # we create a dataframe containing this single row, set the columns to use as index (i.e. primary key(s)), then get the value of the index for the first (and only) row
     return DataFrame(data=row, index=[0]).set_index(primary_keys).index[0]
 
-
+# Used by backend to figure out if data is up-to-date
 def get_last_build_date(ds_name, project):
     return project.get_dataset(ds_name).get_last_metric_values().get_metric_by_id("reporting:BUILD_START_DATE").get("lastValues")[0].get("computed")
 
-
+# Used by backend's lookup endpoint and by EES (when linked dataframe can be loaded in memory and provided in the Tabulator column settings)
 def get_values_from_linked_df(linked_df, linked_ds_key, linked_ds_label, linked_ds_lookup_columns):
     linked_columns = [linked_ds_key]
     if (linked_ds_label != linked_ds_key):
@@ -296,12 +287,25 @@ def get_values_from_linked_df(linked_df, linked_ds_key, linked_ds_label, linked_
         return values_df[linked_columns].rename(
             columns={linked_ds_key: "value", linked_ds_label: "label"}).to_dict("records")
 
+
 # Other utils (unused)
 
+def get_editable_column_names(schema):
+    editable_column_names = []
+    for col in schema:
+        if col.get("editable"):
+            editable_column_names.append(col.get("name"))
+    return editable_column_names
+
+def get_primary_keys(schema):
+    keys = []
+    for col in schema:
+        if col.get("editable_type") == "key":
+            keys.append(col["name"])
+    return keys
 
 def get_table_name(dataset, project_key):
     return dataset.get_config()["params"]["table"].replace("${projectKey}", project_key).replace("${NODE}", dataiku.get_custom_variables().get("NODE"))
-
 
 def call_rest_api(path):
     PORT = dataiku.base.remoterun.get_env_var("DKU_BASE_PORT")
@@ -316,10 +320,8 @@ def call_rest_api(path):
             verify=False
         ).text)
 
-
 def get_webapp_json(webapp_ID):
     return call_rest_api("/webapps/" + webapp_ID)
-
 
 def find_webapp_id(original_ds_name):
     from pandas import DataFrame
