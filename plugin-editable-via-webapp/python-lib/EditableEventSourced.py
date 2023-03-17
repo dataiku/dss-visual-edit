@@ -8,7 +8,6 @@ from os import getenv
 from json import loads
 from datetime import datetime
 from pytz import timezone
-from dash_extensions.javascript import Namespace
 from urllib.parse import urlparse
 from re import sub
 
