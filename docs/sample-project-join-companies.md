@@ -121,7 +121,7 @@ Once the project has been built and successfully tested on a Design node, you wo
 
 <iframe src="https://www.loom.com/embed/e47c5d09871741c48062e3547108bb39" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
-The matching algorithm may change in time. Here is a demo where we update one of its parameters, deploy a new version of the project to Automation node, and see the impact.
+The matching algorithm could be revisited at some point in time. Here is a demo where we update one of its parameters, deploy a new version of the project to Automation node, and see the impact.
 
 <iframe src="https://www.loom.com/embed/8b806a65e50a4406b9ec3d4a31495205" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
@@ -131,5 +131,6 @@ In a real-world setting, you would connect the reference and external datasets t
 
 * There could be additional companies in the reference dataset, in which case there could be new matches to review. This doesn't have an impact on previous matches.
 * There could be additional companies in the external dataset, or company names could change. As a result, the match found for a given company in the reference dataset could change.
-  * If this company wasn't previously reviewed, it will still appear in the webapp but the suggested match will be different.
+  * If we used to have a perfect match for this company, and now it's not perfect anymore, it will appear in the webapp as a new company/match to review.
+  * If this company wasn't previously reviewed, it will still appear in the webapp but the suggested match could be different.
   * If the company was previously reviewed, it won't appear in the webapp and there won't be any impact. This is because matches get overridden by edits, which are based on ids.

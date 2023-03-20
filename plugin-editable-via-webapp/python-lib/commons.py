@@ -169,6 +169,7 @@ def __get_original_df__(original_ds):
     # make sure that primary keys will be in the same order for original_df and editlog_pivoted_df, and that we'll return a dataframe where editable columns are last
     return original_df[primary_keys + display_column_names + editable_column_names], primary_keys
 
+# Used by merge_edits_from_log_pivoted_df method below
 def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
 
     if (not editlog_pivoted_df.size):  # i.e. if empty editlog
