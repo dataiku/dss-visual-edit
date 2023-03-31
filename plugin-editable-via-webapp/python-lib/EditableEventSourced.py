@@ -201,6 +201,9 @@ class EditableEventSourced:
         # used to reference javascript functions in custom_tabulator.js
         self.__ns__ = Namespace("myNamespace", "tabulator")
 
+    def empty_editlog(self):
+        write_empty_editlog(self.editlog_ds)
+
     def get_edited_df_indexed(self):
         return self.get_edited_df().set_index(self.primary_keys)
         

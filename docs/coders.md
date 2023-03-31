@@ -30,5 +30,6 @@ Available methods:
 * get_edited_cells_df
 * update_row
 * delete_row
+* empty_editlog: delete all rows of the editlog (use with caution)
 
 See docstrings in the code for more information.
