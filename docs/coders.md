@@ -15,9 +15,11 @@ EditableEventSourced = dataiku.import_from_plugin("editable-via-webapp", "Editab
 ees = EditableEventSourced.EditableEventSourced(
     original_ds_name="my_dataset",
     primary_keys=["id"],
-    editable_column_names=["my_editable_col"]
+    editable_column_names=["existing_editable_col", "new_editable_col"]
 )
 ```
+
+`editable_column_names` can contain names of columns found in the original dataset, and names of new columns as well.
 
 The first time EES is instantiated on a given dataset, this creates an "editlog" dataset and 2 recipes that create an "editlog pivoted" and an "edited" dataset.
 

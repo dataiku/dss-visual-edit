@@ -162,15 +162,18 @@ def __get_original_df__(original_ds):
 
     original_ds_config = original_ds.get_config()
     primary_keys = original_ds_config["customFields"]["primary_keys"]
-    editable_column_names = original_ds_config["customFields"]["editable_column_names"]
+    editable_column_names = [col for col in original_ds_config["customFields"]["editable_column_names"] if col in original_df.columns]
     schema = original_ds_config.get("schema").get("columns")
     display_column_names = get_display_column_names(schema, primary_keys, editable_column_names)
     
     # make sure that primary keys will be in the same order for original_df and editlog_pivoted_df, and that we'll return a dataframe where editable columns are last
-    return original_df[primary_keys + display_column_names + editable_column_names], primary_keys
+    return original_df[primary_keys + display_column_names + editable_column_names], primary_keys, display_column_names, editable_column_names
 
-# Used by merge_edits_from_log_pivoted_df method below
-def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
+
+# Used by Merge recipe and by EES for getting edited data
+def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
+    original_df, primary_keys, display_columns, editable_columns = __get_original_df__(original_ds)
+    editable_columns_new = [] # this will contain the list of new columns coming from editlog pivoted but not found in the original dataset's schema
 
     if (not editlog_pivoted_df.size):  # i.e. if empty editlog
         edited_df = original_df
@@ -196,8 +199,11 @@ def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
 
         # Change types to match those of original_df
         for col in editlog_pivoted_df.columns:
-            editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(
+            if col in primary_keys + display_columns + editable_columns:
+                editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(
                      original_df[col].dtypes.name)
+            else:
+                editable_columns_new.append(col)
 
         original_df.set_index(primary_keys, inplace=True)
         if (not editlog_pivoted_df.index.name): # if index has no name, i.e. it's a range index
@@ -213,17 +219,14 @@ def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
 
         # "Merge" -> this creates _original columns
         # all last_ and first_ columns have already been dropped
-        editable_column_names = editlog_pivoted_df.columns.tolist()
-        for col in editable_column_names:
+        for col in editable_columns:
             # copy col to a new column whose name is suffixed by "_original"
             edited_df[col + "_original"] = edited_df[col]
             # merge original and last edited values
             edited_df.loc[:, col] = edited_df[col + "_value_last"].where(
                 edited_df[col + "_value_last"].notnull(), edited_df[col + "_original"])
 
-        # Drop the _original and _value_last columns -> this gets us back to the original schema
-        edited_df = edited_df[edited_df.columns[:-2 *
-                                                len(editable_column_names)]].reset_index()
+        edited_df.reset_index(inplace=True)
 
 
         # Stack created rows
@@ -232,12 +235,11 @@ def merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys):
         if (created_df.size):
             edited_df = concat([created_df, edited_df])
 
+        # Drop the _original and _value_last columns
+        edited_df = edited_df[primary_keys + display_columns + editable_columns + editable_columns_new]
+
     return edited_df
 
-# Used by Merge recipe and by EES for getting edited data
-def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
-    original_df, primary_keys = __get_original_df__(original_ds)
-    return merge_edits_from_all_df(original_df, editlog_pivoted_df, primary_keys)
 
 
 # Utils for webapp backend
@@ -288,8 +290,7 @@ def get_values_from_linked_df(linked_df, linked_ds_key, linked_ds_label, linked_
         return values_df[linked_columns].rename(
             columns={linked_ds_key: "value", linked_ds_label: "label"}).to_dict("records")
 
-
-# Other utils (unused)
+# Utils for EES
 
 def get_editable_column_names(schema):
     editable_column_names = []
@@ -304,6 +305,8 @@ def get_primary_keys(schema):
         if col.get("editable_type") == "key":
             keys.append(col["name"])
     return keys
+
+# Other utils (unused)
 
 def get_table_name(dataset, project_key):
     return dataset.get_config()["params"]["table"].replace("${projectKey}", project_key).replace("${NODE}", dataiku.get_custom_variables().get("NODE"))
