@@ -2,6 +2,19 @@
     "version": "0.2.0",
     "configurations": [
         {
+            {
+                "name": "Python: Current File",
+                "type": "python",
+                "request": "launch",
+                "program": "${file}",
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "env": {
+                    "PYTHONPATH": "${workspaceFolder}/plugin-editable-via-webapp/python-lib",
+                    "DKU_CURRENT_PROJECT_KEY": "REPLACE_ME",
+                    "ORIGINAL_DATASET": "replace_me"
+                },
+            },
             "name": "Dash Component Generator",
             "cwd": "${workspaceFolder}/dash_tabulator/",
             "type": "python",
