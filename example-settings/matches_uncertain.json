@@ -1,14 +1,14 @@
 {
-    "primary_keys": ["id_companies_ref"],
-    "editable_column_names": ["id_companies_ext", "reviewed", "comments"],
+    "primary_keys": ["id"],
+    "editable_column_names": ["ext_id", "reviewed", "comments"],
     "freeze_editable_columns": false,
     "group_column_names": [],
     "linked_records_count": 1,
-    "linked_record_name_1": "id_companies_ext",
+    "linked_record_name_1": "ext_id",
     "linked_record_ds_name_1": "companies_ext",
-    "linked_record_key_1": "id",
-    "linked_record_label_column_1": "name",
-    "linked_record_lookup_columns_1": ["city", "country"],
+    "linked_record_key_1": "EntityId",
+    "linked_record_label_column_1": "EntityName",
+    "linked_record_lookup_columns_1": ["Country", "Industry Group"],
     "editschema": [
         {"name": "reviewed", "type": "boolean_tick"}
     ]
