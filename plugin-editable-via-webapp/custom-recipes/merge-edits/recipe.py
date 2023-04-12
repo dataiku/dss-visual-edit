@@ -42,7 +42,4 @@ edited_df = merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df)
 #%% Write output data
 ###
 
-# Write schema explicitly, instead of inferring it when writing the dataframe:
-# This schema should always be the same as that of the original dataset
-edited_ds.write_schema(original_ds.read_schema(), dropAndCreate=True)
-edited_ds.write_dataframe(edited_df, infer_schema=False)
+edited_ds.write_dataframe(edited_df, infer_schema=True, dropAndCreate=True) # the dataframe's types were set explicitly, so it's ok to use them to infer the schema
