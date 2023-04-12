@@ -72,7 +72,6 @@ class EditableEventSourced:
         self.__save_custom_fields__(self.editlog_ds_name)
 
     def __setup_editlog_downstream__(self):
-        editlog_pivoted_ds_schema, edited_ds_schema = get_editlog_pivoted_ds_schema(self.__schema__, self.primary_keys, self.editable_column_names)
         editlog_pivoted_ds_creator = DSSManagedDatasetCreationHelper(
             self.project, self.editlog_pivoted_ds_name)
         if (editlog_pivoted_ds_creator.already_exists()):
@@ -85,11 +84,6 @@ class EditableEventSourced:
             editlog_pivoted_ds_creator.create()
             self.editlog_pivoted_ds = Dataset(
                 self.editlog_pivoted_ds_name, self.project_key)
-            cols = self.primary_keys + \
-                self.editable_column_names + ["last_edit_date", "last_action", "first_action"]
-            editlog_pivoted_df = DataFrame(columns=cols)
-            self.editlog_pivoted_ds.write_schema(editlog_pivoted_ds_schema)
-            self.editlog_pivoted_ds.write_dataframe(editlog_pivoted_df, infer_schema=False)
             logging.debug("Done.")
 
         pivot_recipe_name = "compute_" + self.editlog_pivoted_ds_name
@@ -121,9 +115,6 @@ class EditableEventSourced:
                 connection=self.__connection_name__)
             edited_ds_creator.create()
             self.edited_ds = Dataset(self.edited_ds_name, self.project_key)
-            edited_df = DataFrame(columns=self.edited_df_cols)
-            self.edited_ds.write_schema(edited_ds_schema)
-            self.edited_ds.write_dataframe(edited_df, infer_schema=False)
             logging.debug("Done.")
 
         merge_recipe_name = "compute_" + self.edited_ds_name

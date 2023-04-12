@@ -31,30 +31,6 @@ def __get_editlog_columns__():
 def write_empty_editlog(editlog_ds):
     editlog_ds.write_dataframe(DataFrame(columns=__get_editlog_columns__()), infer_schema=False)
 
-# Used by Pivot recipe and by EES for initialization of editlog pivoted dataset
-def get_editlog_pivoted_ds_schema(original_schema, primary_keys, editable_column_names):
-    editlog_pivoted_ds_schema = []
-    edited_ds_schema = []
-    for col in original_schema:
-        new_col = {}
-        new_col["name"] = col.get("name")
-        type = col.get("type")
-        if (type):
-            new_col["type"] = type
-        meaning = col.get("meaning")
-        if (meaning):
-            new_col["meaning"] = meaning
-        edited_ds_schema.append(new_col)
-        if (col.get("name") in primary_keys + editable_column_names):
-            editlog_pivoted_ds_schema.append(new_col)
-    editlog_pivoted_ds_schema.append(
-        {"name": "last_edit_date", "type": "string", "meaning": "DateSource"})
-    editlog_pivoted_ds_schema.append(
-        {"name": "last_action", "type": "string", "meaning": "Text"})
-    editlog_pivoted_ds_schema.append(
-        {"name": "first_action", "type": "string", "meaning": "Text"})
-    return editlog_pivoted_ds_schema, edited_ds_schema
-
 
 # Utils for EES and plugin components (recipes and scenario steps)
 

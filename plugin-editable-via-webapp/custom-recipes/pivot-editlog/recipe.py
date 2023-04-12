@@ -8,7 +8,7 @@ from dataiku.customrecipe import get_input_names_for_role, get_output_names_for_
 # import sys
 # sys.path.append('../../python-lib')
 
-from commons import pivot_editlog, get_editlog_pivoted_ds_schema
+from commons import pivot_editlog
 
 
 #%% Get recipe parameters
