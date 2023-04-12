@@ -21,7 +21,7 @@ ees = EditableEventSourced.EditableEventSourced(
 
 `editable_column_names` can contain names of columns found in the original dataset, and names of new columns as well.
 
-The first time EES is instantiated on a given dataset, this creates an "editlog" dataset and 2 recipes that create an "editlog pivoted" and an "edited" dataset.
+When EES is instantiated on a given dataset, it creates an "editlog" dataset and 2 recipes that create an "editlog pivoted" and an "edited" dataset, if they don't already exist.
 
 ## Use EES methods to perform CRUD operations
 
