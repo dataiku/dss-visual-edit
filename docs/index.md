@@ -4,6 +4,8 @@ No-code webapps for “human in the loop” analytics & AI.
 
 <iframe src="https://www.loom.com/embed/7b79e45e755544f8baf1ff3ed1bf60ee" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
+[Book a demo](https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1cgQ-IQ2k2eJMm6mUrZxabQgtPSSwaZ9TgNcHcnaUDvrqfweAkf-B7xzZbTSNyYeSRc2smgLbp){: .btn}
+
 Check out our library of [demo videos](https://loom.com/share/folder/b5e96d5672da4a58883b3b05a35445fa): webapp setup, integrating edits into the Flow, feedback loops, usage in Design vs Automation.
 
 ## Use cases

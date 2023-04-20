@@ -10,7 +10,7 @@
 
 ## How to install
 
-* Contact Louis Dorard at Dataiku to get access to the plugin
+* [Contact Louis Dorard at Dataiku to get access to the plugin (private beta)](https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1cgQ-IQ2k2eJMm6mUrZxabQgtPSSwaZ9TgNcHcnaUDvrqfweAkf-B7xzZbTSNyYeSRc2smgLbp)
 * Upload the ZIP file that contains the plugin, to your Dataiku instance
   * ![](add_plugin_upload.png)
   * ![](add_plugin_select_zip.png)
