@@ -1,4 +1,4 @@
-# Sample project: Join Companies
+# Sample project: Company Reconciliation
 
 In this entity reconciliation project, 2 datasets representing the same companies need to be merged. We manually review and correct matches between company entities whose names differ.
 

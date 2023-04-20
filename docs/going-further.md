@@ -10,7 +10,7 @@ You can then add other "tiles" to your Dashboard, such as a Text tile with instr
 
 ![](dashboard_edit.png)
 
-The Scenario tile is displayed as a button to run a chosen scenario. This is a great way to let the end-user run computations that take edits into account. An example is provided in our [sample project: join companies](sample-project-join-companies).
+The Scenario tile is displayed as a button to run a chosen scenario. This is a great way to let the end-user run computations that take edits into account. An example is provided in our [sample project: company reconciliation](sample-project-company-reconciliation).
 
 ## Resetting edits on a design node
 
@@ -42,7 +42,10 @@ Demo videos:
 
 ## Feedback loops
 
-In some use cases the data to review/edit in the webapp depends on previous edits. Check out our [sample project](sample-project-join-companies) that demonstrates this and shares best practices.
+In some use cases the data to review/edit in the webapp depends on previous edits. Check out our samples projects that demonstrate this and share best practices:
+
+* Company Reconciliation
+* AI Feedback App
 
 ## FAQ
 
