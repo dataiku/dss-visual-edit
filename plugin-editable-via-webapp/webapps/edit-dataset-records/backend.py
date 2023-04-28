@@ -12,6 +12,7 @@
 ###
 
 from commons import get_values_from_linked_df, get_user_details, get_last_build_date
+from tabulator_utils import get_columns_tabulator
 from json import dumps
 from flask import Flask, request, jsonify, current_app, make_response
 from pandas import DataFrame
@@ -122,8 +123,12 @@ ees = EditableEventSourced(original_ds_name, primary_keys,
 # %% 3. Define webapp layout and components
 ###
 
+if run_context == "local":
+    user = "local"
+else:
+    user = get_user_details()
 
-columns = ees.get_columns_tabulator(freeze_editable_columns)
+columns = get_columns_tabulator(ees, freeze_editable_columns)
 
 last_build_date_initial = ""
 last_build_date_ok = False
@@ -156,7 +161,7 @@ def serve_layout():
         dash_tabulator.DashTabulator(
             id="datatable",
             columns=columns,
-            data=ees.get_data_tabulator(),  # this gets the most up-to-date edited data
+            data=ees.get_edited_df().to_dict('records'), # this gets the most up-to-date edited data
             groupBy=group_column_names
         ),
 
@@ -214,11 +219,7 @@ def add_edit(cell):
     """
     Record edit in editlog, once a cell has been edited
     """
-    if run_context == "local":
-        user = "local"
-    else:
-        user = get_user_details()
-    return ees.log_edit_tabulator(cell, user)
+    return ees.update_row(cell["row"], cell["column"], cell["value"], user) # cell["row"] contains values for primary keys — and other columns too, but they'll be discarded
 
 
 # CRUD endpoints
@@ -254,7 +255,7 @@ def create_endpoint():
     primary_keys_values = request.get_json().get("primaryKeys")
     column_values = request.get_json().get("columnValues")
     # TODO: check set of primary key values is unique?
-    ees.create_row(primary_keys_values, column_values, user="API")
+    ees.create_row(primary_keys_values, column_values, user)
     response = jsonify({
         "msg": "New row created"
     })
@@ -339,7 +340,7 @@ def update_endpoint():
         primary_keys_values = request.args.get("primaryKeys", "")
         column = request.args.get("column", "")
         value = request.args.get("value", "")
-    info = ees.update_row(primary_keys_values, column, value, user="API")
+    info = ees.update_row(primary_keys_values, column, value, user)
     response = jsonify({"msg": info})
     return response
 
@@ -357,7 +358,7 @@ def delete_endpoint():
         primary_keys = request.get_json().get("primaryKeys")
     else:
         primary_keys = request.args.get("primaryKeys", "")
-    info = ees.delete_row(primary_keys_values, user="API")
+    info = ees.delete_row(primary_keys, user)
     response = jsonify({"msg": f"Row deleted"})
     return response
 
