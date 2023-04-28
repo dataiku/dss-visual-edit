@@ -86,7 +86,7 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
         editlog_df.rename(
             columns={"date": "edit_date"},
             inplace=True)
-        editlog_df = __unpack_keys__(editlog_df, primary_keys)
+        editlog_df = __unpack_keys__(editlog_df, primary_keys).sort_values("edit_date")
 
         # for each key, compute last edit date, last action and first action
         editlog_grouped_last = editlog_df[primary_keys + ["edit_date", "action"]
@@ -96,7 +96,7 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
         editlog_grouped_df = editlog_grouped_last.join(editlog_grouped_first, on=primary_keys)
 
         editlog_pivoted_df = pivot_table(
-            editlog_df.sort_values("edit_date"),  # ordering by edit date
+            editlog_df,
             index=primary_keys,
             columns="column_name",
             values="value",
@@ -153,13 +153,12 @@ def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
     else:
 
         created = editlog_pivoted_df["first_action"]=="create"
-        created_df = editlog_pivoted_df[created]
+        not_deleted = editlog_pivoted_df["last_action"]!="delete"
+        created_df = editlog_pivoted_df[not_deleted & created]
 
 
         # Prepare editlog_pivoted_df
         ###
-
-        not_deleted = editlog_pivoted_df["last_action"]!="delete"
         editlog_pivoted_df = editlog_pivoted_df[not_deleted & ~created]
 
         # Drop columns which are not primary keys nor editable columns
