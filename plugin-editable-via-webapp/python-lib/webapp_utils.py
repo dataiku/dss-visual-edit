@@ -4,6 +4,7 @@ from os import getenv
 import dataiku
 import requests
 
+
 def call_rest_api(path):
     PORT = dataiku.base.remoterun.get_env_var("DKU_BASE_PORT")
     if (PORT == None):
@@ -17,8 +18,10 @@ def call_rest_api(path):
             verify=False
         ).text)
 
+
 def get_webapp_json(webapp_ID):
     return call_rest_api("/webapps/" + webapp_ID)
+
 
 def find_webapp_id(original_ds_name):
     webapps_df = DataFrame(call_rest_api("/webapps/"))

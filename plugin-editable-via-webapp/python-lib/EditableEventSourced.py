@@ -180,7 +180,8 @@ class EditableEventSourced:
             self.editschema_manual_df = DataFrame(
                 data=self.editschema_manual)  # this will be an empty dataframe
 
-        self.display_column_names = get_display_column_names(self.schema_columns, self.primary_keys, self.editable_column_names)
+        self.display_column_names = get_display_column_names(
+            self.schema_columns, self.primary_keys, self.editable_column_names)
 
         # make sure that original dataset has up-to-date custom fields (editlog and datasets/recipes that follow may not - TODO: change this?)
         self.__save_custom_fields__(self.original_ds_name)
@@ -192,7 +193,7 @@ class EditableEventSourced:
 
     def get_edited_df_indexed(self):
         return self.get_edited_df().set_index(self.primary_keys)
-        
+
     def get_edited_df(self):
         return merge_edits_from_log_pivoted_df(
             self.original_ds,
@@ -223,7 +224,7 @@ class EditableEventSourced:
             ```
 
         Returns: single-row dataframe containing the values of editable columns.
-        
+
         Notes:
         - If some rows of the dataset were created, then by definition all columns are editable (including primary keys) .
         - If no row was created, editable columns are those defined in the initial data editing setup.
@@ -253,7 +254,7 @@ class EditableEventSourced:
         if (user is None):
             user = "unknown"
 
-        if column in self.editable_column_names or action=="delete":
+        if column in self.editable_column_names or action == "delete":
 
             # add to the editlog (since it's in append mode)
             self.editlog_ds.write_dataframe(DataFrame(data={
@@ -277,11 +278,11 @@ class EditableEventSourced:
             #             self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0]
 
             info = f"""Updated column {column} where {self.primary_keys} is {key}. New value: {value}."""
-        
+
         else:
 
             info = f"""{column} isn't an editable column"""
-        
+
         logging.info(info)
         return info
 
@@ -309,7 +310,8 @@ class EditableEventSourced:
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         for col in column_values.keys():
-            self.__log_edit__(key=key, column=col, value=column_values.get(col), user=user, action="create")
+            self.__log_edit__(key=key, column=col, value=column_values.get(
+                col), user=user, action="create")
 
     def update_row(self, primary_keys, column, value, user=None):
         """

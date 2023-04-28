@@ -7,6 +7,7 @@ import logging
 # used to reference javascript functions in custom_tabulator.js
 __ns__ = Namespace("myNamespace", "tabulator")
 
+
 def __get_column_tabulator_type__(ees, col_name):
     # Determine column type as string, boolean, boolean_tick, or number
     # - based on the type given in editschema_manual, if any
@@ -48,6 +49,7 @@ def __get_column_tabulator_type__(ees, col_name):
 
     return t_type
 
+
 def __get_column_tabulator_formatter__(t_type):
     # IDEA: improve this code with a dict to do matching (instead of if/else)?
     t_col = {}
@@ -74,6 +76,7 @@ def __get_column_tabulator_formatter__(t_type):
         t_col["headerFilterParams"] = {"format": "yyyy-MM-dd"}
     return t_col
 
+
 def __get_column_tabulator_editor__(t_type):
     t_col = {}
     if t_type == "boolean":
@@ -96,9 +99,10 @@ def __get_column_tabulator_editor__(t_type):
         t_col["editor"] = "input"
     return t_col
 
+
 def __get_column_tabulator_editor_linked_record__(ees, linked_record_name):
     """Define Tabulator editor settings for a column whose type is linked record"""
-    
+
     linked_records_df = DataFrame(data=ees.linked_records).set_index("name")
 
     # Use a list editor
@@ -114,7 +118,7 @@ def __get_column_tabulator_editor_linked_record__(ees, linked_record_name):
 
     # If lookup columns have been provided, use an item formatter in the editor
     linked_ds_lookup_columns = linked_records_df.loc[linked_record_name,
-                                                            "ds_lookup_columns"]
+                                                     "ds_lookup_columns"]
     if linked_ds_lookup_columns != []:
         t_col["editorParams"]["itemFormatter"] = __ns__(
             "itemFormatter")
@@ -156,9 +160,10 @@ def __get_column_tabulator_editor_linked_record__(ees, linked_record_name):
 
     return t_col
 
+
 def get_columns_tabulator(ees, freeze_editable_columns=False):
     """Prepare column settings to pass to Tabulator"""
-    
+
     linked_records_df = DataFrame(data=ees.linked_records).set_index("name")
     try:
         linked_record_names = linked_records_df.index.values.tolist()
@@ -170,7 +175,7 @@ def get_columns_tabulator(ees, freeze_editable_columns=False):
 
         # Properties to be shared by all columns
         t_col = {"field": col_name, "title": col_name, "headerFilter": True,
-                    "resizable": True, "headerContextMenu": __ns__("headerMenu")}
+                 "resizable": True, "headerContextMenu": __ns__("headerMenu")}
 
         # Define formatter and header filters based on type
         t_type = __get_column_tabulator_type__(ees, col_name)
