@@ -18,17 +18,20 @@ Check out our library of [demo videos](https://loom.com/share/folder/b5e96d5672d
 
 ## Features
 
-* Feature-rich data table with editable columns:
+* "Visual Webapp" (no-code setup) with a feature-rich data table:
   * Filter, sort and group data
   * Formatters and editors for different data types (boolean, numerical, textual, date)
   * Support for linked records (aka foreign keys) and lookup columns.
+  * Automatic detection of changes in the source dataset.
 * Continuous update mechanisms: seamless integration of new source data into the webapp and of new edits into production data pipelines.
 * Governance: audit trail of all edits made by end-users.
+* CRUD Python API for coders building custom webapps. It is the same API that provides the Visual Webapp's data persistence layer.
 
 ## Contents
 
 * [Installation](install-plugin): Dataiku v9 and above
-* [Getting started](get-started): Overview of plugin components and key concepts
+* [Getting started: Visual Webapp](get-started): Overview of plugin components and key concepts
+* [Getting started: CRUD Python API](get-started-crud-python-api): Overview of methods to read/write individual or multiple rows of data
 * [Going further](going-further): Deployment, FAQ
 * [Sample project: Company Reconciliation](sample-project-company-reconciliation)
 * [Sample project: AI Feedback App](sample-project-ai-feedback-app)
