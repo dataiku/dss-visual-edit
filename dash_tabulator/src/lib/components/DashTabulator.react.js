@@ -5,6 +5,12 @@ import {TabulatorFull as Tabulator} from "tabulator-tables"; //import Tabulator 
 import "tabulator-tables/dist/css/tabulator.min.css";
 import "tabulator-tables/dist/css/tabulator_semanticui.min.css";
 
+const crypto = require('crypto');
+
+function md5(string) {
+    return crypto.createHash('md5').update(string).digest('hex');
+}
+
 export default class DashTabulator extends React.Component {
     el = React.createRef();
     tabulator = null; //variable to hold your table
@@ -56,7 +62,8 @@ export default class DashTabulator extends React.Component {
             console.log("Cell edited!")
             console.log('cellEdited', cell)
             var edited = new Object() 
-            edited.column = cell.getField()
+            edited.field = cell.getField()
+            edited.type = cell.getColumn().getDefinition()["editor"]
             edited.initialValue = cell.getInitialValue()
             edited.oldValue = cell.getOldValue()
             edited.value = cell.getValue()
@@ -64,7 +71,8 @@ export default class DashTabulator extends React.Component {
             this.props.setProps({cellEdited: edited})
             try {
                 window.parent.WT1SVC.event("lca-datatable-edited", {
-                    "column_name": edited.column
+                    "column_name_hash": md5(edited.field),
+                    "column_type": edited.type
                 });
             } catch (e) { }
         })
