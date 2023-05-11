@@ -65,8 +65,6 @@ At the dataset level:
 
 * empty_editlog: delete all rows of the editlog (use with caution)
 
-TODO: Video with all methods, for CRM and Join Companies examples
-
 ## Next
 
 * [Using edits in the Flow](using-edits): Where to find edits and how to leverage them for analytics
