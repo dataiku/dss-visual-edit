@@ -3,7 +3,7 @@ from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
 from pandas import DataFrame
-from commons import get_editlog_df, write_empty_editlog, get_editlog_ds_schema, get_display_column_names, merge_edits_from_log_pivoted_df, pivot_editlog, get_key_values_from_dict
+from commons import get_original_df, get_editlog_df, write_empty_editlog, get_editlog_ds_schema, get_display_column_names, merge_edits_from_log_pivoted_df, pivot_editlog, get_key_values_from_dict
 from webapp_utils import find_webapp_id, get_webapp_json
 from editschema_utils import get_primary_keys, get_editable_column_names
 from os import getenv
@@ -50,7 +50,7 @@ class EditableEventSourced:
         if (editlog_ds_creator.already_exists()):
             logging.debug("Found editlog")
             self.editlog_ds = Dataset(self.editlog_ds_name, self.project_key)
-            editlog_df = get_editlog_df(self.editlog_ds)
+            editlog_df = self.get_editlog_df()
             if (editlog_df.empty):
                 # Make sure that the dataset's configuration is valid by writing an empty dataframe.
                 # (The editlog dataset might already exist and have a schema, but its configuration might be invalid, for instance when the project was exported to a bundle and deployed to automation, and when using a SQL connection: the dataset exists but no table was created.)
@@ -187,6 +187,12 @@ class EditableEventSourced:
         self.__save_custom_fields__(self.original_ds_name)
         self.__setup_editlog__()
         self.__setup_editlog_downstream__()
+
+    def get_original_df(self):
+        return get_original_df(self.original_ds)
+
+    def get_editlog_df(self):
+        return get_editlog_df(self.editlog_ds)
 
     def empty_editlog(self):
         write_empty_editlog(self.editlog_ds)

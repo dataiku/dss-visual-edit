@@ -131,15 +131,11 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
     return editlog_pivoted_df
 
 # Used by get_original_df below and by EES for init
-
-
 def get_display_column_names(schema, primary_keys, editable_column_names):
     return [col.get("name") for col in schema if col.get("name") not in primary_keys + editable_column_names]
 
-# Used by merge_edits_from_log_pivoted_df method below
-
-
-def __get_original_df__(original_ds):
+# Used by EES and by merge_edits_from_log_pivoted_df method below
+def get_original_df(original_ds):
 
     try:
         # the dataset schema is likely to have been reviewed by the end-user, so let's use it!
@@ -162,10 +158,9 @@ def __get_original_df__(original_ds):
     # make sure that primary keys will be in the same order for original_df and editlog_pivoted_df, and that we'll return a dataframe where editable columns are last
     return original_df[primary_keys + display_column_names + editable_column_names], primary_keys, display_column_names, editable_column_names
 
-
 # Used by Merge recipe and by EES for getting edited data
 def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
-    original_df, primary_keys, display_columns, editable_columns = __get_original_df__(
+    original_df, primary_keys, display_columns, editable_columns = get_original_df(
         original_ds)
     # this will contain the list of new columns coming from editlog pivoted but not found in the original dataset's schema
     editable_columns_new = []
@@ -236,7 +231,7 @@ def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
 # Utils for webapp backend
 
 # Used by backend for the edit callback
-def get_user_details():
+def get_user_identifier():
     client = dataiku.api_client()
     # from https://doc.dataiku.com/dss/latest/webapps/security.html#identifying-users-from-within-a-webapp
     # don't use client.get_own_user().get_settings().get_raw() as this would give the user who started the webapp

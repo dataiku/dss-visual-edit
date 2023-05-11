@@ -11,7 +11,7 @@
 # %% 0. Imports and variable initializations
 ###
 
-from commons import get_values_from_linked_df, get_user_details, get_last_build_date
+from commons import get_values_from_linked_df, get_user_identifier, get_last_build_date
 from tabulator_utils import get_columns_tabulator
 from json import dumps
 from flask import Flask, request, jsonify, current_app, make_response
@@ -126,7 +126,7 @@ ees = EditableEventSourced(original_ds_name, primary_keys,
 if run_context == "local":
     user = "local"
 else:
-    user = get_user_details()
+    user = get_user_identifier()
 
 columns = get_columns_tabulator(ees, freeze_editable_columns)
 
