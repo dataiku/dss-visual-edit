@@ -65,9 +65,6 @@ class EditableEventSourced:
             write_empty_editlog(self.editlog_ds)
             logging.debug("Done.")
 
-        # make sure that editlog is in append mode
-        self.editlog_ds.spec_item["appendMode"] = True
-
         # make sure that editlog has the right custom field values
         self.__save_custom_fields__(self.editlog_ds_name)
 
@@ -195,6 +192,7 @@ class EditableEventSourced:
         return get_editlog_df(self.editlog_ds)
 
     def empty_editlog(self):
+        self.editlog_ds.spec_item["appendMode"] = False
         write_empty_editlog(self.editlog_ds)
 
     def get_edited_df_indexed(self):
@@ -262,7 +260,8 @@ class EditableEventSourced:
 
         if column in self.editable_column_names or action == "delete":
 
-            # add to the editlog (since it's in append mode)
+            # add to the editlog
+            self.editlog_ds.spec_item["appendMode"] = True
             self.editlog_ds.write_dataframe(DataFrame(data={
                 "action": [action],
                 "key": [str(key)],
