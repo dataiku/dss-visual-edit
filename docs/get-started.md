@@ -20,9 +20,7 @@ If you haven't, [install the plugin](install-plugin) first.
 
 ![](webapp.png)
 
-## Making edits
-
-The webapp leverages the Update method.
+## Using the webapp
 
 Edits made via the webapp instantly add rows to the _editlog_.
 
@@ -30,14 +28,14 @@ What you see in the webapp is the **original dataset with overrides** coming fro
 
 Data table features:
 
-* Automatic detection of changes in the source dataset.
+* Each column can be resized, filtered, and used to sort data.
+* Right-clicking on the column name will show a menu with an option to hide the column, and an option to group rows according to the column's values.
 * Filtering:
   * The default filter is a textual one.
   * In the case of a display-only boolean column, the filter is a tristate checkbox (or a simple checkbox if you specified the column type to be "boolean_tick" via the advanced settings' [editschema](editschema)).
-  * Editable boolean columns will have a textual filter that you can use by typing "true" or "false".
-* Right-clicking on the column name will show a menu with an option to hide the column, and an option to group rows according to the column's values.
-* Each column can be resized and filtered.
+  * Editable boolean columns have a textual filter that you can use by typing "true" or "false".
 * All of this can be reset by clicking on the "Reset View" button in the bottom-left corner.
+* Changes in the source dataset are automatically detected and signaled. The user needs to refresh the webpage in order to see them.
 
 ## Next
 
