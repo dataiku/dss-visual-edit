@@ -11,19 +11,19 @@
 # %% 0. Imports and variable initializations
 ###
 
-from commons import get_values_from_linked_df, get_user_identifier, get_last_build_date
-from tabulator_utils import get_columns_tabulator
 from json import dumps
 from flask import Flask, request, jsonify, current_app, make_response
 from pandas import DataFrame
+from dataiku import api_client
 from dataikuapi.utils import DataikuStreamedHttpUTF8CSVReader
 from datetime import datetime
-import dash_tabulator
-from EditableEventSourced import EditableEventSourced
+from dash import Dash, html, dcc, Input, Output, State
 import logging
-from dataiku import api_client
 from os import getenv
-from dash import Dash, html, dcc, Input, Output, State, callback_context
+from commons import get_values_from_linked_df, get_user_identifier, get_last_build_date
+from tabulator_utils import get_columns_tabulator
+from EditableEventSourced import EditableEventSourced
+import dash_tabulator
 
 stylesheets = [
     "https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]

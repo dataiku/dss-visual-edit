@@ -1,5 +1,5 @@
 import dataiku
-from pandas import DataFrame, concat, pivot_table
+from pandas import DataFrame, concat, pivot_table, options
 from flask import request
 import logging
 
@@ -178,6 +178,7 @@ def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
         editlog_pivoted_df = editlog_pivoted_df[not_deleted & ~created]
 
         # Drop columns which are not primary keys nor editable columns
+        options.mode.chained_assignment = None # this helps prevent SettingWithCopyWarnings that are triggered by the drops below
         if ("last_edit_date" in editlog_pivoted_df.columns):
             editlog_pivoted_df.drop(columns=["last_edit_date"], inplace=True)
         if ("last_action" in editlog_pivoted_df.columns):

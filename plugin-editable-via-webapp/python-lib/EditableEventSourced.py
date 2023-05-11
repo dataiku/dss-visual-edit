@@ -186,6 +186,7 @@ class EditableEventSourced:
         self.__setup_editlog_downstream__()
 
     def get_original_df(self):
+        """Get original data without edits"""
         return get_original_df(self.original_ds)
 
     def get_editlog_df(self):
@@ -199,6 +200,7 @@ class EditableEventSourced:
         return self.get_edited_df().set_index(self.primary_keys)
 
     def get_edited_df(self):
+        """Get original data with edited values"""
         return merge_edits_from_log_pivoted_df(
             self.original_ds,
             self.get_edited_cells_df()
@@ -208,6 +210,7 @@ class EditableEventSourced:
         return self.get_edited_cells_df().set_index(self.primary_keys)
 
     def get_edited_cells_df(self):
+        """Get only rows and columns that were edited"""
         return pivot_editlog(
             self.editlog_ds,
             self.primary_keys,
@@ -216,7 +219,7 @@ class EditableEventSourced:
 
     def get_row(self, primary_keys):
         """
-        Read a row that was created or edited (as indicated by the editlog)
+        Read a row that was created, updated or deleted (as indicated by the editlog)
 
         Params:
         - primary_keys: dictionary containing values for all primary keys defined in the initial data editing setup; the set of values must be unique. Example:
@@ -270,18 +273,6 @@ class EditableEventSourced:
                 "date": [datetime.now(timezone("UTC")).isoformat()],
                 "user": [user]
             }))
-
-            # Update lookup columns if a linked record was edited
-            # for linked_record in self.linked_records:
-            #     if (column_name==linked_record["name"]):
-            #         # Retrieve values of the lookup columns from the linked dataset, for the row corresponding to the edited value (linked_record["ds_key"]==value)
-            #         lookup_values = self.__get_lookup_values__(linked_record, value)
-
-            #         # Update table_data with lookup values — note that column names are different in table_data and in the linked record's table
-            #         # Might need to change primary_key_values from a list to a tuple — see this example: df.loc[('cobra', 'mark i'), 'shield'] from https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.loc.html ?
-            #         for lookup_column in linked_record["lookup_columns"]:
-            #             self.__edited_df_indexed__.loc[primary_key_values, lookup_column["name"]] = lookup_values[lookup_column["linked_ds_column_name"]].iloc[0]
-
             info = f"""Updated column {column} where {self.primary_keys} is {key}. New value: {value}."""
 
         else:
@@ -317,6 +308,7 @@ class EditableEventSourced:
         for col in column_values.keys():
             self.__log_edit__(key=key, column=col, value=column_values.get(
                 col), user=user, action="create")
+        return "Created row"
 
     def update_row(self, primary_keys, column, value, user=None):
         """
@@ -341,4 +333,5 @@ class EditableEventSourced:
         - primary_keys: dictionary containing primary key(s) value(s) that identify the row to delete (see get_row method)
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
-        return self.__log_edit__(key, None, None, user, action="delete")
+        self.__log_edit__(key, None, None, user, action="delete")
+        return f"""Deleted row"""
