@@ -1,0 +1,63 @@
+[{
+  'field': 'id',
+  'title': 'id',
+  'frozen': True
+},
+{
+  'field': 'name',
+  'title': 'name',
+},
+{
+  'field': 'industry',
+  'title': 'industry',
+},
+{
+  'field': 'country',
+  'title': 'country',
+},
+{
+  'field': 'distance_initial_match',
+  'title': 'distance_initial_match',
+  'headerFilter': { 'variable': 'myNamespace.tabulator.minMaxFilterEditor' },
+  'resizable': True,
+  'headerContextMenu': { 'variable': 'myNamespace.tabulator.headerMenu' },
+  'headerFilterFunc': { 'variable': 'myNamespace.tabulator.minMaxFilterFunction' },
+  'headerFilterLiveFilter': False
+},
+{
+  'field': 'to_be_reviewed',
+  'title': 'to_be_reviewed',
+  'formatter': 'tickCross',
+  'formatterParams': { 'allowEmpty': True },
+  'hozAlign': 'center',
+  'headerFilterParams': { 'tristate': True }
+},
+{
+  'field': 'ext_id',
+  'title': 'ext_id',
+  'editor': 'input'
+},
+{
+  'field': 'reviewed',
+  'title': 'reviewed',
+  'headerFilter': 'input',
+  'resizable': True,
+  'headerContextMenu': { 'variable': 'myNamespace.tabulator.headerMenu' },
+  'formatter': 'tickCross',
+  'formatterParams': { 'allowEmpty': True },
+  'hozAlign': 'center',
+  'headerFilterParams': {},
+  'editor': 'list',
+  'editorParams': {
+    'values': {
+      'true': 'True',
+      'false': 'False',
+      '': '(empty)'
+    }
+  }
+},
+{
+  'field': 'comments',
+  'title': 'comments',
+  'editor': 'input'
+}]
