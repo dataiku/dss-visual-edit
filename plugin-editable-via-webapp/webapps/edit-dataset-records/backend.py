@@ -8,7 +8,7 @@
 # 2. Instantiate editable event-sourced dataset
 # 3. Define webapp layout and components
 
-# %% 0. Imports and variable initializations
+# 0. Imports and variable initializations
 ###
 
 from json import dumps
@@ -34,7 +34,7 @@ project_key = getenv("DKU_CURRENT_PROJECT_KEY")
 project = client.get_project(project_key)
 
 
-# %% 1. Get webapp parameters
+# 1. Get webapp parameters
 ###
 
 if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
@@ -114,13 +114,13 @@ if (linked_records_count > 0):
             }
         )
 
-# %% 2. Instantiate editable event-sourced dataset
+# 2. Instantiate editable event-sourced dataset
 ###
 
 ees = EditableEventSourced(original_ds_name, primary_keys,
                            editable_column_names, linked_records, editschema_manual)
 
-# %% 3. Define webapp layout and components
+# 3. Define webapp layout and components
 ###
 
 if run_context == "local":
