@@ -35,6 +35,7 @@ Data table features:
   * In the case of a display-only boolean column, the filter is a tristate checkbox (or a simple checkbox if you specified the column type to be "boolean_tick" via the advanced settings' [editschema](editschema)).
   * Editable boolean columns have a textual filter that you can use by typing "true" or "false".
 * All of this can be reset by clicking on the "Reset View" button in the bottom-left corner.
+* Linked records are edited via dropdowns which include the ability to search through all options: when there are many of them, only options that start with the search term are presented.
 * Changes in the source dataset are automatically detected and signaled. The user needs to refresh the webpage in order to see them.
 
 ## Next

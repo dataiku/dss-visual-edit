@@ -19,17 +19,16 @@ Check out our library of [demo videos](https://loom.com/share/folder/b5e96d5672d
 ## Features
 
 * **Visual Webapp (no-code setup)** with a feature-rich data table:
-  * **Automatic input validation**:
-    * Formatting and editing adapts to the detected data types (e.g. numerical cells don’t allow characters).
-    * Supported data types: numerical, textual, date, boolean.
   * **Rich editing experience**:
     * Boolean cells are edited via a checkbox.
     * Datetime cells are edited via a date picker.
     * **Linked records (aka foreign keys)** are edited via a dropdown, with the ability to **search and display lookup columns** from the linked dataset.
+  * **Automatic input validation**: Formatting and editing adapts to the detected data types (e.g. numerical cells don’t allow characters; linked records restrict selection to entries in a linked dataset).
   * Filtering, sorting and grouping of data.
+  * Pagination of large datasets.
   * **Automatic detection of changes** in the source dataset.
 * **Continuous update mechanisms**: seamless integration of new source data into the webapp and of new edits into production data pipelines.
-* **Governance**: audit trail of all edits made by end-users.
+* **Governance**: built-in audit trail of all edits made by end-users.
 * **CRUD Python API** for coders building custom webapps. It is the same API that provides the Visual Webapp's data persistence layer.
 
 ## Contents
