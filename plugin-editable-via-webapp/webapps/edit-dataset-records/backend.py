@@ -123,11 +123,6 @@ ees = EditableEventSourced(original_ds_name, primary_keys,
 # 3. Define webapp layout and components
 ###
 
-if run_context == "local":
-    user = "local"
-else:
-    user = get_user_identifier()
-
 columns = get_columns_tabulator(ees, freeze_editable_columns)
 
 last_build_date_initial = ""
@@ -219,6 +214,7 @@ def add_edit(cell):
     """
     Record edit in editlog, once a cell has been edited
     """
+    user = get_user_identifier()
     return ees.update_row(cell["row"], cell["column"], cell["value"], user) # cell["row"] contains values for primary keys — and other columns too, but they'll be discarded
 
 
@@ -255,7 +251,8 @@ def create_endpoint():
     primary_keys_values = request.get_json().get("primaryKeys")
     column_values = request.get_json().get("columnValues")
     # TODO: check set of primary key values is unique?
-    ees.create_row(primary_keys_values, column_values, user)
+    user = get_user_identifier()
+    ees.create_row(primary_keys_values, column_values)
     response = jsonify({
         "msg": "New row created"
     })
@@ -340,7 +337,7 @@ def update_endpoint():
         primary_keys_values = request.args.get("primaryKeys", "")
         column = request.args.get("column", "")
         value = request.args.get("value", "")
-    info = ees.update_row(primary_keys_values, column, value, user)
+    info = ees.update_row(primary_keys_values, column, value)
     response = jsonify({"msg": info})
     return response
 
@@ -358,7 +355,7 @@ def delete_endpoint():
         primary_keys = request.get_json().get("primaryKeys")
     else:
         primary_keys = request.args.get("primaryKeys", "")
-    info = ees.delete_row(primary_keys, user)
+    info = ees.delete_row(primary_keys)
     response = jsonify({"msg": f"Row deleted"})
     return response
 

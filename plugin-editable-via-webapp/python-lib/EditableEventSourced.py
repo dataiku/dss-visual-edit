@@ -3,7 +3,7 @@ from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
 from pandas import DataFrame
-from commons import get_original_df, get_editlog_df, write_empty_editlog, get_editlog_ds_schema, get_display_column_names, merge_edits_from_log_pivoted_df, pivot_editlog, get_key_values_from_dict
+from commons import get_user_identifier, get_original_df, get_editlog_df, write_empty_editlog, get_editlog_ds_schema, get_display_column_names, merge_edits_from_log_pivoted_df, pivot_editlog, get_key_values_from_dict
 from webapp_utils import find_webapp_id, get_webapp_json
 from editschema_utils import get_primary_keys, get_editable_column_names
 from os import getenv
@@ -241,7 +241,7 @@ class EditableEventSourced:
         # TODO: read row that was not edited too! This can be done via Dataiku API
         return self.get_edited_cells_df_indexed().loc[key]
 
-    def __log_edit__(self, key, column, value, user=None, action="update"):
+    def __log_edit__(self, key, column, value, action="update"):
         # if the type of column_name is a boolean, make sure we read it correctly
         for col in self.schema_columns:
             if (col["name"] == column):
@@ -258,9 +258,6 @@ class EditableEventSourced:
         else:
             value_string = value
 
-        if (user is None):
-            user = "unknown"
-
         if column in self.editable_column_names or action == "delete":
 
             # add to the editlog
@@ -271,7 +268,7 @@ class EditableEventSourced:
                 "column_name": [column],
                 "value": [value_string],
                 "date": [datetime.now(timezone("UTC")).isoformat()],
-                "user": [user]
+                "user": [get_user_identifier()]
             }))
             info = f"""Updated column {column} where {self.primary_keys} is {key}. New value: {value}."""
 
@@ -282,7 +279,7 @@ class EditableEventSourced:
         logging.info(info)
         return info
 
-    def create_row(self, primary_keys, column_values, user=None):
+    def create_row(self, primary_keys, column_values):
         """
         Create a new row.
 
@@ -307,10 +304,10 @@ class EditableEventSourced:
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         for col in column_values.keys():
             self.__log_edit__(key=key, column=col, value=column_values.get(
-                col), user=user, action="create")
+                col), action="create")
         return "Created row"
 
-    def update_row(self, primary_keys, column, value, user=None):
+    def update_row(self, primary_keys, column, value):
         """
         Update a row
 
@@ -323,9 +320,9 @@ class EditableEventSourced:
         Note: this method doesn't implement data validation / it doesn't check that the value is allowed for the specified column.
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
-        return self.__log_edit__(key, column, value, user, action="update")
+        return self.__log_edit__(key, column, value, action="update")
 
-    def delete_row(self, primary_keys, user=None):
+    def delete_row(self, primary_keys):
         """
         Delete a row
 
@@ -333,5 +330,5 @@ class EditableEventSourced:
         - primary_keys: dictionary containing primary key(s) value(s) that identify the row to delete (see get_row method)
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
-        self.__log_edit__(key, None, None, user, action="delete")
+        self.__log_edit__(key, None, None, action="delete")
         return f"""Deleted row"""

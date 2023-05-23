@@ -236,10 +236,16 @@ def get_user_identifier():
     client = dataiku.api_client()
     # from https://doc.dataiku.com/dss/latest/webapps/security.html#identifying-users-from-within-a-webapp
     # don't use client.get_own_user().get_settings().get_raw() as this would give the user who started the webapp
-    request_headers = dict(request.headers)
-    auth_info_browser = client.get_auth_info_from_browser_headers(
-        request_headers)
-    return auth_info_browser["authIdentifier"]
+    user = "unknown"
+    if request:
+        try:
+            request_headers = dict(request.headers)
+            auth_info_browser = client.get_auth_info_from_browser_headers(
+                request_headers)
+            user = auth_info_browser["authIdentifier"]
+        except:
+            None
+    return user
 
 # Used by backend's for CRUD methods
 
