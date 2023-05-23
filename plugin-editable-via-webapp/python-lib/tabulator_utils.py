@@ -164,8 +164,8 @@ def __get_column_tabulator_editor_linked_record__(ees, linked_record_name):
 def get_columns_tabulator(ees, freeze_editable_columns=False):
     """Prepare column settings to pass to Tabulator"""
 
-    linked_records_df = DataFrame(data=ees.linked_records).set_index("name")
     try:
+        linked_records_df = DataFrame(data=ees.linked_records).set_index("name")
         linked_record_names = linked_records_df.index.values.tolist()
     except:
         linked_record_names = []
