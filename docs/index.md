@@ -10,7 +10,7 @@ Check out our library of [demo videos](https://loom.com/share/folder/b5e96d5672d
 
 ## Use cases
 
-* **Entity reconciliation**: 2 or more datasets represent the same entities and need to be merged. However, common properties of a given entity may have different values from one dataset to the other. See our ["company reconciliation" sample project](sample-project-company-reconciliation) where we manually review and correct matches between company entities whose names differ.
+* **Entity reconciliation**: 2 or more datasets represent the same entities and need to be merged. However, common properties of a given entity may have different values from one dataset to the other (e.g. entity name). See our ["company reconciliation" sample project](sample-project-company-reconciliation) where we manually review and correct automated matches between company entities. This can be adapted to the case where entities are customers, suppliers, or even products, whose names differ from one data source to the other.
 * **Forecast override**: machine-made sales forecasts need to be adjusted by a human, to take into account contextual information that wasn't available to the machine, or to correct low-confidence predictions.
 * **AI feedback loop**: human feedback on AI-powered predictions is ingested back into the AI's training data.
 * **Business rules exception handling**: manually filling in missing values in the output of classification rules.

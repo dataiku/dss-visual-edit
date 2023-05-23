@@ -1,15 +1,14 @@
 # Sample project: Company Reconciliation
 
-In this entity reconciliation project, 2 datasets representing the same companies need to be merged. We manually review and correct matches between company entities whose names differ.
+In this entity reconciliation project, 2 datasets representing the same companies need to be merged.
 
-We start this article with a demonstration and we explain how to replicate it using an export of our Dataiku project. We also explain how the project works behind the scenes, the steps to build it from scratch, then we discuss deployment and lifecycle._
+* A simple fuzzy matching pipeline is implemented, based on company names, but there are always going to be cases where matches are incorrect or can't be found by a machine (e.g. Facebook vs Meta, or Google vs Alphabet).
+* We provide a webapp for users with domain knowledge to review and correct uncertain matches, and to manually assign missing ones, in a way that integrates well with the automated matching pipeline.
+* Editing matches is made easy via linked records and lookup columns.
+
+We start this article with a demo video and we explain how to replicate it using an export of our Dataiku project. We also explain how the project works behind the scenes, the steps to build it from scratch, then we discuss deployment and lifecycle._
 
 ## Demonstration
-
-This project demonstrates:
-
-* a case of feedback loop, where the data to review/edit in the webapp depends on previous edits
-* usage of linked records and lookup columns.
 
 <iframe src="https://www.loom.com/embed/7b79e45e755544f8baf1ff3ed1bf60ee" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
@@ -44,7 +43,7 @@ The special role of the `reviewed` column, which we saw in the 1st video when cl
 
 ### Flow
 
-Here is an overview of the project's Flow:
+The project's Flow includes recipes to automatically (fuzzy) match companies based on their names. The data to review/edit in the webapp is based on the output of this matching, and on previous edits: we don't want users to have to review matches that they previously marked as reviewed. This is a case of a feedback loop: the data for review is in `matches_uncertain` and edits can be found the editlog, which is upstream.
 
 ![](sample-project-join-companies-flow.png)
 
@@ -54,14 +53,11 @@ The Flow includes an editlog dataset and recipes provided by the Data Editing pl
 
 <iframe src="https://www.loom.com/embed/17b4c5bf685f4f30a00a51c53d4d006f" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
-
 #### Walkthrough
 
 <iframe src="https://www.loom.com/embed/532c66806723419f9161614b94b749b1" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
 #### Feedback Loop
-
-The Flow implements a feedback loop: the data for review is in `matches_uncertain` and edits can be found in `matches_uncertain_editlog_pivoted`, which is upstream.
 
 <iframe src="https://www.loom.com/embed/7f51ae7c61f14da28f449c3b7d1f478e" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
