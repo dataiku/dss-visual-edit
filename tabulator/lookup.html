@@ -1,5 +1,6 @@
 <link href="https://unpkg.com/tabulator-tables@5.4.4/dist/css/tabulator.min.css" rel="stylesheet">
 <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.4.4/dist/js/tabulator.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <h1>Lookup Formatter with Vanilla Tabulator</h1>
 <div id="example-table"></div>
 <script type="text/javascript">
@@ -10,16 +11,33 @@
         {id:3, name:"Christine Lobowski", progress:42, gender:"female", rating:0, col:"green", dob:"22/05/1982", car:"true"},
         {id:4, name:"Brendon Philips", progress:100, gender:"male", rating:1, col:"orange", dob:"01/08/1980"},
         {id:5, name:"Margret Marmajuke", progress:16, gender:"female", rating:5, col:"yellow", dob:"31/01/1999"},
-        {id:6, name:"Frank Harbours", progress:38, gender:"male", rating:4, col:"red", dob:"12/05/1966", car:1},
+        {id:6, name:"Frank Harbours", progress:38, gender:"male", rating:4, col:"1008201678", dob:"12/05/1966", car:1},
     ];
+
+    function paramLookup(cell){
+        // TODO: cache results
+        key = cell.getValue()
+        label = ""
+        // Assign value returned by GET request to http://localhost:8000/label/companies_ext with parameter key, to label variable; in case connection fails, assign empty value to label
+        $.ajax({
+            url: "http://localhost:8000/label/companies_ext?key=" + key,
+            async: false,
+            success: function(result){
+                label = result
+            },
+            error: function(result){
+                label = ""
+                console.log("Could not retrieve label from server")
+            }
+        });
+        d = {}
+        d[key] = label
+        return d
+    }
 
     var tablecolumns = [
         {title:"Name", field:"name", width:150},
-        {title:"Favourite Color", field:"col", formatter:"lookup", formatterParams:{
-            "yellow": "jaune",
-            "green": "vert",
-            "red": "rouge",
-        }},
+        {title:"Favourite Color", field:"col", formatter:"lookup", formatterParams:paramLookup},
         {title:"Date Of Birth", field:"dob", sorter:"date", hozAlign:"center"},
     ];
 
