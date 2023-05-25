@@ -16,6 +16,7 @@ from flask import Flask, request, jsonify, current_app, make_response
 from pandas import DataFrame
 from dataiku import api_client
 from dataikuapi.utils import DataikuStreamedHttpUTF8CSVReader
+from dataiku_utils import get_rows
 from datetime import datetime
 from dash import Dash, html, dcc, Input, Output, State
 import logging
@@ -64,7 +65,7 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     server = app.server
 
 else:
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     logging.info("Webapp is being run outside of Dataiku")
     run_context = "local"
     info_display = "block"
@@ -364,26 +365,53 @@ def delete_endpoint():
 ###
 
 def get_dataframe_filtered(ds_name, filter_column, filter_term, n_results):
-    logging.debug("Passing request to Dataiku's `data` API endpoint")
-    csv_stream = client._perform_raw(
-        "GET", f"/projects/{project_key}/datasets/{ds_name}/data/",
-        params={
-            "format": "tsv-excel-header",
-            "filter": f"""startsWith(toLowercase(strval("{filter_column}")), "{filter_term}")""",
-            "sampling": dumps({
-                "samplingMethod": "HEAD_SEQUENTIAL",
-                "maxRecords": n_results
-            })
+    schema_columns = project.get_dataset(ds_name).get_schema()["columns"]
+    params = {
+        "format": "tsv-excel-header",
+        "filter": f"""startsWith(toLowercase(strval("{filter_column}")), "{filter_term}")""",
+        "sampling": dumps({
+            "samplingMethod": "HEAD_SEQUENTIAL",
+            "maxRecords": n_results
         })
-    ds = project.get_dataset(ds_name)
-    csv_reader = DataikuStreamedHttpUTF8CSVReader(
-        ds.get_schema()["columns"], csv_stream)
-    rows = []
-    logging.debug("Reading streamed CSV")
-    for row in csv_reader.iter_rows():
-        rows.append(row)
-    logging.debug("Done")
+    }
+    rows = get_rows(client, ds_name, project_key, schema_columns, params)
     return DataFrame(columns=rows[0], data=rows[1:])
+
+def get_label(ds_name, key_column, key, label_column):
+    schema_columns = project.get_dataset(ds_name).get_schema()["columns"]
+    params = {
+        "format": "tsv-excel-header",
+        "filter": f"""strval("{key_column}")=="{key}")""",
+        "sampling": dumps({
+            "samplingMethod": "HEAD_SEQUENTIAL",
+            "maxRecords": 1
+        })
+    }
+    rows = get_rows(client, ds_name, project_key, schema_columns, params)
+    df = DataFrame(columns=rows[0], data=rows[1:])
+    if df.size:
+        return df[label_column].values[0]
+    else:
+        return "not found"
+
+@server.route("/label/<linked_ds_name>", methods=['GET', 'POST'])
+def label_endpoint(linked_ds_name):
+    if request.method == 'POST':
+        key = request.get_json().get("key")
+    else:
+        key = request.args.get('key', '')
+    response = ""
+
+    # Return data only when it's a linked dataset
+    if linked_ds_name in ees.linked_records_df["ds_name"].to_list():
+        linked_record_row = ees.linked_records_df.loc[ees.linked_records_df["ds_name"] == linked_ds_name]
+        linked_ds_lookup_columns = linked_record_row["ds_lookup_columns"][0]
+        linked_ds_key = linked_record_row["ds_key"][0]
+        linked_ds_label = linked_record_row["ds_label"][0]
+        label = get_label(linked_ds_name, linked_ds_key, key, linked_ds_label)
+        response = label
+
+    return response
 
 @server.route("/lookup/<linked_ds_name>", methods=['GET', 'POST'])
 def lookup_endpoint(linked_ds_name):
