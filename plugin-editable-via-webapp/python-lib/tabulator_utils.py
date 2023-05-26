@@ -3,6 +3,7 @@ from dataiku import Dataset
 from dash_extensions.javascript import Namespace
 from commons import get_values_from_linked_df
 import logging
+from dash_extensions.javascript import assign
 
 # used to reference javascript functions in custom_tabulator.js
 __ns__ = Namespace("myNamespace", "tabulator")
@@ -99,6 +100,39 @@ def __get_column_tabulator_editor__(t_type):
         t_col["editor"] = "input"
     return t_col
 
+def __get_column_tabulator_formatter_linked_record__(ees, linked_record_name):
+    """Define Tabulator formatter settings for a column whose type is linked record"""
+
+    t_col = {}
+    t_col["formatter"] = "lookup"
+    # define formatterParams property as an inline javascript function which takes cell as parameter and always returns "toto", using the assign function of the javascript module of dash_extensions
+    # TODO: use paramLookup function from custom_tabulator.js instead of inline javascript function
+    t_col["formatterParams"] = assign(
+        """
+        function(cell){
+            // TODO: cache results
+            url_base = "http://localhost:8000/label/companies_ext"
+            key = cell.getValue()
+            label = ""
+            // Assign value returned by GET request to url_base with parameter key, to label variable; in case connection fails, assign empty value to label
+            $.ajax({
+                url: url_base + "?key=" + key,
+                async: false,
+                success: function(result){
+                    label = result
+                },
+                error: function(result){
+                    label = ""
+                    console.log("Could not retrieve label from server")
+                }
+            });
+            d = {}
+            d[key] = label
+            return d
+        }
+        """
+    )
+    return t_col
 
 def __get_column_tabulator_editor_linked_record__(ees, linked_record_name):
     """Define Tabulator editor settings for a column whose type is linked record"""
@@ -179,7 +213,11 @@ def get_columns_tabulator(ees, freeze_editable_columns=False):
 
         # Define formatter and header filters based on type
         t_type = __get_column_tabulator_type__(ees, col_name)
-        t_col.update(__get_column_tabulator_formatter__(t_type))
+        if col_name in linked_record_names:
+            t_col.update(
+                __get_column_tabulator_formatter_linked_record__(ees, col_name))
+        else:
+            t_col.update(__get_column_tabulator_formatter__(t_type))
         if col_name in ees.primary_keys:
             t_col["frozen"] = True
 

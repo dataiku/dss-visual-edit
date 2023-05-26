@@ -5,6 +5,8 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
 
     tabulator: {
 
+        labels: {},
+
         headerMenu: [
             {
                 label:"Hide Column",
@@ -187,8 +189,28 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
             container.appendChild(end);
         
             return container;
-         }
+         },
 
+        paramLookup: function (cell, url_base){
+            // TODO: cache results
+            key = cell.getValue()
+            label = ""
+            // Assign value returned by GET request to url_base with parameter key, to label variable; in case connection fails, assign empty value to label
+            $.ajax({
+                url: url_base + "?key=" + key,
+                async: false,
+                success: function(result){
+                    label = result
+                },
+                error: function(result){
+                    label = ""
+                    console.log("Could not retrieve label from server")
+                }
+            });
+            d = {}
+            d[key] = label
+            return d
+        }
     }
 
 });
