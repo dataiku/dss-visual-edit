@@ -2,6 +2,7 @@ import logging
 from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
+from dataiku_utils import recipe_already_exists
 from pandas import DataFrame
 from commons import get_user_identifier, get_original_df, get_editlog_df, write_empty_editlog, get_editlog_ds_schema, get_display_column_names, merge_edits_from_log_pivoted_df, pivot_editlog, get_key_values_from_dict
 from webapp_utils import find_webapp_id, get_webapp_json
@@ -11,15 +12,6 @@ from json import loads
 from datetime import datetime
 from pytz import timezone
 from re import sub
-
-
-def __recipe_already_exists__(recipe_name, project):
-    try:
-        project.get_recipe(recipe_name).get_status()
-        return True
-    except:
-        return False
-
 
 class EditableEventSourced:
 
@@ -86,7 +78,7 @@ class EditableEventSourced:
         pivot_recipe_name = "compute_" + self.editlog_pivoted_ds_name
         pivot_recipe_creator = DSSRecipeCreator(
             "CustomCode_pivot-editlog", pivot_recipe_name, self.project)
-        if (__recipe_already_exists__(pivot_recipe_name, self.project)):
+        if (recipe_already_exists(pivot_recipe_name, self.project)):
             logging.debug("Found recipe to create editlog pivoted")
             pivot_recipe = self.project.get_recipe(pivot_recipe_name)
         else:
@@ -117,7 +109,7 @@ class EditableEventSourced:
         merge_recipe_name = "compute_" + self.edited_ds_name
         merge_recipe_creator = DSSRecipeCreator(
             "CustomCode_merge-edits", merge_recipe_name, self.project)
-        if (__recipe_already_exists__(merge_recipe_name, self.project)):
+        if (recipe_already_exists(merge_recipe_name, self.project)):
             logging.debug("Found recipe to create edited dataset")
             merge_recipe = self.project.get_recipe(merge_recipe_name)
         else:
