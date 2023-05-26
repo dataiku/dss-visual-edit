@@ -60,6 +60,7 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     else:
         editschema_manual = {}
 
+    app = Dash(__name__) # TODO: test this doesn't interfere with Dataiku mechanism to start Dash webapps
     server = app.server
 
 else:
@@ -213,8 +214,7 @@ def add_edit(cell):
     """
     Record edit in editlog, once a cell has been edited
     """
-    user = get_user_identifier()
-    return ees.update_row(cell["row"], cell["column"], cell["value"], user) # cell["row"] contains values for primary keys — and other columns too, but they'll be discarded
+    return ees.update_row(cell["row"], cell["column"], cell["value"]) # cell["row"] contains values for primary keys — and other columns too, but they'll be discarded
 
 
 # CRUD endpoints
@@ -398,7 +398,7 @@ def lookup_endpoint(linked_ds_name):
         linked_ds_key = linked_record_row["ds_key"][0]
         linked_ds_label = linked_record_row["ds_label"][0]
         linked_df_filtered = get_dataframe_filtered(
-            linked_ds_name, linked_ds_label, term.strip().lower(), 50)
+            linked_ds_name, project_key, linked_ds_label, term.strip().lower(), 50)
         logging.debug(f"Found {linked_df_filtered.size} entries")
         editor_values_param = get_values_from_linked_df(
             linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns)
