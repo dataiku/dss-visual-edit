@@ -16,7 +16,8 @@ from flask import Flask, request, jsonify, current_app, make_response
 from pandas import DataFrame
 import dataiku
 from dataikuapi.utils import DataikuStreamedHttpUTF8CSVReader
-from dataiku_utils import get_cell_value, get_dataframe_filtered
+from dataiku_utils import get_dataframe_filtered
+from DatasetSQL import DatasetSQL
 from datetime import datetime
 from dash import Dash, html, dcc, Input, Output, State
 import logging
@@ -377,7 +378,8 @@ def label_endpoint(linked_ds_name):
         linked_record_row = ees.linked_records_df.loc[ees.linked_records_df["ds_name"] == linked_ds_name]
         linked_ds_key = linked_record_row["ds_key"][0]
         linked_ds_label = linked_record_row["ds_label"][0]
-        label = get_cell_value(linked_ds_name, linked_ds_key, key, linked_ds_label)
+        linked_ds_sql = DatasetSQL(linked_ds_name, project_key) # TODO: cache this object
+        label = linked_ds_sql.get_cell_value(linked_ds_key, key, linked_ds_label)
         response = label
 
     return response
