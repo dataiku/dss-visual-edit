@@ -28,10 +28,7 @@ from EditableEventSourced import EditableEventSourced
 import dash_tabulator
 
 stylesheets = [
-    "https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
-scripts = ["https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js",
-           "https://cdn.jsdelivr.net/npm/luxon@3.0.4/build/global/luxon.min.js"]
-client = api_client()
+client = dataiku.api_client()
 project_key = getenv("DKU_CURRENT_PROJECT_KEY")
 project = client.get_project(project_key)
 
