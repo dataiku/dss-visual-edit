@@ -194,7 +194,10 @@ def add_edit(cell):
     """
     Record edit in editlog, once a cell has been edited
     """
-    return ees.update_row(cell["row"], cell["column"], cell["value"]) # cell["row"] contains values for primary keys — and other columns too, but they'll be discarded
+    return ees.update_row(
+        primary_keys=cell["row"], # contains values for primary keys — and other columns too, but they'll be discarded
+        column=cell["field"],
+        value=cell["value"]) 
 
 
 # CRUD endpoints
