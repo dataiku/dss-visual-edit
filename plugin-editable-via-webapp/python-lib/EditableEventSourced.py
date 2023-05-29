@@ -7,6 +7,7 @@ from pandas import DataFrame
 from commons import get_user_identifier, get_original_df, get_editlog_df, write_empty_editlog, get_editlog_ds_schema, get_display_column_names, merge_edits_from_log_pivoted_df, pivot_editlog, get_key_values_from_dict
 from webapp_utils import find_webapp_id, get_webapp_json
 from editschema_utils import get_primary_keys, get_editable_column_names
+from DatasetSQL import DatasetSQL
 from os import getenv
 from json import loads
 from datetime import datetime
@@ -157,6 +158,8 @@ class EditableEventSourced:
             if (len(self.linked_records) > 0):
                 self.linked_records_df = DataFrame(
                     data=self.linked_records).set_index("name")
+                for linked_record in self.linked_records:
+                    linked_record["ds"] = DatasetSQL(linked_record["ds_name"], self.project_key)
         self.editschema_manual = editschema_manual
         if (editschema):
             self.primary_keys = get_primary_keys(editschema)

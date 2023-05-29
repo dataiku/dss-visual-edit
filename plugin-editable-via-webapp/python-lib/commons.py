@@ -272,19 +272,3 @@ def get_key_values_from_dict(row, primary_keys):
 
 def get_last_build_date(ds_name, project):
     return project.get_dataset(ds_name).get_last_metric_values().get_metric_by_id("reporting:BUILD_START_DATE").get("lastValues")[0].get("computed")
-
-# Used by backend's lookup endpoint and by EES (when linked dataframe can be loaded in memory and provided in the Tabulator column settings)
-
-
-def get_values_from_linked_df(linked_df, linked_ds_key, linked_ds_label, linked_ds_lookup_columns):
-    linked_columns = [linked_ds_key]
-    if (linked_ds_label != linked_ds_key):
-        linked_columns += [linked_ds_label]
-    if linked_ds_lookup_columns != []:
-        linked_columns += linked_ds_lookup_columns
-    values_df = linked_df[linked_columns].sort_values(linked_ds_label)
-    if len(linked_columns) == 1:
-        return values_df[linked_columns[0]].to_list()
-    else:
-        return values_df[linked_columns].rename(
-            columns={linked_ds_key: "value", linked_ds_label: "label"}).to_dict("records")

@@ -98,37 +98,11 @@ editable_column_names = params.get("editable_column_names")
 freeze_editable_columns = params.get("freeze_editable_columns")
 group_column_names = params.get("group_column_names")
 linked_records_count = params.get("linked_records_count")
-linked_records = []
-if (linked_records_count > 0):
-    for c in range(1, linked_records_count+1):
-        name = params.get(f"linked_record_name_{c}")
-        ds_name = params.get(f"linked_record_ds_name_{c}")
-        ds_key = params.get(f"linked_record_key_{c}")
-        ds_label = params.get(f"linked_record_label_column_{c}")
-        ds_lookup_columns = params.get(f"linked_record_lookup_columns_{c}")
-        if not ds_label:
-            ds_label = ds_key
-        if not ds_lookup_columns:
-            ds_lookup_columns = []
-        linked_records.append(
-            {
-                "name": name,
-                "ds_name": ds_name,
-                "ds_key": ds_key,
-                "ds_label": ds_label,
-                "ds_lookup_columns": ds_lookup_columns
-            }
-        )
+linked_records = get_linked_records(params, linked_records_count)
 
-# 2. Instantiate editable event-sourced dataset
-###
 
 ees = EditableEventSourced(original_ds_name, primary_keys,
                            editable_column_names, linked_records, editschema_manual)
-
-# 3. Define webapp layout and components
-###
-
 columns = get_columns_tabulator(ees, freeze_editable_columns)
 
 last_build_date_initial = ""
@@ -365,11 +339,20 @@ def delete_endpoint():
     return response
 
 
-# Lookup endpoint
+# Label and lookup endpoints used by Tabulator when formatting or editing linked records
 ###
 
 @server.route("/label/<linked_ds_name>", methods=['GET', 'POST'])
 def label_endpoint(linked_ds_name):
+    """
+    Return the label of a row in a linked dataset
+
+    Params:
+    - key: value of the primary key identifying the row to read
+
+    Returns: the value of the column defined as label in the linked dataset
+    """
+
     if request.method == 'POST':
         key = request.get_json().get("key")
     else:
@@ -377,18 +360,23 @@ def label_endpoint(linked_ds_name):
     response = ""
 
     # Return data only when it's a linked dataset
-    if linked_ds_name in ees.linked_records_df["ds_name"].to_list():
-        linked_record_row = ees.linked_records_df.loc[ees.linked_records_df["ds_name"] == linked_ds_name]
-        linked_ds_key = linked_record_row["ds_key"][0]
-        linked_ds_label = linked_record_row["ds_label"][0]
-        linked_ds_sql = DatasetSQL(linked_ds_name, project_key) # TODO: cache this object
-        label = linked_ds_sql.get_cell_value(linked_ds_key, key, linked_ds_label)
-        response = label
+    for lr in ees.linked_records:
+        if linked_ds_name == lr["ds_name"]:
+            linked_ds_sql = lr["ds"]
+            linked_ds_key = lr["ds_key"]
+            linked_ds_label = lr["ds_label"]
+            label = linked_ds_sql.get_cell_value_sql_query(linked_ds_key, key, linked_ds_label)
+            response = label
 
     return response
 
 @server.route("/lookup/<linked_ds_name>", methods=['GET', 'POST'])
 def lookup_endpoint(linked_ds_name):
+    """
+    Get label and lookup values in a linked dataset, matching a search term.
+
+    This endpoint is used by Tabulator when editing a linked record. The values it returns are read by the `itemFormatter` function of the Tabulator table, which displays a dropdown list of linked records whose labels match the search term.
+    """
     if request.method == 'POST':
         term = request.get_json().get("term")
     else:
@@ -406,7 +394,7 @@ def lookup_endpoint(linked_ds_name):
         linked_df_filtered = get_dataframe_filtered(
             linked_ds_name, project_key, linked_ds_label, term.strip().lower(), 50)
         logging.debug(f"Found {linked_df_filtered.size} entries")
-        editor_values_param = get_values_from_linked_df(
+        editor_values_param = get_values_from_df(
             linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns)
         response = jsonify(editor_values_param)
     else:

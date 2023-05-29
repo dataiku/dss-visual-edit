@@ -1,7 +1,6 @@
 from pandas import DataFrame
 from dataiku import Dataset
 from dash_extensions.javascript import Namespace
-from commons import get_values_from_linked_df
 import logging
 from dash_extensions.javascript import assign
 
@@ -100,47 +99,88 @@ def __get_column_tabulator_editor__(t_type):
         t_col["editor"] = "input"
     return t_col
 
-def __get_column_tabulator_formatter_linked_record__(ees, linked_record_name):
-    """Define Tabulator formatter settings for a column whose type is linked record"""
+### Linked records
 
-    t_col = {}
-    t_col["formatter"] = "lookup"
-    # define formatterParams property as an inline javascript function which takes cell as parameter and always returns "toto", using the assign function of the javascript module of dash_extensions
-    # TODO: use paramLookup function from custom_tabulator.js instead of inline javascript function
-    t_col["formatterParams"] = assign(
-        """
-        function(cell){
-            // TODO: cache results
-            url_base = "http://localhost:8000/label/companies_ext"
-            key = cell.getValue()
-            label = ""
-            // Assign value returned by GET request to url_base with parameter key, to label variable; in case connection fails, assign empty value to label
-            $.ajax({
-                url: url_base + "?key=" + key,
-                async: false,
-                success: function(result){
-                    label = result
-                },
-                error: function(result){
-                    label = ""
-                    console.log("Could not retrieve label from server")
-                }
-            });
-            d = {}
-            d[key] = label
-            return d
+def get_values_from_df(df, key_column, label_column, lookup_columns=None):
+    """
+    Get values of specified columns in a given dataframe, to be read by the `itemFormatter` provided to Tabulator when defining a linked record:
+
+    - If no label column and no lookup columns are specified, the return value is a sorted list of key column values
+    - Otherwise, the return value is a list of dicts sorted by label
+
+    The `itemFormatter` function is defined in `custom_tabulator.js`. It is called by Tabulator for each table column which is defined as a linked record, for each row. It formats values of such columns into HTML elements, whose contents come from the dict whose `value` key matches the value of the linked record column.
+
+    Example params:
+    - df: a dataframe
+    - key_column: "id"
+    - label_column: "name"
+    - lookup_columns: ["col1", "col2"]
+
+    Example return value:
+    ```
+    [
+        {
+            "value": "0f45e",
+            "label": "Label One",
+            "col1": "value1",
+            "col2": "value2"
+        },
+        {
+            "value": "c3d2a",
+            "label": "Label Two",
+            "col1": "value3",
+            "col2": "value4"
         }
-        """
-    )
-    return t_col
+    ]
+    ```
 
-def __get_column_tabulator_editor_linked_record__(ees, linked_record_name):
-    """Define Tabulator editor settings for a column whose type is linked record"""
+    If no lookup columns are specified, then the return value is:
+    ```
+    [
+        {
+            "value": "0f45e",
+            "label": "Label One"
+        },
+        {
+            "value": "c3d2a",
+            "label": "Label Two"
+        }
+    ]
+    ```
+
+    If no lookup and label columns are specified, then the return value is:
+    ```
+    ["0f45e", "c3d2a"]
+    ```
+    """
+    selected_columns = [key_column]
+    if (label_column != key_column):
+        selected_columns += [label_column]
+    if lookup_columns is not None:
+        selected_columns += lookup_columns
+
+    # Select specific columns from df
+    selected_df = df[selected_columns]
+
+    # Sort the rows by the values in the label column
+    selected_df = selected_df.sort_values(label_column)
+
+    if len(selected_columns) == 1:
+        return selected_df[selected_columns[0]].to_list()
+    
+    return selected_df[selected_columns].rename(
+        columns={key_column: "value", label_column: "label"}
+    ).to_dict("records")
+
+def __get_column_tabulator_linked_record__(ees, linked_record_name):
+    """Define Tabulator formatter and editor settings for a column whose type is linked record"""
 
     linked_records_df = DataFrame(data=ees.linked_records).set_index("name")
 
-    # Use a list editor
     t_col = {}
+    t_col["formatter"] = "lookup"
+
+    # Use a list editor
     t_col["editor"] = "list"
     t_col["editorParams"] = {
         "autocomplete": True,
@@ -169,6 +209,31 @@ def __get_column_tabulator_editor_linked_record__(ees, linked_record_name):
         # ds_key and ds_label would normally be used, when loading the linked dataset in memory, but here they will be fetched by the API endpoint who has access to an EditableEventSourced dataset and who's given linked_ds_name in the URL
         logging.debug(
             f"Using API to lookup values in {linked_ds_name} since this dataset has {count_records} rows")
+        # TODO: use paramLookup function from custom_tabulator.js instead of inline javascript function
+        t_col["formatterParams"] = assign(
+            f"""
+            function(cell){{
+                url_base = "label/{linked_ds_name}"
+                key = cell.getValue()
+                label = ""
+                // Assign value returned by GET request to url_base with parameter key, to label variable; in case connection fails, assign empty value to label
+                $.ajax({{
+                    url: url_base + "?key=" + key,
+                    async: false,
+                    success: function(result){{
+                        label = result
+                    }},
+                    error: function(result){{
+                        label = ""
+                        console.log("Could not retrieve label from server")
+                    }}
+                }});
+                d = {{}}
+                d[key] = label
+                return d
+            }}
+            """
+        )
         t_col["editorParams"]["filterRemote"] = True
         t_col["editorParams"]["valuesURL"] = "lookup/" + linked_ds_name
 
@@ -179,11 +244,10 @@ def __get_column_tabulator_editor_linked_record__(ees, linked_record_name):
         linked_ds_key = linked_records_df.loc[linked_record_name, "ds_key"]
         linked_ds_label = linked_records_df.loc[linked_record_name, "ds_label"]
         linked_df = Dataset(linked_ds_name).get_dataframe()
-        editor_values_param = get_values_from_linked_df(
+        editor_values_param = get_values_from_df(
             linked_df, linked_ds_key, linked_ds_label, linked_ds_lookup_columns)
         if (linked_ds_label != linked_ds_key):
             # A label column was provided: use labels in the formatter, instead of the keys; for this we provide a "lookup" parameter which looks like this: {"key1": "label1", "key2": "label2", "null": ""}
-            t_col["formatter"] = "lookup"
             formatter_lookup_param = linked_df.set_index(
                 linked_ds_key)[linked_ds_label].to_dict()
             # use empty label when key is missing

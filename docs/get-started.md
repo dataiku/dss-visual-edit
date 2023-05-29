@@ -12,7 +12,7 @@ If you haven't, [install the plugin](install-plugin) first.
   * ![](new_visual_webapp_2.png)
 * The webapp settings interface has several sections...
   * Under "Data" you can choose a dataset, list primary keys and editable columns (note that a column can't be both). ![](data_editing_webapp_params_1.png) ![](data_editing_webapp_params_2.png)
-  * The "Linked Records" section allows to specify editable columns whose values correspond to primary key values of another dataset.
+  * The "Linked Records" section allows to specify editable columns whose values correspond to primary key values of another dataset. This requires the other dataset to be on a SQL connection or to have less than 1,000 records.
   * In the "Layout" section you can choose to freeze editable columns to the right-hand side (which is useful when there are many columns), and to group rows by one or more columns.
   * Additional settings can be provided via the ["editschema" in JSON](editschema).
 * You can now start the webapp backend. Behind the scenes, webapp settings such as primary keys and editable columns will be copied into the corresponding _Data Editing_ fields of the chosen dataset (custom fields provided by the plugin).
