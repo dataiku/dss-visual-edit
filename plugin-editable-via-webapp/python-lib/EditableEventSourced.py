@@ -4,7 +4,7 @@ from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
 from dataiku_utils import recipe_already_exists
 from pandas import DataFrame
-from commons import get_user_identifier, get_original_df, get_editlog_df, write_empty_editlog, get_editlog_ds_schema, get_display_column_names, merge_edits_from_log_pivoted_df, pivot_editlog, get_key_values_from_dict
+from commons import get_user_identifier, get_original_df, get_editlog_df, write_empty_editlog, get_display_column_names, merge_edits_from_log_pivoted_df, pivot_editlog, get_key_values_from_dict
 from webapp_utils import find_webapp_id, get_webapp_json
 from editschema_utils import get_primary_keys, get_editable_column_names
 from DatasetSQL import DatasetSQL
@@ -54,7 +54,17 @@ class EditableEventSourced:
                 connection=self.__connection_name__)
             editlog_ds_creator.create()
             self.editlog_ds = Dataset(self.editlog_ds_name, self.project_key)
-            self.editlog_ds.write_schema(get_editlog_ds_schema())
+            editlog_ds_schema = [
+                # not using date type, in case the editlog is CSV
+                {"name": "date", "type": "string", "meaning": "DateSource"},
+                {"name": "user", "type": "string", "meaning": "Text"},
+                # action can be "update", "create", or "delete"; currently it's ignored by the pivot method
+                {"name": "action", "type": "string", "meaning": "Text"},
+                {"name": "key", "type": "string", "meaning": "Text"},
+                {"name": "column_name", "type": "string", "meaning": "Text"},
+                {"name": "value", "type": "string", "meaning": "Text"}
+            ]
+            self.editlog_ds.write_schema(editlog_ds_schema)
             write_empty_editlog(self.editlog_ds)
             logging.debug("Done.")
 

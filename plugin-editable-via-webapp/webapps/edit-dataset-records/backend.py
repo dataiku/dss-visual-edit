@@ -11,20 +11,20 @@
 # 0. Imports and variable initializations
 ###
 
-from json import dumps
-from flask import Flask, request, jsonify, current_app, make_response
-from pandas import DataFrame
+import logging
+from datetime import datetime
+from os import getenv
+
 import dataiku
-from dataikuapi.utils import DataikuStreamedHttpUTF8CSVReader
+from commons import get_last_build_date, get_user_identifier
+from dash import Dash, Input, Output, State, dcc, html
 from dataiku_utils import get_dataframe_filtered
 from DatasetSQL import DatasetSQL
-from datetime import datetime
-from dash import Dash, html, dcc, Input, Output, State
-import logging
-from os import getenv
-from commons import get_values_from_linked_df, get_user_identifier, get_last_build_date
-from tabulator_utils import get_columns_tabulator
 from EditableEventSourced import EditableEventSourced
+from flask import Flask, current_app, jsonify, make_response, request
+from tabulator_utils import get_columns_tabulator, get_values_from_df
+from webapp_config_utils import get_linked_records
+
 import dash_tabulator
 
 stylesheets = [
@@ -34,6 +34,7 @@ scripts = [
     "https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js",
     "https://code.jquery.com/jquery-3.5.1.min.js", # used by inline javascript code found in tabulator_utils (__get_column_tabulator_formatter_linked_record__)
     "https://cdn.jsdelivr.net/npm/luxon@3.0.4/build/global/luxon.min.js"]
+
 client = dataiku.api_client()
 project_key = getenv("DKU_CURRENT_PROJECT_KEY")
 project = client.get_project(project_key)
@@ -53,6 +54,7 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     from dataiku.customwebapp import get_webapp_config
     original_ds_name = get_webapp_config().get("original_dataset")
     params = get_webapp_config()
+
     if bool(params.get("debug_mode")):
         logging.basicConfig(level=logging.DEBUG)
     else:

@@ -4,34 +4,11 @@ from flask import request
 import logging
 
 
-# Editlog utils
-
-# Used by EES for initialization of editlog
-# TODO: move to EES
-def get_editlog_ds_schema():
-    return [
-        # not using date type, in case the editlog is CSV
-        {"name": "date", "type": "string", "meaning": "DateSource"},
-        {"name": "user", "type": "string", "meaning": "Text"},
-        # action can be "update", "create", or "delete"; currently it's ignored by the pivot method
-        {"name": "action", "type": "string", "meaning": "Text"},
-        {"name": "key", "type": "string", "meaning": "Text"},
-        {"name": "column_name", "type": "string", "meaning": "Text"},
-        {"name": "value", "type": "string", "meaning": "Text"}
-    ]
-
-# Used by write_empty_editlog method below
-
-
-def __get_editlog_columns__():
-    return ["date", "user", "action", "key", "column_name", "value"]
-
-# Used by Empty Editlog step and by EES for initialization of editlog
-
+# Editlog utils - used by Empty Editlog step and by EES for initialization of editlog
 
 def write_empty_editlog(editlog_ds):
     editlog_ds.write_dataframe(
-        DataFrame(columns=__get_editlog_columns__()), infer_schema=False)
+        DataFrame(columns=["date", "user", "action", "key", "column_name", "value"]), infer_schema=False)
 
 
 # Utils for EES and plugin components (recipes and scenario steps)
