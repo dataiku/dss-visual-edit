@@ -1,3 +1,4 @@
 dataiku-api-client
-$DKU_DSS_URL/public/packages/dataiku-internal-client.tar.gz
 ipykernel
+numpy < 1.24
+pandas
