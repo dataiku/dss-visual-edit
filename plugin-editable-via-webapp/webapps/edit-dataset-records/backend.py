@@ -27,13 +27,12 @@ from webapp_config_utils import get_linked_records
 
 import dash_tabulator
 
-stylesheets = [
-    "https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"
-]
+stylesheets = ["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
 scripts = [
     "https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js",
-    "https://code.jquery.com/jquery-3.5.1.min.js", # used by inline javascript code found in tabulator_utils (__get_column_tabulator_formatter_linked_record__)
-    "https://cdn.jsdelivr.net/npm/luxon@3.0.4/build/global/luxon.min.js"]
+    "https://code.jquery.com/jquery-3.5.1.min.js",  # used by inline javascript code found in tabulator_utils (__get_column_tabulator_formatter_linked_record__)
+    "https://cdn.jsdelivr.net/npm/luxon@3.0.4/build/global/luxon.min.js",
+]
 
 client = dataiku.api_client()
 project_key = getenv("DKU_CURRENT_PROJECT_KEY")
@@ -43,15 +42,20 @@ project = client.get_project(project_key)
 # 1. Get webapp parameters
 ###
 
-if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
+if getenv("DKU_CUSTOM_WEBAPP_CONFIG"):
     run_context = "dataiku"
     # this points to a copy of assets/style.css (which is ignored by Dataiku's Dash)
-    stylesheets += ["https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/style.css"]
+    stylesheets += [
+        "https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/style.css"
+    ]
     # same for assets/custom_tabulator.js
-    scripts += ["https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/custom_tabulator.js"]
+    scripts += [
+        "https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/custom_tabulator.js"
+    ]
     info_display = "none"
 
     from dataiku.customwebapp import get_webapp_config
+
     original_ds_name = get_webapp_config().get("original_dataset")
     params = get_webapp_config()
 
@@ -62,13 +66,16 @@ if (getenv("DKU_CUSTOM_WEBAPP_CONFIG")):
     logging.info("Webapp is being run in Dataiku")
 
     from json import loads
+
     editschema_manual_raw = params.get("editschema")
-    if (editschema_manual_raw and editschema_manual_raw != ""):
+    if editschema_manual_raw and editschema_manual_raw != "":
         editschema_manual = loads(editschema_manual_raw)
     else:
         editschema_manual = {}
 
-    app = Dash(__name__) # TODO: test this doesn't interfere with Dataiku mechanism to start Dash webapps
+    app = Dash(
+        __name__
+    )  # TODO: test this doesn't interfere with Dataiku mechanism to start Dash webapps
     server = app.server
 
 else:
@@ -80,12 +87,12 @@ else:
     # Get original dataset name as an environment variable
     # Get primary keys and editable column names from the custom fields of that dataset
     from json import load
+
     original_ds_name = getenv("ORIGINAL_DATASET")
-    params = load(open("../../../example-settings/" +
-                  original_ds_name + ".json"))
+    params = load(open("../../../example-settings/" + original_ds_name + ".json"))
 
     editschema_manual = params.get("editschema")
-    if (not editschema_manual):
+    if not editschema_manual:
         editschema_manual = {}
 
     server = Flask(__name__)
@@ -103,48 +110,68 @@ linked_records_count = params.get("linked_records_count")
 linked_records = get_linked_records(params, linked_records_count)
 
 
-ees = EditableEventSourced(original_ds_name, primary_keys,
-                           editable_column_names, linked_records, editschema_manual)
+ees = EditableEventSourced(
+    original_ds_name,
+    primary_keys,
+    editable_column_names,
+    linked_records,
+    editschema_manual,
+)
 columns = get_columns_tabulator(ees, freeze_editable_columns)
 
 last_build_date_initial = ""
 last_build_date_ok = False
 
+
 def serve_layout():
     global last_build_date_initial, last_build_date_ok
     try:
-        last_build_date_initial = get_last_build_date(
-            original_ds_name, project)
+        last_build_date_initial = get_last_build_date(original_ds_name, project)
         last_build_date_ok = True
     except:
         last_build_date_initial = ""
         last_build_date_ok = False
 
     # This function is called upon loading/refreshing the page in the browser
-    return html.Div(children=[
-        html.Div(id="refresh-div", children=[
-            html.Div(id="data-refresh-message",
-                     children="The original dataset has changed, please refresh this page to load it here. (Your edits are safe.)", style={"display": "inline"}),
-            html.Div(id="last-build-date", children=str(last_build_date_initial),
-                     style={"display": "none"})  # when the original dataset was last built
-        ], className="ui compact warning message", style={"display": "none"}),
-
-        dcc.Interval(
-            id="interval-component-iu",
-            interval=10*1000,  # in milliseconds
-            n_intervals=0
-        ),
-
-        dash_tabulator.DashTabulator(
-            id="datatable",
-            columns=columns,
-            data=ees.get_edited_df().to_dict('records'), # this gets the most up-to-date edited data
-            groupBy=group_column_names
-        ),
-
-        html.Div(id="edit-info", children="Info zone for tabulator",
-                 style={"display": info_display})
-    ])
+    return html.Div(
+        children=[
+            html.Div(
+                id="refresh-div",
+                children=[
+                    html.Div(
+                        id="data-refresh-message",
+                        children="The original dataset has changed, please refresh this page to load it here. (Your edits are safe.)",
+                        style={"display": "inline"},
+                    ),
+                    html.Div(
+                        id="last-build-date",
+                        children=str(last_build_date_initial),
+                        style={"display": "none"},
+                    ),  # when the original dataset was last built
+                ],
+                className="ui compact warning message",
+                style={"display": "none"},
+            ),
+            dcc.Interval(
+                id="interval-component-iu",
+                interval=10 * 1000,  # in milliseconds
+                n_intervals=0,
+            ),
+            dash_tabulator.DashTabulator(
+                id="datatable",
+                columns=columns,
+                data=ees.get_edited_df().to_dict(
+                    "records"
+                ),  # this gets the most up-to-date edited data
+                groupBy=group_column_names,
+            ),
+            html.Div(
+                id="edit-info",
+                children="Info zone for tabulator",
+                style={"display": info_display},
+            ),
+        ]
+    )
 
 
 app.layout = serve_layout
@@ -153,17 +180,16 @@ data_fresh = True
 
 
 @app.callback(
-    [
-        Output("refresh-div", "style"),
-        Output("last-build-date", "children")
-    ],
+    [Output("refresh-div", "style"), Output("last-build-date", "children")],
     [
         # Changes in the Inputs trigger the callback
         Input("interval-component-iu", "n_intervals"),
         # Changes in States don't trigger the callback
         State("refresh-div", "style"),
-        State("last-build-date", "children")
-    ], prevent_initial_call=True)
+        State("last-build-date", "children"),
+    ],
+    prevent_initial_call=True,
+)
 def toggle_refresh_div_visibility(n_intervals, refresh_div_style, last_build_date):
     """
     Toggle visibility of refresh div, when the interval component fires: check last build date of original dataset and if it's more recent than what we had, display the refresh div
@@ -171,16 +197,18 @@ def toggle_refresh_div_visibility(n_intervals, refresh_div_style, last_build_dat
     global last_build_date_ok
     style_new = refresh_div_style
     if last_build_date_ok:
-        last_build_date_new = str(
-            get_last_build_date(original_ds_name, project))
+        last_build_date_new = str(get_last_build_date(original_ds_name, project))
         if int(last_build_date_new) > int(last_build_date):
             logging.info("The original dataset has changed.")
             last_build_date_new_fmtd = datetime.utcfromtimestamp(
-                int(last_build_date_new)/1000).isoformat()
+                int(last_build_date_new) / 1000
+            ).isoformat()
             last_build_date_fmtd = datetime.utcfromtimestamp(
-                int(last_build_date)/1000).isoformat()
+                int(last_build_date) / 1000
+            ).isoformat()
             logging.info(
-                f"""Last build date: {last_build_date_new} ({last_build_date_new_fmtd}) — previously {last_build_date} ({last_build_date_fmtd})""")
+                f"""Last build date: {last_build_date_new} ({last_build_date_new_fmtd}) — previously {last_build_date} ({last_build_date_fmtd})"""
+            )
             style_new["display"] = "block"
             data_fresh = False
     else:
@@ -191,21 +219,26 @@ def toggle_refresh_div_visibility(n_intervals, refresh_div_style, last_build_dat
 @app.callback(
     Output("edit-info", "children"),
     Input("datatable", "cellEdited"),
-    prevent_initial_call=True)
+    prevent_initial_call=True,
+)
 def add_edit(cell):
     """
     Record edit in editlog, once a cell has been edited
     """
     return ees.update_row(
-        primary_keys=cell["row"], # contains values for primary keys — and other columns too, but they'll be discarded
+        primary_keys=cell[
+            "row"
+        ],  # contains values for primary keys — and other columns too, but they'll be discarded
         column=cell["field"],
-        value=cell["value"]) 
+        value=cell["value"],
+    )
 
 
 # CRUD endpoints
 ###
 
-@server.route("/create", methods=['POST'])
+
+@server.route("/create", methods=["POST"])
 def create_endpoint():
     """
     Create a new row.
@@ -213,7 +246,7 @@ def create_endpoint():
     Params:
     - primaryKeys: dict containing values for all primary keys defined in the initial data editing setup; the set of values must be unique.
     - columnValues: dict containing values for all other columns.
-    
+
     Example request JSON:
     ```json
     {
@@ -227,7 +260,7 @@ def create_endpoint():
         }
     }
     ```
-    
+
     Returns a message confirming row creation.
 
     Note: this method doesn't implement data validation / it doesn't check that the values are allowed for the specified columns.
@@ -237,12 +270,11 @@ def create_endpoint():
     # TODO: check set of primary key values is unique?
     user = get_user_identifier()
     ees.create_row(primary_keys_values, column_values)
-    response = jsonify({
-        "msg": "New row created"
-    })
+    response = jsonify({"msg": "New row created"})
     return response
 
-@server.route("/read", methods=['POST'])
+
+@server.route("/read", methods=["POST"])
 def read_endpoint():
     """
     Read a row that was created or edited via webapp or API
@@ -278,7 +310,8 @@ def read_endpoint():
     response = ees.get_row(primary_keys_values).to_json()
     return response
 
-@server.route("/read-all-edits", methods=['GET'])
+
+@server.route("/read-all-edits", methods=["GET"])
 def read_all_edits_endpoint():
     """
     Read all rows edited or created via webapp or API
@@ -286,12 +319,15 @@ def read_all_edits_endpoint():
     Returns: CSV-formatted dataset with rows that were created or edited, and values of primary key and editable columns. See remarks of the `read` endpoint.
     """
     response = make_response(ees.get_edited_cells_df_indexed().to_csv())
-    response.headers["Content-Disposition"] = "attachment; filename=" + original_ds_name + "_edits.csv"
+    response.headers["Content-Disposition"] = (
+        "attachment; filename=" + original_ds_name + "_edits.csv"
+    )
     response.headers["Content-Type"] = "text/csv"
     response.headers["Cache-Control"] = "no-store"
     return response
 
-@server.route("/update", methods=['GET', 'POST'])
+
+@server.route("/update", methods=["GET", "POST"])
 def update_endpoint():
     """
     Update a row
@@ -313,7 +349,7 @@ def update_endpoint():
 
     Note: this method doesn't implement data validation / it doesn't check that the value is allowed for the specified column.
     """
-    if request.method == 'POST':
+    if request.method == "POST":
         primary_keys_values = request.get_json().get("primaryKeys")
         column = request.get_json().get("column")
         value = request.get_json().get("value")
@@ -325,7 +361,8 @@ def update_endpoint():
     response = jsonify({"msg": info})
     return response
 
-@server.route("/delete", methods=['GET', 'POST'])
+
+@server.route("/delete", methods=["GET", "POST"])
 def delete_endpoint():
     """
     Delete a row
@@ -335,7 +372,7 @@ def delete_endpoint():
 
     Returns a message confirming row deletion.
     """
-    if request.method == 'POST':
+    if request.method == "POST":
         primary_keys = request.get_json().get("primaryKeys")
     else:
         primary_keys = request.args.get("primaryKeys", "")
@@ -347,7 +384,8 @@ def delete_endpoint():
 # Label and lookup endpoints used by Tabulator when formatting or editing linked records
 ###
 
-@server.route("/label/<linked_ds_name>", methods=['GET', 'POST'])
+
+@server.route("/label/<linked_ds_name>", methods=["GET", "POST"])
 def label_endpoint(linked_ds_name):
     """
     Return the label of a row in a linked dataset
@@ -358,10 +396,10 @@ def label_endpoint(linked_ds_name):
     Returns: the value of the column defined as label in the linked dataset
     """
 
-    if request.method == 'POST':
+    if request.method == "POST":
         key = request.get_json().get("key")
     else:
-        key = request.args.get('key', '')
+        key = request.args.get("key", "")
     response = ""
 
     # Return data only when it's a linked dataset
@@ -370,37 +408,45 @@ def label_endpoint(linked_ds_name):
             linked_ds_sql = lr["ds"]
             linked_ds_key = lr["ds_key"]
             linked_ds_label = lr["ds_label"]
-            label = linked_ds_sql.get_cell_value_sql_query(linked_ds_key, key, linked_ds_label)
+            label = linked_ds_sql.get_cell_value_sql_query(
+                linked_ds_key, key, linked_ds_label
+            )
             response = label
 
     return response
 
-@server.route("/lookup/<linked_ds_name>", methods=['GET', 'POST'])
+
+@server.route("/lookup/<linked_ds_name>", methods=["GET", "POST"])
 def lookup_endpoint(linked_ds_name):
     """
     Get label and lookup values in a linked dataset, matching a search term.
 
     This endpoint is used by Tabulator when editing a linked record. The values it returns are read by the `itemFormatter` function of the Tabulator table, which displays a dropdown list of linked records whose labels match the search term.
     """
-    if request.method == 'POST':
+    if request.method == "POST":
         term = request.get_json().get("term")
     else:
-        term = request.args.get('term', '')
+        term = request.args.get("term", "")
     logging.info(
-        f"""Received a request for dataset "{linked_ds_name}", term "{term}" ({len(term)} characters)""")
+        f"""Received a request for dataset "{linked_ds_name}", term "{term}" ({len(term)} characters)"""
+    )
     response = jsonify({})
 
     # Return data only when it's a linked dataset
     if linked_ds_name in ees.linked_records_df["ds_name"].to_list():
-        linked_record_row = ees.linked_records_df.loc[ees.linked_records_df["ds_name"] == linked_ds_name]
+        linked_record_row = ees.linked_records_df.loc[
+            ees.linked_records_df["ds_name"] == linked_ds_name
+        ]
         linked_ds_lookup_columns = linked_record_row["ds_lookup_columns"][0]
         linked_ds_key = linked_record_row["ds_key"][0]
         linked_ds_label = linked_record_row["ds_label"][0]
         linked_df_filtered = get_dataframe_filtered(
-            linked_ds_name, project_key, linked_ds_label, term.strip().lower(), 50)
+            linked_ds_name, project_key, linked_ds_label, term.strip().lower(), 10
+        )
         logging.debug(f"Found {linked_df_filtered.size} entries")
         editor_values_param = get_values_from_df(
-            linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns)
+            linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns
+        )
         response = jsonify(editor_values_param)
     else:
         logging.info(f"""Dataset {linked_ds_name} is not a linked dataset!""")
@@ -411,21 +457,24 @@ def lookup_endpoint(linked_ds_name):
 # Dummy endpoints
 ###
 
+
 @server.route("/dash")
 def my_dash_app():
     return app.index()
 
-@server.route("/echo", methods=['GET', 'POST'])
+
+@server.route("/echo", methods=["GET", "POST"])
 def echo_endpoint():
-    if request.method == 'POST':
+    if request.method == "POST":
         term = request.get_json().get("term")
     else:
-        term = request.args.get('term', '')
+        term = request.args.get("term", "")
     return jsonify([term])
 
-@server.route('/static')
+
+@server.route("/static")
 def static_page():
-    return current_app.send_static_file('values_url.html')
+    return current_app.send_static_file("values_url.html")
 
 
 logging.info("Webapp OK")
