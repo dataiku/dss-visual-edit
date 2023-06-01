@@ -1,17 +1,6 @@
+/* define SourceSansPro */
 @font-face {
-    font-family: SourceSansPro;
-    src: url(SourceSansPro-Bold.woff);
-    font-weight: 600;
-}
-@font-face {
-    font-family: SourceSansPro;
-    src: url(SourceSansPro-Semibold.woff);
-    font-weight: 500;
-}
-@font-face {
-    font-family: SourceSansPro;
-    src: url(SourceSansPro-Regular.woff);
-    font-weight: 400;
+    src: url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,500,700');
 }
 
 body {
@@ -20,7 +9,7 @@ body {
 }
 
 body, button, select.tabulator-page-size, input[type=search] {
-    font-family: 'SourceSansPro' !important;
+    font-family: 'Source Sans Pro' !important;
 }
 
 .tabulator {

@@ -4,6 +4,8 @@ import {resolveProp} from 'dash-extensions';
 import {TabulatorFull as Tabulator} from "tabulator-tables"; //import Tabulator library
 import "tabulator-tables/dist/css/tabulator.min.css";
 import "tabulator-tables/dist/css/tabulator_semanticui.min.css";
+import "../../../assets/custom_tabulator.js";
+import "../../../assets/tabulator_dataiku.css";
 
 const crypto = require('crypto');
 
