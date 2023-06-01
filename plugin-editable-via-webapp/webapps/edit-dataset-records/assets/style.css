@@ -90,11 +90,21 @@ body, button, select.tabulator-page-size, input[type=search] {
 }
 
 .tabulator-row.tabulator-selectable.tabulator-selected .tabulator-editable {
-    background-color: #A7CBFA !important;
+    background-color: hsl(214, 89%, 82%) !important;
     /* background-color: rgb(76, 175, 80) !important;
     color: white !important; */
 }
 
+.linked-record {
+    background-color: hsla(215, 38%, 66%, 0.2) !important;
+    border-radius: 9999px;
+    padding: 0 10px;
+}
+
+.column-type {
+    font-size: 80%;
+    font-weight: normal;
+}
 
 input[type=search] {
     border-width: 1px;

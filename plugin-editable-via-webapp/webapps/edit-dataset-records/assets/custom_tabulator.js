@@ -189,7 +189,7 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
             container.appendChild(end);
         
             return container;
-         },
+        },
 
         paramLookup: function (cell, url_base){
             // TODO: cache results
