@@ -200,46 +200,27 @@ def __get_column_tabulator_linked_record__(ees, linked_record_name):
     """Define Tabulator formatter and editor settings for a column whose type is linked record"""
 
     linked_records_df = DataFrame(data=ees.linked_records).set_index("name")
-
-    t_col = {}
-    t_col["sorter"] = "string"
-    t_col["headerFilter"] = __ns__("linkedRecordHeaderFilter")
-    t_col["formatter"] = "lookup"
-
-    # Use a list editor
-    t_col["editor"] = "list"
-    t_col["editorParams"] = {
-        "autocomplete": True,
-        "filterDelay": 300,
-        # "freetext": True,
-        "listOnEmpty": True,
-        "clearable": False,
-        "valuesLookupField": linked_record_name,
-    }
-
-    # If lookup columns have been provided, use an item formatter in the editor
+    linked_ds_name = linked_records_df.loc[linked_record_name, "ds_name"]
+    linked_ds_label_column = linked_records_df.loc[linked_record_name, "ds_label"]
     linked_ds_lookup_columns = linked_records_df.loc[
         linked_record_name, "ds_lookup_columns"
     ]
-    if linked_ds_lookup_columns != []:
-        t_col["editorParams"]["itemFormatter"] = __ns__("itemFormatter")
 
-    # Define possible values in the list
-    linked_ds_name = linked_records_df.loc[linked_record_name, "ds_name"]
-    linked_ds = ees.project.get_dataset(linked_ds_name)
-    metrics = linked_ds.compute_metrics(metric_ids=["records:COUNT_RECORDS"])["result"][
-        "computed"
-    ]
-    for m in metrics:
-        if m["metric"]["metricType"] == "COUNT_RECORDS":
-            count_records = int(m["value"])
-    if count_records > 1000:
-        # ds_key and ds_label would normally be used, when loading the linked dataset in memory, but here they will be fetched by the API endpoint who has access to an EditableEventSourced dataset and who's given linked_ds_name in the URL
-        logging.debug(
-            f"Using API to lookup values in {linked_ds_name} since this dataset has {count_records} rows"
-        )
+    t_col = {}
+    t_col["sorter"] = "string"
+    t_col["titleFormatter"] = assign(
+        f"""
+        function(cell){{
+            return cell.getValue() + "<br><span class='column-type'>Linked Record</span>"
+        }}
+        """
+    )
+
+    # If a label column was provided, use a lookup formatter
+    if linked_ds_label_column != []:
+        # t_col["formatter"] = "lookup"
         # TODO: use paramLookup function from custom_tabulator.js instead of inline javascript function
-        t_col["formatterParams"] = assign(
+        t_col["formatter"] = assign(
             f"""
             function(cell){{
                 url_base = "label/{linked_ds_name}"
@@ -259,34 +240,25 @@ def __get_column_tabulator_linked_record__(ees, linked_record_name):
                 }});
                 d = {{}}
                 d[key] = label
-                return d
+                return "<span class='linked-record'>" + label + "</span>"
             }}
             """
         )
-        t_col["editorParams"]["filterRemote"] = True
-        t_col["editorParams"]["valuesURL"] = "lookup/" + linked_ds_name
 
-    else:
-        # The dataset can be loaded in memory
-        logging.debug(
-            f"Loading {linked_ds_name} in memory since this dataset has {count_records} rows"
-        )
-        linked_ds_key = linked_records_df.loc[linked_record_name, "ds_key"]
-        linked_ds_label = linked_records_df.loc[linked_record_name, "ds_label"]
-        linked_df = Dataset(linked_ds_name).get_dataframe()
-        editor_values_param = get_values_from_df(
-            linked_df, linked_ds_key, linked_ds_label, linked_ds_lookup_columns
-        )
-        if linked_ds_label != linked_ds_key:
-            # A label column was provided: use labels in the formatter, instead of the keys; for this we provide a "lookup" parameter which looks like this: {"key1": "label1", "key2": "label2", "null": ""}
-            formatter_lookup_param = linked_df.set_index(linked_ds_key)[
-                linked_ds_label
-            ].to_dict()
-            # use empty label when key is missing
-            formatter_lookup_param["null"] = ""
-            t_col["formatterParams"] = formatter_lookup_param
-        t_col["editorParams"]["values"] = editor_values_param
-        t_col["editorParams"]["filterFunc"] = __ns__("filterFunc")
+    # Use a list editor
+    t_col["editor"] = "list"
+    t_col["editorParams"] = {
+        "autocomplete": True,
+        "filterRemote": True,
+        "valuesURL": "lookup/" + linked_ds_name,
+        "filterDelay": 300,
+        "listOnEmpty": True,
+        "clearable": False,
+        "valuesLookupField": linked_record_name,
+    }
+    # If lookup columns were provided, use an item formatter in the editor
+    if linked_ds_lookup_columns != []:
+        t_col["editorParams"]["itemFormatter"] = __ns__("itemFormatter")
 
     return t_col
 

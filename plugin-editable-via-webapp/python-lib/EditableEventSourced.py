@@ -158,10 +158,10 @@ class EditableEventSourced:
     def __init__(
         self,
         original_ds_name,
-        primary_keys=None,
+        primary_keys,
         editable_column_names=None,
-        linked_records={},
-        editschema_manual={},
+        linked_records=None,
+        editschema_manual=None,
         project_key=None,
         editschema=None,
     ):
@@ -174,6 +174,7 @@ class EditableEventSourced:
         client = api_client()
         self.project = client.get_project(self.project_key)
         self.original_ds = Dataset(self.original_ds_name, self.project_key)
+        self.schema_columns = self.original_ds.get_config().get("schema").get("columns")
 
         self.editlog_ds_name = self.original_ds_name + "_editlog"
         self.editlog_pivoted_ds_name = self.editlog_ds_name + "_pivoted"
@@ -185,13 +186,11 @@ class EditableEventSourced:
         if self.__connection_name__ == None:
             self.__connection_name__ = "filesystem_managed"
 
-        self.schema_columns = self.original_ds.get_config().get("schema").get("columns")
-        # turn __schema__ into a DataFrame with "name" as index, and thus easily get the type for a given name
-        if primary_keys:
-            self.primary_keys = primary_keys
-        # else: it's in the custom field
+        self.primary_keys = primary_keys
         if editable_column_names:
             self.editable_column_names = editable_column_names
+
+        # For each linked record, add linked dataset/dataframe as attribute
         if linked_records:
             self.linked_records = linked_records
             if len(self.linked_records) > 0:
@@ -199,13 +198,42 @@ class EditableEventSourced:
                     "name"
                 )
                 for linked_record in self.linked_records:
-                    try:
+                    linked_ds_name = linked_record["ds_name"]
+                    linked_ds = Dataset(linked_ds_name, self.project_key)
+                    connection_name = linked_ds.get_config()["params"]["connection"]
+                    connection_type = (
+                        client.get_connection(connection_name).get_info().get_type()
+                    )
+                    if "SQL" in connection_type or "snowflake" in connection_type:
                         linked_record["ds"] = DatasetSQL(
-                            linked_record["ds_name"], self.project_key
+                            linked_ds_name, self.project_key
                         )
-                    except:
-                        linked_record["ds"] = None
+                    else:
+                        logging.debug(
+                            f"""Loading linked dataset "{linked_ds_name}" in memory since it isn't on an SQL connection"""
+                        )
+                        # get the first 1000 rows of the dataset
+                        linked_record["df"] = linked_ds.get_dataframe(
+                            sampling="head", limit=1000
+                        )
+                        count_records = None
+                        metrics = linked_ds.compute_metrics(
+                            metric_ids=["records:COUNT_RECORDS"]
+                        )["result"]["computed"]
+                        for m in metrics:
+                            if m["metric"]["metricType"] == "COUNT_RECORDS":
+                                count_records = int(m["value"])
+                                if count_records > 1000:
+                                    logging.warning(
+                                        f"Linked dataset {linked_ds_name} has {count_records} records — capping at 1,000 rows to avoid memory issues"
+                                    )
+                        if count_records is None:
+                            logging.warning(
+                                f"Unknown number of records for linked dataset {linked_ds_name} — capping at 1,000 rows to avoid memory issues"
+                            )
+
         self.editschema_manual = editschema_manual
+
         if editschema:
             self.primary_keys = get_primary_keys(editschema)
             self.editable_column_names = get_editable_column_names(editschema)
