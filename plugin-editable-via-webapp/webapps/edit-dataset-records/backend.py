@@ -73,9 +73,6 @@ if getenv("DKU_CUSTOM_WEBAPP_CONFIG"):
     else:
         editschema_manual = {}
 
-    app = Dash(
-        __name__
-    )  # TODO: test this doesn't interfere with Dataiku mechanism to start Dash webapps
     server = app.server
 
 else:
