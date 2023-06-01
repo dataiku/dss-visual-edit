@@ -22,7 +22,7 @@ Check out our library of [demo videos](https://loom.com/share/folder/b5e96d5672d
   * **Rich editing experience**:
     * Boolean cells are edited via a checkbox.
     * Datetime cells are edited via a date picker.
-    * **Linked records (aka foreign keys)** are edited via a dropdown, with the ability to **search and display lookup columns** from the linked dataset.
+    * **Airtable-like editing of linked records** (aka foreign keys) via dropdown, with the ability to **search and display lookup columns** from the linked dataset.
   * **Automatic input validation**: Formatting and editing adapts to the detected data types (e.g. numerical cells don’t allow characters; linked records restrict selection to entries in a linked dataset).
   * Filtering, sorting and grouping of data.
   * Pagination of large datasets.

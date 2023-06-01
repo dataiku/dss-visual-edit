@@ -29,6 +29,12 @@ body, button, select.tabulator-page-size, input[type=search] {
     margin: 0;
 }
 
+.tabulator-arrow {
+    right: 0;
+    top: 0.75em;
+    position: absolute;
+}
+
 .tabulator-row {
     border: none !important;
 }
@@ -102,8 +108,10 @@ body, button, select.tabulator-page-size, input[type=search] {
 }
 
 .column-type {
-    font-size: 80%;
+    font-size: 10px;
     font-weight: normal;
+    font-family: 'Monaco';
+    color: rgb(102, 102, 102);
 }
 
 input[type=search] {

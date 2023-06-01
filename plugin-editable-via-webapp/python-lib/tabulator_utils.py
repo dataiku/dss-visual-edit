@@ -208,13 +208,6 @@ def __get_column_tabulator_linked_record__(ees, linked_record_name):
 
     t_col = {}
     t_col["sorter"] = "string"
-    t_col["titleFormatter"] = assign(
-        f"""
-        function(cell){{
-            return cell.getValue() + "<br><span class='column-type'>Linked Record</span>"
-        }}
-        """
-    )
 
     # If a label column was provided, use a lookup formatter
     if linked_ds_label_column != []:
@@ -240,7 +233,12 @@ def __get_column_tabulator_linked_record__(ees, linked_record_name):
                 }});
                 d = {{}}
                 d[key] = label
-                return "<span class='linked-record'>" + label + "</span>"
+                // if label is empty, return empty string
+                if (label == "") {{
+                    return label
+                }} else {{
+                    return "<span class='linked-record'>" + label + "</span>"
+                }}
             }}
             """
         )
@@ -297,9 +295,25 @@ def get_columns_tabulator(ees, freeze_editable_columns=False):
             if freeze_editable_columns:
                 t_col["frozen"] = True  # freeze to the right
             if col_name in linked_record_names:
+                t_type = "linked_record"
                 t_col.update(__get_column_tabulator_linked_record__(ees, col_name))
             else:
                 t_col.update(__get_column_tabulator_editor__(t_type))
+        pretty_types = {
+            "number": "Number",
+            "string": "Text",
+            "boolean": "Checkbox",
+            "boolean_tick": "Checkbox",
+            "date": "Date",
+            "linked_record": "Linked Record",
+        }
+        t_col["titleFormatter"] = assign(
+            f"""
+            function(cell){{
+                return cell.getValue() + "<br><span class='column-type'>{pretty_types[t_type]}</span>"
+            }}
+            """
+        )
 
         t_cols.append(t_col)
 
