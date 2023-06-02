@@ -2,19 +2,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            {
-                "name": "Python: Current File",
-                "type": "python",
-                "request": "launch",
-                "program": "${file}",
-                "console": "integratedTerminal",
-                "justMyCode": true,
-                "env": {
-                    "PYTHONPATH": "${workspaceFolder}/plugin-editable-via-webapp/python-lib",
-                    "DKU_CURRENT_PROJECT_KEY": "REPLACE_ME",
-                    "ORIGINAL_DATASET": "replace_me"
-                },
-            },
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/plugin-editable-via-webapp/python-lib",
+                "DKU_CURRENT_PROJECT_KEY": "REPLACE_ME",
+                "ORIGINAL_DATASET": "replace_me"
+        },
+        {
             "name": "Dash Component Generator",
             "cwd": "${workspaceFolder}/dash_tabulator/",
             "type": "python",
@@ -43,10 +42,12 @@
             },
             "args": [
                 "run",
-                "--no-debugger" // this is used to disable the flask built-in debugger so that it doesn't interfere with the VS Code debugger - see https://flask.palletsprojects.com/en/2.2.x/debugging/
+                "--no-debugger", // this is used to disable the flask built-in debugger so that it doesn't interfere with the VS Code debugger - see https://flask.palletsprojects.com/en/2.2.x/debugging/
+                "--port",
+                "8000"
             ],
             "jinja": true,
-            "justMyCode": false
+            "justMyCode": true
         }
     ]
 }

@@ -4,34 +4,11 @@ from flask import request
 import logging
 
 
-# Editlog utils
-
-# Used by EES for initialization of editlog
-# TODO: move to EES
-def get_editlog_ds_schema():
-    return [
-        # not using date type, in case the editlog is CSV
-        {"name": "date", "type": "string", "meaning": "DateSource"},
-        {"name": "user", "type": "string", "meaning": "Text"},
-        # action can be "update", "create", or "delete"; currently it's ignored by the pivot method
-        {"name": "action", "type": "string", "meaning": "Text"},
-        {"name": "key", "type": "string", "meaning": "Text"},
-        {"name": "column_name", "type": "string", "meaning": "Text"},
-        {"name": "value", "type": "string", "meaning": "Text"}
-    ]
-
-# Used by write_empty_editlog method below
-
-
-def __get_editlog_columns__():
-    return ["date", "user", "action", "key", "column_name", "value"]
-
-# Used by Empty Editlog step and by EES for initialization of editlog
-
+# Editlog utils - used by Empty Editlog step and by EES for initialization of editlog
 
 def write_empty_editlog(editlog_ds):
     editlog_ds.write_dataframe(
-        DataFrame(columns=__get_editlog_columns__()), infer_schema=False)
+        DataFrame(columns=["date", "user", "action", "key", "column_name", "value"]), infer_schema=False)
 
 
 # Utils for EES and plugin components (recipes and scenario steps)
@@ -272,19 +249,3 @@ def get_key_values_from_dict(row, primary_keys):
 
 def get_last_build_date(ds_name, project):
     return project.get_dataset(ds_name).get_last_metric_values().get_metric_by_id("reporting:BUILD_START_DATE").get("lastValues")[0].get("computed")
-
-# Used by backend's lookup endpoint and by EES (when linked dataframe can be loaded in memory and provided in the Tabulator column settings)
-
-
-def get_values_from_linked_df(linked_df, linked_ds_key, linked_ds_label, linked_ds_lookup_columns):
-    linked_columns = [linked_ds_key]
-    if (linked_ds_label != linked_ds_key):
-        linked_columns += [linked_ds_label]
-    if linked_ds_lookup_columns != []:
-        linked_columns += linked_ds_lookup_columns
-    values_df = linked_df[linked_columns].sort_values(linked_ds_label)
-    if len(linked_columns) == 1:
-        return values_df[linked_columns[0]].to_list()
-    else:
-        return values_df[linked_columns].rename(
-            columns={linked_ds_key: "value", linked_ds_label: "label"}).to_dict("records")

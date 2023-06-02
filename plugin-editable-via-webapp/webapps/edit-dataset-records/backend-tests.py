@@ -1,33 +1,24 @@
 #%%
+from os import getenv, environ
+environ["ORIGINAL_DATASET"] = "matches_uncertain"
+environ["DKU_CURRENT_PROJECT_KEY"] = "COMPANY_RECONCILIATION"
+
+#%%
+from dataiku import Dataset
+from pandas import DataFrame
+project_key = getenv("DKU_CURRENT_PROJECT_KEY")
+original_ds_name = getenv("ORIGINAL_DATASET")
+original_ds = Dataset(original_ds_name)
+original_schema = original_ds.read_schema()
+original_schema_df = DataFrame(original_schema).set_index("name")
+
+#%%
 import dataiku
-ds = dataiku.Dataset("stakeholders_tbc_prepared", "STAKEHOLDER_OWNERSHIP")
 client = dataiku.api_client()
-project = client.get_project("STAKEHOLDER_OWNERSHIP")
-ds = project.get_dataset("stakeholders_tbc_prepared")
+project = client.get_project(project_key)
+
+#%%
+ds = project.get_dataset(original_ds_name)
 settings = ds.get_settings()
 definition = ds.get_definition()
 last_metrics = ds.get_last_metric_values()
-
-
-#%%
-import sys
-sys.path.append('../../python-lib')
-original_ds_name = "stakeholders_tbc_filtered"
-project_key = "STAKEHOLDER_OWNERSHIP"
-editschema = [
-    {"name": "Stakeholder Id", "editable_type": "key"},
-    {"name": "Security Id", "editable_type": "key"},
-    {"name": "Report Date", "editable_type": "key"},
-    {"name": "Stakeholder Name"},
-    {"name": "Security Name"},
-    {"name": "1) Position is Free Float? (TRUE/FALSE)", "title": "Free float?", "type": "boolean", "editable": True},
-    {"name": "In case 1) = FALSE then 2) Shares in FS Correct? (TRUE/FALSE)", "title": "If not, Shares correct?", "type": "boolean", "editable": True},
-    {"name": "In case 2) = FALSE then 3) Fill in shares manually", "title": "If not, Shares value?", "type": "number", "editable": True}
-]
-
-#%%
-from EditableEventSourced import EditableEventSourced
-ees = EditableEventSourced(original_ds_name, editschema, project_key)
-user = "test"
-
-# Dash cells: see backend.py starting at Dash layout definition

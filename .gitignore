@@ -15,3 +15,4 @@ react-tabulator/lib
 **/node_modules
 *.log
 .vscode/launch.json
+plugin-editable-via-webapp/webapps/edit-dataset-records/assets/dashExtensions_default.js
