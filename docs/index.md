@@ -10,10 +10,12 @@ Check out our library of [demo videos](https://loom.com/share/folder/b5e96d5672d
 
 ## Use cases
 
-* **Entity reconciliation**: 2 or more datasets represent the same entities and need to be merged. However, common properties of a given entity may have different values from one dataset to the other (e.g. entity name). See our ["company reconciliation" sample project](sample-project-company-reconciliation) where we manually review and correct automated matches between company entities. This can be adapted to the case where entities are customers, suppliers, or even products, whose names differ from one data source to the other.
-* **Forecast override**: machine-made sales forecasts need to be adjusted by a human, to take into account contextual information that wasn't available to the machine, or to correct low-confidence predictions.
-* **AI feedback loop**: human feedback on AI-powered predictions is ingested back into the AI's training data.
-* **Business rules exception handling**: manually filling in missing values in the output of classification rules.
+* **Entity Resolution** (aka record linkage): 2 or more datasets represent the same entities and need to be merged. However, common properties of a given entity may have different values from one dataset to the other (e.g. entity name).
+  * See our ["company resolution" sample project](sample-project-company-resolution) where we manually review and correct automated matches between company entities.
+  * This can be adapted to the case where entities are customers, suppliers, or even products, whose names differ from one data source to the other.
+* **Forecast Override**: machine-made forecasts (e.g. sales) need to be adjusted by a human, to take into account contextual information that wasn't available to the machine, or to correct low-confidence predictions.
+* **AI Feedback Loop**: provide feedback on the outputs of an AI in production, and ingest back into the AI's training data.
+* **Business rules exception handling**: fill in missing values or override values in the output of business rules.
 * **Data correctioning**.
 
 ## Features
@@ -37,5 +39,5 @@ Check out our library of [demo videos](https://loom.com/share/folder/b5e96d5672d
 * [Getting started: Visual Webapp](get-started): Overview of plugin components and key concepts
 * [Getting started: CRUD Python API](get-started-crud-python-api): Overview of methods to read/write individual or multiple rows of data
 * [Going further](going-further): Deployment, FAQ
-* [Sample project: Company Reconciliation](sample-project-company-reconciliation)
+* [Sample project: Company Resolution](sample-project-company-resolution)
 * [Sample project: AI Feedback App](sample-project-ai-feedback-app)
