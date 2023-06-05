@@ -200,10 +200,15 @@ class EditableEventSourced:
                 for linked_record in self.linked_records:
                     linked_ds_name = linked_record["ds_name"]
                     linked_ds = Dataset(linked_ds_name, self.project_key)
-                    connection_name = linked_ds.get_config()["params"]["connection"]
-                    connection_type = (
-                        client.get_connection(connection_name).get_info().get_type()
+                    connection_name = (
+                        linked_ds.get_config().get("params").get("connection")
                     )
+                    if connection_name:
+                        connection_type = (
+                            client.get_connection(connection_name).get_info().get_type()
+                        )
+                    else:
+                        connection_type = ""
                     if "SQL" in connection_type or "snowflake" in connection_type:
                         linked_record["ds"] = DatasetSQL(
                             linked_ds_name, self.project_key
