@@ -411,20 +411,24 @@ def label_endpoint(linked_ds_name):
         key = request.get_json().get("key")
     else:
         key = request.args.get("key", "")
-    response = ""
+    label = ""
 
     # Return data only when it's a linked dataset
     for lr in ees.linked_records:
         if linked_ds_name == lr["ds_name"]:
-            linked_ds_sql = lr["ds"]
             linked_ds_key = lr["ds_key"]
             linked_ds_label = lr["ds_label"]
-            label = linked_ds_sql.get_cell_value_sql_query(
-                linked_ds_key, key, linked_ds_label
-            )
-            response = label
-
-    return response
+            if key != "" and linked_ds_label and linked_ds_label != linked_ds_key:
+                if lr.get("ds"):
+                    label = lr["ds"].get_cell_value_sql_query(
+                        linked_ds_key, key, linked_ds_label
+                    )
+                else:
+                    linked_df = lr["df"].set_index(linked_ds_key)
+                    label = linked_df.loc[key, linked_ds_label]
+            else:
+                label = key
+    return label
 
 
 @server.route("/lookup/<linked_ds_name>", methods=["GET", "POST"])

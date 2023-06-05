@@ -201,6 +201,7 @@ def __get_column_tabulator_linked_record__(ees, linked_record_name):
 
     linked_records_df = DataFrame(data=ees.linked_records).set_index("name")
     linked_ds_name = linked_records_df.loc[linked_record_name, "ds_name"]
+    linked_ds_key_column = linked_records_df.loc[linked_record_name, "ds_key"]
     linked_ds_label_column = linked_records_df.loc[linked_record_name, "ds_label"]
     linked_ds_lookup_columns = linked_records_df.loc[
         linked_record_name, "ds_lookup_columns"
@@ -210,8 +211,7 @@ def __get_column_tabulator_linked_record__(ees, linked_record_name):
     t_col["sorter"] = "string"
 
     # If a label column was provided, use a lookup formatter
-    if linked_ds_label_column != []:
-        # t_col["formatter"] = "lookup"
+    if linked_ds_label_column != "" and linked_ds_label_column != linked_ds_key_column:
         # TODO: use paramLookup function from custom_tabulator.js instead of inline javascript function
         t_col["formatter"] = assign(
             f"""
