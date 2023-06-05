@@ -222,16 +222,23 @@ class EditableEventSourced:
                             sampling="head", limit=1000
                         )
                         count_records = None
-                        metrics = linked_ds.compute_metrics(
-                            metric_ids=["records:COUNT_RECORDS"]
-                        )["result"]["computed"]
-                        for m in metrics:
-                            if m["metric"]["metricType"] == "COUNT_RECORDS":
-                                count_records = int(m["value"])
-                                if count_records > 1000:
-                                    logging.warning(
-                                        f"Linked dataset {linked_ds_name} has {count_records} records — capping at 1,000 rows to avoid memory issues"
-                                    )
+                        try:
+                            metrics = self.project.get_dataset(
+                                linked_ds_name
+                            ).compute_metrics(metric_ids=["records:COUNT_RECORDS"])[
+                                "result"
+                            ][
+                                "computed"
+                            ]
+                            for m in metrics:
+                                if m["metric"]["metricType"] == "COUNT_RECORDS":
+                                    count_records = int(m["value"])
+                                    if count_records > 1000:
+                                        logging.warning(
+                                            f"Linked dataset {linked_ds_name} has {count_records} records — capping at 1,000 rows to avoid memory issues"
+                                        )
+                        except:
+                            pass
                         if count_records is None:
                             logging.warning(
                                 f"Unknown number of records for linked dataset {linked_ds_name} — capping at 1,000 rows to avoid memory issues"
