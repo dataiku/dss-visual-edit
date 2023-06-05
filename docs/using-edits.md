@@ -28,12 +28,12 @@ The recipes are based on the same code as the webapp and the CRUD methods.
 
 ## Leveraging edits for analytics
 
-Depending on your use case, you would add recipes downstream of _editlog\_pivoted_ or of _edited_. For instance, you may only need access to edited rows, found in _editlog\_pivoted_, instead of _edited_ which also contains rows that weren't edited. This is the case in our [sample project](sample-project-company-reconciliation).
+Depending on your use case, you would add recipes downstream of _editlog\_pivoted_ or of _edited_. For instance, you may only need access to edited rows, found in _editlog\_pivoted_, instead of _edited_ which also contains rows that weren't edited. This is the case in our [sample project](sample-project-company-resolution).
 
 You decide when to build the datasets downstream of the _editlog_ (including _editlog\_pivoted_ and _edited_).
 
 ## Next
 
 * [Going further](going-further): Resetting edits on a design node, Deploying to production (automation node), Feedback loops, FAQ.
-* [Sample project: Company Reconciliation](sample-project-company-reconciliation)
+* [Sample project: Company Resolution](sample-project-company-resolution)
 * [Sample project: AI Feedback App](sample-project-ai-feedback-app)

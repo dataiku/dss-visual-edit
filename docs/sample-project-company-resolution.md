@@ -1,6 +1,6 @@
-# Sample project: Company Reconciliation
+# Sample project: Company Resolution
 
-In this entity reconciliation project, 2 datasets representing the same companies need to be merged.
+In this entity resolution project, 2 datasets representing the same companies need to be merged.
 
 * A simple fuzzy matching pipeline is implemented, based on company names, but there are always going to be cases where matches are incorrect or can't be found by a machine (e.g. Facebook vs Meta, or Google vs Alphabet).
 * We provide a webapp for users with domain knowledge to review and correct uncertain matches, and to manually assign missing ones, in a way that integrates well with the automated matching pipeline.
