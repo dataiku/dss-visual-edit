@@ -191,8 +191,8 @@ class EditableEventSourced:
             self.editable_column_names = editable_column_names
 
         # For each linked record, add linked dataset/dataframe as attribute
+        self.linked_records = linked_records
         if linked_records:
-            self.linked_records = linked_records
             if len(self.linked_records) > 0:
                 self.linked_records_df = DataFrame(data=self.linked_records).set_index(
                     "name"
