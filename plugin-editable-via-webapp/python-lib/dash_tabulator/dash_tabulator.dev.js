@@ -129,7 +129,7 @@ window["dash_tabulator"] =
 /******/ 	        var srcFragments = src.split('/');
 /******/ 	        var fileFragments = srcFragments.slice(-1)[0].split('.');
 /******/
-/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1685636685");
+/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1685975356");
 /******/ 	        srcFragments.splice(-1, 1, fileFragments.join('.'))
 /******/
 /******/ 	        return srcFragments.join('/');
@@ -78708,6 +78708,7 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
       // Instantiate Tabulator when element is mounted
       var _this$props = this.props,
           id = _this$props.id,
+          dataset_name = _this$props.dataset_name,
           data = _this$props.data,
           columns = _this$props.columns,
           groupBy = _this$props.groupBy,
@@ -78770,6 +78771,7 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
 
         try {
           window.parent.WT1SVC.event("lca-datatable-edited", {
+            "dataset_name_hash": md5(dataset_name),
             "column_name_hash": md5(edited.field),
             "column_type": edited.type
           });
@@ -78784,7 +78786,17 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
       console.log("Rendering!");
 
       try {
-        window.parent.WT1SVC.event("lca-datatable-viewed");
+        window.parent.WT1SVC.event("lca-datatable-viewed", {
+          "dataset_name_hash": md5(this.props.dataset_name),
+          // create columns_hashed as a copy of the columns array where each item's "field" property has been hashed and other properties have been kept as they were
+          "rows_count": this.props.data.length,
+          "columns_hashed": this.props.columns.map(function (item) {
+            var item_hashed = Object.assign({}, item);
+            item_hashed["field"] = md5(item["field"]);
+            item_hashed["title"] = md5(item["title"]);
+            return item_hashed;
+          })
+        });
       } catch (e) {} // const {id, data, columns, groupBy, cellEdited} = this.props;
       // if (this.tabulator) this.tabulator.setData(data)
 

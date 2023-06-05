@@ -20,7 +20,7 @@ export default class DashTabulator extends React.Component {
     componentDidMount() {
         // Instantiate Tabulator when element is mounted
 
-        const {id, data, columns, groupBy, cellEdited} = this.props;
+        const {id, dataset_name, data, columns, groupBy, cellEdited} = this.props;
 
         // Interpret column formatters as function handles.
         for(let i=0; i < columns.length; i++){
@@ -73,6 +73,7 @@ export default class DashTabulator extends React.Component {
             this.props.setProps({cellEdited: edited})
             try {
                 window.parent.WT1SVC.event("lca-datatable-edited", {
+                    "dataset_name_hash": md5(dataset_name),
                     "column_name_hash": md5(edited.field),
                     "column_type": edited.type
                 });
@@ -87,7 +88,19 @@ export default class DashTabulator extends React.Component {
 
     render() {
         console.log("Rendering!")
-        try { window.parent.WT1SVC.event("lca-datatable-viewed"); }
+        try {
+            window.parent.WT1SVC.event("lca-datatable-viewed", {
+                "dataset_name_hash": md5(this.props.dataset_name),
+                // create columns_hashed as a copy of the columns array where each item's "field" property has been hashed and other properties have been kept as they were
+                "rows_count": this.props.data.length,
+                "columns_hashed": this.props.columns.map((item) => {
+                    let item_hashed = Object.assign({}, item);
+                    item_hashed["field"] = md5(item["field"]);
+                    item_hashed["title"] = md5(item["title"]);
+                    return item_hashed;
+                })
+            })
+        }
         catch (e) { }
 
         // const {id, data, columns, groupBy, cellEdited} = this.props;
