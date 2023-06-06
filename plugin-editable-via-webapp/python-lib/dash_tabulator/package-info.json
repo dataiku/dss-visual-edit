@@ -25,14 +25,10 @@
   "author": "Louis Dorard <louis.dorard@dataiku.com>",
   "license": "",
   "dependencies": {
-    "bootstrap": "^5.2.2",
     "dash-extensions": "^0.0.1",
     "ramda": "^0.26.1",
-    "react-bootstrap": "^2.6.0",
-    "semantic-ui-css": "^2.5.0",
-    "semantic-ui-react": "^2.1.3",
     "set-blocking": "^2.0.0",
-    "tabulator-tables": "5.4.2"
+    "tabulator-tables": "5.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",
