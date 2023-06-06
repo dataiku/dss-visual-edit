@@ -15,7 +15,7 @@
         },
         {
             "name": "Webapp",
-            "cwd": "webapps/edit-dataset-records/",
+            "cwd": "${workspaceFolder}/webapps/edit-dataset-records/",
             "type": "python",
             "request": "launch",
             "module": "flask",
