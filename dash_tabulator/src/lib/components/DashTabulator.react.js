@@ -20,7 +20,7 @@ export default class DashTabulator extends React.Component {
     componentDidMount() {
         // Instantiate Tabulator when element is mounted
 
-        const {id, dataset_name, data, columns, groupBy, cellEdited} = this.props;
+        const {id, datasetName, data, columns, groupBy, cellEdited} = this.props;
 
         // Interpret column formatters as function handles.
         for(let i=0; i < columns.length; i++){
@@ -47,6 +47,7 @@ export default class DashTabulator extends React.Component {
 
         this.tabulator = new Tabulator(this.el, {
             "data": data,
+            "datasetName": datasetName,
             "reactiveData": true,
             "columns": columns,
             "groupBy": groupBy,
@@ -73,7 +74,7 @@ export default class DashTabulator extends React.Component {
             this.props.setProps({cellEdited: edited})
             try {
                 window.parent.WT1SVC.event("lca-datatable-edited", {
-                    "dataset_name_hash": md5(dataset_name),
+                    "dataset_name_hash": md5(datasetName),
                     "column_name_hash": md5(edited.field),
                     "column_type": edited.type
                 });
@@ -90,7 +91,7 @@ export default class DashTabulator extends React.Component {
         console.log("Rendering!")
         try {
             window.parent.WT1SVC.event("lca-datatable-viewed", {
-                "dataset_name_hash": md5(this.props.dataset_name),
+                "dataset_name_hash": md5(this.props.datasetName),
                 // create columns_hashed as a copy of the columns array where each item's "field" property has been hashed and other properties have been kept as they were
                 "rows_count": this.props.data.length,
                 "columns_hashed": this.props.columns.map((item) => {
@@ -114,6 +115,7 @@ export default class DashTabulator extends React.Component {
 
 DashTabulator.defaultProps = {
     data: [],
+    datasetName: "",
     columns : [],
     groupBy : []
 };
@@ -127,12 +129,17 @@ DashTabulator.propTypes = {
     /**
      * Data to display in the table.
      */
-     data: PropTypes.array,
+    data: PropTypes.array,
 
     /**
      * Column definitions.
      */
     columns: PropTypes.array,
+
+    /**
+     * Name of the corresponding Dataiku dataset.
+     */
+    datasetName: PropTypes.string,
 
     /**
      * Columns to group by.

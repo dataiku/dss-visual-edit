@@ -156,7 +156,7 @@ def serve_layout():
             ),
             dash_tabulator.DashTabulator(
                 id="datatable",
-                dataset_name=original_ds_name,
+                datasetName=original_ds_name,
                 columns=columns,
                 data=ees.get_edited_df().to_dict(
                     "records"

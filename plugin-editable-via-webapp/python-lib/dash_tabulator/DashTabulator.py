@@ -21,6 +21,9 @@ Keyword arguments:
 - data (list; optional):
     Data to display in the table.
 
+- datasetName (string; default ""):
+    Name of the corresponding Dataiku dataset.
+
 - groupBy (list; optional):
     Columns to group by."""
     _children_props = []
@@ -28,10 +31,10 @@ Keyword arguments:
     _namespace = 'dash_tabulator'
     _type = 'DashTabulator'
     @_explicitize_args
-    def __init__(self, id=Component.UNDEFINED, data=Component.UNDEFINED, columns=Component.UNDEFINED, groupBy=Component.UNDEFINED, cellEdited=Component.UNDEFINED, **kwargs):
-        self._prop_names = ['id', 'cellEdited', 'columns', 'data', 'groupBy']
+    def __init__(self, id=Component.UNDEFINED, data=Component.UNDEFINED, columns=Component.UNDEFINED, datasetName=Component.UNDEFINED, groupBy=Component.UNDEFINED, cellEdited=Component.UNDEFINED, **kwargs):
+        self._prop_names = ['id', 'cellEdited', 'columns', 'data', 'datasetName', 'groupBy']
         self._valid_wildcard_attributes =            []
-        self.available_properties = ['id', 'cellEdited', 'columns', 'data', 'groupBy']
+        self.available_properties = ['id', 'cellEdited', 'columns', 'data', 'datasetName', 'groupBy']
         self.available_wildcard_properties =            []
         _explicit_args = kwargs.pop('_explicit_args')
         _locals = locals()

@@ -33,6 +33,17 @@
           "computed": false
         }
       },
+      "datasetName": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "Name of the corresponding Dataiku dataset.",
+        "defaultValue": {
+          "value": "\"\"",
+          "computed": false
+        }
+      },
       "groupBy": {
         "type": {
           "name": "array"
