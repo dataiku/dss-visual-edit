@@ -40,4 +40,4 @@ Data table features:
 
 ## Next
 
-* [Using edits in the Flow](using-edits): Where to find edits, Leveraging edits for analytics
+* [Using edits in the Flow](using-edits): Where to find edits & How to leverage for analytics & AI
