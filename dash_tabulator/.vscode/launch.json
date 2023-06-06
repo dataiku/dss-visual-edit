@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Dash Component Generator",
+            "type": "python",
+            "request": "launch",
+            "module": "dash.development.component_generator",
+            "args": [
+                "src/lib/components",
+                "dash_tabulator",
+                "-p",
+                "package-info.json"
+            ],
+            "justMyCode": false
+        }
+    ]
+}
