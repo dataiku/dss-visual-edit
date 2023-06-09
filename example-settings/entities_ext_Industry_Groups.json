@@ -1,0 +1,12 @@
+{
+    "primary_keys": ["Industry Group"],
+    "editable_column_names": ["Industry"],
+    "freeze_editable_columns": false,
+    "group_column_names": [],
+    "linked_records_count": 1,
+    "linked_record_name_1": "Industry",
+    "linked_record_ds_name_1": "entities_ref_Industries",
+    "linked_record_key_1": "Industry",
+    "linked_record_label_column_1": "Industry",
+    "linked_record_lookup_columns_1": []
+}

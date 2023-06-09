@@ -200,6 +200,7 @@ class EditableEventSourced:
                 for linked_record in self.linked_records:
                     linked_ds_name = linked_record["ds_name"]
                     linked_ds = Dataset(linked_ds_name, self.project_key)
+                    # Get the connection type of the linked dataset
                     connection_name = (
                         linked_ds.get_config().get("params").get("connection")
                     )
@@ -209,10 +210,43 @@ class EditableEventSourced:
                         )
                     else:
                         connection_type = ""
-                    if "SQL" in connection_type or "snowflake" in connection_type:
-                        linked_record["ds"] = DatasetSQL(
-                            linked_ds_name, self.project_key
+                    # Get the number of records in the linked dataset
+                    count_records = None
+                    try:
+                        metrics = self.project.get_dataset(
+                            linked_ds_name
+                        ).compute_metrics(metric_ids=["records:COUNT_RECORDS"])[
+                            "result"
+                        ][
+                            "computed"
+                        ]
+                        for m in metrics:
+                            if m["metric"]["metricType"] == "COUNT_RECORDS":
+                                count_records = int(m["value"])
+                                if count_records > 1000:
+                                    logging.warning(
+                                        f"Linked dataset {linked_ds_name} has {count_records} records — capping at 1,000 rows to avoid memory issues"
+                                    )
+                    except:
+                        pass
+                    if count_records is None:
+                        logging.warning(
+                            f"Unknown number of records for linked dataset {linked_ds_name} — capping at 1,000 rows to avoid memory issues"
                         )
+                    # If the linked dataset is on an SQL connection and if it has more than 1000 records, load it as a DatasetSQL object
+                    if "SQL" in connection_type or "snowflake" in connection_type:
+                        if count_records is not None and count_records <= 1000:
+                            logging.debug(
+                                f"""Loading linked dataset "{linked_ds_name}" in memory since it has less than 1000 records"""
+                            )
+                            linked_record["df"] = linked_ds.get_dataframe()
+                        else:
+                            logging.debug(
+                                f"""Loading linked dataset "{linked_ds_name}" as a DatasetSQL object since it has more than 1000 records or an unknown number of records"""
+                            )
+                            linked_record["ds"] = DatasetSQL(
+                                linked_ds_name, self.project_key
+                            )
                     else:
                         logging.debug(
                             f"""Loading linked dataset "{linked_ds_name}" in memory since it isn't on an SQL connection"""
@@ -221,28 +255,6 @@ class EditableEventSourced:
                         linked_record["df"] = linked_ds.get_dataframe(
                             sampling="head", limit=1000
                         )
-                        count_records = None
-                        try:
-                            metrics = self.project.get_dataset(
-                                linked_ds_name
-                            ).compute_metrics(metric_ids=["records:COUNT_RECORDS"])[
-                                "result"
-                            ][
-                                "computed"
-                            ]
-                            for m in metrics:
-                                if m["metric"]["metricType"] == "COUNT_RECORDS":
-                                    count_records = int(m["value"])
-                                    if count_records > 1000:
-                                        logging.warning(
-                                            f"Linked dataset {linked_ds_name} has {count_records} records — capping at 1,000 rows to avoid memory issues"
-                                        )
-                        except:
-                            pass
-                        if count_records is None:
-                            logging.warning(
-                                f"Unknown number of records for linked dataset {linked_ds_name} — capping at 1,000 rows to avoid memory issues"
-                            )
 
         self.editschema_manual = editschema_manual
 

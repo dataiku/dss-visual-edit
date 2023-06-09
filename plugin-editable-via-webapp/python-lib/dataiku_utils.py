@@ -5,6 +5,7 @@ from pandas import DataFrame
 
 client = api_client()
 
+
 def recipe_already_exists(recipe_name, project):
     """Determine if a recipe already exists in a project
 
@@ -21,6 +22,7 @@ def recipe_already_exists(recipe_name, project):
     except:
         return False
 
+
 def get_rows(dataset_name, project_key, params):
     """Get the rows of a dataset
 
@@ -35,14 +37,14 @@ def get_rows(dataset_name, project_key, params):
     project = client.get_project(project_key)
     schema_columns = project.get_dataset(dataset_name).get_schema()["columns"]
     csv_stream = client._perform_raw(
-        "GET", f"/projects/{project_key}/datasets/{dataset_name}/data/",
-        params=params)
-    csv_reader = DataikuStreamedHttpUTF8CSVReader(
-        schema_columns, csv_stream)
+        "GET", f"/projects/{project_key}/datasets/{dataset_name}/data/", params=params
+    )
+    csv_reader = DataikuStreamedHttpUTF8CSVReader(schema_columns, csv_stream)
     rows = []
     for row in csv_reader.iter_rows():
         rows.append(row)
     return rows
+
 
 def get_dataframe_filtered(ds_name, project_key, filter_column, filter_term, n_results):
     """
@@ -55,16 +57,15 @@ def get_dataframe_filtered(ds_name, project_key, filter_column, filter_term, n_r
     - filter_term: term to filter on
     - n_results: number of results to return
 
-    Returns: DataFrame
+    Returns: DataFrame with default index
     """
 
     params = {
         "format": "tsv-excel-header",
         "filter": f"""startsWith(toLowercase(strval("{filter_column}")), "{filter_term}")""",
-        "sampling": dumps({
-            "samplingMethod": "HEAD_SEQUENTIAL",
-            "maxRecords": n_results
-        })
+        "sampling": dumps(
+            {"samplingMethod": "HEAD_SEQUENTIAL", "maxRecords": n_results}
+        ),
     }
     rows = get_rows(ds_name, project_key, params)
     return DataFrame(columns=rows[0], data=rows[1:]) if len(rows) > 0 else DataFrame()

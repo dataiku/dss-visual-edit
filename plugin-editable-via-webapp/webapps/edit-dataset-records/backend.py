@@ -419,6 +419,7 @@ def label_endpoint(linked_ds_name):
         if linked_ds_name == lr["ds_name"]:
             linked_ds_key = lr["ds_key"]
             linked_ds_label = lr["ds_label"]
+            # Return label only if a label column is defined (and different from the key column)
             if key != "" and linked_ds_label and linked_ds_label != linked_ds_key:
                 if lr.get("ds"):
                     label = lr["ds"].get_cell_value_sql_query(
@@ -449,16 +450,40 @@ def lookup_endpoint(linked_ds_name):
     response = jsonify({})
 
     # Return data only when it's a linked dataset
-    if linked_ds_name in ees.linked_records_df["ds_name"].to_list():
-        linked_record_row = ees.linked_records_df.loc[
-            ees.linked_records_df["ds_name"] == linked_ds_name
-        ]
-        linked_ds_lookup_columns = linked_record_row["ds_lookup_columns"][0]
-        linked_ds_key = linked_record_row["ds_key"][0]
-        linked_ds_label = linked_record_row["ds_label"][0]
-        linked_df_filtered = get_dataframe_filtered(
-            linked_ds_name, project_key, linked_ds_label, term.strip().lower(), 10
-        )
+    n_results = 10
+    for lr in ees.linked_records:
+        if linked_ds_name == lr["ds_name"]:
+            linked_ds_key = lr["ds_key"]
+            linked_ds_label = lr["ds_label"]
+            linked_ds_lookup_columns = lr["ds_lookup_columns"]
+            if lr.get("ds"):
+                # Use the Dataiku API to filter the dataset
+                linked_df_filtered = get_dataframe_filtered(
+                    linked_ds_name,
+                    project_key,
+                    linked_ds_label,
+                    term.strip().lower(),
+                    n_results,
+                )
+            else:
+                linked_df = lr["df"].set_index(linked_ds_key)
+                if term == "":
+                    n_results = 100  # show more options if no search term is provided
+                    linked_df_filtered = linked_df.head(n_results).reset_index()
+                else:
+                    # Filter linked_df for rows whose label contains the search term
+                    linked_df_filtered = (
+                        linked_df[
+                            linked_df[linked_ds_label]
+                            .str.lower()
+                            .str.contains(term.strip().lower())
+                        ]
+                        .head(n_results)
+                        .reset_index()
+                    )
+                logging.debug(f"Found {linked_df_filtered.size} entries")
+                response = linked_df_filtered.to_json(orient="index")
+
         logging.debug(f"Found {linked_df_filtered.size} entries")
         editor_values_param = get_values_from_df(
             linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns
