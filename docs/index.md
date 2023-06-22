@@ -1,6 +1,6 @@
 # Plugin: Data Editing | Dataiku
 
-**Webapps for “human in the loop” analytics & AI**
+**Interfaces for “human in the loop” analytics & AI**
 
 <iframe src="https://www.loom.com/embed/7b79e45e755544f8baf1ff3ed1bf60ee" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
@@ -9,7 +9,7 @@
 ## Use cases
 
 * **Entity Resolution** (aka record linkage): review and correct fuzzy matches between 2 or more datasets representing the same entities (e.g. customers, suppliers, products) but with differing IDs and names. [Demo project →](sample-project-company-resolution)
-* **AI Feedback Loop**: provide feedback on the outputs of an AI in production, and ingest back into the AI's training data. [Demo project →](sample-project-ai-feedback-app)
+* **AI Validation and Improvement**: continuously provide feedback on AI outputs in production, and ingest back into the AI's training data. [Demo project →](sample-project-ai-feedback-app)
 * **Forecast Override**: machine-made forecasts (e.g. sales) need to be adjusted by a human, to take into account contextual information that wasn't available to the machine, or to correct low-confidence predictions.
 * **Business rules exception handling**: fill in missing values or override values in the output of business rules.
 * **Data correctioning**.
