@@ -262,13 +262,13 @@ class EditableEventSourced:
             self.primary_keys = get_primary_keys(editschema)
             self.editable_column_names = get_editable_column_names(editschema)
             self.editschema_manual = editschema
-        if self.editschema_manual != {}:
+        if self.editschema_manual:
             self.editschema_manual_df = DataFrame(
                 data=self.editschema_manual
             ).set_index("name")
         else:
             self.editschema_manual_df = DataFrame(
-                data=self.editschema_manual
+                data={}
             )  # this will be an empty dataframe
 
         self.display_column_names = get_display_column_names(
