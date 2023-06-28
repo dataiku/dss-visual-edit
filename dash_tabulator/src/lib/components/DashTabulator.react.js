@@ -9,7 +9,7 @@ import "../../../assets/tabulator_dataiku.css";
 
 const crypto = require('crypto');
 
-const plugin_version = "1.8.3";
+const plugin_version = "1.8.4";
 
 function md5(string) {
     return crypto.createHash('md5').update(string).digest('hex');
