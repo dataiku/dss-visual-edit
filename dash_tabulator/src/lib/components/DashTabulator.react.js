@@ -9,6 +9,8 @@ import "../../../assets/tabulator_dataiku.css";
 
 const crypto = require('crypto');
 
+const plugin_version = "1.8.3";
+
 function md5(string) {
     return crypto.createHash('md5').update(string).digest('hex');
 }
@@ -76,7 +78,8 @@ export default class DashTabulator extends React.Component {
                 window.parent.WT1SVC.event("lca-datatable-edited", {
                     "dataset_name_hash": md5(datasetName),
                     "column_name_hash": md5(edited.field),
-                    "column_type": edited.type
+                    "column_type": edited.type,
+                    "plugin_version": plugin_version
                 });
             } catch (e) { }
         })
@@ -99,7 +102,8 @@ export default class DashTabulator extends React.Component {
                     item_hashed["field"] = md5(item["field"]);
                     item_hashed["title"] = md5(item["title"]);
                     return item_hashed;
-                })
+                }),
+                "plugin_version": plugin_version
             })
         }
         catch (e) { }
