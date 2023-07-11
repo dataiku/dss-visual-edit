@@ -40,6 +40,28 @@ Demo videos:
 * [Deploy to production](https://www.loom.com/share/e47c5d09871741c48062e3547108bb39)
 * [Update in production](https://www.loom.com/share/8b806a65e50a4406b9ec3d4a31495205)
 
+## Sharing with business users
+
+### Security
+
+As any Dataiku webapp, it can either require authentication, or it can be made accessible to visitors who are not logged into Dataiku. We do not recommend the latter option, as anyone who has access to the webapp will be allowed to see the data that it exposes and to make edits. If, however, you do want to make the webapp accessible to unauthenticated visitors, their edits will be attributed to the user "none" in the editlog.
+
+When authentication is required:
+
+* The webapp can only be used by users with a Reader license or above.
+* Even though the name "Reader" might suggest that they can only read data, they webapp doesn't make a distinction between license types and Readers are able to make edits.
+* You can restrict access to specified (groups of) users via the Project > Security settings: only those with "Read Dashboard" permission will be able to use the webapp (i.e. see and edit data).
+
+Remember that the webapp only writes data to the editlog, not to the original dataset (which stays unchanged). The editlog pivoted and the edited datasets can only be changed by running the recipes that build them.
+
+### Best practices and remarks
+
+When sharing the webapp with business users, it's a good idea to tick "auto-start backend" in webapp settings, which will help make sure that the webapp is always available. In an effort to be conscious of your Dataiku instance's resources, we recommend running the webapp in containerized execution when available.
+
+You can share a direct link to the webapp (or a dashboard that embeds it), but it can be easier for end-users to find it again in the future if it's added to a Workspace. Workspaces provide a friendlier way for business users to access all objects shared with them in Dataiku. If your end-users don't already use a Workspace, we recommend creating one for them and having them use Workspaces as their Dataiku home page.
+
+Remark on concurrent usage: several users can view and edit data at the same time, but they won't see each other's edits in real-time; if 2 or more users try to edit the same cell at the same time, the last edit is the one that will be taken into account.
+
 ## Feedback loops
 
 In some use cases the data to review/edit in the webapp depends on previous edits. Check out our samples projects that demonstrate this and share best practices:

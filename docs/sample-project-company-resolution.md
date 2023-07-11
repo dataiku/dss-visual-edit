@@ -1,10 +1,12 @@
 # Sample project: Company Resolution
 
-In this entity resolution project, 2 datasets representing the same companies need to be merged.
+In this entity resolution project, 2 datasets representing the same companies need to be merged, for data enrichment purposes. The 1st one is an internal dataset (e.g. CRM) and the 2nd one is an external dataset (e.g. from a data provider).
 
-* A simple fuzzy matching pipeline is implemented, based on company names, but there are always going to be cases where matches are incorrect or can't be found by a machine (e.g. Facebook vs Meta, or Google vs Alphabet).
-* We provide a webapp for users with domain knowledge to review and correct uncertain matches, and to manually assign missing ones, in a way that integrates well with the automated matching pipeline.
+* A simple fuzzy matching pipeline is implemented, based on company names. The outcome is a dataset of automated matches.
+* There will always be cases where matches are incorrect or missing, because they can't be found by a machine based on names only (e.g. Facebook vs Meta, or Google vs Alphabet).
+* The plugin helps create a webapp for users with domain knowledge to review and correct uncertain matches, and to manually assign missing ones. The outcome is a dataset of manually edited matches.
 * Editing matches is made easy via linked records and lookup columns.
+* Edits are integrated in the data pipeline thanks to a recipe that overrides automated matches with manually edited matches.
 
 We start this article with a demo video and we explain how to replicate it using an export of our Dataiku project. We also explain how the project works behind the scenes, the steps to build it from scratch, then we discuss deployment and lifecycle._
 

@@ -6,13 +6,13 @@ If you haven't, [install the plugin](install-plugin) first.
 
 * Once you've identified the dataset to edit via a webapp, please review its schema as a first step.
   * The webapp uses column meanings to show data (or let you edit it) in the best way. If the meaning wasn't defined explicitly, the webapp uses the storage type instead.
-  * If a column has missing values (which is typically the case for an editable column), make sure to use an appropriate storage type (e.g. not "integer"). When in doubt, use "string".
+  * If a column has missing values, make sure to use an appropriate storage type (e.g. use "string" and not "integer", even if the meaning is Integer). This also applies to editable columns that don't have missing values, because the user could set values to empty.
 * Go to Webapps, create New Visual Webapp, pick Data Editing (this component is provided by the plugin).
   * ![](new_visual_webapp.png)
   * ![](new_visual_webapp_2.png)
 * The webapp settings interface has several sections...
   * Under "Data" you can choose a dataset, list primary keys and editable columns (note that a column can't be both). ![](data_editing_webapp_params_1.png) ![](data_editing_webapp_params_2.png)
-  * The "Linked Records" section allows to specify editable columns whose values correspond to primary key values of another dataset. This requires the other dataset to be on a SQL connection or to have less than 1,000 records.
+  * The "Linked Records" section allows to specify editable columns whose values correspond to primary key values of another dataset, called the "Linked Dataset". One of these two requirements must be met: 1) the Linked Dataset must have less than 1,000 records; OR 2) the Linked Dataset must be on a SQL connection.
   * In the "Layout" section you can choose to freeze editable columns to the right-hand side (which is useful when there are many columns), and to group rows by one or more columns.
   * Additional settings can be provided via the ["editschema" in JSON](editschema).
 * You can now start the webapp backend. Behind the scenes, webapp settings such as primary keys and editable columns will be copied into the corresponding _Data Editing_ fields of the chosen dataset (custom fields provided by the plugin).

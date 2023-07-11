@@ -2,7 +2,7 @@
 
 <iframe src="https://www.loom.com/embed/3d899ce5f7544850abe91d088b969331" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
-As an alternative to using the Data Editing Visual Webapp, you can build a custom webapp that uses the CRUD (Create, Read, Update, Delete) methods provided by the `EditableEventSourced` Python class.
+As an alternative to using the Data Editing Visual Webapp, you can build a custom webapp that uses the CRUD (Create, Read, Update, Delete) methods provided by the `EditableEventSourced` Python class — or the REST API endpoints that wrap them.
 
 The implementation of these methods is based on the [Event Sourcing pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing): instead of storing the current (edited) state of the data, we use an append-only store to record the full series of actions taken on that data. This store is a dataset that we call the "editlog", which we create on the same connection as the original dataset, with the same name suffixed by "_editlog".
 
