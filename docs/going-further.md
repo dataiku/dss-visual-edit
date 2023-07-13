@@ -49,6 +49,7 @@ As any Dataiku webapp, it can either require authentication, or it can be made a
 When authentication is required:
 
 * The webapp can only be used by users with a Reader license or above.
+* It allows to read contents of the original dataset, of the associated editlog, and of the label and lookup columns of linked datasets (if any).
 * Even though the name "Reader" might suggest that they can only read data, they webapp doesn't make a distinction between license types and Readers are able to make edits.
 * You can restrict access to specified (groups of) users via the Project > Security settings: only those with "Read Dashboard" permission will be able to use the webapp (i.e. see and edit data).
 
