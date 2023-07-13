@@ -1,29 +1,28 @@
 {
     "meta": {
-        "label": "Merge edits",
-        "description": "Merge values edited via the webapp into a copy of the original dataset.",
+        "label": "Override",
+        "description": "Copy the source dataset and override rows that were edited",
         "icon": "icon-plus"
     },
     "kind": "PYTHON",
     "inputRoles": [
         {
-            "name": "original",
-            "label": "Original dataset",
-            "description": "Contains the data to be made editable via webapp",
+            "name": "source",
+            "label": "Source dataset",
+            "description": "Dataset made available to the writeback functionality",
             "arity": "UNARY",
             "required": true,
             "acceptsDataset": true
         },
         {
-            "name": "editlog_pivoted",
-            "label": "Pivoted edit log",
-            "description": "Created by webapp and associated pivot recipe",
+            "name": "edited_rows",
+            "label": "Edited rows",
+            "description": "Created by writeback functionality and associated replay recipe",
             "arity": "UNARY",
             "required": true,
             "acceptsDataset": true
         }
     ],
-
     "outputRoles": [
         {
             "name": "edited",

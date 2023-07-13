@@ -1,7 +1,7 @@
 {
     "meta": {
-        "label": "Data Editing",
-        "description": "Webapp to edit records of a dataset and maintain an editlog dataset.",
+        "label": "Data Feedback",
+        "description": "Provide feedback on a Dataset at the row-level: mark as reviewed, add comments, or change values in editable columns. Edits are written back to the flow.",
         "icon": "icon-edit-sign"
     },
     "baseType": "DASH",

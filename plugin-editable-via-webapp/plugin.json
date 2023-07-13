@@ -1,10 +1,10 @@
 {
-    "id": "editable-via-webapp",
+    "id": "writeback",
     "version": "1.8.5",
     "meta": {
-        "label": "Editable via webapp",
-        "description": "Edit dataset records via a webapp and replay edits in the Flow",
-        "author": "Dataiku (Louis Dorard, Julien Hobeika)",
+        "label": "Writeback",
+        "description": "Interfaces for human-in-the-loop analytics and AI: Visual Webapp and CRUD API to edit a Dataset's values, and write edited values back to a new source Dataset in the Flow.",
+        "author": "Dataiku (Louis Dorard)",
         "icon": "icon-edit-sign",
         "tags": [],
         "url": "http://dataiku.github.io/lca/",

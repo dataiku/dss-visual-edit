@@ -1,45 +1,11 @@
 {
     "meta": {
-        "label": "Data Editing",
-        "description": "Properties managed by a Data Editing webapp. Do not modify directly — use the corresponding webapp's settings to make changes.",
+        "label": "Writeback",
+        "description": "Used for writeback functionality — do not modify here",
         "icon": "icon-columns"
     },
     "customFields": [
         {
-            "applyToObjects": {
-                "mode": "SOME",
-                "includedObjectTypes": ["DATASET", "RECIPE"]
-            },
-            "field": {
-                "name": "webapp_url",
-                "label": "Webapp URL",
-                "description": "",
-                "type": "STRING"
-            }
-        },
-        {
-            "applyToObjects": {
-                "mode": "SOME",
-                "includedObjectTypes": ["DATASET"]
-            },
-            "field": {
-                "name": "original_ds",
-                "label": "Original Dataset",
-                "description": "",
-                "type": "DATASET"
-            }
-        },{
-            "applyToObjects": {
-                "mode": "SOME",
-                "includedObjectTypes": ["DATASET"]
-            },
-            "field": {
-                "name": "editlog_ds",
-                "label": "Edit Log",
-                "description": "",
-                "type": "DATASET"
-            }
-        },{
             "applyToObjects": {
                 "mode": "SOME",
                 "includedObjectTypes": ["DATASET"]
@@ -49,7 +15,7 @@
                 "label": "Primary Keys",
                 "description": "",
                 "type": "COLUMNS",
-                "datasetParamName": "original_ds"
+                "datasetParamName": "source"
             }
         },{
             "applyToObjects": {
@@ -61,7 +27,7 @@
                 "label": "Editable Columns",
                 "description": "",
                 "type": "COLUMNS",
-                "datasetParamName": "original_ds"
+                "datasetParamName": "source"
             }
         }
     ]

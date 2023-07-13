@@ -1,15 +1,15 @@
 {
     "meta": {
-        "label": "Pivot editlog",
-        "description": "Create a dataset whose rows correspond to unique keys from the editlog, columns are the original dataset's editable columns, and values are the last edits.",
+        "label": "Replay",
+        "description": "Create a dataset of edited rows and columns. When the same cell was edited multiple times, the last edit is kept.",
         "icon": "icon-repeat"
     },
     "kind": "PYTHON",
     "inputRoles": [
         {
-            "name": "editlog",
+            "name": "edit_log",
             "label": "Edit log",
-            "description": "Managed by webapp",
+            "description": "Maintained by writeback functionality",
             "arity": "UNARY",
             "required": true,
             "acceptsDataset": true
@@ -17,8 +17,8 @@
     ],
     "outputRoles": [
         {
-            "name": "editlog_pivoted",
-            "label": "Pivoted edit log",
+            "name": "edited_rows",
+            "label": "Edited rows",
             "description": "",
             "arity": "UNARY",
             "required": true,
