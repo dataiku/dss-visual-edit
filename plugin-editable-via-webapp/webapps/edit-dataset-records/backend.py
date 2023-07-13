@@ -105,7 +105,7 @@ freeze_editable_columns = params.get("freeze_editable_columns")
 group_column_names = params.get("group_column_names")
 linked_records_count = params.get("linked_records_count")
 linked_records = get_linked_records(params, linked_records_count)
-authorized_users = params.get("authorized_users").split(",")
+authorized_users = params.get("authorized_users")
 
 ees = EditableEventSourced(
     original_ds_name=original_ds_name,

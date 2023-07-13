@@ -18,7 +18,10 @@
         "Country",
         "Industry Group"
     ],
-    "authorized_users": "unknown,louis.dorard@dataiku.com",
+    "authorized_users": [
+        "unknown",
+        "louis.dorard@dataiku.com"
+    ],
     "editschema": [
         {
             "name": "Reviewed",
