@@ -1,6 +1,12 @@
 {
-    "primary_keys": ["ID"],
-    "editable_column_names": ["Matched Entity", "Reviewed", "Comments"],
+    "primary_keys": [
+        "ID"
+    ],
+    "editable_column_names": [
+        "Matched Entity",
+        "Reviewed",
+        "Comments"
+    ],
     "freeze_editable_columns": false,
     "group_column_names": [],
     "linked_records_count": 1,
@@ -8,8 +14,18 @@
     "linked_record_ds_name_1": "entities_ext",
     "linked_record_key_1": "EntityId",
     "linked_record_label_column_1": "EntityName",
-    "linked_record_lookup_columns_1": ["Country", "Industry Group"],
+    "linked_record_lookup_columns_1": [
+        "Country",
+        "Industry Group"
+    ],
+    "authorized_users": [
+        "unknown",
+        "louis.dorard@dataiku.com"
+    ],
     "editschema": [
-        {"name": "Reviewed", "type": "boolean_tick"}
+        {
+            "name": "Reviewed",
+            "type": "boolean_tick"
+        }
     ]
 }

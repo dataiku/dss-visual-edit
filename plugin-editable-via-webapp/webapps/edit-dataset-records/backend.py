@@ -105,22 +105,26 @@ freeze_editable_columns = params.get("freeze_editable_columns")
 group_column_names = params.get("group_column_names")
 linked_records_count = params.get("linked_records_count")
 linked_records = get_linked_records(params, linked_records_count)
-
+authorized_users = params.get("authorized_users")
 
 ees = EditableEventSourced(
-    original_ds_name,
-    primary_keys,
-    editable_column_names,
-    linked_records,
-    editschema_manual,
+    original_ds_name=original_ds_name,
+    project_key=project_key,
+    primary_keys=primary_keys,
+    editable_column_names=editable_column_names,
+    linked_records=linked_records,
+    editschema_manual=editschema_manual,
+    authorized_users=authorized_users,
 )
+
+
 columns = get_columns_tabulator(ees, freeze_editable_columns)
 
 last_build_date_initial = ""
 last_build_date_ok = False
 
 
-def serve_layout():
+def serve_layout():  # This function is called upon loading/refreshing the page in the browser
     global last_build_date_initial, last_build_date_ok
     try:
         last_build_date_initial = get_last_build_date(original_ds_name, project)
@@ -129,47 +133,51 @@ def serve_layout():
         last_build_date_initial = ""
         last_build_date_ok = False
 
-    # This function is called upon loading/refreshing the page in the browser
-    return html.Div(
-        children=[
-            html.Div(
-                id="refresh-div",
-                children=[
-                    html.Div(
-                        id="data-refresh-message",
-                        children="The original dataset has changed, please refresh this page to load it here. (Your edits are safe.)",
-                        style={"display": "inline"},
-                    ),
-                    html.Div(
-                        id="last-build-date",
-                        children=str(last_build_date_initial),
-                        style={"display": "none"},
-                    ),  # when the original dataset was last built
-                ],
-                className="ui compact warning message",
-                style={"display": "none"},
-            ),
-            dcc.Interval(
-                id="interval-component-iu",
-                interval=10 * 1000,  # in milliseconds
-                n_intervals=0,
-            ),
-            dash_tabulator.DashTabulator(
-                id="datatable",
-                datasetName=original_ds_name,
-                columns=columns,
-                data=ees.get_edited_df().to_dict(
-                    "records"
-                ),  # this gets the most up-to-date edited data
-                groupBy=group_column_names,
-            ),
-            html.Div(
-                id="edit-info",
-                children="Info zone for tabulator",
-                style={"display": info_display},
-            ),
-        ]
-    )
+    # get user's email and check if it's in authorized_users; if not, return a div which says "unauthorized access"
+    user_id = get_user_identifier()
+    if not authorized_users or user_id in authorized_users:
+        return html.Div(
+            children=[
+                html.Div(
+                    id="refresh-div",
+                    children=[
+                        html.Div(
+                            id="data-refresh-message",
+                            children="The original dataset has changed, please refresh this page to load it here. (Your edits are safe.)",
+                            style={"display": "inline"},
+                        ),
+                        html.Div(
+                            id="last-build-date",
+                            children=str(last_build_date_initial),
+                            style={"display": "none"},
+                        ),  # when the original dataset was last built
+                    ],
+                    className="ui compact warning message",
+                    style={"display": "none"},
+                ),
+                dcc.Interval(
+                    id="interval-component-iu",
+                    interval=10 * 1000,  # in milliseconds
+                    n_intervals=0,
+                ),
+                dash_tabulator.DashTabulator(
+                    id="datatable",
+                    datasetName=original_ds_name,
+                    columns=columns,
+                    data=ees.get_edited_df().to_dict(
+                        "records"
+                    ),  # this gets the most up-to-date edited data
+                    groupBy=group_column_names,
+                ),
+                html.Div(
+                    id="edit-info",
+                    children="Info zone for tabulator",
+                    style={"display": info_display},
+                ),
+            ]
+        )
+    else:
+        return html.Div("Unauthorized")
 
 
 app.layout = serve_layout
