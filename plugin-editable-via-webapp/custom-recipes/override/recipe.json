@@ -1,7 +1,7 @@
 {
     "meta": {
         "label": "Override",
-        "description": "Copy the source dataset and override rows that were edited",
+        "description": "Copy a source Dataset and override values coming from a Dataset of edited rows (see Replay recipe).",
         "icon": "icon-plus"
     },
     "kind": "PYTHON",
