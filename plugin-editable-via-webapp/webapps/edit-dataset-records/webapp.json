@@ -169,7 +169,7 @@
         {
             "name": "authorized_users",
             "label": "Authorized users",
-            "description": "List identifiers of users who are authorized to view the webapp and make edits, separated by commas. Leave empty to give access to anyone who has project-level permission to read dashboards.",
+            "description": "List identifiers of users authorized to view the webapp and make edits, as Strings. Leave empty to give access to anyone who has project-level permission to read dashboards.",
             "type": "ARRAY"
         },
         {
