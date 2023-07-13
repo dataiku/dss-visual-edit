@@ -3,7 +3,7 @@
     "version": "1.8.5",
     "meta": {
         "label": "Writeback",
-        "description": "Interfaces for human-in-the-loop analytics and AI: Visual Webapp with powerful data browsing and editing capabilities, API for row-level CRUD on any Dataset. Edits are written back to a new source Dataset in the Flow.",
+        "description": "Interfaces for human-in-the-loop workflows: Visual Webapp with powerful data browsing and editing, API for row-level CRUD on any Dataset. Edits are written back to a new source Dataset in the Flow.",
         "author": "Dataiku (Louis Dorard)",
         "icon": "icon-edit-sign",
         "tags": [],
