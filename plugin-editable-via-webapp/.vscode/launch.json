@@ -25,7 +25,7 @@
                 "FLASK_ENV": "development",
                 "PYTHONPATH": "../../python-lib",
                 "DKU_CURRENT_PROJECT_KEY": "ENTITY_RESOLUTION",
-                "ORIGINAL_DATASET": "matches_uncertain"
+                "ORIGINAL_DATASET": "matches_to_be_reviewed"
             },
             "args": [
                 "run",

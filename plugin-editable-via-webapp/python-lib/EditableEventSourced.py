@@ -164,6 +164,7 @@ class EditableEventSourced:
         editschema_manual=None,
         project_key=None,
         editschema=None,
+        authorized_users=None,
     ):
         self.original_ds_name = original_ds_name
         if project_key is None:
@@ -223,16 +224,9 @@ class EditableEventSourced:
                         for m in metrics:
                             if m["metric"]["metricType"] == "COUNT_RECORDS":
                                 count_records = int(m["value"])
-                                if count_records > 1000:
-                                    logging.warning(
-                                        f"Linked dataset {linked_ds_name} has {count_records} records — capping at 1,000 rows to avoid memory issues"
-                                    )
                     except:
                         pass
-                    if count_records is None:
-                        logging.warning(
-                            f"Unknown number of records for linked dataset {linked_ds_name} — capping at 1,000 rows to avoid memory issues"
-                        )
+
                     # If the linked dataset is on an SQL connection and if it has more than 1000 records, load it as a DatasetSQL object
                     if "SQL" in connection_type or "snowflake" in connection_type:
                         if count_records is not None and count_records <= 1000:
@@ -251,6 +245,14 @@ class EditableEventSourced:
                         logging.debug(
                             f"""Loading linked dataset "{linked_ds_name}" in memory since it isn't on an SQL connection"""
                         )
+                        if count_records is None:
+                            logging.warning(
+                                f"Unknown number of records for linked dataset {linked_ds_name}"
+                            )
+                        elif count_records > 1000:
+                            logging.warning(
+                                f"Linked dataset {linked_ds_name} has {count_records} records — capping at 1,000 rows to avoid memory issues"
+                            )
                         # get the first 1000 rows of the dataset
                         linked_record["df"] = linked_ds.get_dataframe(
                             sampling="head", limit=1000
@@ -270,6 +272,8 @@ class EditableEventSourced:
             self.editschema_manual_df = DataFrame(
                 data={}
             )  # this will be an empty dataframe
+
+        self.authorized_users = authorized_users
 
         self.display_column_names = get_display_column_names(
             self.schema_columns, self.primary_keys, self.editable_column_names
@@ -350,25 +354,29 @@ class EditableEventSourced:
         else:
             value_string = value
 
-        if column in self.editable_column_names or action == "delete":
-            # add to the editlog
-            self.editlog_ds.spec_item["appendMode"] = True
-            self.editlog_ds.write_dataframe(
-                DataFrame(
-                    data={
-                        "action": [action],
-                        "key": [str(key)],
-                        "column_name": [column],
-                        "value": [value_string],
-                        "date": [datetime.now(timezone("UTC")).isoformat()],
-                        "user": [get_user_identifier()],
-                    }
-                )
-            )
-            info = f"""Updated column {column} where {self.primary_keys} is {key}. New value: {value}."""
-
+        user_identifier = get_user_identifier()
+        if self.authorized_users and not user_identifier in self.authorized_users:
+            info = "Unauthorized"
         else:
-            info = f"""{column} isn't an editable column"""
+            if column in self.editable_column_names or action == "delete":
+                # add to the editlog
+                self.editlog_ds.spec_item["appendMode"] = True
+                self.editlog_ds.write_dataframe(
+                    DataFrame(
+                        data={
+                            "action": [action],
+                            "key": [str(key)],
+                            "column_name": [column],
+                            "value": [value_string],
+                            "date": [datetime.now(timezone("UTC")).isoformat()],
+                            "user": [user_identifier],
+                        }
+                    )
+                )
+                info = f"""Updated column {column} where {self.primary_keys} is {key}. New value: {value}."""
+
+            else:
+                info = f"""{column} isn't an editable column"""
 
         logging.info(info)
         return info
