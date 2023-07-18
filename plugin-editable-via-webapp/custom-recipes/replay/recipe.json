@@ -1,7 +1,7 @@
 {
     "meta": {
         "label": "Replay",
-        "description": "Create a dataset of edited rows from a log of edit events (\"editlog\"). When the same cell was edited multiple times, the last edit is kept.",
+        "description": "Create a dataset of edited rows from the raw event log maintained by the writeback functionality (\"editlog\"). When the same cell was edited multiple times, the last edit is kept.",
         "icon": "icon-repeat"
     },
     "kind": "PYTHON",

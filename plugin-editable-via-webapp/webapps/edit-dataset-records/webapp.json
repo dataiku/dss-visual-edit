@@ -1,7 +1,7 @@
 {
     "meta": {
         "label": "Data Feedback",
-        "description": "Provide feedback on a Dataset at the row-level: mark as reviewed, add comments, or change values in editable columns. Edits are written back to the Flow in an \"editlog\" Dataset.",
+        "description": "Provide feedback on rows of a Dataset: mark as reviewed, add comments, or change values in editable columns. Based on a reusable Dash component with powerful data browsing and editing features, and a Dataset row-level CRUD API. Edits are written back to the Flow in an \"editlog\" Dataset.",
         "icon": "icon-edit-sign"
     },
     "baseType": "DASH",

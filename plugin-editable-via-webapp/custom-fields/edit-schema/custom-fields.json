@@ -1,7 +1,7 @@
 {
     "meta": {
         "label": "Writeback",
-        "description": "Dataset fields used by the writeback functionality",
+        "description": "Dataset fields used by the writeback functionality: primary keys, editable columns, linked records (aka foreign keys).",
         "icon": "icon-columns"
     },
     "customFields": [
