@@ -3,7 +3,7 @@
     "version": "1.8.5",
     "meta": {
         "label": "Writeback",
-        "description": "Implement human-in-the-loop workflows with no-code data browsing and editing apps, powered by a Dataset row-level CRUD API. Edits are written back to separate Datasets in the Flow.",
+        "description": "Implement human-in-the-loop workflows: no-code data browsing and editing apps, Dash component, and Dataset row-level CRUD API. Edits are written back to separate Datasets in the Flow.",
         "author": "Dataiku (Louis Dorard)",
         "icon": "icon-edit-sign",
         "tags": [],

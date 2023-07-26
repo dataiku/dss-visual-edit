@@ -1,4 +1,4 @@
-# Getting started: CRUD Python API | Plugin: Data Editing | Dataiku
+# Getting started: CRUD Python API | Plugin: Writeback | Dataiku
 
 <iframe src="https://www.loom.com/embed/3d899ce5f7544850abe91d088b969331" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
@@ -8,14 +8,14 @@ The implementation of these methods is based on the [Event Sourcing pattern](htt
 
 Let's take a quick tour of how to use the CRUD Python API. If you haven't, [install the plugin](install-plugin) first.
 
-## Instantiate the `EditableEventSourced` class
+## Instantiate the `WritebackDataset` class
 
 ```python
 import dataiku
-dataiku.use_plugin_libs("editable-via-webapp")
-EditableEventSourced = dataiku.import_from_plugin("editable-via-webapp", "EditableEventSourced")
+dataiku.use_plugin_libs("writeback")
+WritebackDataset = dataiku.import_from_plugin("writeback", "WritebackDataset")
 
-ees = EditableEventSourced.EditableEventSourced(
+wb_ds = WritebackDataset.WritebackDataset(
     original_ds_name="my_dataset",
     primary_keys=["id"],
     editable_column_names=["existing_editable_col", "new_editable_col"]
