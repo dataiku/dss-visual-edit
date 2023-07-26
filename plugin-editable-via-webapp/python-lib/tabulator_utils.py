@@ -216,7 +216,7 @@ def __get_column_tabulator_linked_record__(ees, linked_record_name):
         t_col["formatter"] = assign(
             f"""
             function(cell){{
-                url_base = "label/{linked_ds_name}/{ees.original_ds_name}"
+                url_base = "label/{linked_ds_name}/{ees.original_ds_name}/"
                 key = cell.getValue()
                 label = ""
                 // Assign value returned by GET request to url_base with parameter key, to label variable; in case connection fails, assign empty value to label
