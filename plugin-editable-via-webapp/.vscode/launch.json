@@ -15,7 +15,7 @@
             },
         },
         {
-            "name": "Webapp",
+            "name": "Dash Webapp",
             "cwd": "${workspaceFolder}/webapps/edit-dataset-records/",
             "type": "python",
             "request": "launch",
@@ -35,6 +35,48 @@
             ],
             "jinja": true,
             "justMyCode": false
+        },
+        {
+            "name": "AIO test",
+            "cwd": "${workspaceFolder}/python-lib/",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "DataTableAIO-test.py",
+                "FLASK_DEBUG": "1",
+                "DKU_CURRENT_PROJECT_KEY": "ENTITY_RESOLUTION",
+                "ORIGINAL_DATASET": "matches_to_be_reviewed"
+            },
+            "args": [
+                "run",
+                "--no-debugger", // this is used to disable the flask built-in debugger so that it doesn't interfere with the VS Code debugger - see https://flask.palletsprojects.com/en/2.2.x/debugging/
+                "--port",
+                "8000"
+            ],
+            "jinja": true,
+            "justMyCode": false
+        },
+        {
+            "name": "Streamlit",
+            "cwd": "${workspaceFolder}/webapps/edit-dataset-records/",
+            "type": "python",
+            "request": "launch",
+            "module": "streamlit",
+            "env": {
+                "STREAMLIT_APP": "backend-streamlit.py",
+                "STREAMLIT_ENV": "development",
+                "PYTHONPATH": "../../python-lib",
+                "DKU_CURRENT_PROJECT_KEY": "ENTITY_RESOLUTION",
+                "ORIGINAL_DATASET": "matches_to_be_reviewed"
+            },
+            "args": [
+                "run",
+                "backend-streamlit.py"
+            ],
+            "console": "integratedTerminal",
+            "jinja": true,
+            "justMyCode": true
         }
     ]
 }

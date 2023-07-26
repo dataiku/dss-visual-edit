@@ -164,11 +164,11 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
             }
         
             function keypress(e){
-                if(e.keyCode == 13){
+                if(e.keyCode == 13){ // corresponds to Enter key
                     buildValues();
                 }
         
-                if(e.keyCode == 27){
+                if(e.keyCode == 27){ // corresponds to Escape key
                     cancel();
                 }
             }

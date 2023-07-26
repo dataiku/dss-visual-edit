@@ -9,7 +9,7 @@ import "../../../assets/tabulator_dataiku.css";
 
 const crypto = require('crypto');
 
-const plugin_version = "1.8.4";
+const plugin_version = "1.8.5";
 
 function md5(string) {
     return crypto.createHash('md5').update(string).digest('hex');
@@ -22,7 +22,7 @@ export default class DashTabulator extends React.Component {
     componentDidMount() {
         // Instantiate Tabulator when element is mounted
 
-        const {id, datasetName, data, columns, groupBy, cellEdited} = this.props;
+        const {id, datasetName, data, columns, primaryKeys, editableColumns, groupBy, cellEdited} = this.props;
 
         // Interpret column formatters as function handles.
         for(let i=0; i < columns.length; i++){
@@ -52,6 +52,8 @@ export default class DashTabulator extends React.Component {
             "datasetName": datasetName,
             "reactiveData": true,
             "columns": columns,
+            "primaryKeys": primaryKeys,
+            "editableColumns": editableColumns,
             "groupBy": groupBy,
             "selectable": 1,
             "layout": "fitDataTable",
@@ -121,6 +123,8 @@ DashTabulator.defaultProps = {
     data: [],
     datasetName: "",
     columns : [],
+    primaryKeys : [],
+    editableColumns : [],
     groupBy : []
 };
 
@@ -136,19 +140,29 @@ DashTabulator.propTypes = {
     data: PropTypes.array,
 
     /**
-     * Column definitions.
-     */
-    columns: PropTypes.array,
-
-    /**
      * Name of the corresponding Dataiku dataset.
      */
     datasetName: PropTypes.string,
 
     /**
-     * Columns to group by.
+     * Column definitions.
      */
-     groupBy: PropTypes.array,
+    columns: PropTypes.array,
+
+    /**
+     * List of columns to use as primary keys.
+     */
+    primaryKeys: PropTypes.array,
+
+    /**
+     * List of columns to make editable.
+     */
+    editableColumns: PropTypes.array,
+
+    /**
+     * List of columns to group by.
+     */
+    groupBy: PropTypes.array,
 
     /**
      * Dash-assigned callback that should be called to report property changes
