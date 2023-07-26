@@ -21,6 +21,7 @@ from dash import Dash, Input, Output, State, dcc, html
 from dataiku_utils import get_dataframe_filtered
 from EditableEventSourced import EditableEventSourced
 from flask import Flask, current_app, jsonify, make_response, request
+from linked_records_blueprint import linked_records_blueprint
 from tabulator_utils import get_columns_tabulator, get_values_from_df
 from webapp_config_utils import get_linked_records
 
@@ -92,6 +93,7 @@ else:
         editschema_manual = {}
 
     server = Flask(__name__)
+    server.register_blueprint(linked_records_blueprint)
     app = Dash(__name__, server=server)
     app.enable_dev_tools(debug=True, dev_tools_ui=True)
 

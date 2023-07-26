@@ -31,33 +31,58 @@ class EditableEventSourced:
     Edits are stored in a separate dataset called the editlog. The source dataset is never changed. Both the source dataset and the editlog are used to compute the edited state.
     """
 
-    def __save_custom_fields__(self):
-        self.original_ds_settings.custom_fields["original_ds"] = self.original_ds_name
-        self.original_ds_settings.custom_fields["editlog_ds"] = self.editlog_ds_name
-        self.original_ds_settings.custom_fields["primary_keys"] = self.primary_keys
-        self.original_ds_settings.custom_fields[
-            "editable_column_names"
-        ] = self.editable_column_names
-        if self.webapp_url:
-            self.original_ds_settings.custom_fields["webapp_url"] = self.webapp_url
-        self.original_ds_settings.save()
+    def __set_ontology__(self, primary_keys, editable_column_names, linked_records):
+        self.primary_keys = primary_keys
+        # if no editable_column_names are provided, all columns except primary keys are editable
+        if editable_column_names:
+            self.editable_column_names = editable_column_names
+        else:
+            self.editable_column_names = [
+                column["name"]
+                for column in self.schema_columns
+                if column["name"] not in self.primary_keys
+            ]
+        self.linked_records = linked_records
 
-    def __init_webapp_url__(self):
+    def __save_custom_fields__(
+        self,
+        ds_name,
+        original_ds=None,
+        editlog_ds=None,
+        primary_keys=None,
+        editable_column_names=None,
+        linked_records=None,
+    ):
         """
-        This method is called by the constructor to set the webapp_url and webapp_url_public attributes.
+        Save custom fields in a dataset's settings.
+
+        Params:
+        - ds_name: name of the dataset whose custom fields are to be saved
+        - original_ds: value to set for the corresponding field (name of original dataset)
+        - editlog_ds: value to set for the corresponding field (name of editlog dataset)
+        - primary_keys: value to set for the corresponding field (list of primary keys)
+        - editable_column_names: value to set for the corresponding field (list of editable column names-
+        - linked_records: value to set for the corresponding field (list of linked records)
         """
-        try:
-            webapp_id = find_webapp_id(self.original_ds_name)
-            webapp_name = sub(
-                r"[\W_]+", "-", get_webapp_json(webapp_id).get("name").lower()
-            )
-            self.webapp_url = (
-                f"/projects/{self.project_key}/webapps/{webapp_id}_{webapp_name}/edit"
-            )
-            self.webapp_url_public = f"/public-webapps/{self.project_key}/{webapp_id}/"
-        except:
-            self.webapp_url = None
-            self.webapp_url_public = "/"
+        ds_settings = self.project.get_dataset(ds_name).get_settings()
+        if original_ds:
+            ds_settings.custom_fields["original_ds"] = original_ds
+        if editlog_ds:
+            ds_settings.custom_fields["editlog_ds"] = editlog_ds
+        if primary_keys:
+            ds_settings.custom_fields["primary_keys"] = primary_keys
+        if editable_column_names:
+            ds_settings.custom_fields["editable_column_names"] = editable_column_names
+        if linked_records:
+            ds_settings.custom_fields["linked_records"] = linked_records
+        ds_settings.save()
+
+    def __load_custom_fields__(self):
+        ds_settings = self.project.get_dataset(self.original_ds_name).get_settings()
+        primary_keys = ds_settings.custom_fields.get("primary_keys")
+        editable_column_names = ds_settings.custom_fields.get("editable_column_names")
+        linked_records = ds_settings.custom_fields.get("linked_records")
+        return primary_keys, editable_column_names, linked_records
 
     def __init_editlog__(self):
         editlog_ds_creator = DSSManagedDatasetCreationHelper(
@@ -90,14 +115,6 @@ class EditableEventSourced:
             write_empty_editlog(self.editlog_ds)
             logging.debug("Done.")
 
-        # save custom field values in the editlog: only the original dataset name, the primary keys, and the editable column names are needed
-        editlog_settings = self.project.get_dataset(self.editlog_ds_name).get_settings()
-        editlog_settings.custom_fields["original_ds"] = self.original_ds_name
-        editlog_settings.custom_fields["primary_keys"] = self.primary_keys
-        editlog_settings.custom_fields[
-            "editable_column_names"
-        ] = self.editable_column_names
-
     def __init_editlog_downstream__(self):
         editlog_pivoted_ds_creator = DSSManagedDatasetCreationHelper(
             self.project, self.editlog_pivoted_ds_name
@@ -129,7 +146,6 @@ class EditableEventSourced:
             pivot_settings = pivot_recipe.get_settings()
             pivot_settings.add_input("editlog", self.editlog_ds_name)
             pivot_settings.add_output("editlog_pivoted", self.editlog_pivoted_ds_name)
-            pivot_settings.custom_fields["webapp_url"] = self.webapp_url
             pivot_settings.save()
             logging.debug("Done.")
 
@@ -160,7 +176,6 @@ class EditableEventSourced:
             merge_settings.add_input("original", self.original_ds_name)
             merge_settings.add_input("editlog_pivoted", self.editlog_pivoted_ds_name)
             merge_settings.add_output("edited", self.edited_ds_name)
-            merge_settings.custom_fields["webapp_url"] = self.webapp_url
             merge_settings.save()
             logging.debug("Done.")
 
@@ -182,7 +197,7 @@ class EditableEventSourced:
 
         :param primary_keys (optional): the list of primary keys of the original dataset.
         - When provided, it will be stored in the original dataset's custom fields, along with editable_column_names and linked_records.
-        - If not provided, the primary keys will be retrieved from the original dataset's custom fields @TODO: implement retrieval; if none are found, an exception will be raised @TODO: raise exception.
+        - If not provided, the primary keys will be retrieved from the original dataset's custom fields.
 
         :param editable_column_names (optional): the list of editable columns of the original dataset. If not provided, the editable columns will be read from the original dataset's custom fields; if none are found, all columns except primary keys will be made editable.
 
@@ -201,7 +216,6 @@ class EditableEventSourced:
         else:
             self.project_key = project_key
         self.project = client.get_project(self.project_key)
-        self.__init_webapp_url__()
         self.original_ds_name = original_ds_name
         self.original_ds = Dataset(self.original_ds_name, self.project_key)
         self.schema_columns = self.original_ds.get_config().get("schema").get("columns")
@@ -210,41 +224,42 @@ class EditableEventSourced:
         )
         if self.__connection_name__ is None:
             self.__connection_name__ = "filesystem_managed"
-        self.original_ds_settings = self.project.get_dataset(
-            self.original_ds_name
-        ).get_settings()
 
         self.editlog_ds_name = self.original_ds_name + "_editlog"
         self.editlog_pivoted_ds_name = self.editlog_ds_name + "_pivoted"
         self.edited_ds_name = self.original_ds_name + "_edited"
 
         if primary_keys:
-            self.primary_keys = primary_keys
-            if editable_column_names:
-                self.editable_column_names = editable_column_names
-            else:
-                self.editable_column_names = [  # all columns except primary keys
-                    column["name"]
-                    for column in self.schema_columns
-                    if column["name"] not in self.primary_keys
-                ]
-            self.__save_custom_fields__()
-            self.__init_editlog__()  # TODO: save custom fields in editlog dataset, outside of this method
+            self.__set_ontology__(primary_keys, editable_column_names, linked_records)
+            self.__save_custom_fields__(
+                ds_name=self.original_ds_name,
+                original_ds=self.original_ds_name,
+                editlog_ds=self.editlog_ds_name,
+                primary_keys=self.primary_keys,
+                editable_column_names=self.editable_column_names,
+                linked_records=self.linked_records,
+            )
+            self.__init_editlog__()
+            self.__save_custom_fields__(
+                ds_name=self.editlog_ds_name,
+                original_ds=self.original_ds_name,
+                primary_keys=self.primary_keys,
+                editable_column_names=self.editable_column_names,
+            )
             self.__init_editlog_downstream__()
         else:
-            self.primary_keys = self.original_ds_settings.custom_fields.get(
-                "primary_keys"
-            )
-            self.editable_column_names = self.original_ds_settings.custom_fields.get(
-                "editable_column_names"
-            )
-            self.linked_records = self.original_ds_settings.custom_fields.get(
-                "linked_records"
-            )  # TODO: implement linked records in custom fields
+            # if no primary keys are provided, read them + editable columns names + linked records from the original dataset's custom fields
+            (
+                primary_keys,
+                editable_column_names,
+                linked_records,
+            ) = self.__load_custom_fields__()
+            self.__set_ontology__(primary_keys, editable_column_names, linked_records)
+            self.__init_editlog__()
+            self.__init_editlog_downstream__()
 
-        if linked_records:
+        if self.linked_records:
             # For each linked record, add linked dataset/dataframe as attribute
-            self.linked_records = linked_records
             if len(self.linked_records) > 0:
                 self.linked_records_df = DataFrame(data=self.linked_records).set_index(
                     "name"

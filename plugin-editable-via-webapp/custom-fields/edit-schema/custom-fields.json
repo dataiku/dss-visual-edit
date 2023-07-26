@@ -8,19 +8,9 @@
         {
             "applyToObjects": {
                 "mode": "SOME",
-                "includedObjectTypes": ["DATASET", "RECIPE"]
-            },
-            "field": {
-                "name": "webapp_url",
-                "label": "Webapp URL",
-                "description": "",
-                "type": "STRING"
-            }
-        },
-        {
-            "applyToObjects": {
-                "mode": "SOME",
-                "includedObjectTypes": ["DATASET"]
+                "includedObjectTypes": [
+                    "DATASET"
+                ]
             },
             "field": {
                 "name": "original_ds",
@@ -28,10 +18,13 @@
                 "description": "",
                 "type": "DATASET"
             }
-        },{
+        },
+        {
             "applyToObjects": {
                 "mode": "SOME",
-                "includedObjectTypes": ["DATASET"]
+                "includedObjectTypes": [
+                    "DATASET"
+                ]
             },
             "field": {
                 "name": "editlog_ds",
@@ -39,10 +32,13 @@
                 "description": "",
                 "type": "DATASET"
             }
-        },{
+        },
+        {
             "applyToObjects": {
                 "mode": "SOME",
-                "includedObjectTypes": ["DATASET"]
+                "includedObjectTypes": [
+                    "DATASET"
+                ]
             },
             "field": {
                 "name": "primary_keys",
@@ -51,10 +47,13 @@
                 "type": "COLUMNS",
                 "datasetParamName": "original_ds"
             }
-        },{
+        },
+        {
             "applyToObjects": {
                 "mode": "SOME",
-                "includedObjectTypes": ["DATASET"]
+                "includedObjectTypes": [
+                    "DATASET"
+                ]
             },
             "field": {
                 "name": "editable_column_names",
@@ -62,6 +61,20 @@
                 "description": "",
                 "type": "COLUMNS",
                 "datasetParamName": "original_ds"
+            }
+        },
+        {
+            "applyToObjects": {
+                "mode": "SOME",
+                "includedObjectTypes": [
+                    "DATASET"
+                ]
+            },
+            "field": {
+                "name": "linked_records",
+                "label": "Linked Records",
+                "description": "As a list of dictionaries, each with the following keys: name, ds_name, key, label_column, lookup_columns",
+                "type": "TEXTAREA"
             }
         }
     ]
