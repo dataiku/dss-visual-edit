@@ -18,7 +18,7 @@ from webapp_utils import find_webapp_id, get_webapp_json
 from editschema_utils import get_primary_keys, get_editable_column_names
 from DatasetSQL import DatasetSQL
 from os import getenv
-from json import loads
+from json import loads, dumps
 from datetime import datetime
 from pytz import timezone
 from re import sub
@@ -74,14 +74,14 @@ class EditableEventSourced:
         if editable_column_names:
             ds_settings.custom_fields["editable_column_names"] = editable_column_names
         if linked_records:
-            ds_settings.custom_fields["linked_records"] = linked_records
+            ds_settings.custom_fields["linked_records"] = dumps(linked_records)
         ds_settings.save()
 
     def __load_custom_fields__(self):
         ds_settings = self.project.get_dataset(self.original_ds_name).get_settings()
         primary_keys = ds_settings.custom_fields.get("primary_keys")
         editable_column_names = ds_settings.custom_fields.get("editable_column_names")
-        linked_records = ds_settings.custom_fields.get("linked_records")
+        linked_records = loads(ds_settings.custom_fields.get("linked_records"))
         return primary_keys, editable_column_names, linked_records
 
     def __init_editlog__(self):

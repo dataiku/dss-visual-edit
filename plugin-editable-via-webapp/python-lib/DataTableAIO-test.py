@@ -3,7 +3,6 @@
 from flask import Flask
 import dash
 from os import getenv
-from json import load
 from DataTableAIO import DataTableAIO
 
 original_ds_name = getenv("ORIGINAL_DATASET")
