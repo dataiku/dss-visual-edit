@@ -74,6 +74,7 @@ if getenv("DKU_CUSTOM_WEBAPP_CONFIG"):
         editschema_manual = {}
 
     server = app.server
+    server.register_blueprint(linked_records_blueprint)
 
 else:
     logging.basicConfig(level=logging.INFO)
