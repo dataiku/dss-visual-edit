@@ -4,8 +4,6 @@
 
 As an alternative to using the Data Editing Visual Webapp, you can build a custom webapp that uses the CRUD (Create, Read, Update, Delete) methods provided by the `EditableEventSourced` Python class — or the REST API endpoints that wrap them.
 
-The implementation of these methods is based on the [Event Sourcing pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing): instead of storing the current (edited) state of the data, we use an append-only store to record the full series of actions taken on that data. This store is a dataset that we call the "editlog", which we create on the same connection as the original dataset, with the same name suffixed by "_editlog".
-
 Let's take a quick tour of how to use the CRUD Python API. If you haven't, [install the plugin](install-plugin) first.
 
 ## Instantiate the `EditableEventSourced` class
@@ -24,11 +22,7 @@ ees = EditableEventSourced.EditableEventSourced(
 
 `editable_column_names` can contain names of columns found in the original dataset, and names of new columns as well.
 
-When EES is instantiated on a given dataset, it creates the "editlog" dataset and 2 recipes that create an "edits" and an "edited" dataset, if they don't already exist. Read more in [Using edits in the Flow](using-edits).
-
-Edits made via CRUD methods instantly add rows to the _editlog_.
-
-## Use EES methods to perform CRUD operations
+## Perform CRUD operations
 
 Here we provide an overview of available methods — more information can be found in the docstrings in the code.
 
@@ -53,17 +47,23 @@ At the row level:
 * update_row - update any row
 * delete_row - deleted any row
 
-These methods have an optional `user` parameter (default value is "unknown"). When working in the context of an active HTTP request (e.g. in a Flask or Dash app), the following can be used to extract the identifier of the user logged into Dataiku (e.g. their email address). This identifier would be included in the request headers sent by the user's web browser.
+These methods have an optional `user` parameter (default value is "unknown").
 
-```python
-from commons import get_user_identifier
-commons = dataiku.import_from_plugin("editable-via-webapp", "commons")
-user = commons.get_user_identifier()
-```
+When these methods are called in the context of an active HTTP request (e.g. in a Flask or Dash app), the identifier of the user logged into Dataiku is retrieved (e.g. their email address); this identifier would be included in the request headers sent by the user's web browser. Otherwise, the identifier is set to "unknown".
+
+The identifier is used to attribute edits to them in the editlog.
 
 At the dataset level:
 
 * empty_editlog: delete all rows of the editlog (use with caution)
+
+## Behind the scenes
+
+The implementation of these methods is based on the [Event Sourcing pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing): instead of directly storing the current state of the edited data, we use an append-only store to record the full series of actions on that data. This store is a dataset that we call the "editlog".
+
+When the `EditableEventSourced` class is instantiated on a given dataset, it creates an "editlog" dataset and 2 recipes that create an "editlog pivoted" and an "edited" dataset (if they don't already exist). Those datasets are created on the same connection as the original dataset.
+
+Edits made via CRUD methods instantly add rows to the editlog. The editlog pivoted and the edited datasets are only updated when the recipes that build them are run. Read more in [Using edits in the Flow](using-edits).
 
 ## Next
 
