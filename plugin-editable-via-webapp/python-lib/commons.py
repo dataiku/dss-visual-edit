@@ -8,8 +8,9 @@ import logging
 
 
 def write_empty_editlog(editlog_ds):
+    cols = [col["name"] for col in editlog_ds.get_config().get("schema").get("columns")]
     editlog_ds.write_dataframe(
-        DataFrame(columns=["date", "user", "action", "key", "column_name", "value"]),
+        DataFrame(columns=cols),
         infer_schema=False,
     )
 

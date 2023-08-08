@@ -86,6 +86,8 @@ class EditableEventSourced:
             write_empty_editlog(self.editlog_ds)
             logging.debug("Done.")
 
+        self.editlog_columns = self.editlog_ds.get_config().get("schema").get("columns")
+
         # make sure that editlog has the right custom field values
         self.__save_custom_fields__(self.editlog_ds_name)
 
@@ -361,18 +363,16 @@ class EditableEventSourced:
             if column in self.editable_column_names or action == "delete":
                 # add to the editlog
                 self.editlog_ds.spec_item["appendMode"] = True
-                self.editlog_ds.write_dataframe(
-                    DataFrame(
-                        data={
-                            "action": [action],
-                            "key": [str(key)],
-                            "column_name": [column],
-                            "value": [value_string],
-                            "date": [datetime.now(timezone("UTC")).isoformat()],
-                            "user": [user_identifier],
-                        }
-                    )
-                )
+                edit_data = {
+                    "key": [str(key)],
+                    "column_name": [column],
+                    "value": [value_string],
+                    "date": [datetime.now(timezone("UTC")).isoformat()],
+                    "user": [user_identifier],
+                }
+                if "action" in [col["name"] for col in self.editlog_columns]:
+                    edit_data.update({"action": [action]})
+                self.editlog_ds.write_dataframe(DataFrame(data=edit_data))
                 info = f"""Updated column {column} where {self.primary_keys} is {key}. New value: {value}."""
 
             else:
