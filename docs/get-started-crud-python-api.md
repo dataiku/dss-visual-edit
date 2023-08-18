@@ -24,20 +24,22 @@ ees = EditableEventSourced.EditableEventSourced(
 
 ## Perform CRUD operations
 
-Here we provide an overview of available methods — more information can be found in the docstrings in the code.
+Here we provide an overview of available methods.
+
+More information on the parameters can be found in the [docstrings](backend/).
 
 ### Read data
 
 At row level:
 
-* `get_row` — read a row that was created, updated or deleted; params: dictionary containing primary key(s) value(s) of the row to read.
+* `get_row(primary_keys)` — read a row that was created, updated or deleted; params: dictionary containing primary key(s) value(s) of the row to read.
 
 At dataset level:
 
-* `get_original_df` — original data (all rows) without edits
-* `get_edited_df` — original data (all rows) with edited values
-* `get_edited_cells_df` — only rows and columns that were edited
-* `get_editlog_df`
+* `get_original_df()` — original data (all rows) without edits
+* `get_edited_df()` — original data (all rows) with edited values
+* `get_edited_cells_df()` — only rows and columns that were edited
+* `get_editlog_df()`
 
 These methods return Pandas dataframes.
 
@@ -45,15 +47,15 @@ These methods return Pandas dataframes.
 
 At row level:
 
-* `create_row` - create a new row; params: dictionary containing primary key(s) value(s) of the row to create, dictionary containing values for all other columns.
-* `update_row` - update any row; params: primary key(s) value(s) of the row to update, name of column to update, new value.
-* `delete_row` - deleted any row, params: primary key(s) value(s) of the row to delete.
+* `create_row(primary_keys, column_values)` - create a new row; params: dictionary containing primary key(s) value(s) of the row to create, dictionary containing values for all other columns.
+* `update_row(primary_keys, column, value)` - update any row; params: primary key(s) value(s) of the row to update, name of column to update, new value.
+* `delete_row(primary_keys)` - deleted any row, params: primary key(s) value(s) of the row to delete.
 
 Note on the attribution of edits in the editlog: when these methods are called in the context of an active HTTP request (e.g. in a Flask or Dash app), the identifier of the user logged into Dataiku (e.g. their email address) is retrieved from the request headers sent by their web browser. Otherwise, the identifier is set to "unknown".
 
 At dataset level:
 
-* `empty_editlog`: delete all rows of the editlog (use with caution)
+* `empty_editlog()`: delete all rows of the editlog (use with caution)
 
 ## Behind the scenes
 
