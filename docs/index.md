@@ -1,8 +1,6 @@
 # Plugin: Data Editing | Dataiku
 
-## Interfaces for human-in-the-loop analytics and AI
-
-Dataiku Visual Webapp and Python CRUD API to write manually-entered data back to the Flow.
+## Build apps that write manually-entered data back to the Flow
 
 <iframe src="https://www.loom.com/embed/7b79e45e755544f8baf1ff3ed1bf60ee" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
@@ -10,36 +8,26 @@ Dataiku Visual Webapp and Python CRUD API to write manually-entered data back to
 
 ## Use cases
 
-* **Entity Resolution** (aka record linkage): review and correct fuzzy matches between 2 or more datasets representing the same entities (e.g. customers, suppliers, products) but with differing IDs and names. [Demo project →](sample-project-company-resolution)
-* **AI Validation and Improvement**: continuously provide feedback on AI outputs in production, and ingest back into the AI's training data. [Demo project →](sample-project-ai-feedback-app)
-* **Forecast Override**: machine-made forecasts (e.g. sales) need to be adjusted by a human, to take into account contextual information that wasn't available to the machine, or to correct low-confidence predictions.
-* **Business rules exception handling**: fill in missing values or override values in the output of business rules.
-* **Data correctioning**.
+* Human-in-the-loop analytics and AI:
+  * **Entity Resolution** (aka record linkage): review and correct fuzzy matches between 2 or more datasets representing the same entities (e.g. customers, suppliers, products) but with differing IDs and names. [Demo project →](sample-project-company-resolution)
+  * **AI Validation and Improvement**: continuously provide feedback on AI outputs in production, and ingest back into the AI's training data. [Demo project →](sample-project-ai-feedback-app)
+  * **Forecast Override**: machine-made forecasts (e.g. sales) need to be adjusted by a human, to take into account contextual information that wasn't available to the machine, or to correct low-confidence predictions.
+  * **Automation Reviewing**: deal with exceptions by overriding values in the output of business rules, or filling in missing values.
+* **Data Quality Campaigns**: fix incorrect records and improve downstream analytics.
 
 ## Features
 
-* **Visual Webapp (no-code setup)** with a feature-rich data table:
-  * **Rich editing experience**:
-    * **Automatic input validation**: Formatting and editing adapts to the detected data types:
-      * numerical cells don’t allow characters
-      * boolean cells are edited via a checkbox
-      * date cells are edited via a date picker
-      * linked records restrict selection to entries in a linked dataset.
-    * **Airtable-like editing of linked records** (aka foreign keys) via dropdown, with the ability to **search and display lookup columns** in real time, from a linked dataset of any size.
-  * **Powerful data browsing**:
-    * **Filtering, sorting and grouping** in real time.
-    * Re-ordering, re-sizing and hiding columns, so you can focus on content that's import to you.
-    * Pagination of large datasets.
-  * **Automatic detection of changes** in the source dataset.
-* **Continuous update mechanisms**: seamless integration of new source data into the webapp and of new edits into production data pipelines.
-* **Dataset of edited rows**: this can serve as input to a recipe that writes back to a source system, or for the implementation of a feedback loop (e.g. stacking with an AI training dataset).
+* **No-code data editing webapp** with powerful data browsing (filtering, sorting, grouping in real-time) and rich editing experience (automatic input validation, linked records, lookup columns). [Learn more →](data-table-features)
+* **Continuous updates**: seamless integration of new edits into production data pipelines, and of new data into the webapp (changes are detected automatically and previous edits are applied to the new data).
+* **Dataset of edited rows**: use as input to a recipe that writes back to a source system, or for the implementation of a feedback loop (e.g. stacking with an AI training dataset).
 * **Governance**: built-in audit trail of all edits made by end-users.
-* **[API for row-level CRUD on intermediate datasets]((get-started-crud-python-api))** for coders building custom webapps. It is the same API that provides the Visual Webapp's data persistence layer.
+* **API to Create, Read, Update, Delete rows (CRUD)**, for coders building custom webapps.
 
-## How tos
+## How-tos
 
 * [Install](install-plugin) (Dataiku v9 and above)
-* [No-code] [Get started: Visual Webapp](get-started): Setup, overview of plugin components and key concepts
-* [Low-code] [Get started: CRUD Python API](get-started-crud-python-api): Overview of methods to read/write individual or multiple rows of data
+* Get started:
+  * [No-code] [Visual Webapp](get-started): Setup, overview of plugin components and key concepts
+  * [Low-code] [CRUD Python API](get-started-crud-python-api): Overview of methods to read/write individual or multiple rows of data
 * [Use edits in the Flow](using-edits): Where to find edits & How to leverage for analytics & AI
 * [Go further](going-further): Reset edits on a design node, Deploy to production (automation node), Implement feedback loops, FAQ
