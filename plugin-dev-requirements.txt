@@ -1,4 +1,0 @@
-dataiku-api-client
-ipykernel
-numpy < 1.24
-pandas
