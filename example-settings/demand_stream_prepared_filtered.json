@@ -1,7 +1,0 @@
-{
-    "primary_keys": ["shop", "part", "model", "line_number"],
-    "editable_column_names": ["ie_override_date", "delete_demand"],
-    "freeze_editable_columns": true,
-    "group_column_names": [],
-    "linked_records_count": 0
-}

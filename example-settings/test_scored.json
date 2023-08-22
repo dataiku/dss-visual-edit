@@ -1,7 +1,0 @@
-{
-    "primary_keys": ["email_text", "email_version", "user_country", "weekday", "hour_binned", "purchase_binned"],
-    "editable_column_names": ["prediction"],
-    "freeze_editable_columns": false,
-    "group_column_names": [],
-    "linked_records_count": 0
-}

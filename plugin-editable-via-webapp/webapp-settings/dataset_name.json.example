@@ -1,0 +1,16 @@
+{
+    "primary_keys": [
+        "Key Column 1",
+        "Key Column 2"
+    ],
+    "editable_column_names": [
+        "Editable Column 1",
+        "Editable Column 2",
+        "Editable Column 3"
+    ],
+    "freeze_editable_columns": false,
+    "group_column_names": [],
+    "linked_records_count": 0,
+    "authorized_users": [],
+    "editschema": []
+}

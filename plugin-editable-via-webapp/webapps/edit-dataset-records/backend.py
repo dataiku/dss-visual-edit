@@ -86,7 +86,7 @@ else:
     from json import load
 
     original_ds_name = getenv("ORIGINAL_DATASET")
-    params = load(open("../../../example-settings/" + original_ds_name + ".json"))
+    params = load(open("../../webapp-settings/" + original_ds_name + ".json"))
 
     editschema_manual = params.get("editschema")
     if not editschema_manual:
