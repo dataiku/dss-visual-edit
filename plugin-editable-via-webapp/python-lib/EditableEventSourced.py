@@ -26,9 +26,7 @@ from re import sub
 
 class EditableEventSourced:
     """
-    This class provides CRUD methods to make a dataset editable using the Event Sourcing pattern.
-
-    Edits are stored in a separate dataset called the editlog. The source dataset is never changed. Both the source dataset and the editlog are used to compute the edited state.
+    This class provides CRUD methods to make a dataset editable using the Event Sourcing pattern: edits are stored in a separate dataset called the editlog. The source dataset is never changed. Both the source dataset and the editlog are used to compute the edited state.
     """
 
     def __save_custom_fields__(self, dataset_name):
@@ -286,53 +284,97 @@ class EditableEventSourced:
         self.__setup_editlog__()
         self.__setup_editlog_downstream__()
 
-    def get_original_df(self):
-        """Get original data without edits"""
+    def get_original_df(self) -> DataFrame:
+        """
+        Returns the original data without any edits.
+
+        Returns:
+            pandas.DataFrame: The original data.
+        """
         return get_original_df(self.original_ds)
 
-    def get_editlog_df(self):
+    def get_editlog_df(self) -> DataFrame:
+        """
+        Returns the contents of the editlog.
+
+        Returns:
+            pandas.DataFrame: A DataFrame containing the editlog.
+        """
         return get_editlog_df(self.editlog_ds)
 
     def empty_editlog(self):
+        """
+        Writes an empty dataframe to the editlog dataset.
+        """
         self.editlog_ds.spec_item["appendMode"] = False
         write_empty_editlog(self.editlog_ds)
 
-    def get_edited_df_indexed(self):
+    def get_edited_df_indexed(self) -> DataFrame:
+        """
+        Returns the original dataframe with any edited values, indexed by the primary keys.
+
+        Returns:
+            pandas.DataFrame: A DataFrame with the original data and any edited values, indexed by the primary keys.
+        """
         return self.get_edited_df().set_index(self.primary_keys)
 
-    def get_edited_df(self):
-        """Get original data with edited values"""
+    def get_edited_df(self) -> DataFrame:
+        """
+        Returns the original dataframe with any edited values.
+
+        Returns:
+            pandas.DataFrame: A DataFrame with the original data and any edited values.
+        """
         return merge_edits_from_log_pivoted_df(
             self.original_ds, self.get_edited_cells_df()
         )
 
-    def get_edited_cells_df_indexed(self):
+    def get_edited_cells_df_indexed(self) -> DataFrame:
+        """
+        Returns a pandas DataFrame with the edited cells, indexed by the primary keys.
+
+        Returns:
+            pandas.DataFrame
+                A DataFrame containing only the edited rows and columns, indexed by the primary keys.
+        """
         return self.get_edited_cells_df().set_index(self.primary_keys)
 
     def get_edited_cells_df(self) -> DataFrame:
-        """Get only rows and columns that were edited"""
+        """
+        Returns a pandas DataFrame with the edited cells.
+
+        Returns:
+            pandas.DataFrame:
+                A DataFrame containing only the edited rows and columns.
+        """
         return pivot_editlog(
             self.editlog_ds, self.primary_keys, self.editable_column_names
         )
 
     def get_row(self, primary_keys):
         """
-        Read a row that was created, updated or deleted (as indicated by the editlog)
+        Retrieve a single row from the dataset that was created, updated or deleted.
 
-        Params:
-        - primary_keys: dictionary containing values for all primary keys defined in the initial data editing setup; the set of values must be unique. Example:
-            ```python
-            {
-                "key1": "cat",
-                "key2": "2022-12-21",
-            }
-            ```
+        Args:
+            primary_keys (dict): A dictionary containing values for all primary keys defined in the initial data editing setup. The set of values must be unique. Example:
+                {
+                    "key1": "cat",
+                    "key2": "2022-12-21",
+                }
 
-        Returns: single-row dataframe containing the values of editable columns.
+        Returns:
+            pandas.DataFrame:
+                A single-row dataframe containing the values of editable columns, indexed by the primary keys. Example:
+                ```
+                key1        key2        editable_column1    editable_column2
+                "cat"       2022-12-21  "hello"             42
+                ```
 
         Notes:
-        - If some rows of the dataset were created, then by definition all columns are editable (including primary keys) .
-        - If no row was created, editable columns are those defined in the initial data editing setup.
+            - The current implementation loads all edited rows in memory, then filters the rows that match the provided primary key values.
+            - This method does not read rows that were not edited, and it does not read columns which are not editable.
+                - If some rows of the dataset were created, then by definition all columns are editable (including primary keys).
+                - If no row was created, editable columns are those defined in the initial data editing setup.
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         # TODO: implementation can be optimized, so that we only load one row of the original dataset, and only load rows of the editlog that match the provided primary key values
@@ -373,7 +415,7 @@ class EditableEventSourced:
                 if "action" in [col["name"] for col in self.editlog_columns]:
                     edit_data.update({"action": [action]})
                 self.editlog_ds.write_dataframe(DataFrame(data=edit_data))
-                info = f"""Updated column {column} where {self.primary_keys} is {key}. New value: {value}."""
+                info = f"""Logging {action} action: column {column} set to value {value} where {self.primary_keys} is {key}."""
 
             else:
                 info = f"""{column} isn't an editable column"""
@@ -381,57 +423,58 @@ class EditableEventSourced:
         logging.info(info)
         return info
 
-    def create_row(self, primary_keys, column_values):
+    def create_row(self, primary_keys: dict, column_values: dict) -> str:
         """
-        Create a new row.
+        Creates a new row.
 
-        Params:
-        - primary_keys: dictionary containing values for all primary keys (the set of values must be unique). Example:
-            ```python
-            {
-                "id": "My new unique id"
-            }
-            ```
-        - column_values: dictionary containing values for all other columns. Example:
-            ```python
-            {
-                "col1": "hey",
-                "col2": 42,
-                "col3": true
-            }
-            ```
+        Args:
+            primary_keys (dict): A dictionary containing values for all primary keys. The set of values must be unique.
+                Example: {"id": "My new unique id"}
+            column_values (dict): A dictionary containing values for all other columns.
+                Example: {"col1": "hey", "col2": 42, "col3": True}
 
-        Note: this method doesn't implement data validation / it doesn't check that the values are allowed for the specified columns.
+        Returns:
+            str: A message indicating that the row was created.
+
+        Note:
+            This method does not implement data validation or check that the values are allowed for the specified columns.
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         for col in column_values.keys():
             self.__log_edit__(
                 key=key, column=col, value=column_values.get(col), action="create"
             )
-        return "Created row"
+        return "Row successfully created"
 
-    def update_row(self, primary_keys, column, value):
+    def update_row(self, primary_keys: dict, column: str, value: str) -> str:
         """
-        Update a row
+        Updates a row.
 
-        Params:
-        - primary_keys: dictionary containing primary key(s) value(s) that identify the row to update (see get_row method)
-        - column: name of the column to update
-        - value: value to set for the cell identified by key and column
-        ```
+        Args:
+            primary_keys (dict): A dictionary containing primary key(s) value(s) that identify the row to update.
+            column (str): The name of the column to update.
+            value (str): The value to set for the cell identified by key and column.
 
-        Note: this method doesn't implement data validation / it doesn't check that the value is allowed for the specified column.
+        Returns:
+            str: A message indicating that the row was edited.
+
+        Note:
+            This method doesn't implement data validation. It doesn't check that the value is allowed for the specified column.
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
-        return self.__log_edit__(key, column, value, action="update")
+        self.__log_edit__(key, column, value, action="update")
+        return "Row successfully updated"
 
-    def delete_row(self, primary_keys):
+    def delete_row(self, primary_keys: dict):
         """
-        Delete a row
+        Deletes a row identified by the given primary key(s).
 
-        Params:
-        - primary_keys: dictionary containing primary key(s) value(s) that identify the row to delete (see get_row method)
+        Args:
+            primary_keys (dict): A dictionary containing the primary key(s) value(s) that identify the row to delete.
+
+        Returns:
+            str: A message indicating that the row was deleted.
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         self.__log_edit__(key, None, None, action="delete")
-        return f"""Deleted row"""
+        return "Row successfully deleted"
