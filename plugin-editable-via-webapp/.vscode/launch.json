@@ -22,7 +22,7 @@
             "module": "flask",
             "env": {
                 "FLASK_APP": "backend.py",
-                "FLASK_ENV": "development",
+                "FLASK_DEBUG": "1",
                 "PYTHONPATH": "../../python-lib",
                 "DKU_CURRENT_PROJECT_KEY": "ENTITY_RESOLUTION",
                 "ORIGINAL_DATASET": "matches_to_be_reviewed"
