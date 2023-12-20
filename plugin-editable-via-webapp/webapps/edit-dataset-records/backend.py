@@ -457,8 +457,15 @@ def lookup_endpoint(linked_ds_name):
     )
     response = jsonify({})
 
+    term = term.strip().lower()
+    if term != "":
+        n_results = (
+            10  # show a limited number of options when a search term is provided
+        )
+    else:
+        n_results = 1000  # show more options if no search term is provided
+
     # Return data only when it's a linked dataset
-    n_results = 10
     for lr in ees.linked_records:
         if linked_ds_name == lr["ds_name"]:
             linked_ds_key = lr["ds_key"]
@@ -470,21 +477,20 @@ def lookup_endpoint(linked_ds_name):
                     linked_ds_name,
                     project_key,
                     linked_ds_label,
-                    term.strip().lower(),
+                    term,
                     n_results,
                 )
             else:
-                linked_df = lr["df"].set_index(linked_ds_key)
+                linked_df = lr["df"].set_index(
+                    linked_ds_key
+                )  # note: this is already capped to 1000 rows
                 if term == "":
-                    n_results = 100  # show more options if no search term is provided
-                    linked_df_filtered = linked_df.head(n_results).reset_index()
+                    linked_df_filtered = linked_df.reset_index()
                 else:
                     # Filter linked_df for rows whose label contains the search term
                     linked_df_filtered = (
                         linked_df[
-                            linked_df[linked_ds_label]
-                            .str.lower()
-                            .str.contains(term.strip().lower())
+                            linked_df[linked_ds_label].str.lower().str.contains(term)
                         ]
                         .head(n_results)
                         .reset_index()
