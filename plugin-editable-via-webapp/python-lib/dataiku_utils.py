@@ -69,3 +69,12 @@ def get_dataframe_filtered(ds_name, project_key, filter_column, filter_term, n_r
     }
     rows = get_rows(ds_name, project_key, params)
     return DataFrame(columns=rows[0], data=rows[1:]) if len(rows) > 0 else DataFrame()
+
+
+def get_connection_info(ds):
+    connection_name = ds.get_config().get("params").get("connection")
+    if connection_name:
+        connection_type = client.get_connection(connection_name).get_info().get_type()
+    else:
+        connection_type = ""
+    return connection_name, connection_type

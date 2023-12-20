@@ -3,8 +3,8 @@ from pandas import DataFrame
 
 client = api_client()
 
-class DatasetSQL:
 
+class DatasetSQL:
     def __init__(self, name, project_key):
         """Initialize a DatasetSQL object
 
@@ -15,9 +15,14 @@ class DatasetSQL:
         self.name = name
         self.project_key = project_key
         self.dataset = Dataset(name, project_key)
-        self.connection_name = self.dataset.get_config()['params']['connection']
+        self.connection_name = self.dataset.get_config()["params"]["connection"]
         self.executor = SQLExecutor2(connection=self.connection_name)
-        self.table_name = self.dataset.get_config()["params"]["table"].replace("${projectKey}", project_key).replace("${NODE}", get_custom_variables(project_key).get("NODE"))
+        self.table_name = self.dataset.get_config()["params"]["table"].replace(
+            "${projectKey}", project_key
+        )
+        node = get_custom_variables(project_key).get("NODE")
+        if node:
+            self.table_name = self.table_name.replace("${NODE}", node)
 
     def get_cell_value_executor(self, key_column_name, key_value, column_name):
         """
@@ -30,7 +35,7 @@ class DatasetSQL:
 
         Returns: cell value
         """
-        if key_value!="":
+        if key_value != "":
             select_query = f"""
                 SELECT "{column_name}"
                 FROM "{self.table_name}"
@@ -48,7 +53,7 @@ class DatasetSQL:
         """
         Get the value of a cell identified by a key value and a column name, using the sql_query method of the Dataiku client
         """
-        if key_value!="" and key_value!="null":
+        if key_value != "" and key_value != "null":
             select_query = f"""
                 SELECT "{column_name}"
                 FROM "{self.table_name}"
@@ -57,11 +62,12 @@ class DatasetSQL:
             streamed_query = client.sql_query(
                 query=select_query,
                 connection=self.connection_name,
-                project_key=self.project_key)
+                project_key=self.project_key,
+            )
             rows = []
             for row in streamed_query.iter_rows():
                 rows.append(row)
-            if len(rows)>0:
+            if len(rows) > 0:
                 return rows[0][0]
             else:
                 return "[Not found]"

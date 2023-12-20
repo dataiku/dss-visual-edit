@@ -2,7 +2,7 @@ import logging
 from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
-from dataiku_utils import recipe_already_exists
+from dataiku_utils import recipe_already_exists, get_connection_info
 from pandas import DataFrame
 from commons import (
     get_user_identifier,
@@ -85,9 +85,6 @@ class EditableEventSourced:
             logging.debug("Done.")
 
         self.editlog_columns = self.editlog_ds.get_config().get("schema").get("columns")
-
-        # make sure that editlog has the right custom field values
-        self.__save_custom_fields__(self.editlog_ds_name)
 
     def __setup_editlog_downstream__(self):
         editlog_pivoted_ds_creator = DSSManagedDatasetCreationHelper(
@@ -202,15 +199,7 @@ class EditableEventSourced:
                     linked_ds_name = linked_record["ds_name"]
                     linked_ds = Dataset(linked_ds_name, self.project_key)
                     # Get the connection type of the linked dataset
-                    connection_name = (
-                        linked_ds.get_config().get("params").get("connection")
-                    )
-                    if connection_name:
-                        connection_type = (
-                            client.get_connection(connection_name).get_info().get_type()
-                        )
-                    else:
-                        connection_type = ""
+                    connection_name, connection_type = get_connection_info(linked_ds)
                     # Get the number of records in the linked dataset
                     count_records = None
                     try:
@@ -279,9 +268,10 @@ class EditableEventSourced:
             self.schema_columns, self.primary_keys, self.editable_column_names
         )
 
-        # make sure that original dataset has up-to-date custom fields (editlog and datasets/recipes that follow may not - TODO: change this?)
+        # make sure that original dataset and editlog have up-to-date custom fields
         self.__save_custom_fields__(self.original_ds_name)
         self.__setup_editlog__()
+        self.__save_custom_fields__(self.editlog_ds_name)
         self.__setup_editlog_downstream__()
 
     def get_original_df(self) -> DataFrame:
