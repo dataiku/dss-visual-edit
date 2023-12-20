@@ -481,30 +481,20 @@ def lookup_endpoint(linked_ds_name):
                     n_results,
                 )
             else:
-                linked_df = lr["df"].set_index(
-                    linked_ds_key
-                )  # note: this is already capped to 1000 rows
+                linked_df = lr["df"]  # note: this is already capped to 1000 rows
                 if term == "":
-                    linked_df_filtered = linked_df.reset_index()
+                    linked_df_filtered = linked_df
                 else:
                     # Filter linked_df for rows whose label contains the search term
-                    linked_df_filtered = (
-                        linked_df[
-                            linked_df[linked_ds_label].str.lower().str.contains(term)
-                        ]
-                        .head(n_results)
-                        .reset_index()
-                    )
-                logging.debug(f"Found {linked_df_filtered.size} entries")
-                response = linked_df_filtered.to_json(orient="index")
+                    linked_df_filtered = linked_df[
+                        linked_df[linked_ds_label].str.lower().str.contains(term)
+                    ].head(n_results)
 
         logging.debug(f"Found {linked_df_filtered.size} entries")
         editor_values_param = get_values_from_df(
             linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns
         )
         response = jsonify(editor_values_param)
-    else:
-        logging.info(f"""Dataset {linked_ds_name} is not a linked dataset!""")
 
     return response
 
