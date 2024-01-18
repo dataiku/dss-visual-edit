@@ -1,6 +1,6 @@
 # Plugin: Data Editing | Dataiku
 
-## Build apps that write manually-entered data back to the Flow
+## Build apps to edit data and write it back to the Flow
 
 <iframe src="https://www.loom.com/embed/7b79e45e755544f8baf1ff3ed1bf60ee" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
@@ -17,10 +17,14 @@
 
 ## Features
 
-* **No-code data editing webapp** with powerful data browsing (filtering, sorting, grouping in real-time) and rich editing experience (automatic input validation, linked records, lookup columns). [Learn more →](data-table-features)
-* **Continuous updates**: seamless integration of new edits into production data pipelines, and of new data into the webapp (changes are detected automatically and previous edits are applied to the new data).
+* **No-code webapp**:
+  * Powerful data browsing (filtering, sorting, grouping in real-time)
+  * Rich editing experience (automatic input validation, linked records, lookup columns)
+  * [Learn more →](data-table-features)
 * **Dataset of edited rows**: use as input to a recipe that writes back to a source system, or for the implementation of a feedback loop (e.g. stacking with an AI training dataset).
 * **Governance**: built-in audit trail of all edits made by end-users.
+* **Reviewing**: when marking a row of generated data as reviewed, generated values are automatically persisted (even if they weren't edited).
+* **Continuous updates**: seamless integration of new edits into production data pipelines, and of new data into the webapp (changes are detected automatically and previous edits are applied to the new data).
 * **API to Create, Read, Update, Delete rows (CRUD)**, for coders building custom webapps.
 
 ## How-tos

@@ -7,7 +7,7 @@
 How to replicate:
 
 * [Install the Data Editing plugin](install-plugin).
-* [Download project bundle](dss-bundle-ML_FEEDBACK_LOOP.zip) and import on your instance. Note: the project uses the managed Amazon S3 data connection provided on Dataiku Online — you may have to remap to one of your own data connections.
+* [Download project bundle](dss-bundle-ML_FEEDBACK_LOOP.zip) and import on your instance. Note: the project uses the FileSystem data connection but it can be modified to use one of your own data connections.
 * Build dataset `test_scored` (recursive build).
 * Go to Webapps and start "Editing predictions".
 * Go to Dashboards and to "Review":
