@@ -53,12 +53,38 @@ def __unpack_keys__(df, new_key_names, old_key_name="key"):
     return df
 
 
+def get_dataframe(mydataset):
+    # Get the dataframe from the dataset, with the right column types
+    #
+    # Note: mydataset.get_dataframe(infer_with_pandas=False, bool_as_str=True) fails when there are missing values in integer columns.
+
+    # Get the right column types: this would be given by the dataset's schema, except when dealing with integers where we want to enforce the use of Pandas' Int64 type (see https://pandas.pydata.org/pandas-docs/stable/user_guide/integer_na.html).
+    myschema = mydataset.read_schema()
+    [names, dtypes, parse_date_columns] = dataiku.Dataset.get_dataframe_schema_st(
+        myschema, bool_as_str=True, int_as_float=False
+    )
+    for col in myschema:
+        n = col["name"]
+        t = col["type"]
+        if t in ["tinyint", "smallint", "int", "bigint"]:
+            dtypes[n] = "Int64"
+
+    # Get the dataframe, using iter_dataframes_forced_types to which we can pass our column types. This code was inspired from the example at https://developer.dataiku.com/latest/api-reference/python/datasets.html#dataiku.Dataset.iter_dataframes_forced_types
+    mydataset_df = DataFrame({})
+    chunksize = 1000
+    for df in mydataset.iter_dataframes_forced_types(
+        names, dtypes, parse_date_columns, chunksize=chunksize
+    ):
+        mydataset_df = concat([mydataset_df, df])
+    return mydataset_df
+
+
 # Used by pivot_editlog method below, and by EES when checking for status of editlog
 
 
 def get_editlog_df(editlog_ds):
     # the schema was specified upon creation of the dataset, so let's use it
-    return editlog_ds.get_dataframe(infer_with_pandas=False, bool_as_str=True)
+    return get_dataframe(editlog_ds)
 
 
 # Used by Pivot recipe and by EES for getting edited cells
@@ -135,18 +161,7 @@ def get_display_column_names(schema, primary_keys, editable_column_names):
 
 # Used by EES and by merge_edits_from_log_pivoted_df method below
 def get_original_df(original_ds):
-    try:
-        # the dataset schema is likely to have been reviewed by the end-user, so let's use it!
-        original_df = original_ds.get_dataframe(
-            infer_with_pandas=False, bool_as_str=True
-        )
-    except:
-        logging.warning(
-            """Couldn't use the original dataset's schema when loading its contents as a dataframe. Letting Pandas infer the schema.
-        
-        This is likely due to a column with missing values and 'int' storage type; this can be fixed by changing its storage type to 'string'."""
-        )
-        original_df = original_ds.get_dataframe()
+    original_df = get_dataframe(original_ds)
 
     original_ds_config = original_ds.get_config()
     primary_keys = original_ds_config["customFields"]["primary_keys"]
