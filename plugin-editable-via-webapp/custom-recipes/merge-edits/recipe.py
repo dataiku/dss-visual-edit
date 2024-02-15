@@ -3,6 +3,7 @@
 
 import dataiku
 from dataiku.customrecipe import get_input_names_for_role, get_output_names_for_role
+from pandas import DataFrame
 
 # when using interactive execution:
 # import sys
@@ -17,7 +18,8 @@ from commons import merge_edits_from_log_pivoted_df
 original_names = get_input_names_for_role("original")
 original_datasets = [dataiku.Dataset(name) for name in original_names]
 original_ds = original_datasets[0]
-myschema = original_ds.read_schema()
+original_schema = original_ds.read_schema()
+original_schema_df = DataFrame(original_schema).set_index("name")
 
 pivoted_names = get_input_names_for_role("editlog_pivoted")
 pivoted_datasets = [dataiku.Dataset(name) for name in pivoted_names]
@@ -48,3 +50,8 @@ edited_df = merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df)
 edited_ds.write_with_schema(
     edited_df, drop_and_create=True
 )  # the dataframe's types were set explicitly, so let's use them to write this dataset's schema
+edited_schema = edited_ds.read_schema()
+# for each item of edited_schema, make sure its type is the same as the one given by original_schema
+for item in edited_schema:
+    item["type"] = original_schema_df.loc[item["name"]]["type"]
+edited_ds.write_schema(edited_schema)
