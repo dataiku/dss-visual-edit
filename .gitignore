@@ -17,3 +17,4 @@ react-tabulator/lib
 .vscode/launch.json
 plugin-editable-via-webapp/webapps/edit-dataset-records/assets/dashExtensions_default.js
 plugin-editable-via-webapp/webapp-settings/*.json
+plugin-editable-via-webapp/venv/
