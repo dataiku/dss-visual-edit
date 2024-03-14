@@ -7,7 +7,7 @@ from pandas import DataFrame
 from commons import (
     get_user_identifier,
     get_original_df,
-    get_editlog_df,
+    get_dataframe,
     write_empty_editlog,
     get_display_column_names,
     merge_edits_from_log_pivoted_df,
@@ -60,7 +60,7 @@ class EditableEventSourced:
         if editlog_ds_creator.already_exists():
             logging.debug("Found editlog")
             self.editlog_ds = Dataset(self.editlog_ds_name, self.project_key)
-            editlog_df = self.get_editlog_df()
+            editlog_df = get_dataframe(self.editlog_ds)
             if editlog_df.empty:
                 # Make sure that the dataset's configuration is valid by writing an empty dataframe.
                 # (The editlog dataset might already exist and have a schema, but its configuration might be invalid, for instance when the project was exported to a bundle and deployed to automation, and when using a SQL connection: the dataset exists but no table was created.)
@@ -282,15 +282,6 @@ class EditableEventSourced:
             pandas.DataFrame: The original data.
         """
         return get_original_df(self.original_ds)
-
-    def get_editlog_df(self) -> DataFrame:
-        """
-        Returns the contents of the editlog.
-
-        Returns:
-            pandas.DataFrame: A DataFrame containing the editlog.
-        """
-        return get_editlog_df(self.editlog_ds)
 
     def empty_editlog(self):
         """
