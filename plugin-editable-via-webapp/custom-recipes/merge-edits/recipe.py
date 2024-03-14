@@ -9,7 +9,7 @@ from pandas import DataFrame
 # import sys
 # sys.path.append('../../python-lib')
 
-from commons import merge_edits_from_log_pivoted_df
+from commons import merge_edits_from_log_pivoted_df, get_dataframe
 
 
 # %% Get recipe parameters
@@ -33,9 +33,7 @@ edited_ds = edited_datasets[0]
 # %% Read input data
 ###
 
-editlog_pivoted_df = (
-    pivoted_ds.get_dataframe()
-)  # this dataframe was written by the pivot-editlog recipe which inferred the schema upon writing, so we stay with the default infer_with_pandas=True
+editlog_pivoted_df = get_dataframe(pivoted_ds) # this dataframe was written by the pivot-editlog recipe which inferred the schema upon writing: let's use this schema when reading this dataset
 
 
 # %% Compute output data

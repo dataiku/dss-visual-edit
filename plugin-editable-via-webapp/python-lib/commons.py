@@ -54,9 +54,9 @@ def __unpack_keys__(df, new_key_names, old_key_name="key"):
 
 
 def get_dataframe(mydataset):
-    # Get the dataframe from the dataset, with the right column types
+    # Get the dataframe from the dataset, using data types as given by its schema, Int64 for integer columns, and str for boolean columns
     #
-    # Note: mydataset.get_dataframe(infer_with_pandas=False, bool_as_str=True) fails when there are missing values in integer columns.
+    # Note: an alternative would be to use mydataset.get_dataframe(infer_with_pandas=False, bool_as_str=True), but this fails when there are missing values in integer columns.
 
     # Get the right column types: this would be given by the dataset's schema, except when dealing with integers where we want to enforce the use of Pandas' Int64 type (see https://pandas.pydata.org/pandas-docs/stable/user_guide/integer_na.html).
     myschema = mydataset.read_schema()
@@ -79,14 +79,6 @@ def get_dataframe(mydataset):
     return mydataset_df
 
 
-# Used by pivot_editlog method below, and by EES when checking for status of editlog
-
-
-def get_editlog_df(editlog_ds):
-    # the schema was specified upon creation of the dataset, so let's use it
-    return get_dataframe(editlog_ds)
-
-
 # Used by Pivot recipe and by EES for getting edited cells
 
 
@@ -101,7 +93,7 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
     )
     all_columns_df = DataFrame(columns=cols)
 
-    editlog_df = get_editlog_df(editlog_ds)
+    editlog_df = get_dataframe(editlog_ds)
     if not editlog_df.size:  # i.e. if empty editlog
         editlog_pivoted_df = all_columns_df
     else:

@@ -35,4 +35,4 @@ editlog_pivoted_df = pivot_editlog(editlog_ds, primary_keys, editable_column_nam
 #%% Write output data
 ###
 
-editlog_pivoted_ds.write_dataframe(editlog_pivoted_df, infer_schema=True, dropAndCreate=True) # the schema could be different from that of the original dataset
+editlog_pivoted_ds.write_dataframe(editlog_pivoted_df, infer_schema=True, dropAndCreate=True) # the schema is inferred upon writing and might be different from that of the original dataset: this will be reconciled by the merge recipe/method
