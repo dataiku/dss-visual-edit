@@ -12,7 +12,9 @@ Let's take a quick tour of how to use this. If you haven't, [install the plugin]
 import dataiku
 dataiku.use_plugin_libs("editable-via-webapp")
 EditableEventSourced = dataiku.import_from_plugin("editable-via-webapp", "EditableEventSourced")
+```
 
+```python
 ees = EditableEventSourced.EditableEventSourced(
     original_ds_name="my_dataset",
     primary_keys=["id"],
@@ -20,7 +22,7 @@ ees = EditableEventSourced.EditableEventSourced(
 )
 ```
 
-`editable_column_names` can contain names of columns found in the original dataset, and names of new columns as well.
+`editable_column_names` can contain names of columns found in the original dataset, and names of new columns that don't exist yet.
 
 ## Perform CRUD operations
 
@@ -56,6 +58,103 @@ Note on the attribution of edits in the editlog: when these methods are called i
 At dataset level:
 
 * `empty_editlog()`: delete all rows of the editlog (use with caution)
+
+## Example usage in Dash
+
+### Simple example
+
+This example is based on the tshirt orders dataset from the [Basics 101 course](https://academy.dataiku.com/basics-101).
+
+Import `EditableEventSourced` as shown previously, then use it in the Dash app code:
+
+```python
+from dash import html, Input, Output
+
+# Define the data and columns to use in the data table component
+###
+
+ORIGINAL_DATASET = "orders"
+PRIMARY_KEYS = ["order_id"]
+EDITABLE_COLUMN_NAMES = ["tshirt_price", "tshirt_quantity"]
+
+ees = EditableEventSourced.EditableEventSourced(
+    original_ds_name=ORIGINAL_DATASET,
+    primary_keys=PRIMARY_KEYS,
+    editable_column_names=EDITABLE_COLUMN_NAMES,
+)
+
+tabulator_utils = dataiku.import_from_plugin("editable-via-webapp", "tabulator_utils")
+columns = tabulator_utils.get_columns_tabulator(ees)
+
+# Define Dash layout and callbacks
+###
+
+dash_tabulator = dataiku.import_from_plugin("editable-via-webapp", "dash_tabulator")
+
+def serve_layout():
+    return html.Div([
+        dash_tabulator.DashTabulator(
+            id="quickstart-datatable",
+            datasetName=ORIGINAL_DATASET,
+            data=ees.get_edited_df().to_dict("records"),
+            columns=columns
+        ),
+        html.Div(id="quickstart-output")
+    ])
+
+app.layout = serve_layout
+
+@app.callback(
+    Output("quickstart-output", "children"),
+    Input("quickstart-datatable", "cellEdited"),
+    prevent_initial_call=True,
+)
+def log_edit(cell):
+    """
+    Record edit in editlog, once a cell has been edited
+
+    cell is a dict with the following properties: row, field, value
+    """
+    return ees.update_row(cell["row"], cell["field"], cell["value"])
+```
+
+### Example with advanced Tabulator features
+
+In this example we define a calculated column using the Tabulator `mutator` feature and a JavaScript function that implements the calculation to perform (here: adding 2 to the values of the `tshirt_quantity` column).
+
+We also demonstrate usage of Tabulator's `headerFilter` and `sorter` features.
+
+In the above code example, replace the definition of `columns` with the following:
+
+```python
+from dash_extensions import javascript
+
+columns = [
+    {"field": "order_id", "headerFilter": True},
+    {"field": "pages_visited", "sorter": "number"},
+    {"field": "customer_id", "headerFilter": True},
+    {"field": "tshirt_category", "headerFilter": True},
+    {"field": "tshirt_price", "sorter": "number", "editor": "number"},
+    {
+        "field": "tshirt_quantity",
+        "sorter": "number",
+        "editor": "number",
+        "mutateLink": "calculated",
+    },
+    {"field": "comments", "editor": "input"},
+    {
+        "field": "calculated",
+        "title": "calculated",
+        "mutator": javascript.assign(
+            """
+function(value, data){
+return parseInt(data.tshirt_quantity) + 2;
+}
+"""
+        ),
+    },
+]
+```
 
 ## Behind the scenes
 
