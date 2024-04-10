@@ -27,11 +27,4 @@
 * **Continuous updates**: seamless integration of new edits into production data pipelines, and of new data into the webapp (changes are detected automatically and previous edits are applied to the new data).
 * **API to Create, Read, Update, Delete rows (CRUD)**, for coders building custom webapps.
 
-## How-tos
-
-* [Install](install-plugin) (Dataiku v9 and above)
-* Get started:
-  * [No-code] [Visual Webapp](get-started): Setup, overview of plugin components and key concepts
-  * [Low-code] [CRUD Python API](get-started-crud-python-api): Overview of methods to read/write individual or multiple rows of data
-* [Use edits in the Flow](using-edits): Where to find edits & How to leverage for analytics & AI
-* [Go further](going-further): Reset edits on a design node, Deploy to production (automation node), Implement feedback loops, FAQ
+## [Get started](get-started)

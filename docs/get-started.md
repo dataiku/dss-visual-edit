@@ -1,43 +1,121 @@
 # Getting started: Visual Webapp | Plugin: Data Editing | Dataiku
 
-If you haven't, [install the plugin](install-plugin) first.
+## Use case description
 
-## Creating a Data Editing webapp
+There are two main types of use cases for the plugin's Visual Webapp:
 
-* Once you've identified the dataset to edit via a webapp, please review its schema as a first step.
-  * The webapp uses column meanings to show data (or let you edit it) in the best way. If the meaning wasn't defined explicitly, the webapp uses the storage type instead.
-  * If a column has missing values, make sure to use an appropriate storage type (e.g. use "string" and not "integer", even if the meaning is Integer). This also applies to editable columns that don't have missing values, because the user could set values to empty.
+* Making corrections on "source" data (meaning data that's not machine-generated)
+* Providing feedback on machine-generated data
+
+In this guide, we focus on the former. The latter is slightly more complex and will be covered in a separate guide.
+
+Here, we want business users (aka end-users) to edit data, and we want to use the edited data for better downstream analytics and reporting. Instead of doing this in Excel, we want end-users to access a web interface. Therefore we need a front-end for them to see and enter data, and we need to "connect" the data entered via the web front-end with the analytics pipeline. This guide is structured as follows:
+
+* Preliminary steps
+* Create a Data Editing webapp
+* Start the webapp
+* Test the webapp
+* Use edits in the Flow
+
+## Preliminary steps
+
+* [Install the plugin](install-plugin), if not already available.
+* Create a new project and add a dataset (via an existing Connection, or file upload). You could also apply the following to an existing project and dataset, which may appear as an input dataset or as the result of an existing recipe.
+* Review the dataset schema. The plugin's Visual Webapp uses column meanings to show data and enable editing in the most appropriate way (e.g. using checkboxes for boolean columns). If the meaning wasn't defined explicitly, the webapp will consider the storage type instead.
+
+## Create a Data Editing webapp
+
 * Go to Webapps, create New Visual Webapp, pick Data Editing (this component is provided by the plugin).
   * ![](new_visual_webapp.png)
   * ![](new_visual_webapp_2.png)
-* The webapp settings interface has several sections...
-  * Under "Data" you can choose a dataset, list primary keys and editable columns (note that a column can't be both). ![](data_editing_webapp_params_1.png) ![](data_editing_webapp_params_2.png)
-  * The "Linked Records" section allows to specify editable columns whose values correspond to primary key values of another dataset, called the "Linked Dataset". One of these two requirements must be met: 1) the Linked Dataset must have less than 1,000 records; OR 2) the Linked Dataset must be on a SQL connection.
-  * In the "Layout" section you can choose to freeze editable columns to the right-hand side (which is useful when there are many columns), and to group rows by one or more columns.
-  * Additional settings can be provided via the ["editschema" in JSON](editschema).
-* You can now start the webapp backend. Behind the scenes, webapp settings such as primary keys and editable columns will be copied into the corresponding _Data Editing_ fields of the chosen dataset (custom fields provided by the plugin).
-* Here is an example of what a data editing webapp would look like:
+* Settings:
+  * _Data_:
+    * Select a dataset, list primary keys and editable columns (note that a column can't be both). ![](data_editing_webapp_params_1.png) ![](data_editing_webapp_params_2.png)
+    * Double check the selection of primary keys and editable columns: ground-truth values of editable columns should be fixed for a given (set of) primary key(s) value(s).
+  * _Linked Records_: for columns where the editor should be a dropdown widget — see dedicated page [here](linked-records).
+  * _Layout_: here you can choose to freeze editable columns to the right-hand side (which is useful when there are many columns), and to group rows by one or more columns.
+  * Advanced settings can be provided via the ["editschema" in JSON](editschema).
+
+## Start the webapp
+
+Here is an example of what a data editing webapp would look like:
 
 ![](webapp.png)
 
-## Using the webapp
+A few things happen behind the scenes upon starting the webapp:
 
-Edits made via the webapp instantly add rows to the _editlog_.
+* Settings such as primary keys and editable columns are copied into the corresponding _Data Editing_ fields of the chosen dataset (custom fields provided by the plugin).
+* 3 datasets are created (if they don't already exist):
 
-What you see in the webapp is the **original dataset with overrides** coming from the editlog.
+![](new_datasets.png)
 
-Data table features:
+Their names start with the original dataset's name. Let's review them by their suffix:
 
-* Each column can be resized, filtered, and used to sort data.
-* Right-clicking on the column name will show a menu with an option to hide the column, and an option to group rows according to the column's values.
-* Filtering:
-  * The default filter is a textual one.
-  * In the case of a display-only boolean column, the filter is a tristate checkbox (or a simple checkbox if you specified the column type to be "boolean_tick" via the advanced settings' [editschema](editschema)).
-  * Editable boolean columns have a textual filter that you can use by typing "true" or "false".
-* All of this can be reset by clicking on the "Reset View" button in the bottom-left corner.
-* Linked records are edited via dropdowns which include the ability to search through all options: when there are many of them, only options that start with the search term are presented.
-* Changes in the source dataset are automatically detected and signaled. The user needs to refresh the webpage in order to see them.
+ 1. **_editlog_** is the raw record of all edit events captured by the webapp. The schema of this dataset is fixed, whatever the original dataset. Here is an example: ![](editlog.png)
+ 2. **_editlog\_pivoted_** is the output of the _pivot-editlog_ recipe (provided by the plugin) and the user-friendly view of edits. In the previous example: ![](editlog_pivoted.png)
+    * Its schema is a subset of the original dataset's: it doesn't have columns that are display-only, but it has the same key columns and the same editable columns, plus a _last\_edit\_date_ column.
+    * Its rows are a subset of the original dataset's: it doesn't contain rows where no edits were made.
+    * You can think of it as...
+      * A "diff" between edited and original data.
+      * A dataset of overrides to apply to the original dataset.
+      * The result of "replaying" edit events stored in the log: we only see the last edited values.
+ 3. **_edited_** is the output of the _merge-edits_ recipe (provided by the plugin) that feeds from the original dataset and the _editlog\_pivoted_.
+    * It corresponds to the edited data that you are seeing via the webapp.
+    * However, it is not in sync with the webapp: it's up to you to decide when to build it in the Flow.
+    * It contains the same number of rows as in the original dataset. For any given cell identified by its column and primary key values, if a non-empty value is found in _editlog\_pivoted_, this value is used instead of the original one.
+    * Note that, as a result of the above, it is impossible to empty a non-empty cell with the plugin’s Visual Webapp and recipes. This is because empty values in _editlog\_pivoted_ are ignored.
+
+The datasets are created on the same connection as the original dataset. For edits to be recorded by the webapp, this has to be a write connection. If that's not the case, you can change the connection of these datasets as soon as they've been added to the Flow.
+
+## Test the webapp on your own
+
+You may want to test the webapp with a few edits, then check the _editlog_ dataset to see the recorded changes. See all end-user features of the webapp's data table [here](data-table-features).
+
+### Resetting edits
+
+Only use this on a design node, if needed for your tests.
+
+Create and run a _reset edits_ scenario with an "Initialize editlog" Step. This type of scenario step is provided by the plugin and can be found toward the end of the list of available steps.
+
+![](scenario_initialize_editlog.png)
+
+### Behind the scenes
+
+When opening the webapp in your browser, the same code as in the recipes is executed, from the original dataset and the editlog, in order to present an edited view of the data.
+
+Edits made via the webapp instantly add rows to the _editlog_. The _editlog\_pivoted_ and _edited_ datasets are updated only when you run the corresponding recipes.
+
+## Use edits in the Flow
+
+You may want to leverage the _editlog\_pivoted_ dataset to write corrections back to the IT system that holds source data.
+
+In most use cases, however, you would first use the _edited_ dataset as input to recipes, for analytics and reporting purposes. Here are a few tips when doing that:
+
+* Edits would not be instantly reflected in your reporting, as the _edited_ dataset is not updated in real-time. You decide when you want this to happen.
+* We recommend creating a _commit edits_ scenario that builds all that is downstream of the _editlog_ and updates the reporting based on edited data. Its execution can be scheduled, or it can be triggered manually. If you have a _reset edits_ scenario, add a step at the end to also run the _commit edits_ scenario.
+* If you want to allow end-users to trigger this scenario on their own, you can embed the data editing webapp in a Dashboard to which you will add a Scenario tile (more on this in the next section).
+* Reporting is materialized by a dashboard built from the edited dataset or other datasets downstream. This dashboard would be accessed by business users via the web, or it would be scheduled to be converted to a pdf and sent by email via a dedicated scenario. We recommend creating an _update source_ scenario to take into account any changes or additional data from source systems, re-build the dataset used by the webapp, and re-run the _commit edits_ scenario.
+
+## Test the webapp with a business user
+
+The best way to make the webapp accessible to end-users is by publishing it to a Dashboard. For this, from the webapp view, click on the Actions button of the menu at the top, on the right-hand side). You may have already created a Dashboard in your project for reporting purposes; in this case, add the webapp to a new slide of the dashboard.
+
+![](publish_dashboard.png)
+
+You can then add other "tiles" to your Dashboard, such as a Text tile with instructions on how to use the webapp, or a Scenario tile, and adjust the layout.
+
+![](dashboard_edit.png)
+
+The Scenario tile is displayed as a button to run a chosen scenario (typically the _commit edits_ scenario discussed above).
 
 ## Next
 
-* [Using edits in the Flow](using-edits): Where to find edits & How to leverage for analytics & AI
+Once all the tests are successful, the next step is to [deploy your project](deploy) on an automation node, or as a duplicate project on your design node.
+
+Because we're creating a webapp where users can enter data and this gets processed, we'll need to have two instances of the project leveraging the plugin: one on a design node, one on an automation node (each with its own set of edits).
+
+If you want to learn more about the plugin, you can check out the following:
+
+* [FAQ](faq)
+* [Sample project: Company Resolution](sample-project-company-resolution)
+* [Sample project: AI Feedback App](sample-project-ai-feedback-app)

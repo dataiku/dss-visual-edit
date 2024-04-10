@@ -4,7 +4,7 @@
 
 As an alternative to using the Data Editing Visual Webapp, you can build a custom webapp that uses the CRUD (Create, Read, Update, Delete) methods provided by the `EditableEventSourced` Python class.
 
-Let's take a quick tour of how to use this. If you haven't, [install the plugin](install-plugin) first.
+Let's take a quick tour of how to use this. We strongly recommend following the [Visual Webapp guide](get-started) first, to get an initial understanding of the plugin's features and concepts.
 
 ## Instantiate the `EditableEventSourced` class
 
@@ -163,7 +163,3 @@ The implementation of these methods is based on the [Event Sourcing pattern](htt
 When the `EditableEventSourced` class is instantiated on a given dataset, it creates an "editlog" dataset and 2 recipes that create an "editlog pivoted" and an "edited" dataset (if they don't already exist). Those datasets are created on the same connection as the original dataset.
 
 Edits made via CRUD methods instantly add rows to the editlog. The editlog pivoted and the edited datasets are only updated when the recipes that build them are run.
-
-## Next
-
-* [Using edits in the Flow](using-edits): Where to find edits and how to leverage them for analytics
