@@ -20,7 +20,7 @@ Here, we want business users (aka end-users) to edit data based on their domain 
 ## Preliminary steps
 
 * [Install the plugin](install-plugin), if not already available.
-* Create a new project and add a dataset (via an existing Connection, or file upload). You could also apply the following to an existing project and dataset, which may appear as an input dataset or as the result of an existing recipe.
+* Create a new project and add a dataset (via an existing Connection, or file upload). The screen captures shown in this guide were taken on a new project where we uploaded the [orders CSV file](https://downloads.dataiku.com/public/website-additional-assets/data/orders.csv) found in the Basics 101 course of the Dataiku Academy. You could also apply the following to an existing project and dataset, which may appear as an input dataset or as the result of an existing recipe.
 * Review the dataset schema. The plugin's Visual Webapp uses column meanings to show data and enable editing in the most appropriate way (e.g. using checkboxes for boolean columns). If the meaning wasn't defined explicitly, the webapp will consider the storage type instead.
 
 ## Create a Data Editing webapp
@@ -112,11 +112,11 @@ The Scenario tile is displayed as a button to run a chosen scenario (typically t
 
 ## Next
 
-Once all the tests are successful, the next step is to [deploy your project](deploy) on an automation node, or as a duplicate project on your design node.
+Because we're building a project with an interface where users can enter data and this gets processed, we'll need to have two instances of the project leveraging the plugin: one for development, one for production; each will have its own set of edits.
 
-Because we're creating a webapp where users can enter data and this gets processed, we'll need to have two instances of the project leveraging the plugin: one on a design node, one on an automation node (each with its own set of edits).
+Once all your tests are successful, the next step is to [deploy your project](deploy) on an automation node, or as a duplicate project on your design node.
 
-If you want to learn more about the plugin, you can check out the following:
+If you want to learn more about the plugin, you can also check out the following:
 
 * [FAQ](faq)
 * [Sample project: Company Resolution](sample-project-company-resolution)
