@@ -1,4 +1,4 @@
-# Getting started: Visual Webapp | Plugin: Data Editing | Dataiku
+# Getting started | Plugin: Data Editing | Dataiku
 
 ## Use case description
 
@@ -9,7 +9,7 @@ There are two main types of use cases for the plugin's Visual Webapp:
 
 In this guide, we focus on the former. The latter is slightly more complex and will be covered in a separate guide.
 
-Here, we want business users (aka end-users) to edit data, and we want to use the edited data for better downstream analytics and reporting. Instead of doing this in Excel, we want end-users to access a web interface. Therefore we need a front-end for them to see and enter data, and we need to "connect" the data entered via the web front-end with the analytics pipeline. This guide is structured as follows:
+Here, we want business users (aka end-users) to edit data based on their domain expertise, and we want to use the edited data for better downstream analytics and reporting. Instead of doing this in Excel, we want end-users to access a web interface. Therefore we need a front-end for them to see and enter data, and we need to "connect" the data entered via the web front-end with the analytics pipeline. This guide is structured as follows:
 
 * Preliminary steps
 * Create a Data Editing webapp
@@ -30,7 +30,7 @@ Here, we want business users (aka end-users) to edit data, and we want to use th
   * ![](new_visual_webapp_2.png)
 * Settings:
   * _Data_:
-    * Select a dataset, list primary keys and editable columns (note that a column can't be both). ![](data_editing_webapp_params_1.png) ![](data_editing_webapp_params_2.png)
+    * Select a dataset, list primary keys and editable columns (note that a column can't be both). ![](data_editing_webapp_params_orders.png)
     * Double check the selection of primary keys and editable columns: ground-truth values of editable columns should be fixed for a given (set of) primary key(s) value(s).
   * _Linked Records_: for columns where the editor should be a dropdown widget — see dedicated page [here](linked-records).
   * _Layout_: here you can choose to freeze editable columns to the right-hand side (which is useful when there are many columns), and to group rows by one or more columns.
@@ -40,7 +40,7 @@ Here, we want business users (aka end-users) to edit data, and we want to use th
 
 Here is an example of what a data editing webapp would look like:
 
-![](webapp.png)
+![](webapp_orders.png)
 
 A few things happen behind the scenes upon starting the webapp:
 
@@ -71,7 +71,7 @@ The datasets are created on the same connection as the original dataset. For edi
 
 You may want to test the webapp with a few edits, then check the _editlog_ dataset to see the recorded changes. See all end-user features of the webapp's data table [here](data-table-features).
 
-### Resetting edits
+### How to reset edits
 
 Only use this on a design node, if needed for your tests.
 
@@ -92,15 +92,17 @@ You may want to leverage the _editlog\_pivoted_ dataset to write corrections bac
 In most use cases, however, you would first use the _edited_ dataset as input to recipes, for analytics and reporting purposes. Here are a few tips when doing that:
 
 * Edits would not be instantly reflected in your reporting, as the _edited_ dataset is not updated in real-time. You decide when you want this to happen.
-* We recommend creating a _commit edits_ scenario that builds all that is downstream of the _editlog_ and updates the reporting based on edited data. Its execution can be scheduled, or it can be triggered manually. If you have a _reset edits_ scenario, add a step at the end to also run the _commit edits_ scenario.
+* We recommend creating a **_commit edits_** scenario that builds all that is downstream of the _editlog_ and updates the reporting based on edited data. Its execution can be scheduled, or it can be triggered manually. If you have a _reset edits_ scenario, add a step at the end to also run the _commit edits_ scenario.
 * If you want to allow end-users to trigger this scenario on their own, you can embed the data editing webapp in a Dashboard to which you will add a Scenario tile (more on this in the next section).
-* Reporting is materialized by a dashboard built from the edited dataset or other datasets downstream. This dashboard would be accessed by business users via the web, or it would be scheduled to be converted to a pdf and sent by email via a dedicated scenario. We recommend creating an _update source_ scenario to take into account any changes or additional data from source systems, re-build the dataset used by the webapp, and re-run the _commit edits_ scenario.
+* Reporting is materialized by a dashboard built from the edited dataset or other datasets downstream. This dashboard would be accessed by business users via the web, or it would be scheduled to be converted to a pdf and sent by email via a dedicated scenario. We recommend creating an **_update source_** scenario to take into account any changes or additional data from source systems, re-build the dataset used by the webapp, and re-run the _commit edits_ scenario.
 
 ## Test the webapp with a business user
 
-The best way to make the webapp accessible to end-users is by publishing it to a Dashboard. For this, from the webapp view, click on the Actions button of the menu at the top, on the right-hand side). You may have already created a Dashboard in your project for reporting purposes; in this case, add the webapp to a new slide of the dashboard.
+The best way to make the webapp accessible to end-users is by publishing it to a Dashboard. For this, from the webapp view, click on the Actions button of the menu at the top, on the right-hand side). 
 
 ![](publish_dashboard.png)
+
+You may have already created a Dashboard in your project for reporting purposes; in this case, add the webapp to a new slide of the dashboard.
 
 You can then add other "tiles" to your Dashboard, such as a Text tile with instructions on how to use the webapp, or a Scenario tile, and adjust the layout.
 
