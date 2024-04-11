@@ -5,7 +5,7 @@
 There are two main types of use cases for the plugin's Visual Webapp:
 
 * Making corrections on "source" data (meaning data that's not machine-generated)
-* Providing feedback on machine-generated data
+* Reviewing machine-generated data
 
 In this guide, we focus on the former. The latter is slightly more complex and will be covered in a separate guide.
 
@@ -21,7 +21,12 @@ Here, we want business users (aka end-users) to edit data based on their domain 
 
 * [Install the plugin](install-plugin), if not already available.
 * Create a new project and add a dataset (via an existing Connection, or file upload). The screen captures shown in this guide were taken on a new project where we uploaded the [orders CSV file](https://downloads.dataiku.com/public/website-additional-assets/data/orders.csv) found in the Basics 101 course of the Dataiku Academy. You could also apply the following to an existing project and dataset, which may appear as an input dataset or as the result of an existing recipe.
-* Review the dataset schema. The plugin's Visual Webapp uses column meanings to show data and enable editing in the most appropriate way (e.g. using checkboxes for boolean columns). If the meaning wasn't defined explicitly, the webapp will consider the storage type instead.
+* Review the dataset schema. The plugin's Visual Webapp uses it to display, sort, filter data and enable editing in the most appropriate way. When a column meaning was defined explicitly, the webapp will use it; otherwise it will consider the storage type instead.
+  * Use a “Boolean” meaning to show boolean values as ticks and crosses and to enable editing with checkboxes; filtering will be text-based;
+  * Use a numerical meaning to restrict editing to numbers only, to enable sorting by numerical order, and filtering with min-max values;
+  * Use a “Date” meaning to enable sorting by chronological order, editing and filtering with date pickers
+  * Use a “Text” meaning for both free-text input and for dropdowns (this will be specified in the Visual Webapp's settings), text-based filtering, and sorting by alphabetical order.
+
 
 ## Create a Data Editing webapp
 
@@ -51,7 +56,7 @@ A few things happen behind the scenes upon starting the webapp:
 
 Their names start with the original dataset's name. Let's review them by their suffix:
 
- 1. **_editlog_** is the raw record of all edit events captured by the webapp. The schema of this dataset is fixed, whatever the original dataset. Here is an example: ![](editlog.png)
+ 1. **_editlog_** is the raw record of all edit events captured by the webapp. It also serves as an audit trail, for governance purposes. The schema of this dataset is fixed, whatever the original dataset. Here is an example: ![](editlog.png)
  2. **_editlog\_pivoted_** is the output of the _pivot-editlog_ recipe (provided by the plugin) and the user-friendly view of edits. In the previous example: ![](editlog_pivoted.png)
     * Its schema is a subset of the original dataset's: it doesn't have columns that are display-only, but it has the same key columns and the same editable columns, plus a _last\_edit\_date_ column.
     * Its rows are a subset of the original dataset's: it doesn't contain rows where no edits were made.
@@ -65,7 +70,7 @@ Their names start with the original dataset's name. Let's review them by their s
     * It contains the same number of rows as in the original dataset. For any given cell identified by its column and primary key values, if a non-empty value is found in _editlog\_pivoted_, this value is used instead of the original one.
     * Note that, as a result of the above, it is impossible to empty a non-empty cell with the plugin’s Visual Webapp and recipes. This is because empty values in _editlog\_pivoted_ are ignored.
 
-The datasets are created on the same connection as the original dataset. For edits to be recorded by the webapp, this has to be a write connection. If that's not the case, you can change the connection of these datasets as soon as they've been added to the Flow.
+The datasets are created on the same connection as the original dataset. If not already the case, we recommend using a SQL connection for fast and reliable edits. For edits to be recorded by the webapp, this has to be a write connection. If that's not the case, you can change the connection of these datasets as soon as they've been added to the Flow.
 
 ## Test the webapp on your own
 
@@ -98,7 +103,9 @@ In most use cases, however, you would first use the _edited_ dataset as input to
 
 ## Test the webapp with a business user
 
-The best way to make the webapp accessible to end-users is by publishing it to a Dashboard. For this, from the webapp view, click on the Actions button of the menu at the top, on the right-hand side). 
+Prerequisite: End-users of the webapp must be Dataiku users on a Reader license or above.
+
+The best way to make the webapp accessible to business users is by publishing it to a Dashboard. For this, from the webapp view, click on the Actions button of the menu at the top, on the right-hand side).
 
 ![](publish_dashboard.png)
 
@@ -112,12 +119,8 @@ The Scenario tile is displayed as a button to run a chosen scenario (typically t
 
 ## Next
 
-Because we're building a project with an interface where users can enter data and this gets processed, we'll need to have two instances of the project leveraging the plugin: one for development, one for production; each will have its own set of edits.
+Because we're building a project with an interface where users can enter data and this gets processed, we'll need to have two instances of the project leveraging the plugin: one for development, one for production; each will have its own set of edits. Once all your tests are successful, the next step is to [deploy your project](deploy) on an automation node, or as a duplicate project on your design node.
 
-Once all your tests are successful, the next step is to [deploy your project](deploy) on an automation node, or as a duplicate project on your design node.
+If you're interested in the use case of reviewing machine-generated data, check out the [dedicated guide](reviewing).
 
-If you want to learn more about the plugin, you can also check out the following:
-
-* [FAQ](faq)
-* [Sample project: Company Resolution](sample-project-company-resolution)
-* [Sample project: AI Feedback App](sample-project-ai-feedback-app)
+You can also check out the [FAQ](faq) to learn more about the plugin.
