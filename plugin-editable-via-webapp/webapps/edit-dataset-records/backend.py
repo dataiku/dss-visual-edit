@@ -498,28 +498,4 @@ def lookup_endpoint(linked_ds_name):
 
     return response
 
-
-# Dummy endpoints
-###
-
-
-@server.route("/dash")
-def my_dash_app():
-    return app.index()
-
-
-@server.route("/echo", methods=["GET", "POST"])
-def echo_endpoint():
-    if request.method == "POST":
-        term = request.get_json().get("term")
-    else:
-        term = request.args.get("term", "")
-    return jsonify([term])
-
-
-@server.route("/static")
-def static_page():
-    return current_app.send_static_file("values_url.html")
-
-
 logging.info("Webapp OK")
