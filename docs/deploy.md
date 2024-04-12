@@ -111,6 +111,4 @@ When sharing the production webapp with business users, it's a good idea to tick
 
 You can share a direct link to the webapp (or a dashboard that embeds it), but it can be easier for end-users to find it again in the future if it's added to a Workspace. Workspaces provide a friendlier way for business users to access all objects shared with them in Dataiku. If your end-users don't already use a Workspace, we recommend creating one for them and having them use Workspaces as their Dataiku home page.
 
-Remark on concurrent usage: several users can view and edit data at the same time, but they won't see each other's edits in real-time; if 2 or more users try to edit the same cell at the same time, the last edit is the one that will be taken into account.
-
 If a domain-specific issue is detected downstream of edits, review the editlog to understand its root cause. If a cell was incorrectly edited, edit it again via the webapp, which will log the correct value; you can then build datasets downstream.

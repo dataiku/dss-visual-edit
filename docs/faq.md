@@ -4,6 +4,10 @@
 
 If the webapp backend started successfully but the webapp itself isn't functioning as expected, clear the browser's cached images and files.
 
+## Can the webapp be used by several users at the same time?
+
+Several users can view and edit data at the same time, but they won't see each other's edits in real-time; if 2 or more users try to edit the same cell at the same time, all their edits will be logged but only the last edit will make its way to the _editlog\_pivoted_ dataset.
+
 ## What happens if my source dataset changes?
 
 The webapp automatically detects changes in the original dataset, by periodically checking the last build date of the dataset. As a consequence, it only works if this isn't a "source" dataset but the output of a recipe.
