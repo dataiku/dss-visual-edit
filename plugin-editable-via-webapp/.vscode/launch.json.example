@@ -12,6 +12,7 @@
                 "PYTHONPATH": "python-lib",
                 "DKU_CURRENT_PROJECT_KEY": "REPLACE_ME",
                 "ORIGINAL_DATASET": "replace_me"
+            }
         },
         {
             "name": "Webapp",
