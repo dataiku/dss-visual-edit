@@ -21,7 +21,7 @@
 * Right-clicking on the column name will show a menu with an option to hide the column, and an option to group rows by value.
 * Filtering:
   * The default filter is a textual one.
-  * In the case of a display-only boolean column, the filter is a tristate checkbox (or a simple checkbox if you specified the column type to be "boolean_tick" via the advanced settings' [editschema](editschema)).
+  * In the case of a display-only boolean column, the filter is a tri-state checkbox (or a simple toggle if you specified the column type to be "boolean_tick" via the advanced settings ([editschema](editschema)).
   * Editable boolean columns have a textual filter that you can use by typing "true" or "false".
 * All of this can be reset by clicking on the "Reset View" button in the bottom-left corner.
 * Linked records are edited via dropdowns which include the ability to search through all options: when there are many of them, only options that start with the search term are presented.
