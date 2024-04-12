@@ -115,8 +115,7 @@ The Scenario tile is displayed as a button to run a chosen scenario (typically t
 
 ## Next
 
-Because we're building a project with an interface where users can enter data and this gets processed, we'll need to have two instances of the project leveraging the plugin: one for development, one for production; each will have its own set of edits. Once all your tests are successful, the next step is to [deploy your project](deploy) on an automation node, or as a duplicate project on your design node.
-
-If you're interested in the use case of reviewing machine-generated data, check out the [dedicated guide](reviewing).
-
-You can also check out the [FAQ](faq) to learn more about the plugin.
+* If you need to customize the way the webapp displays data and create your own data editing front-end, check out the guide to our [CRUD Python API](get-started-crud-python-api) and the examples it contains to learn how to use the plugin's data persistence layer for your webapp's backend.
+* Because we're building a project with an interface where users can enter data and this gets processed, we'll need to have two instances of the project leveraging the plugin: one for development, one for production; each will have its own set of edits. Once all your tests are successful, the next step is to [deploy your project](deploy) on an automation node, or as a duplicate project on your design node.
+* If you're interested in the use case of reviewing machine-generated data, check out the [dedicated guide](reviewing).
+* You can also check out the [FAQ](faq) to learn more about the plugin.
