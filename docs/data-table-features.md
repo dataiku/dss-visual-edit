@@ -2,7 +2,7 @@
 
 ## Rich editing experience
 
-* **Automatic input validation**: Formatting and editing adapts to the detected data types:
+* **Automatic input validation**: Formatting and editing adapt to the detected data types:
   * Numerical cells don’t allow characters
   * Boolean cells are edited via a checkbox
   * Date cells are edited via a date picker
@@ -12,13 +12,13 @@
 ## Powerful data browsing
 
 * **Filtering, sorting and grouping** in real time.
-* Re-ordering, re-sizing and hiding columns, so you can focus on content that's import to you.
+* Re-ordering, re-sizing and hiding columns, so you can focus on content that's important to you.
 * Pagination of large datasets.
 * **Automatic detection of changes** in the source dataset.
 
 ## How to use these features
 
-* Right-clicking on the column name will show a menu with an option to hide the column, and an option to group rows according to the column's values.
+* Right-clicking on the column name will show a menu with an option to hide the column, and an option to group rows by value.
 * Filtering:
   * The default filter is a textual one.
   * In the case of a display-only boolean column, the filter is a tristate checkbox (or a simple checkbox if you specified the column type to be "boolean_tick" via the advanced settings' [editschema](editschema)).
