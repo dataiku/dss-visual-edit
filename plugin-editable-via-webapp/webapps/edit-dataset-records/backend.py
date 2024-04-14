@@ -182,9 +182,6 @@ def serve_layout():  # This function is called upon loading/refreshing the page 
 
 app.layout = serve_layout
 
-data_fresh = True
-
-
 @app.callback(
     [Output("refresh-div", "style"), Output("last-build-date", "children")],
     [
@@ -216,7 +213,6 @@ def toggle_refresh_div_visibility(n_intervals, refresh_div_style, last_build_dat
                 f"""Last build date: {last_build_date_new} ({last_build_date_new_fmtd}) — previously {last_build_date} ({last_build_date_fmtd})"""
             )
             style_new["display"] = "block"
-            data_fresh = False
     else:
         last_build_date_new = last_build_date
     return style_new, last_build_date_new
