@@ -5,10 +5,9 @@
 import logging
 from datetime import datetime
 
-import dataiku
 from commons import get_last_build_date, get_user_identifier
 from dash import Dash, Input, Output, State, dcc, html
-from dataiku_utils import get_dataframe_filtered
+from dataiku_utils import get_dataframe_filtered, client as dss_client
 from EditableEventSourced import EditableEventSourced
 from flask import Flask, jsonify, make_response, request
 from tabulator_utils import get_columns_tabulator, get_values_from_df
@@ -60,8 +59,7 @@ app.config.external_scripts = scripts
 
 project_key = webapp_config.project_key
 
-client = dataiku.api_client()
-project = client.get_project(project_key)
+project = dss_client.get_project(project_key)
 
 primary_keys = webapp_config.primary_keys
 editable_column_names = webapp_config.editable_column_names
