@@ -43,7 +43,6 @@ project = client.get_project(project_key)
 ###
 
 if getenv("DKU_CUSTOM_WEBAPP_CONFIG"):
-    run_context = "dataiku"
     # this points to a copy of assets/style.css (which is ignored by Dataiku's Dash)
     stylesheets += [
         "https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/style.css"
@@ -78,7 +77,6 @@ if getenv("DKU_CUSTOM_WEBAPP_CONFIG"):
 else:
     logging.basicConfig(level=logging.INFO)
     logging.info("Webapp is being run outside of Dataiku")
-    run_context = "local"
     info_display = "block"
 
     # Get original dataset name as an environment variable
