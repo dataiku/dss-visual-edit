@@ -6,11 +6,16 @@ from webapp_config_utils import get_linked_records
 
 class WebAppConfig:
     def __init__(self) -> None:
+        def to_bool(val: str = None) -> bool:
+            if val is None:
+                return False
+            return val.lower() == "true"
+
         self.running_in_dss = getenv("DKU_CUSTOM_WEBAPP_CONFIG") is not None
         if self.running_in_dss:
             config = get_webapp_config()
             self.original_ds_name = config.get("original_dataset")
-            self.debug_mode = bool(config.get("debug_mode"))
+            self.debug_mode = to_bool(config.get("debug_mode"))
 
             editschema_manual_raw = config.get("editschema")
             self.editschema_manual = (
@@ -20,7 +25,7 @@ class WebAppConfig:
             )
         else:
             self.original_ds_name = getenv("ORIGINAL_DATASET")
-            self.debug_mode = bool(getenv("DEBUG_MODE"))
+            self.debug_mode = to_bool(getenv("DEBUG_MODE"))
 
             config = load(
                 open("../../webapp-settings/" + self.original_ds_name + ".json")
