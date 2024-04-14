@@ -1,31 +1,32 @@
 # -*- coding: utf-8 -*-
 
 # Dash webapp to edit dataset records
-#
-# This code is structured as follows:
-# 0. Imports and variable initializations
-# 1. Get webapp parameters (original dataset, primary keys, editable columns, linked records...)
-# 2. Instantiate editable event-sourced dataset
-# 3. Define webapp layout and components
-
-# 0. Imports and variable initializations
-###
 
 import logging
 from datetime import datetime
-from os import getenv
 
 import dataiku
 from commons import get_last_build_date, get_user_identifier
 from dash import Dash, Input, Output, State, dcc, html
 from dataiku_utils import get_dataframe_filtered
-from DatasetSQL import DatasetSQL
 from EditableEventSourced import EditableEventSourced
-from flask import Flask, current_app, jsonify, make_response, request
+from flask import Flask, jsonify, make_response, request
 from tabulator_utils import get_columns_tabulator, get_values_from_df
-from webapp_config_utils import get_linked_records
+
+from webapp_config_loader import WebAppConfig
 
 import dash_tabulator
+
+webapp_config = WebAppConfig()
+if webapp_config.debug_mode:
+    logging.basicConfig(level=logging.DEBUG)
+else:
+    logging.basicConfig(level=logging.INFO)
+
+if webapp_config.running_in_dss:
+    logging.info("Web app starting inside DSS...")
+else:
+    logging.info("Web app starting outside DSS...")
 
 stylesheets = ["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
 scripts = [
@@ -34,15 +35,7 @@ scripts = [
     "https://cdn.jsdelivr.net/npm/luxon@3.0.4/build/global/luxon.min.js",
 ]
 
-client = dataiku.api_client()
-project_key = getenv("DKU_CURRENT_PROJECT_KEY")
-project = client.get_project(project_key)
-
-
-# 1. Get webapp parameters
-###
-
-if getenv("DKU_CUSTOM_WEBAPP_CONFIG"):
+if webapp_config.running_in_dss:
     # this points to a copy of assets/style.css (which is ignored by Dataiku's Dash)
     stylesheets += [
         "https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/style.css"
@@ -53,42 +46,10 @@ if getenv("DKU_CUSTOM_WEBAPP_CONFIG"):
     ]
     info_display = "none"
 
-    from dataiku.customwebapp import get_webapp_config
-
-    original_ds_name = get_webapp_config().get("original_dataset")
-    params = get_webapp_config()
-
-    if bool(params.get("debug_mode")):
-        logging.basicConfig(level=logging.DEBUG)
-    else:
-        logging.basicConfig(level=logging.INFO)
-    logging.info("Webapp is being run in Dataiku")
-
-    from json import loads
-
-    editschema_manual_raw = params.get("editschema")
-    if editschema_manual_raw and editschema_manual_raw != "":
-        editschema_manual = loads(editschema_manual_raw)
-    else:
-        editschema_manual = {}
-
     server = app.server
 
 else:
-    logging.basicConfig(level=logging.INFO)
-    logging.info("Webapp is being run outside of Dataiku")
     info_display = "block"
-
-    # Get original dataset name as an environment variable
-    # Get primary keys and editable column names from the custom fields of that dataset
-    from json import load
-
-    original_ds_name = getenv("ORIGINAL_DATASET")
-    params = load(open("../../webapp-settings/" + original_ds_name + ".json"))
-
-    editschema_manual = params.get("editschema")
-    if not editschema_manual:
-        editschema_manual = {}
 
     server = Flask(__name__)
     app = Dash(__name__, server=server)
@@ -97,13 +58,19 @@ else:
 app.config.external_stylesheets = stylesheets
 app.config.external_scripts = scripts
 
-primary_keys = params.get("primary_keys")
-editable_column_names = params.get("editable_column_names")
-freeze_editable_columns = params.get("freeze_editable_columns")
-group_column_names = params.get("group_column_names")
-linked_records_count = params.get("linked_records_count")
-linked_records = get_linked_records(params, linked_records_count)
-authorized_users = params.get("authorized_users")
+project_key = webapp_config.project_key
+
+client = dataiku.api_client()
+project = client.get_project(project_key)
+
+primary_keys = webapp_config.primary_keys
+editable_column_names = webapp_config.editable_column_names
+freeze_editable_columns = webapp_config.freeze_editable_columns
+group_column_names = webapp_config.group_column_names
+linked_records_count = webapp_config.linked_records_count
+linked_records = webapp_config.linked_records
+authorized_users = webapp_config.authorized_users
+original_ds_name = webapp_config.original_ds_name
 
 ees = EditableEventSourced(
     original_ds_name=original_ds_name,
@@ -111,7 +78,7 @@ ees = EditableEventSourced(
     primary_keys=primary_keys,
     editable_column_names=editable_column_names,
     linked_records=linked_records,
-    editschema_manual=editschema_manual,
+    editschema_manual=webapp_config.editschema_manual,
     authorized_users=authorized_users,
 )
 
@@ -179,6 +146,7 @@ def serve_layout():  # This function is called upon loading/refreshing the page 
 
 
 app.layout = serve_layout
+
 
 @app.callback(
     [Output("refresh-div", "style"), Output("last-build-date", "children")],
@@ -491,5 +459,6 @@ def lookup_endpoint(linked_ds_name):
         response = jsonify(editor_values_param)
 
     return response
+
 
 logging.info("Webapp OK")
