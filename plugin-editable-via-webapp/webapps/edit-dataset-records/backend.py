@@ -19,7 +19,7 @@ import dash_tabulator
 
 webapp_config = WebAppConfig()
 
-logging.info("Web app starting inside DSS..." + webapp_config.running_in_dss)
+logging.info(f"Web app starting inside DSS:{webapp_config.running_in_dss}.")
 
 stylesheets = ["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
 scripts = [
