@@ -39,7 +39,7 @@ if webapp_config.running_in_dss:
     ]
     info_display = "none"
 
-    server = app.server
+    server = app.server  # type: ignore  # noqa: F821
 
 else:
     info_display = "block"
@@ -242,7 +242,6 @@ def create_endpoint():
     primary_keys_values = request.get_json().get("primaryKeys")
     column_values = request.get_json().get("columnValues")
     # TODO: check set of primary key values is unique?
-    user = get_user_identifier()
     ees.create_row(primary_keys_values, column_values)
     response = jsonify({"msg": "New row created"})
     return response
@@ -350,8 +349,8 @@ def delete_endpoint():
         primary_keys = request.get_json().get("primaryKeys")
     else:
         primary_keys = request.args.get("primaryKeys", "")
-    info = ees.delete_row(primary_keys)
-    response = jsonify({"msg": f"Row deleted"})
+    ees.delete_row(primary_keys)
+    response = jsonify({"msg": "Row deleted"})
     return response
 
 
