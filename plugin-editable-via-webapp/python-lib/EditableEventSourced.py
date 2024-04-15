@@ -49,7 +49,7 @@ class EditableEventSourced:
                 f"/projects/{self.project_key}/webapps/{webapp_id}_{webapp_name}/edit"
             )
             self.webapp_url_public = f"/public-webapps/{self.project_key}/{webapp_id}/"
-        except:
+        except Exception:
             self.webapp_url = None
             self.webapp_url_public = "/"
 
@@ -213,7 +213,7 @@ class EditableEventSourced:
                         for m in metrics:
                             if m["metric"]["metricType"] == "COUNT_RECORDS":
                                 count_records = int(m["value"])
-                    except:
+                    except Exception:
                         pass
 
                     # If the linked dataset is on an SQL connection and if it has more than 1000 records, load it as a DatasetSQL object

@@ -86,7 +86,7 @@ def serve_layout():  # This function is called upon loading/refreshing the page 
     try:
         last_build_date_initial = get_last_build_date(original_ds_name, project)
         last_build_date_ok = True
-    except:
+    except Exception:
         last_build_date_initial = ""
         last_build_date_ok = False
 

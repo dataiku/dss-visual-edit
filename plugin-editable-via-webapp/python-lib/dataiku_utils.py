@@ -19,7 +19,7 @@ def recipe_already_exists(recipe_name, project):
     try:
         project.get_recipe(recipe_name).get_status()
         return True
-    except:
+    except Exception:
         return False
 
 

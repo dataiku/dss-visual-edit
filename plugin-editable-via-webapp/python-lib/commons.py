@@ -207,7 +207,7 @@ def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
         # Change types to match those of original_df
         for col in editlog_pivoted_df.columns:
             if col in primary_keys + display_columns + editable_columns:
-                if original_df[col].dtypes.name=="Int64":
+                if original_df[col].dtypes.name == "Int64":
                     editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(float)
                 editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(
                     original_df[col].dtypes.name
@@ -269,7 +269,7 @@ def get_user_identifier():
                 request_headers
             )
             user = auth_info_browser["authIdentifier"]
-        except:
+        except Exception:
             None
     return user
 
