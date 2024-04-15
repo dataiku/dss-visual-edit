@@ -3,6 +3,7 @@
 # Dash webapp to edit dataset records
 
 import logging
+import logging_setup  # noqa: F401 necessary to setup logging basicconfig before dataiku module sets a default config
 from datetime import datetime
 
 from commons import get_last_build_date, get_user_identifier
@@ -12,15 +13,11 @@ from EditableEventSourced import EditableEventSourced
 from flask import Flask, jsonify, make_response, request
 from tabulator_utils import get_columns_tabulator, get_values_from_df
 
-from webapp_config_loader import WebAppConfig
+from config_loader import WebAppConfig
 
 import dash_tabulator
 
 webapp_config = WebAppConfig()
-if webapp_config.debug_mode:
-    logging.basicConfig(level=logging.DEBUG)
-else:
-    logging.basicConfig(level=logging.INFO)
 
 if webapp_config.running_in_dss:
     logging.info("Web app starting inside DSS...")
