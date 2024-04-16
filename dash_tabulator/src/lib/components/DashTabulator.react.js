@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {resolveProp} from 'dash-extensions';
-import {TabulatorFull as Tabulator} from "tabulator-tables"; //import Tabulator library
+import { resolveProp } from 'dash-extensions';
+import { TabulatorFull as Tabulator } from "tabulator-tables"; //import Tabulator library
 import "tabulator-tables/dist/css/tabulator.min.css";
 import "tabulator-tables/dist/css/tabulator_semanticui.min.css";
 import "../../../assets/custom_tabulator.js";
@@ -9,7 +9,7 @@ import "../../../assets/tabulator_dataiku.css";
 
 const crypto = require('crypto');
 
-const plugin_version = "1.8.4";
+const plugin_version = "1.8.11";
 
 function md5(string) {
     return crypto.createHash('md5').update(string).digest('hex');
@@ -22,23 +22,19 @@ export default class DashTabulator extends React.Component {
     componentDidMount() {
         // Instantiate Tabulator when element is mounted
 
-        const {id, datasetName, data, columns, groupBy, cellEdited} = this.props;
+        const { id, datasetName, data, columns, groupBy, cellEdited } = this.props;
 
         // Interpret column formatters as function handles.
-        for(let i=0; i < columns.length; i++){
+        for (let i = 0; i < columns.length; i++) {
             let header = columns[i];
-            for (let key in header){ 
+            for (let key in header) {
                 let o = header[key];
-                console.log(key);
-                console.log(o);
-                if (o instanceof Object) { 
+                if (o instanceof Object) {
                     header[key] = resolveProp(o, this);
                     if (!o.variable && !o.arrow) {
-                        for (let key2 in o){
+                        for (let key2 in o) {
                             let o2 = o[key2]
-                            console.log(key2);
-                            console.log(o2);
-                            if (o2 instanceof Object) { 
+                            if (o2 instanceof Object) {
                                 o[key2] = resolveProp(o2, this);
                             }
                         }
@@ -60,20 +56,21 @@ export default class DashTabulator extends React.Component {
             "paginationSizeSelector": [10, 20, 50, 100],
             "movableColumns": true,
             "persistence": true,
-            "footerElement":"<button class='tabulator-page' onclick='localStorage.clear(); window.location.reload();'>Reset View</button>"
+            "footerElement": "<button class='tabulator-page' onclick='localStorage.clear(); window.location.reload();'>Reset View</button>"
         });
 
-        this.tabulator.on("cellEdited", (cell) => { 
+        this.tabulator.on("cellEdited", (cell) => {
             console.log("Cell edited!")
             console.log('cellEdited', cell)
-            var edited = new Object() 
+            cell.getElement().classList.add("tabulator-edited-cell");
+            var edited = new Object()
             edited.field = cell.getField()
             edited.type = cell.getColumn().getDefinition()["editor"]
             edited.initialValue = cell.getInitialValue()
             edited.oldValue = cell.getOldValue()
             edited.value = cell.getValue()
             edited.row = cell.getData()
-            this.props.setProps({cellEdited: edited})
+            this.props.setProps({ cellEdited: edited })
             try {
                 window.parent.WT1SVC.event("lca-datatable-edited", {
                     "dataset_name_hash": md5(datasetName),
@@ -91,7 +88,7 @@ export default class DashTabulator extends React.Component {
     }
 
     render() {
-        console.log("Rendering!")
+        console.log("Rendering data table. Plugin version is " + plugin_version + ".")
         try {
             window.parent.WT1SVC.event("lca-datatable-viewed", {
                 "dataset_name_hash": md5(this.props.datasetName),
@@ -120,8 +117,8 @@ export default class DashTabulator extends React.Component {
 DashTabulator.defaultProps = {
     data: [],
     datasetName: "",
-    columns : [],
-    groupBy : []
+    columns: [],
+    groupBy: []
 };
 
 DashTabulator.propTypes = {
@@ -148,7 +145,7 @@ DashTabulator.propTypes = {
     /**
      * Columns to group by.
      */
-     groupBy: PropTypes.array,
+    groupBy: PropTypes.array,
 
     /**
      * Dash-assigned callback that should be called to report property changes
