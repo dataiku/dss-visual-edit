@@ -129,7 +129,7 @@ window["dash_tabulator"] =
 /******/ 	        var srcFragments = src.split('/');
 /******/ 	        var fileFragments = srcFragments.slice(-1)[0].split('.');
 /******/
-/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1713259384");
+/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1713259439");
 /******/ 	        srcFragments.splice(-1, 1, fileFragments.join('.'))
 /******/
 /******/ 	        return srcFragments.join('/');
@@ -78675,7 +78675,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var crypto = __webpack_require__(/*! crypto */ "./node_modules/crypto-browserify/index.js");
 
-var plugin_version = "1.8.4";
+var plugin_version = "1.8.11";
 
 function md5(string) {
   return crypto.createHash('md5').update(string).digest('hex');
