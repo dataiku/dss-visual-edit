@@ -283,6 +283,17 @@ def get_columns_tabulator(ees, freeze_editable_columns=False):
             "headerFilter": True,
             "resizable": True,
             "headerContextMenu": __ns__("headerMenu"),
+            "tooltip": assign(
+                f"""
+                function(cell){{
+                    var tip = cell.getValue()
+                    if (cell.isEdited()) {{
+                        tip = tip + " (initial value: " + cell.getInitialValue() + ")"
+                    }}
+                    return tip
+                }}
+                """
+            ),
         }
 
         # Define formatter and header filters based on type
