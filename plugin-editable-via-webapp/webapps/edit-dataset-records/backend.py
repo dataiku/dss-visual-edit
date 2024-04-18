@@ -29,13 +29,8 @@ scripts = [
 ]
 
 if webapp_config.running_in_dss:
-    info_display = "none"
-
     server = app.server  # type: ignore  # noqa: F821
-
 else:
-    info_display = "block"
-
     server = Flask(__name__)
     app = Dash(__name__, server=server)
     app.enable_dev_tools(debug=True, dev_tools_ui=True)
@@ -121,7 +116,9 @@ def serve_layout():  # This function is called upon loading/refreshing the page 
                 html.Div(
                     id="edit-info",
                     children="Info zone for tabulator",
-                    style={"display": info_display},
+                    style={
+                        "display": "none" if webapp_config.running_in_dss else "block"
+                    },
                 ),
             ]
         )
