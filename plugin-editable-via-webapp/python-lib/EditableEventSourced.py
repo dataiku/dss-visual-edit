@@ -92,7 +92,6 @@ class EditableEventSourced:
         )
         if editlog_pivoted_ds_creator.already_exists():
             logging.debug("Found editlog pivoted")
-            unused_variable = None
         else:
             logging.debug("No editlog pivoted found, creating it...")
             editlog_pivoted_ds_creator.with_store_into(
