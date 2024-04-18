@@ -270,7 +270,7 @@ def get_user_identifier():
             )
             user = auth_info_browser["authIdentifier"]
         except Exception:
-            None
+            logging.error("Failed to get user authentication info.")
     return user
 
 

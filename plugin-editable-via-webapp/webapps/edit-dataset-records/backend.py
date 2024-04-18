@@ -74,6 +74,9 @@ def serve_layout():  # This function is called upon loading/refreshing the page 
         last_build_date_initial = get_last_build_date(original_ds_name, project)
         last_build_date_ok = True
     except Exception:
+        logging.warning(
+            f"Failed to get last build date of {original_ds_name}. Serve layout without this information."
+        )
         last_build_date_initial = ""
         last_build_date_ok = False
 
