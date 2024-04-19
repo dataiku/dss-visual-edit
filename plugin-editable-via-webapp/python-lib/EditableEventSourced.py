@@ -5,7 +5,7 @@ from dataikuapi.dss.recipe import DSSRecipeCreator
 from dataiku_utils import recipe_already_exists, get_connection_info
 from pandas import DataFrame
 from commons import (
-    get_user_identifier,
+    try_get_user_identifier,
     get_original_df,
     get_dataframe,
     write_empty_editlog,
@@ -379,8 +379,10 @@ class EditableEventSourced:
         else:
             value_string = value
 
-        user_identifier = get_user_identifier()
-        if self.authorized_users and not user_identifier in self.authorized_users:
+        user_identifier = try_get_user_identifier()
+        if self.authorized_users and (
+            user_identifier is None or user_identifier not in self.authorized_users
+        ):
             info = "Unauthorized"
         else:
             if column in self.editable_column_names or action == "delete":
@@ -391,7 +393,7 @@ class EditableEventSourced:
                     "column_name": [column],
                     "value": [value_string],
                     "date": [datetime.now(timezone("UTC")).isoformat()],
-                    "user": [user_identifier],
+                    "user": ["unknown" if user_identifier is None else user_identifier],
                 }
                 if "action" in [col["name"] for col in self.editlog_columns]:
                     edit_data.update({"action": [action]})

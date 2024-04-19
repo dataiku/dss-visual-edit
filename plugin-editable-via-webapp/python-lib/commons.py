@@ -1,3 +1,4 @@
+from __future__ import annotations
 import dataiku
 from pandas import DataFrame, concat, pivot_table, options
 from flask import request
@@ -256,12 +257,11 @@ def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
 # Utils for webapp backend
 
 
-# Used by backend for the edit callback
-def get_user_identifier():
+def try_get_user_identifier() -> str | None:
     client = dataiku.api_client()
     # from https://doc.dataiku.com/dss/latest/webapps/security.html#identifying-users-from-within-a-webapp
     # don't use client.get_own_user().get_settings().get_raw() as this would give the user who started the webapp
-    user = "unknown"
+    user = None
     if request:
         try:
             request_headers = dict(request.headers)
@@ -270,10 +270,14 @@ def get_user_identifier():
             )
             user = auth_info_browser["authIdentifier"]
         except Exception:
-            logging.exception(
-                "Failed to get user authentication info.",
-            )
+            logging.exception("Failed to get user authentication info.")
     return user
+
+
+# Used by backend for the edit callback
+def get_user_identifier():
+    user = try_get_user_identifier()
+    return "unknown" if user is None else user
 
 
 # Used by backend's for CRUD methods

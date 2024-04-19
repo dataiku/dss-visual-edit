@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 # Dash webapp to edit dataset records
-
+from __future__ import annotations
 import logging
 import logging_setup  # noqa: F401 necessary to setup logging basicconfig before dataiku module sets a default config
 from datetime import datetime
 
-from commons import get_last_build_date, get_user_identifier
+from commons import get_last_build_date, try_get_user_identifier
 from dash import Dash, Input, Output, State, dcc, html
 from dataiku_utils import get_dataframe_filtered, client as dss_client
 from EditableEventSourced import EditableEventSourced
@@ -81,9 +81,11 @@ def serve_layout():  # This function is called upon loading/refreshing the page 
         last_build_date_initial = ""
         last_build_date_ok = False
 
-    # get user's email and check if it's in authorized_users; if not, return a div which says "unauthorized access"
-    user_id = get_user_identifier()
-    if not authorized_users or user_id in authorized_users:
+    user_id = try_get_user_identifier()
+
+    # no specific authorized users configured or match in the list of authorized users grant you access to the layout.
+    if not authorized_users or (user_id is not None and user_id in authorized_users):
+        logging.debug(f"User '{user_id}' is being served layout.")
         return html.Div(
             children=[
                 html.Div(
@@ -125,6 +127,11 @@ def serve_layout():  # This function is called upon loading/refreshing the page 
                     },
                 ),
             ]
+        )
+    # specific authorized users configured but failure to get current user info.
+    elif authorized_users and user_id is None:
+        return html.Div(
+            "Failed to fetch your user information. Try refreshing the page."
         )
     else:
         return html.Div("Unauthorized")
