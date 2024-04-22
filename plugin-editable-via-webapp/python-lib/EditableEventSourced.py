@@ -1,3 +1,4 @@
+from __future__ import annotations
 import logging
 from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
@@ -22,6 +23,19 @@ from json import loads
 from datetime import datetime
 from pytz import timezone
 from re import sub
+
+
+class EditSuccess:
+    pass
+
+
+class EditFailure:
+    def __init__(self, message: str) -> None:
+        self.message = message
+
+
+class EditUnauthorized:
+    pass
 
 
 class EditableEventSourced:
@@ -362,7 +376,9 @@ class EditableEventSourced:
         # TODO: read row that was not edited too! This can be done via Dataiku API
         return self.get_edited_cells_df_indexed().loc[key]
 
-    def __log_edit__(self, key, column, value, action="update"):
+    def __log_edit__(
+        self, key, column, value, action="update"
+    ) -> EditSuccess | EditFailure | EditUnauthorized:
         # if the type of column_name is a boolean, make sure we read it correctly
         for col in self.schema_columns:
             if col["name"] == column:
@@ -383,7 +399,10 @@ class EditableEventSourced:
         if self.authorized_users and (
             user_identifier is None or user_identifier not in self.authorized_users
         ):
-            info = "Unauthorized"
+            logging.debug(
+                f"""Logging {action} action unauthorized ('{user_identifier}'): column {column} set to value {value} where {self.primary_keys} is {key}."""
+            )
+            return EditUnauthorized()
         else:
             if column in self.editable_column_names or action == "delete":
                 # add to the editlog
@@ -398,13 +417,15 @@ class EditableEventSourced:
                 if "action" in [col["name"] for col in self.editlog_columns]:
                     edit_data.update({"action": [action]})
                 self.editlog_ds.write_dataframe(DataFrame(data=edit_data))
-                info = f"""Logging {action} action: column {column} set to value {value} where {self.primary_keys} is {key}."""
-
+                logging.debug(
+                    f"""Logging {action} action success: column {column} set to value {value} where {self.primary_keys} is {key}."""
+                )
+                return EditSuccess()
             else:
-                info = f"""{column} isn't an editable column"""
-
-        logging.info(info)
-        return info
+                logging.info(
+                    f"""Logging {action} action failed: column {column} set to value {value} where {self.primary_keys} is {key}."""
+                )
+                return EditFailure(f"""{column} isn't an editable column.""")
 
     def create_row(self, primary_keys: dict, column_values: dict) -> str:
         """
@@ -429,7 +450,9 @@ class EditableEventSourced:
             )
         return "Row successfully created"
 
-    def update_row(self, primary_keys: dict, column: str, value: str) -> str:
+    def update_row(
+        self, primary_keys: dict, column: str, value: str
+    ) -> EditSuccess | EditFailure | EditUnauthorized:
         """
         Updates a row.
 
@@ -445,10 +468,11 @@ class EditableEventSourced:
             This method doesn't implement data validation. It doesn't check that the value is allowed for the specified column.
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
-        self.__log_edit__(key, column, value, action="update")
-        return "Row successfully updated"
+        return self.__log_edit__(key, column, value, action="update")
 
-    def delete_row(self, primary_keys: dict):
+    def delete_row(
+        self, primary_keys: dict
+    ) -> EditSuccess | EditFailure | EditUnauthorized:
         """
         Deletes a row identified by the given primary key(s).
 
@@ -459,5 +483,4 @@ class EditableEventSourced:
             str: A message indicating that the row was deleted.
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
-        self.__log_edit__(key, None, None, action="delete")
-        return "Row successfully deleted"
+        return self.__log_edit__(key, None, None, action="delete")
