@@ -3,7 +3,7 @@
 # Dash webapp to edit dataset records
 from __future__ import annotations
 import logging
-import logging_setup  # noqa: F401 necessary to setup logging basicconfig before dataiku module sets a default config
+import webapp.logging.setup  # noqa: F401 necessary to setup logging basicconfig before dataiku module sets a default config
 from datetime import datetime
 
 from commons import get_last_build_date, try_get_user_identifier
@@ -18,7 +18,7 @@ from EditableEventSourced import (
 from flask import Flask, jsonify, make_response, request
 from tabulator_utils import get_columns_tabulator, get_values_from_df
 
-from config_loader import WebAppConfig
+from webapp.config.loader import WebAppConfig
 
 import dash_tabulator
 
