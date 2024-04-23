@@ -1,9 +1,10 @@
 from os import getenv
 import logging
+from typing import Union
 from dataiku.customwebapp import get_webapp_config
 
 
-def __bool__(val: str = None) -> bool:
+def __bool__(val: Union[str, None]) -> bool:
     if val is None:
         return False
     return val.lower() == "true"

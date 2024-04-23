@@ -133,7 +133,7 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
 
         # Drop any columns from the pivot that may not be one of the editable_column_names
         for col in editlog_pivoted_df.columns:
-            if not col in cols:
+            if col not in cols:
                 editlog_pivoted_df.drop(columns=[col], inplace=True)
 
         editlog_pivoted_df.reset_index(inplace=True)

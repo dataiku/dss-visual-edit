@@ -194,7 +194,7 @@ class EditableEventSourced:
         self.__connection_name__ = (
             self.original_ds.get_config().get("params").get("connection")
         )
-        if self.__connection_name__ == None:
+        if self.__connection_name__ is None:
             self.__connection_name__ = "filesystem_managed"
 
         self.primary_keys = primary_keys
@@ -372,7 +372,7 @@ class EditableEventSourced:
         # if the type of column_name is a boolean, make sure we read it correctly
         for col in self.schema_columns:
             if col["name"] == column:
-                if type(value) == str and col.get("type") == "boolean":
+                if isinstance(value, str) and col.get("type") == "boolean":
                     if value == "":
                         value = None
                     else:
@@ -380,7 +380,7 @@ class EditableEventSourced:
                 break
 
         # store value as a string, unless it's None
-        if value != None:
+        if value is not None:
             value_string = str(value)
         else:
             value_string = value

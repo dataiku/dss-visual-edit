@@ -1,9 +1,8 @@
 """
 This file contains functions used to generate the Tabulator columns configuration for a given dataset.
 """
-
+from typing import Union
 from pandas import DataFrame
-from dataiku import Dataset
 from dash_extensions.javascript import Namespace
 import logging
 from dash_extensions.javascript import assign
@@ -121,7 +120,10 @@ def __get_column_tabulator_editor__(t_type):
 
 
 def get_values_from_df(
-    df: DataFrame, key_col: str, label_col: str, lookup_cols: list = None
+    df: DataFrame,
+    key_col: str,
+    label_col: str,
+    lookup_cols: Union[list, None] = None,
 ) -> list:
     """
     Get values of specified columns in a given dataframe, to be read by the `itemFormatter` provided to Tabulator when defining a linked record:
