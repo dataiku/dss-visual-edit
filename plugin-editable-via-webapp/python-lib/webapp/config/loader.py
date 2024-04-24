@@ -18,7 +18,8 @@ class WebAppConfig:
             original_ds_name = self.__validate_original_dataset_name__(
                 getenv("ORIGINAL_DATASET")
             )
-            dic_config = load(open(f"../../webapp-settings/{original_ds_name}.json"))
+            with open(f"../../webapp-settings/{original_ds_name}.json") as fp:
+                dic_config = load(fp)
             typed_config = Config(**dic_config)
             typed_config.original_dataset = original_ds_name
 
