@@ -205,7 +205,7 @@ class EditableEventSourced:
 
         # For each linked record, add linked dataset/dataframe as attribute
         self.linked_records = linked_records if linked_records is not None else []
-        if len(self.linked_records) > 0:
+        if self.linked_records:
             self.linked_records_df = DataFrame(
                 data=[lr.info.__dict__ for lr in self.linked_records]
             ).set_index("name")
