@@ -22,6 +22,8 @@ from json import loads
 from datetime import datetime
 from pytz import timezone
 from re import sub
+from typing import List
+from webapp.config.models import LinkedRecord, EditSchema
 
 
 class EditSuccess:
@@ -167,14 +169,14 @@ class EditableEventSourced:
 
     def __init__(
         self,
-        original_ds_name,
-        primary_keys,
-        editable_column_names=None,
-        linked_records=None,
-        editschema_manual=None,
-        project_key=None,
+        original_ds_name: str,
+        primary_keys: List[str],
+        editable_column_names: List[str] | None = None,
+        linked_records: List[LinkedRecord] | None = None,
+        editschema_manual: List[EditSchema] | None = None,
+        project_key: str | None = None,
         editschema=None,
-        authorized_users=None,
+        authorized_users: List[str] | None = None,
     ):
         self.original_ds_name = original_ds_name
         if project_key is None:
@@ -202,63 +204,56 @@ class EditableEventSourced:
             self.editable_column_names = editable_column_names
 
         # For each linked record, add linked dataset/dataframe as attribute
-        self.linked_records = linked_records
-        if linked_records:
-            if len(self.linked_records) > 0:
-                self.linked_records_df = DataFrame(data=self.linked_records).set_index(
-                    "name"
-                )
-                for linked_record in self.linked_records:
-                    linked_ds_name = linked_record["ds_name"]
-                    linked_ds = Dataset(linked_ds_name, self.project_key)
-                    # Get the connection type of the linked dataset
-                    connection_name, connection_type = get_connection_info(linked_ds)
-                    # Get the number of records in the linked dataset
-                    count_records = None
-                    try:
-                        metrics = self.project.get_dataset(
-                            linked_ds_name
-                        ).compute_metrics(metric_ids=["records:COUNT_RECORDS"])[
-                            "result"
-                        ][
-                            "computed"
-                        ]
-                        for m in metrics:
-                            if m["metric"]["metricType"] == "COUNT_RECORDS":
-                                count_records = int(m["value"])
-                    except Exception:
-                        pass
+        self.linked_records = linked_records if linked_records is not None else []
+        if len(self.linked_records) > 0:
+            self.linked_records_df = DataFrame(
+                data=[lr.info.__dict__ for lr in self.linked_records]
+            ).set_index("name")
+            for linked_record in self.linked_records:
+                linked_ds_name = linked_record.ds_name
+                linked_ds = Dataset(linked_ds_name, self.project_key)
+                # Get the connection type of the linked dataset
+                connection_name, connection_type = get_connection_info(linked_ds)
+                # Get the number of records in the linked dataset
+                count_records = None
+                try:
+                    metrics = self.project.get_dataset(linked_ds_name).compute_metrics(
+                        metric_ids=["records:COUNT_RECORDS"]
+                    )["result"]["computed"]
+                    for m in metrics:
+                        if m["metric"]["metricType"] == "COUNT_RECORDS":
+                            count_records = int(m["value"])
+                except Exception:
+                    pass
 
-                    # If the linked dataset is on an SQL connection and if it has more than 1000 records, load it as a DatasetSQL object
-                    if "SQL" in connection_type or "snowflake" in connection_type:
-                        if count_records is not None and count_records <= 1000:
-                            logging.debug(
-                                f"""Loading linked dataset "{linked_ds_name}" in memory since it has less than 1000 records"""
-                            )
-                            linked_record["df"] = linked_ds.get_dataframe()
-                        else:
-                            logging.debug(
-                                f"""Loading linked dataset "{linked_ds_name}" as a DatasetSQL object since it has more than 1000 records or an unknown number of records"""
-                            )
-                            linked_record["ds"] = DatasetSQL(
-                                linked_ds_name, self.project_key
-                            )
+                # If the linked dataset is on an SQL connection and if it has more than 1000 records, load it as a DatasetSQL object
+                if "SQL" in connection_type or "snowflake" in connection_type:
+                    if count_records is not None and count_records <= 1000:
+                        logging.debug(
+                            f"""Loading linked dataset "{linked_ds_name}" in memory since it has less than 1000 records"""
+                        )
+                        linked_record.df = linked_ds.get_dataframe()
                     else:
                         logging.debug(
-                            f"""Loading linked dataset "{linked_ds_name}" in memory since it isn't on an SQL connection"""
+                            f"""Loading linked dataset "{linked_ds_name}" as a DatasetSQL object since it has more than 1000 records or an unknown number of records"""
                         )
-                        if count_records is None:
-                            logging.warning(
-                                f"Unknown number of records for linked dataset {linked_ds_name}"
-                            )
-                        elif count_records > 1000:
-                            logging.warning(
-                                f"Linked dataset {linked_ds_name} has {count_records} records — capping at 1,000 rows to avoid memory issues"
-                            )
-                        # get the first 1000 rows of the dataset
-                        linked_record["df"] = linked_ds.get_dataframe(
-                            sampling="head", limit=1000
+                        linked_record.ds = DatasetSQL(linked_ds_name, self.project_key)
+                else:
+                    logging.debug(
+                        f"""Loading linked dataset "{linked_ds_name}" in memory since it isn't on an SQL connection"""
+                    )
+                    if count_records is None:
+                        logging.warning(
+                            f"Unknown number of records for linked dataset {linked_ds_name}"
                         )
+                    elif count_records > 1000:
+                        logging.warning(
+                            f"Linked dataset {linked_ds_name} has {count_records} records — capping at 1,000 rows to avoid memory issues"
+                        )
+                    # get the first 1000 rows of the dataset
+                    linked_record.df = linked_ds.get_dataframe(
+                        sampling="head", limit=1000
+                    )
 
         self.editschema_manual = editschema_manual
 

@@ -201,7 +201,7 @@ def get_values_from_df(
 def __get_column_tabulator_linked_record__(ees, linked_record_name):
     """Define Tabulator formatter and editor settings for a column whose type is linked record"""
 
-    linked_records_df = DataFrame(data=ees.linked_records).set_index("name")
+    linked_records_df = ees.linked_records_df
     linked_ds_name = linked_records_df.loc[linked_record_name, "ds_name"]
     linked_ds_key_column = linked_records_df.loc[linked_record_name, "ds_key"]
     linked_ds_label_column = linked_records_df.loc[linked_record_name, "ds_label"]
@@ -269,7 +269,7 @@ def get_columns_tabulator(ees, freeze_editable_columns=False):
     linked_record_names = []
     if ees.linked_records:
         try:
-            linked_records_df = DataFrame(data=ees.linked_records).set_index("name")
+            linked_records_df = ees.linked_records_df
             linked_record_names = linked_records_df.index.values.tolist()
         except Exception:
             logging.exception("Failed to get linked record names.")

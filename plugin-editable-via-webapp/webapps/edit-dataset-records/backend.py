@@ -3,6 +3,7 @@
 # Dash webapp to edit dataset records
 from __future__ import annotations
 import logging
+from webapp.config.models import LinkedRecord
 import webapp.logging.setup  # noqa: F401 necessary to setup logging basicconfig before dataiku module sets a default config
 from datetime import datetime
 
@@ -34,7 +35,7 @@ scripts = [
 ]
 
 if webapp_config.running_in_dss:
-    server = app.server  # type: ignore  # noqa: F821
+    server = app.server
 else:
     server = Flask(__name__)
     app = Dash(__name__, server=server)
@@ -44,30 +45,24 @@ app.config.external_stylesheets = stylesheets
 app.config.external_scripts = scripts
 
 project_key = webapp_config.project_key
-
 project = dss_client.get_project(project_key)
 
-primary_keys = webapp_config.primary_keys
 editable_column_names = webapp_config.editable_column_names
-freeze_editable_columns = webapp_config.freeze_editable_columns
-group_column_names = webapp_config.group_column_names
-linked_records_count = webapp_config.linked_records_count
-linked_records = webapp_config.linked_records
 authorized_users = webapp_config.authorized_users
 original_ds_name = webapp_config.original_ds_name
 
 ees = EditableEventSourced(
     original_ds_name=original_ds_name,
     project_key=project_key,
-    primary_keys=primary_keys,
+    primary_keys=webapp_config.primary_keys,
     editable_column_names=editable_column_names,
-    linked_records=linked_records,
+    linked_records=webapp_config.linked_records,
     editschema_manual=webapp_config.editschema_manual,
     authorized_users=authorized_users,
 )
 
 
-columns = get_columns_tabulator(ees, freeze_editable_columns)
+columns = get_columns_tabulator(ees, webapp_config.freeze_editable_columns)
 
 last_build_date_initial = ""
 last_build_date_ok = False
@@ -135,7 +130,7 @@ def serve_layout():  # This function is called upon loading/refreshing the page 
                     data=ees.get_edited_df().to_dict(
                         "records"
                     ),  # this gets the most up-to-date edited data
-                    groupBy=group_column_names,
+                    groupBy=webapp_config.group_column_names,
                 ),
                 html.Div(
                     id="edit-info",
@@ -393,22 +388,33 @@ def label_endpoint(linked_ds_name):
         key = request.args.get("key", "")
     label = ""
 
-    # Return data only when it's a linked dataset
+    linked_record: LinkedRecord | None = None
     for lr in ees.linked_records:
-        if linked_ds_name == lr["ds_name"]:
-            linked_ds_key = lr["ds_key"]
-            linked_ds_label = lr["ds_label"]
-            # Return label only if a label column is defined (and different from the key column)
-            if key != "" and linked_ds_label and linked_ds_label != linked_ds_key:
-                if lr.get("ds"):
-                    label = lr["ds"].get_cell_value_sql_query(
-                        linked_ds_key, key, linked_ds_label
-                    )
-                else:
-                    linked_df = lr["df"].set_index(linked_ds_key)
-                    label = linked_df.loc[key, linked_ds_label]
-            else:
-                label = key
+        if linked_ds_name == lr.ds_name:
+            linked_record = lr
+            break
+
+    if linked_record is None:
+        return "Unnknown linked dataset.", 404
+
+    # Return data only when it's a linked dataset
+    linked_ds_key = linked_record.ds_key
+    linked_ds_label = linked_record.ds_label
+    # Return label only if a label column is defined (and different from the key column)
+    if key != "" and linked_ds_label and linked_ds_label != linked_ds_key:
+        if linked_record.ds:
+            label = linked_record.ds.get_cell_value_sql_query(
+                linked_ds_key, key, linked_ds_label
+            )
+        else:
+            linked_record_df = linked_record.df
+            if linked_record_df is None:
+                return "Something went wrong. Try restarting the backend.", 500
+
+            linked_df = linked_record_df.set_index(linked_ds_key)
+            label = linked_df.loc[key, linked_ds_label]
+    else:
+        label = key
     return label
 
 
@@ -437,29 +443,38 @@ def lookup_endpoint(linked_ds_name):
         n_results = 1000  # show more options if no search term is provided
 
     # Return data only when it's a linked dataset
+    linked_record: LinkedRecord | None = None
     for lr in ees.linked_records:
-        if linked_ds_name == lr["ds_name"]:
-            linked_ds_key = lr["ds_key"]
-            linked_ds_label = lr["ds_label"]
-            linked_ds_lookup_columns = lr["ds_lookup_columns"]
-            if lr.get("ds"):
-                # Use the Dataiku API to filter the dataset
-                linked_df_filtered = get_dataframe_filtered(
-                    linked_ds_name,
-                    project_key,
-                    linked_ds_label,
-                    term,
-                    n_results,
-                )
-            else:
-                linked_df = lr["df"]  # note: this is already capped to 1000 rows
-                if term == "":
-                    linked_df_filtered = linked_df
-                else:
-                    # Filter linked_df for rows whose label contains the search term
-                    linked_df_filtered = linked_df[
-                        linked_df[linked_ds_label].str.lower().str.contains(term)
-                    ].head(n_results)
+        if linked_ds_name == lr.ds_name:
+            linked_record = lr
+            break
+
+    if linked_record is None:
+        return "Unnknown linked dataset.", 404
+
+    linked_ds_key = linked_record.ds_key
+    linked_ds_label = linked_record.ds_label
+    linked_ds_lookup_columns = linked_record.ds_lookup_columns
+    if linked_record.ds:
+        # Use the Dataiku API to filter the dataset
+        linked_df_filtered = get_dataframe_filtered(
+            linked_ds_name,
+            project_key,
+            linked_ds_label,
+            term,
+            n_results,
+        )
+    else:
+        linked_df = linked_record.df  # note: this is already capped to 1000 rows
+        if linked_df is None:
+            return "Something went wrong. Try restarting the backend.", 500
+        if term == "":
+            linked_df_filtered = linked_df
+        else:
+            # Filter linked_df for rows whose label contains the search term
+            linked_df_filtered = linked_df[
+                linked_df[linked_ds_label].str.lower().str.contains(term)
+            ].head(n_results)
 
         logging.debug(f"Found {linked_df_filtered.size} entries")
         editor_values_param = get_values_from_df(
