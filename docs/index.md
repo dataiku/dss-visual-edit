@@ -34,7 +34,6 @@
 * [Data table features](data-table-features)
   * [Linked records](linked-records)
   * [Editschema](editschema)
-* [HTTP API](get-started-crud-python-api)
-* [Python library](backend/)
+* [Python library](get-started-crud-python-api)
 * [Deploying in production](deploy)
 * [FAQ](faq)
