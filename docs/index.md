@@ -27,4 +27,14 @@
 * **Continuous updates**: seamless integration of new edits into production data pipelines, and of new data into the webapp (changes are detected automatically and previous edits are applied to the new data).
 * **API to Create, Read, Update, Delete rows (CRUD)**, for coders building custom webapps.
 
-## [Get started](get-started)
+## [Get started right away!](get-started)
+
+## Quick links
+* [Plugin installation](install-plugin)
+* [Data table features](data-table-features)
+  * [Linked records](linked-records)
+  * [Editschema](editschema)
+* [HTTP API](get-started-crud-python-api)
+* [Python library](backend/)
+* [Deploying in production](deploy)
+* [FAQ](faq)
