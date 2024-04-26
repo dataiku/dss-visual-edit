@@ -109,7 +109,7 @@ Reviewing could be made in a spreadsheet program. It involves:
     * Marking a match as approved doesn't automatically move it from `matches_uncertain` to `matches_certain`. We need to rebuild these datasets. For this, we need to make sure that the editlog_pivoted dataset has been rebuilt.
   * Steps:
     * Create an Update scenario with a force-rebuild of `matches_uncertain_editlog_pivoted` and a rebuild of `matches_uncertain`.
-    * Create a dashboard which embeds the webapp and has a button to run that scenario (see screenshot in [Going further > Adding the webapp to a Dashboard](https://dataiku.github.io/lca/going-further#adding-the-webapp-to-a-dashboard)).
+    * Create a dashboard which embeds the webapp and has a button to run that scenario (see screenshot in [Get started > Test the webapp with a business user](https://dataiku.github.io/lca/get-started#test-the-webapp-with-a-business-user)).
 
 ## Lifecycle
 
