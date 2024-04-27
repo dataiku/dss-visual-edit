@@ -6,9 +6,10 @@ import logging
 from webapp.config.models import LinkedRecord
 import webapp.logging.setup  # noqa: F401 necessary to setup logging basicconfig before dataiku module sets a default config
 from datetime import datetime
-
-from commons import get_last_build_date, try_get_user_identifier
+from pandas.api.types import is_integer_dtype, is_float_dtype
+from commons import get_last_build_date, get_original_df, try_get_user_identifier
 from dash import Dash, Input, Output, State, dcc, html
+from dataiku import Dataset
 from dataiku_utils import get_dataframe_filtered, client as dss_client
 from EditableEventSourced import (
     EditSuccess,
@@ -400,6 +401,21 @@ def label_endpoint(linked_ds_name):
     # Return data only when it's a linked dataset
     linked_ds_key = linked_record.ds_key
     linked_ds_label = linked_record.ds_label
+
+    # Cast provided key value into appropriate type, necessary for integers for example.
+    original_df, primary_keys, display_columns, editable_columns = get_original_df(
+        ees.original_ds
+    )
+
+    key_dtype = original_df[linked_record.name].dtype
+    try:
+        if is_integer_dtype(key_dtype):
+            key = int(key)
+        if is_float_dtype(key_dtype):
+            key = float(key)
+    except Exception:
+        return "Invalid key type.", 400
+
     # Return label only if a label column is defined (and different from the key column)
     if key != "" and linked_ds_label and linked_ds_label != linked_ds_key:
         if linked_record.ds:
@@ -412,7 +428,10 @@ def label_endpoint(linked_ds_name):
                 return "Something went wrong. Try restarting the backend.", 500
 
             linked_df = linked_record_df.set_index(linked_ds_key)
-            label = linked_df.loc[key, linked_ds_label]
+            try:
+                label = linked_df.loc[key, linked_ds_label]
+            except Exception:
+                return label
     else:
         label = key
     return label
