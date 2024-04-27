@@ -1,5 +1,5 @@
 from json import dumps
-from dataiku import api_client
+from dataiku import Dataset, api_client
 from dataikuapi.utils import DataikuStreamedHttpUTF8CSVReader
 from pandas import DataFrame
 
@@ -71,10 +71,6 @@ def get_dataframe_filtered(ds_name, project_key, filter_column, filter_term, n_r
     return DataFrame(columns=rows[0], data=rows[1:]) if len(rows) > 0 else DataFrame()
 
 
-def get_connection_info(ds):
-    connection_name = ds.get_config().get("params").get("connection")
-    if connection_name:
-        connection_type = client.get_connection(connection_name).get_info().get_type()
-    else:
-        connection_type = ""
-    return connection_name, connection_type
+def is_sql_dataset(ds: Dataset) -> bool:
+    # locationInfoType may not exist, for example for editable dataset.
+    return ds.get_location_info().get("locationInfoType", "") == "SQL"

@@ -3,7 +3,7 @@ import logging
 from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
-from dataiku_utils import recipe_already_exists, get_connection_info
+from dataiku_utils import is_sql_dataset, recipe_already_exists
 from pandas import DataFrame
 from commons import (
     try_get_user_identifier,
@@ -14,6 +14,7 @@ from commons import (
     pivot_editlog,
     get_key_values_from_dict,
 )
+from webapp.db.editlogs import EditLog, EditLogAppenderFactory
 from webapp_utils import find_webapp_id, get_webapp_json
 from editschema_utils import get_primary_keys, get_editable_column_names
 from DatasetSQL import DatasetSQL
@@ -212,8 +213,6 @@ class EditableEventSourced:
             for linked_record in self.linked_records:
                 linked_ds_name = linked_record.ds_name
                 linked_ds = Dataset(linked_ds_name, self.project_key)
-                # Get the connection type of the linked dataset
-                connection_name, connection_type = get_connection_info(linked_ds)
                 # Get the number of records in the linked dataset
                 count_records = None
                 try:
@@ -227,7 +226,7 @@ class EditableEventSourced:
                     pass
 
                 # If the linked dataset is on an SQL connection and if it has more than 1000 records, load it as a DatasetSQL object
-                if "SQL" in connection_type or "snowflake" in connection_type:
+                if is_sql_dataset(linked_ds):
                     if count_records is not None and count_records <= 1000:
                         logging.debug(
                             f"""Loading linked dataset "{linked_ds_name}" in memory since it has less than 1000 records"""
@@ -281,6 +280,8 @@ class EditableEventSourced:
         self.__setup_editlog__()
         self.__save_custom_fields__(self.editlog_ds_name)
         self.__setup_editlog_downstream__()
+
+        self.editlog_appender = EditLogAppenderFactory().create(self.editlog_ds)
 
     def empty_editlog(self):
         """
@@ -391,21 +392,26 @@ class EditableEventSourced:
         else:
             if column in self.editable_column_names or action == "delete":
                 # add to the editlog
-                self.editlog_ds.spec_item["appendMode"] = True
-                edit_data = {
-                    "key": [str(key)],
-                    "column_name": [column],
-                    "value": [value_string],
-                    "date": [datetime.now(timezone("UTC")).isoformat()],
-                    "user": ["unknown" if user_identifier is None else user_identifier],
-                }
-                if "action" in [col["name"] for col in self.editlog_columns]:
-                    edit_data.update({"action": [action]})
-                self.editlog_ds.write_dataframe(DataFrame(data=edit_data))
-                logging.debug(
-                    f"""Logging {action} action success: column {column} set to value {value} where {self.primary_keys} is {key}."""
-                )
-                return EditSuccess()
+                try:
+                    self.editlog_appender.append(
+                        EditLog(
+                            str(key),
+                            column,
+                            value_string,
+                            datetime.now(timezone("UTC")).isoformat(),
+                            "unknown" if user_identifier is None else user_identifier,
+                            action,
+                        )
+                    )
+                    logging.debug(
+                        f"""Logging {action} action success: column {column} set to value {value} where {self.primary_keys} is {key}."""
+                    )
+                    return EditSuccess()
+                except Exception:
+                    logging.exception("Failed to append edit log.")
+                    return EditFailure(
+                        "Internal server error, failed to append edit log."
+                    )
             else:
                 logging.info(
                     f"""Logging {action} action failed: column {column} set to value {value} where {self.primary_keys} is {key}."""
