@@ -451,7 +451,6 @@ def lookup_endpoint(linked_ds_name):
     logging.info(
         f"""Received a request for dataset "{linked_ds_name}", term "{term}" ({len(term)} characters)"""
     )
-    response = jsonify({})
 
     term = term.strip().lower()
     if term != "":
@@ -495,13 +494,11 @@ def lookup_endpoint(linked_ds_name):
                 linked_df[linked_ds_label].str.lower().str.contains(term)
             ].head(n_results)
 
-        logging.debug(f"Found {linked_df_filtered.size} entries")
-        editor_values_param = get_values_from_df(
-            linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns
-        )
-        response = jsonify(editor_values_param)
-
-    return response
+    logging.debug(f"Found {linked_df_filtered.size} entries")
+    editor_values_param = get_values_from_df(
+        linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns
+    )
+    return jsonify(editor_values_param)
 
 
 logging.info("Webapp OK")

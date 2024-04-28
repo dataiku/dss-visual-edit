@@ -39,9 +39,16 @@ def get_rows(dataset_name, project_key, params):
     csv_stream = client._perform_raw(
         "GET", f"/projects/{project_key}/datasets/{dataset_name}/data/", params=params
     )
+    # CSV reader will cast all the cells in the type specified in the schema.
+    # However, in the stream, the first row contains the name of the colums which should not be casted obviously.
+    # We therefore skip the first row and reconstruct it according to the schema.
     csv_reader = DataikuStreamedHttpUTF8CSVReader(schema_columns, csv_stream)
-    rows = []
-    for row in csv_reader.iter_rows():
+    rows_iter = csv_reader.iter_rows()
+    # skip first row
+    next(rows_iter)
+
+    rows = [[c.get("name") for c in schema_columns]]
+    for row in rows_iter:
         rows.append(row)
     return rows
 
