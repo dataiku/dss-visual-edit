@@ -419,9 +419,12 @@ def label_endpoint(linked_ds_name):
     # Return label only if a label column is defined (and different from the key column)
     if key != "" and linked_ds_label and linked_ds_label != linked_ds_key:
         if linked_record.ds:
-            label = linked_record.ds.get_cell_value_sql_query(
-                linked_ds_key, key, linked_ds_label
-            )
+            try:
+                label = linked_record.ds.get_cell_value_sql_query(
+                    linked_ds_key, key, linked_ds_label
+                )
+            except Exception:
+                return "Something went wrong fetching label of linked value.", 500
         else:
             linked_record_df = linked_record.df
             if linked_record_df is None:
