@@ -463,7 +463,6 @@ def lookup_endpoint(linked_ds_name):
     else:
         n_results = 1000  # show more options if no search term is provided
 
-    # Return data only when it's a linked dataset
     linked_record: LinkedRecord | None = None
     for lr in ees.linked_records:
         if linked_ds_name == lr.ds_name:
@@ -471,7 +470,7 @@ def lookup_endpoint(linked_ds_name):
             break
 
     if linked_record is None:
-        return "Unnknown linked dataset.", 404
+        return "Unknown linked dataset.", 404
 
     linked_ds_key = linked_record.ds_key
     linked_ds_label = linked_record.ds_label
