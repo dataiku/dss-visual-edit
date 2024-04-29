@@ -67,7 +67,7 @@ class EditableEventSourced:
             )
             self.webapp_url_public = f"/public-webapps/{self.project_key}/{webapp_id}/"
         except Exception:
-            logging.exception("Failed to init webapp url.")
+            logging.exception("Failed to retrieve webapp url.")
             self.webapp_url = None
             self.webapp_url_public = "/"
 
