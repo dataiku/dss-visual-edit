@@ -47,30 +47,26 @@ Here is an example of what a data editing webapp would look like:
 
 ![](webapp_orders.png)
 
-A few things happen behind the scenes upon starting the webapp:
-
-* Settings such as primary keys and editable columns are copied into the corresponding _Data Editing_ fields of the chosen dataset (custom fields provided by the plugin).
-* 3 datasets are created (if they don't already exist):
-
-![](new_datasets.png)
-
+3 datasets are created upon starting the webapp (if they don't already exist): ![](new_datasets.png)
 Their names start with the original dataset's name. Let's review them by their suffix:
 
- 1. **_editlog_** is the raw record of all edit events captured by the webapp. It also serves as an audit trail, for governance purposes. The schema of this dataset is fixed, whatever the original dataset. Here is an example: ![](editlog.png)
- 2. **_editlog\_pivoted_** is the output of the _pivot-editlog_ recipe (provided by the plugin) and the user-friendly view of edits. In the previous example: ![](editlog_pivoted.png)
-    * Its schema is a subset of the original dataset's: it doesn't have columns that are display-only, but it has the same key columns and the same editable columns, plus a _last\_edit\_date_ column.
-    * Its rows are a subset of the original dataset's: it doesn't contain rows where no edits were made.
-    * You can think of it as...
-      * A "diff" between edited and original data.
-      * A dataset of overrides to apply to the original dataset.
-      * The result of "replaying" edit events stored in the log: we only see the last edited values.
- 3. **_edited_** is the output of the _merge-edits_ recipe (provided by the plugin) that feeds from the original dataset and the _editlog\_pivoted_.
-    * It corresponds to the edited data that you are seeing via the webapp.
-    * However, it is not in sync with the webapp: it's up to you to decide when to build it in the Flow.
-    * It contains the same number of rows as in the original dataset. For any given cell identified by its column and primary key values, if a non-empty value is found in _editlog\_pivoted_, this value is used instead of the original one.
-    * Note that, as a result of the above, it is impossible to empty a non-empty cell with the plugin’s Visual Webapp and recipes. This is because empty values in _editlog\_pivoted_ are ignored.
+1. **_editlog_** is the raw record of all edit events captured by the webapp. It also serves as an audit trail, for governance purposes. The schema of this dataset is fixed, whatever the original dataset. Here is an example: ![](editlog.png)
+2. **_editlog\_pivoted_** is the output of the _pivot-editlog_ recipe (provided by the plugin) and the user-friendly view of edits. In the previous example: ![](editlog_pivoted.png)
+  * Its schema is a subset of the original dataset's: it doesn't have columns that are display-only, but it has the same key columns and the same editable columns, plus a _last\_edit\_date_ column.
+  * Its rows are a subset of the original dataset's: it doesn't contain rows where no edits were made.
+  * You can think of it as...
+    * A "diff" between edited and original data.
+    * A dataset of overrides to apply to the original dataset.
+    * The result of "replaying" edit events stored in the log: we only see the last edited values.
+3. **_edited_** is the output of the _merge-edits_ recipe (provided by the plugin) that feeds from the original dataset and the _editlog\_pivoted_.
+  * It corresponds to the edited data that you are seeing via the webapp.
+  * However, it is not in sync with the webapp: it's up to you to decide when to build it in the Flow.
+  * It contains the same number of rows as in the original dataset. For any given cell identified by its column and primary key values, if a non-empty value is found in _editlog\_pivoted_, this value is used instead of the original one.
+  * Note that, as a result of the above, it is impossible to empty a non-empty cell with the plugin’s Visual Webapp and recipes. This is because empty values in _editlog\_pivoted_ are ignored.
 
 The datasets are created on the same connection as the original dataset. If not already the case, we recommend using a SQL connection for fast and reliable edits. For edits to be recorded by the webapp, this has to be a write connection. If that's not the case, you can change the connection of these datasets as soon as they've been added to the Flow.
+
+Settings such as primary keys and editable columns are copied into the _Data Editing_ fields of the original and the _editlog_ datasets ([custom fields provided by the plugin](https://doc.dataiku.com/dss/latest/plugins/reference/custom-fields.html) — see the bottom right corner of the screenshot above). This is how the recipes have access to settings defined in the webapp.
 
 ## Test the webapp on your own
 
@@ -119,8 +115,7 @@ The Scenario tile is displayed as a button to run a chosen scenario (typically t
 
 ## Next
 
-Because we're building a project with an interface where users can enter data and this gets processed, we'll need to have two instances of the project leveraging the plugin: one for development, one for production; each will have its own set of edits. Once all your tests are successful, the next step is to [deploy your project](deploy) on an automation node, or as a duplicate project on your design node.
-
-If you're interested in the use case of reviewing machine-generated data, check out the [dedicated guide](reviewing).
-
-You can also check out the [FAQ](faq) to learn more about the plugin.
+* If you need to customize the way the webapp displays data and create your own data editing front-end, check out the guide to our [CRUD Python API](get-started-crud-python-api) and the examples it contains to learn how to use the plugin's data persistence layer for your webapp's backend.
+* Because we're building a project with an interface where users can enter data and this gets processed, we'll need to have two instances of the project leveraging the plugin: one for development, one for production; each will have its own set of edits. Once all your tests are successful, the next step is to [deploy your project](deploy) on an automation node, or as a duplicate project on your design node.
+* If you're interested in the use case of reviewing machine-generated data, check out the [dedicated guide](reviewing).
+* You can also check out the [FAQ](faq) to learn more about the plugin.
