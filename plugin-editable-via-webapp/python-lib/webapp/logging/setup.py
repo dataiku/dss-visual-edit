@@ -15,8 +15,7 @@ def __is_running_in__dss__() -> bool:
 
 
 if __is_running_in__dss__():
-    config = get_webapp_config()
-    if __bool__(config.get("debug_mode")):
+    if __bool__(get_webapp_config().get("debug_mode")):
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.INFO)
