@@ -7,6 +7,7 @@ from dataiku_utils import is_sql_dataset, recipe_already_exists
 from pandas import DataFrame
 from commons import (
     try_get_user_identifier,
+    get_original_df,
     get_dataframe,
     write_empty_editlog,
     get_display_column_names,
@@ -282,6 +283,14 @@ class EditableEventSourced:
         self.__setup_editlog_downstream__()
 
         self.editlog_appender = EditLogAppenderFactory().create(self.editlog_ds)
+
+    def get_original_df(self):
+        """
+        Returns the original data without any edits.
+        Returns:
+            pandas.DataFrame: The original data.
+        """
+        return get_original_df(self.original_ds)
 
     def empty_editlog(self):
         """

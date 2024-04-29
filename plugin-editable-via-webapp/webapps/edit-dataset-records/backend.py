@@ -7,9 +7,8 @@ from webapp.config.models import LinkedRecord
 import webapp.logging.setup  # noqa: F401 necessary to setup logging basicconfig before dataiku module sets a default config
 from datetime import datetime
 from pandas.api.types import is_integer_dtype, is_float_dtype
-from commons import get_last_build_date, get_original_df, try_get_user_identifier
+from commons import get_last_build_date, try_get_user_identifier
 from dash import Dash, Input, Output, State, dcc, html
-from dataiku import Dataset
 from dataiku_utils import get_dataframe_filtered, client as dss_client
 from EditableEventSourced import (
     EditSuccess,
@@ -403,9 +402,7 @@ def label_endpoint(linked_ds_name):
     linked_ds_label = linked_record.ds_label
 
     # Cast provided key value into appropriate type, necessary for integers for example.
-    original_df, primary_keys, display_columns, editable_columns = get_original_df(
-        ees.original_ds
-    )
+    original_df, primary_keys, display_columns, editable_columns = ees.get_original_df()
 
     key_dtype = original_df[linked_record.name].dtype
     try:
