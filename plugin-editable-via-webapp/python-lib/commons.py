@@ -279,12 +279,6 @@ def try_get_user_identifier() -> str | None:
     return user
 
 
-# Used by backend for the edit callback
-def get_user_identifier():
-    user = try_get_user_identifier()
-    return "unknown" if user is None else user
-
-
 # Used by backend's for CRUD methods
 
 
