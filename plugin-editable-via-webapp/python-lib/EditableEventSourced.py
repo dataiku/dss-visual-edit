@@ -263,7 +263,7 @@ class EditableEventSourced:
             self.editschema_manual = editschema
         if self.editschema_manual:
             self.editschema_manual_df = DataFrame(
-                data=self.editschema_manual
+                data=[s.__dict__ for s in self.editschema_manual]
             ).set_index("name")
         else:
             self.editschema_manual_df = DataFrame(
