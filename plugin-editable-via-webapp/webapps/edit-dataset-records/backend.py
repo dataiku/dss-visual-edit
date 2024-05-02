@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 
 # Dash webapp to edit dataset records
+#
+# This code is structured as follows:
+# 0. Imports and variable initializations.
+# 1. Get webapp parameters (original dataset, primary keys, editable columns, linked records...).
+#    Depending if it is running inside DSS or not, parameters are fetched from a launch.json file (outside DSS) or an environment variable (inside).
+#    In case we start the app outside DSS, we start a flask web server.
+# 2. Instantiate editable event-sourced dataset.
+# 3. Define Dash webapp layout and components.
 from __future__ import annotations
 import logging
 from webapp.config.models import LinkedRecord
