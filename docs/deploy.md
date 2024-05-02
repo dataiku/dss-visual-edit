@@ -32,7 +32,14 @@ A simple way to initialize the editlog is with a _reset edits_ scenario as descr
 
 ### Secure procedure
 
-We show a more secure way of initializing the editlog: we want to make sure that the only way that changes can be made to the editlog table is via `INSERT` statements, and that the `date` cannot be set freely (otherwise one may insert events "in the past"). We illustrate with SQL code for a Postgresql database.
+>**For audit purposes, we strongly encourage to follow this procedure.**
+
+In the context of audit, it is especially critical to make sure no tampering is possible. Three layers of security can be put in place for this:
+- from a dataiku permissions standpoint, limit access to the editlog dataset.
+- use an SQL connection that is only allowed to select or insert rows.
+- set up your editlog database so the `date` cannot be set freely (otherwise one may insert events "in the past").
+
+We illustrate with SQL code for a Postgresql database.
 
 * Use the `date` column as the primary key and make sure it's always set to the current date/time when data is inserted in this table (we're assuming that the date of the system running the database can't be tampered with).
 
@@ -56,7 +63,7 @@ BEFORE INSERT ON editlog
 FOR EACH ROW EXECUTE FUNCTION set_timestamp_id();
 ```
 
-* Set this table to be append-only
+* Set this table to be append-only.
 
 ```sql
 REVOKE ALL ON TABLE editlog FROM public;
@@ -81,7 +88,7 @@ BEFORE UPDATE OR DELETE ON editlog
 FOR EACH ROW EXECUTE FUNCTION prevent_updates();
 ```
 
-* Set up a Connection to this database, using the credentials of a database user with limited permissions (only INSERTs).
+* Set up a Connection to this database, using the credentials of a database user with limited permissions (only SELECTs and INSERTs).
 
 ## Security considerations
 

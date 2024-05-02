@@ -3,29 +3,37 @@
 # Dash webapp to edit dataset records
 #
 # This code is structured as follows:
-# 0. Imports and variable initializations
-# 1. Get webapp parameters (original dataset, primary keys, editable columns, linked records...)
-# 2. Instantiate editable event-sourced dataset
-# 3. Define webapp layout and components
-
-# 0. Imports and variable initializations
-###
-
+# 0. Imports and variable initializations.
+# 1. Get webapp parameters (original dataset, primary keys, editable columns, linked records...).
+#    Depending if it is running inside DSS or not, parameters are fetched from a launch.json file (outside DSS) or an environment variable (inside).
+#    In case we start the app outside DSS, we start a flask web server.
+# 2. Instantiate editable event-sourced dataset.
+# 3. Define Dash webapp layout and components.
+from __future__ import annotations
 import logging
+from webapp.config.models import LinkedRecord
+import webapp.logging.setup  # noqa: F401 necessary to setup logging basicconfig before dataiku module sets a default config
 from datetime import datetime
-from os import getenv
-
-import dataiku
-from commons import get_last_build_date, get_user_identifier
+from pandas.api.types import is_integer_dtype, is_float_dtype
+from commons import get_last_build_date, try_get_user_identifier
 from dash import Dash, Input, Output, State, dcc, html
-from dataiku_utils import get_dataframe_filtered
-from DatasetSQL import DatasetSQL
-from EditableEventSourced import EditableEventSourced
-from flask import Flask, current_app, jsonify, make_response, request
+from dataiku_utils import get_dataframe_filtered, client as dss_client
+from EditableEventSourced import (
+    EditSuccess,
+    EditFailure,
+    EditUnauthorized,
+    EditableEventSourced,
+)
+from flask import Flask, jsonify, make_response, request
 from tabulator_utils import get_columns_tabulator, get_values_from_df
-from webapp_config_utils import get_linked_records
+
+from webapp.config.loader import WebAppConfig
 
 import dash_tabulator
+
+webapp_config = WebAppConfig()
+
+logging.info(f"Web app starting inside DSS:{webapp_config.running_in_dss}.")
 
 stylesheets = ["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
 scripts = [
@@ -34,64 +42,9 @@ scripts = [
     "https://cdn.jsdelivr.net/npm/luxon@3.0.4/build/global/luxon.min.js",
 ]
 
-client = dataiku.api_client()
-project_key = getenv("DKU_CURRENT_PROJECT_KEY")
-project = client.get_project(project_key)
-
-
-# 1. Get webapp parameters
-###
-
-if getenv("DKU_CUSTOM_WEBAPP_CONFIG"):
-    run_context = "dataiku"
-    # this points to a copy of assets/style.css (which is ignored by Dataiku's Dash)
-    stylesheets += [
-        "https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/style.css"
-    ]
-    # same for assets/custom_tabulator.js
-    scripts += [
-        "https://plugin-editable-via-webapp.s3.eu-west-1.amazonaws.com/custom_tabulator.js"
-    ]
-    info_display = "none"
-
-    from dataiku.customwebapp import get_webapp_config
-
-    original_ds_name = get_webapp_config().get("original_dataset")
-    params = get_webapp_config()
-
-    if bool(params.get("debug_mode")):
-        logging.basicConfig(level=logging.DEBUG)
-    else:
-        logging.basicConfig(level=logging.INFO)
-    logging.info("Webapp is being run in Dataiku")
-
-    from json import loads
-
-    editschema_manual_raw = params.get("editschema")
-    if editschema_manual_raw and editschema_manual_raw != "":
-        editschema_manual = loads(editschema_manual_raw)
-    else:
-        editschema_manual = {}
-
+if webapp_config.running_in_dss:
     server = app.server
-
 else:
-    logging.basicConfig(level=logging.INFO)
-    logging.info("Webapp is being run outside of Dataiku")
-    run_context = "local"
-    info_display = "block"
-
-    # Get original dataset name as an environment variable
-    # Get primary keys and editable column names from the custom fields of that dataset
-    from json import load
-
-    original_ds_name = getenv("ORIGINAL_DATASET")
-    params = load(open("../../webapp-settings/" + original_ds_name + ".json"))
-
-    editschema_manual = params.get("editschema")
-    if not editschema_manual:
-        editschema_manual = {}
-
     server = Flask(__name__)
     app = Dash(__name__, server=server)
     app.enable_dev_tools(debug=True, dev_tools_ui=True)
@@ -99,29 +52,41 @@ else:
 app.config.external_stylesheets = stylesheets
 app.config.external_scripts = scripts
 
-primary_keys = params.get("primary_keys")
-editable_column_names = params.get("editable_column_names")
-freeze_editable_columns = params.get("freeze_editable_columns")
-group_column_names = params.get("group_column_names")
-linked_records_count = params.get("linked_records_count")
-linked_records = get_linked_records(params, linked_records_count)
-authorized_users = params.get("authorized_users")
+project_key = webapp_config.project_key
+project = dss_client.get_project(project_key)
+
+editable_column_names = webapp_config.editable_column_names
+authorized_users = webapp_config.authorized_users
+original_ds_name = webapp_config.original_ds_name
 
 ees = EditableEventSourced(
     original_ds_name=original_ds_name,
     project_key=project_key,
-    primary_keys=primary_keys,
+    primary_keys=webapp_config.primary_keys,
     editable_column_names=editable_column_names,
-    linked_records=linked_records,
-    editschema_manual=editschema_manual,
+    linked_records=webapp_config.linked_records,
+    editschema_manual=webapp_config.editschema_manual,
     authorized_users=authorized_users,
 )
 
 
-columns = get_columns_tabulator(ees, freeze_editable_columns)
+columns = get_columns_tabulator(ees, webapp_config.freeze_editable_columns)
 
 last_build_date_initial = ""
 last_build_date_ok = False
+
+
+def __edit_result_to_message__(
+    r: EditSuccess | EditFailure | EditUnauthorized,
+) -> str:
+    if isinstance(r, EditSuccess):
+        return "Row successfully updated"
+    elif isinstance(r, EditFailure):
+        return r.message
+    elif isinstance(r, EditUnauthorized):
+        return "Unauthorized"
+    else:
+        return "Unexpected update result"
 
 
 def serve_layout():  # This function is called upon loading/refreshing the page in the browser
@@ -129,13 +94,19 @@ def serve_layout():  # This function is called upon loading/refreshing the page 
     try:
         last_build_date_initial = get_last_build_date(original_ds_name, project)
         last_build_date_ok = True
-    except:
+    except Exception:
+        logging.warning(
+            f"Failed to get last build date of {original_ds_name}. Serve layout without this information.",
+            exc_info=True,
+        )
         last_build_date_initial = ""
         last_build_date_ok = False
 
-    # get user's email and check if it's in authorized_users; if not, return a div which says "unauthorized access"
-    user_id = get_user_identifier()
-    if not authorized_users or user_id in authorized_users:
+    user_id = try_get_user_identifier()
+
+    # no specific authorized users configured or match in the list of authorized users grant you access to the layout.
+    if not authorized_users or (user_id is not None and user_id in authorized_users):
+        logging.debug(f"User '{user_id}' is being served layout.")
         return html.Div(
             children=[
                 html.Div(
@@ -167,22 +138,27 @@ def serve_layout():  # This function is called upon loading/refreshing the page 
                     data=ees.get_edited_df().to_dict(
                         "records"
                     ),  # this gets the most up-to-date edited data
-                    groupBy=group_column_names,
+                    groupBy=webapp_config.group_column_names,
                 ),
                 html.Div(
                     id="edit-info",
                     children="Info zone for tabulator",
-                    style={"display": info_display},
+                    style={
+                        "display": "none" if webapp_config.running_in_dss else "block"
+                    },
                 ),
             ]
+        )
+    # specific authorized users configured but failure to get current user info.
+    elif authorized_users and user_id is None:
+        return html.Div(
+            "Failed to fetch your user information. Try refreshing the page."
         )
     else:
         return html.Div("Unauthorized")
 
 
 app.layout = serve_layout
-
-data_fresh = True
 
 
 @app.callback(
@@ -216,7 +192,6 @@ def toggle_refresh_div_visibility(n_intervals, refresh_div_style, last_build_dat
                 f"""Last build date: {last_build_date_new} ({last_build_date_new_fmtd}) — previously {last_build_date} ({last_build_date_fmtd})"""
             )
             style_new["display"] = "block"
-            data_fresh = False
     else:
         last_build_date_new = last_build_date
     return style_new, last_build_date_new
@@ -233,24 +208,24 @@ def add_edit(cell):
 
     If the cell is in the Reviewed column, we also update values for all other editable columns in the same row (except Comments). The values in these columns are generated by the upstream data flow and subject to change. We record them, in case the user didn't edit them before marking the row as reviewed.
     """
+
     info = ""
     if cell["field"] == "Reviewed" or cell["field"] == "reviewed":
         for col in editable_column_names:
             if col != "Comments" and col != "comments":
-                info += (
-                    ees.update_row(
-                        primary_keys=cell[
-                            "row"
-                        ],  # contains values for primary keys — and other columns too, but they'll be discarded
-                        column=col,
-                        value=cell["row"][col],
-                    )
-                    + "\n"
+                result = ees.update_row(
+                    primary_keys=cell[
+                        "row"
+                    ],  # contains values for primary keys — and other columns too, but they'll be discarded
+                    column=col,
+                    value=cell["row"][col],
                 )
+                info += __edit_result_to_message__(result) + "\n"
     else:
-        info = ees.update_row(
+        result = ees.update_row(
             primary_keys=cell["row"], column=cell["field"], value=cell["value"]
         )
+        info = __edit_result_to_message__(result)
     return info
 
 
@@ -288,7 +263,6 @@ def create_endpoint():
     primary_keys_values = request.get_json().get("primaryKeys")
     column_values = request.get_json().get("columnValues")
     # TODO: check set of primary key values is unique?
-    user = get_user_identifier()
     ees.create_row(primary_keys_values, column_values)
     response = jsonify({"msg": "New row created"})
     return response
@@ -378,7 +352,7 @@ def update_endpoint():
         column = request.args.get("column", "")
         value = request.args.get("value", "")
     info = ees.update_row(primary_keys_values, column, value)
-    response = jsonify({"msg": info})
+    response = jsonify({"msg": __edit_result_to_message__(info)})
     return response
 
 
@@ -396,8 +370,8 @@ def delete_endpoint():
         primary_keys = request.get_json().get("primaryKeys")
     else:
         primary_keys = request.args.get("primaryKeys", "")
-    info = ees.delete_row(primary_keys)
-    response = jsonify({"msg": f"Row deleted"})
+    result = ees.delete_row(primary_keys)
+    response = jsonify({"msg": __edit_result_to_message__(result)})
     return response
 
 
@@ -422,22 +396,52 @@ def label_endpoint(linked_ds_name):
         key = request.args.get("key", "")
     label = ""
 
-    # Return data only when it's a linked dataset
+    linked_record: LinkedRecord | None = None
     for lr in ees.linked_records:
-        if linked_ds_name == lr["ds_name"]:
-            linked_ds_key = lr["ds_key"]
-            linked_ds_label = lr["ds_label"]
-            # Return label only if a label column is defined (and different from the key column)
-            if key != "" and linked_ds_label and linked_ds_label != linked_ds_key:
-                if lr.get("ds"):
-                    label = lr["ds"].get_cell_value_sql_query(
-                        linked_ds_key, key, linked_ds_label
-                    )
-                else:
-                    linked_df = lr["df"].set_index(linked_ds_key)
-                    label = linked_df.loc[key, linked_ds_label]
-            else:
-                label = key
+        if linked_ds_name == lr.ds_name:
+            linked_record = lr
+            break
+
+    if linked_record is None:
+        return "Unnknown linked dataset.", 404
+
+    # Return data only when it's a linked dataset
+    linked_ds_key = linked_record.ds_key
+    linked_ds_label = linked_record.ds_label
+
+    # Cast provided key value into appropriate type, necessary for integers for example.
+    original_df, primary_keys, display_columns, editable_columns = ees.get_original_df()
+
+    key_dtype = original_df[linked_record.name].dtype
+    try:
+        if is_integer_dtype(key_dtype):
+            key = int(key)
+        if is_float_dtype(key_dtype):
+            key = float(key)
+    except Exception:
+        return "Invalid key type.", 400
+
+    # Return label only if a label column is defined (and different from the key column)
+    if key != "" and linked_ds_label and linked_ds_label != linked_ds_key:
+        if linked_record.ds:
+            try:
+                label = linked_record.ds.get_cell_value_sql_query(
+                    linked_ds_key, key, linked_ds_label
+                )
+            except Exception:
+                return "Something went wrong fetching label of linked value.", 500
+        else:
+            linked_record_df = linked_record.df
+            if linked_record_df is None:
+                return "Something went wrong. Try restarting the backend.", 500
+
+            linked_df = linked_record_df.set_index(linked_ds_key)
+            try:
+                label = linked_df.loc[key, linked_ds_label]
+            except Exception:
+                return label
+    else:
+        label = key
     return label
 
 
@@ -455,7 +459,6 @@ def lookup_endpoint(linked_ds_name):
     logging.info(
         f"""Received a request for dataset "{linked_ds_name}", term "{term}" ({len(term)} characters)"""
     )
-    response = jsonify({})
 
     term = term.strip().lower()
     if term != "":
@@ -465,61 +468,44 @@ def lookup_endpoint(linked_ds_name):
     else:
         n_results = 1000  # show more options if no search term is provided
 
-    # Return data only when it's a linked dataset
+    linked_record: LinkedRecord | None = None
     for lr in ees.linked_records:
-        if linked_ds_name == lr["ds_name"]:
-            linked_ds_key = lr["ds_key"]
-            linked_ds_label = lr["ds_label"]
-            linked_ds_lookup_columns = lr["ds_lookup_columns"]
-            if lr.get("ds"):
-                # Use the Dataiku API to filter the dataset
-                linked_df_filtered = get_dataframe_filtered(
-                    linked_ds_name,
-                    project_key,
-                    linked_ds_label,
-                    term,
-                    n_results,
-                )
-            else:
-                linked_df = lr["df"]  # note: this is already capped to 1000 rows
-                if term == "":
-                    linked_df_filtered = linked_df
-                else:
-                    # Filter linked_df for rows whose label contains the search term
-                    linked_df_filtered = linked_df[
-                        linked_df[linked_ds_label].str.lower().str.contains(term)
-                    ].head(n_results)
+        if linked_ds_name == lr.ds_name:
+            linked_record = lr
+            break
 
-        logging.debug(f"Found {linked_df_filtered.size} entries")
-        editor_values_param = get_values_from_df(
-            linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns
+    if linked_record is None:
+        return "Unknown linked dataset.", 404
+
+    linked_ds_key = linked_record.ds_key
+    linked_ds_label = linked_record.ds_label
+    linked_ds_lookup_columns = linked_record.ds_lookup_columns
+    if linked_record.ds:
+        # Use the Dataiku API to filter the dataset
+        linked_df_filtered = get_dataframe_filtered(
+            linked_ds_name,
+            project_key,
+            linked_ds_label,
+            term,
+            n_results,
         )
-        response = jsonify(editor_values_param)
-
-    return response
-
-
-# Dummy endpoints
-###
-
-
-@server.route("/dash")
-def my_dash_app():
-    return app.index()
-
-
-@server.route("/echo", methods=["GET", "POST"])
-def echo_endpoint():
-    if request.method == "POST":
-        term = request.get_json().get("term")
     else:
-        term = request.args.get("term", "")
-    return jsonify([term])
+        linked_df = linked_record.df  # note: this is already capped to 1000 rows
+        if linked_df is None:
+            return "Something went wrong. Try restarting the backend.", 500
+        if term == "":
+            linked_df_filtered = linked_df
+        else:
+            # Filter linked_df for rows whose label contains the search term
+            linked_df_filtered = linked_df[
+                linked_df[linked_ds_label].str.lower().str.contains(term)
+            ].head(n_results)
 
-
-@server.route("/static")
-def static_page():
-    return current_app.send_static_file("values_url.html")
+    logging.debug(f"Found {linked_df_filtered.size} entries")
+    editor_values_param = get_values_from_df(
+        linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns
+    )
+    return jsonify(editor_values_param)
 
 
 logging.info("Webapp OK")

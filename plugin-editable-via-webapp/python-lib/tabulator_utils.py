@@ -1,9 +1,8 @@
 """
 This file contains functions used to generate the Tabulator columns configuration for a given dataset.
 """
-
+from typing import Union
 from pandas import DataFrame
-from dataiku import Dataset
 from dash_extensions.javascript import Namespace
 import logging
 from dash_extensions.javascript import assign
@@ -121,7 +120,10 @@ def __get_column_tabulator_editor__(t_type):
 
 
 def get_values_from_df(
-    df: DataFrame, key_col: str, label_col: str, lookup_cols: list = None
+    df: DataFrame,
+    key_col: str,
+    label_col: str,
+    lookup_cols: Union[list, None] = None,
 ) -> list:
     """
     Get values of specified columns in a given dataframe, to be read by the `itemFormatter` provided to Tabulator when defining a linked record:
@@ -199,7 +201,7 @@ def get_values_from_df(
 def __get_column_tabulator_linked_record__(ees, linked_record_name):
     """Define Tabulator formatter and editor settings for a column whose type is linked record"""
 
-    linked_records_df = DataFrame(data=ees.linked_records).set_index("name")
+    linked_records_df = ees.linked_records_df
     linked_ds_name = linked_records_df.loc[linked_record_name, "ds_name"]
     linked_ds_key_column = linked_records_df.loc[linked_record_name, "ds_key"]
     linked_ds_label_column = linked_records_df.loc[linked_record_name, "ds_label"]
@@ -267,10 +269,10 @@ def get_columns_tabulator(ees, freeze_editable_columns=False):
     linked_record_names = []
     if ees.linked_records:
         try:
-            linked_records_df = DataFrame(data=ees.linked_records).set_index("name")
+            linked_records_df = ees.linked_records_df
             linked_record_names = linked_records_df.index.values.tolist()
-        except:
-            None
+        except Exception:
+            logging.exception("Failed to get linked record names.")
 
     t_cols = []
     for col_name in (

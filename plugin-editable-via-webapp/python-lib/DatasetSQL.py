@@ -1,5 +1,6 @@
+import logging
 from dataiku import Dataset, SQLExecutor2, api_client, get_custom_variables
-from pandas import DataFrame
+from dataiku.sql import SelectQuery, Column, toSQL
 
 client = api_client()
 
@@ -24,6 +25,19 @@ class DatasetSQL:
         if node:
             self.table_name = self.table_name.replace("${NODE}", node)
 
+    def __get_safe_query__(self, key_column_name, key_value, column_name):
+        select_query = SelectQuery()
+        select_query.select_from(self.dataset)
+        select_query.select([Column(column_name)])
+        select_query.where(Column(key_column_name).eq(key_value))
+        select_query.limit(1)
+
+        try:
+            return toSQL(select_query, self.dataset)
+        except Exception:
+            logging.exception("Error when generating query.")
+            raise
+
     def get_cell_value_executor(self, key_column_name, key_value, column_name):
         """
         Get the value of a cell identified by a key value and a column name, using a SQLExecutor2 object
@@ -36,12 +50,9 @@ class DatasetSQL:
         Returns: cell value
         """
         if key_value != "":
-            select_query = f"""
-                SELECT "{column_name}"
-                FROM "{self.table_name}"
-                WHERE "{key_column_name}"='{key_value}'
-                LIMIT 1"""
-            df = self.executor.query_to_df(select_query)
+            df = self.executor.query_to_df(
+                self.__get_safe_query__(key_column_name, key_value, column_name)
+            )
             if df.size:
                 return df[column_name].values[0]
             else:
@@ -54,13 +65,8 @@ class DatasetSQL:
         Get the value of a cell identified by a key value and a column name, using the sql_query method of the Dataiku client
         """
         if key_value != "" and key_value != "null":
-            select_query = f"""
-                SELECT "{column_name}"
-                FROM "{self.table_name}"
-                WHERE "{key_column_name}"='{key_value}'
-                LIMIT 1"""
             streamed_query = client.sql_query(
-                query=select_query,
+                query=self.__get_safe_query__(key_column_name, key_value, column_name),
                 connection=self.connection_name,
                 project_key=self.project_key,
             )

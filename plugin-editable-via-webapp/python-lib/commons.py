@@ -1,5 +1,7 @@
+from __future__ import annotations
 import dataiku
 from pandas import DataFrame, concat, pivot_table, options
+from pandas.api.types import is_integer_dtype, is_float_dtype
 from flask import request
 import logging
 
@@ -132,7 +134,7 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
 
         # Drop any columns from the pivot that may not be one of the editable_column_names
         for col in editlog_pivoted_df.columns:
-            if not col in cols:
+            if col not in cols:
                 editlog_pivoted_df.drop(columns=[col], inplace=True)
 
         editlog_pivoted_df.reset_index(inplace=True)
@@ -206,12 +208,16 @@ def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
 
         # Change types to match those of original_df
         for col in editlog_pivoted_df.columns:
+            original_dtype = original_df[col].dtypes.name
             if col in primary_keys + display_columns + editable_columns:
-                if original_df[col].dtypes.name=="Int64":
+                if is_integer_dtype(original_dtype):
+                    editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(int)
+                elif is_float_dtype(original_dtype):
                     editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(float)
-                editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(
-                    original_df[col].dtypes.name
-                )
+                else:
+                    editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(
+                        original_dtype
+                    )
             else:
                 editable_columns_new.append(col)
 
@@ -256,12 +262,11 @@ def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
 # Utils for webapp backend
 
 
-# Used by backend for the edit callback
-def get_user_identifier():
+def try_get_user_identifier() -> str | None:
     client = dataiku.api_client()
     # from https://doc.dataiku.com/dss/latest/webapps/security.html#identifying-users-from-within-a-webapp
     # don't use client.get_own_user().get_settings().get_raw() as this would give the user who started the webapp
-    user = "unknown"
+    user = None
     if request:
         try:
             request_headers = dict(request.headers)
@@ -269,8 +274,8 @@ def get_user_identifier():
                 request_headers
             )
             user = auth_info_browser["authIdentifier"]
-        except:
-            None
+        except Exception:
+            logging.exception("Failed to get user authentication info.")
     return user
 
 

@@ -1,5 +1,5 @@
 from json import dumps
-from dataiku import api_client
+from dataiku import Dataset, api_client
 from dataikuapi.utils import DataikuStreamedHttpUTF8CSVReader
 from pandas import DataFrame
 
@@ -19,7 +19,7 @@ def recipe_already_exists(recipe_name, project):
     try:
         project.get_recipe(recipe_name).get_status()
         return True
-    except:
+    except Exception:
         return False
 
 
@@ -39,9 +39,16 @@ def get_rows(dataset_name, project_key, params):
     csv_stream = client._perform_raw(
         "GET", f"/projects/{project_key}/datasets/{dataset_name}/data/", params=params
     )
+    # CSV reader will cast all the cells in the type specified in the schema.
+    # However, in the stream, the first row contains the name of the colums which should not be casted obviously.
+    # We therefore skip the first row and reconstruct it according to the schema.
     csv_reader = DataikuStreamedHttpUTF8CSVReader(schema_columns, csv_stream)
-    rows = []
-    for row in csv_reader.iter_rows():
+    rows_iter = csv_reader.iter_rows()
+    # skip first row
+    next(rows_iter)
+
+    rows = [[c.get("name") for c in schema_columns]]
+    for row in rows_iter:
         rows.append(row)
     return rows
 
@@ -71,10 +78,6 @@ def get_dataframe_filtered(ds_name, project_key, filter_column, filter_term, n_r
     return DataFrame(columns=rows[0], data=rows[1:]) if len(rows) > 0 else DataFrame()
 
 
-def get_connection_info(ds):
-    connection_name = ds.get_config().get("params").get("connection")
-    if connection_name:
-        connection_type = client.get_connection(connection_name).get_info().get_type()
-    else:
-        connection_type = ""
-    return connection_name, connection_type
+def is_sql_dataset(ds: Dataset) -> bool:
+    # locationInfoType may not exist, for example for editable dataset.
+    return ds.get_location_info().get("locationInfoType", "") == "SQL"

@@ -1,11 +1,12 @@
+from __future__ import annotations
 import logging
 from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
-from dataiku_utils import recipe_already_exists, get_connection_info
+from dataiku_utils import is_sql_dataset, recipe_already_exists
 from pandas import DataFrame
 from commons import (
-    get_user_identifier,
+    try_get_user_identifier,
     get_original_df,
     get_dataframe,
     write_empty_editlog,
@@ -14,6 +15,7 @@ from commons import (
     pivot_editlog,
     get_key_values_from_dict,
 )
+from webapp.db.editlogs import EditLog, EditLogAppenderFactory
 from webapp_utils import find_webapp_id, get_webapp_json
 from editschema_utils import get_primary_keys, get_editable_column_names
 from DatasetSQL import DatasetSQL
@@ -22,6 +24,21 @@ from json import loads
 from datetime import datetime
 from pytz import timezone
 from re import sub
+from typing import List
+from webapp.config.models import LinkedRecord, EditSchema
+
+
+class EditSuccess:
+    pass
+
+
+class EditFailure:
+    def __init__(self, message: str) -> None:
+        self.message = message
+
+
+class EditUnauthorized:
+    pass
 
 
 class EditableEventSourced:
@@ -49,7 +66,8 @@ class EditableEventSourced:
                 f"/projects/{self.project_key}/webapps/{webapp_id}_{webapp_name}/edit"
             )
             self.webapp_url_public = f"/public-webapps/{self.project_key}/{webapp_id}/"
-        except:
+        except Exception:
+            logging.exception("Failed to retrieve webapp url.")
             self.webapp_url = None
             self.webapp_url_public = "/"
 
@@ -92,7 +110,6 @@ class EditableEventSourced:
         )
         if editlog_pivoted_ds_creator.already_exists():
             logging.debug("Found editlog pivoted")
-            unused_variable = None
         else:
             logging.debug("No editlog pivoted found, creating it...")
             editlog_pivoted_ds_creator.with_store_into(
@@ -154,14 +171,14 @@ class EditableEventSourced:
 
     def __init__(
         self,
-        original_ds_name,
-        primary_keys,
-        editable_column_names=None,
-        linked_records=None,
-        editschema_manual=None,
-        project_key=None,
+        original_ds_name: str,
+        primary_keys: List[str],
+        editable_column_names: List[str] | None = None,
+        linked_records: List[LinkedRecord] | None = None,
+        editschema_manual: List[EditSchema] | None = None,
+        project_key: str | None = None,
         editschema=None,
-        authorized_users=None,
+        authorized_users: List[str] | None = None,
     ):
         self.original_ds_name = original_ds_name
         if project_key is None:
@@ -181,7 +198,7 @@ class EditableEventSourced:
         self.__connection_name__ = (
             self.original_ds.get_config().get("params").get("connection")
         )
-        if self.__connection_name__ == None:
+        if self.__connection_name__ is None:
             self.__connection_name__ = "filesystem_managed"
 
         self.primary_keys = primary_keys
@@ -189,63 +206,54 @@ class EditableEventSourced:
             self.editable_column_names = editable_column_names
 
         # For each linked record, add linked dataset/dataframe as attribute
-        self.linked_records = linked_records
-        if linked_records:
-            if len(self.linked_records) > 0:
-                self.linked_records_df = DataFrame(data=self.linked_records).set_index(
-                    "name"
-                )
-                for linked_record in self.linked_records:
-                    linked_ds_name = linked_record["ds_name"]
-                    linked_ds = Dataset(linked_ds_name, self.project_key)
-                    # Get the connection type of the linked dataset
-                    connection_name, connection_type = get_connection_info(linked_ds)
-                    # Get the number of records in the linked dataset
-                    count_records = None
-                    try:
-                        metrics = self.project.get_dataset(
-                            linked_ds_name
-                        ).compute_metrics(metric_ids=["records:COUNT_RECORDS"])[
-                            "result"
-                        ][
-                            "computed"
-                        ]
-                        for m in metrics:
-                            if m["metric"]["metricType"] == "COUNT_RECORDS":
-                                count_records = int(m["value"])
-                    except:
-                        pass
+        self.linked_records = linked_records if linked_records is not None else []
+        if self.linked_records:
+            self.linked_records_df = DataFrame(
+                data=[lr.info.__dict__ for lr in self.linked_records]
+            ).set_index("name")
+            for linked_record in self.linked_records:
+                linked_ds_name = linked_record.ds_name
+                linked_ds = Dataset(linked_ds_name, self.project_key)
+                # Get the number of records in the linked dataset
+                count_records = None
+                try:
+                    metrics = self.project.get_dataset(linked_ds_name).compute_metrics(
+                        metric_ids=["records:COUNT_RECORDS"]
+                    )["result"]["computed"]
+                    for m in metrics:
+                        if m["metric"]["metricType"] == "COUNT_RECORDS":
+                            count_records = int(m["value"])
+                except Exception:
+                    pass
 
-                    # If the linked dataset is on an SQL connection and if it has more than 1000 records, load it as a DatasetSQL object
-                    if "SQL" in connection_type or "snowflake" in connection_type:
-                        if count_records is not None and count_records <= 1000:
-                            logging.debug(
-                                f"""Loading linked dataset "{linked_ds_name}" in memory since it has less than 1000 records"""
-                            )
-                            linked_record["df"] = linked_ds.get_dataframe()
-                        else:
-                            logging.debug(
-                                f"""Loading linked dataset "{linked_ds_name}" as a DatasetSQL object since it has more than 1000 records or an unknown number of records"""
-                            )
-                            linked_record["ds"] = DatasetSQL(
-                                linked_ds_name, self.project_key
-                            )
+                # If the linked dataset is on an SQL connection and if it has more than 1000 records, load it as a DatasetSQL object
+                if is_sql_dataset(linked_ds):
+                    if count_records is not None and count_records <= 1000:
+                        logging.debug(
+                            f"""Loading linked dataset "{linked_ds_name}" in memory since it has less than 1000 records"""
+                        )
+                        linked_record.df = linked_ds.get_dataframe()
                     else:
                         logging.debug(
-                            f"""Loading linked dataset "{linked_ds_name}" in memory since it isn't on an SQL connection"""
+                            f"""Loading linked dataset "{linked_ds_name}" as a DatasetSQL object since it has more than 1000 records or an unknown number of records"""
                         )
-                        if count_records is None:
-                            logging.warning(
-                                f"Unknown number of records for linked dataset {linked_ds_name}"
-                            )
-                        elif count_records > 1000:
-                            logging.warning(
-                                f"Linked dataset {linked_ds_name} has {count_records} records — capping at 1,000 rows to avoid memory issues"
-                            )
-                        # get the first 1000 rows of the dataset
-                        linked_record["df"] = linked_ds.get_dataframe(
-                            sampling="head", limit=1000
+                        linked_record.ds = DatasetSQL(linked_ds_name, self.project_key)
+                else:
+                    logging.debug(
+                        f"""Loading linked dataset "{linked_ds_name}" in memory since it isn't on an SQL connection"""
+                    )
+                    if count_records is None:
+                        logging.warning(
+                            f"Unknown number of records for linked dataset {linked_ds_name}"
                         )
+                    elif count_records > 1000:
+                        logging.warning(
+                            f"Linked dataset {linked_ds_name} has {count_records} records — capping at 1,000 rows to avoid memory issues"
+                        )
+                    # get the first 1000 rows of the dataset
+                    linked_record.df = linked_ds.get_dataframe(
+                        sampling="head", limit=1000
+                    )
 
         self.editschema_manual = editschema_manual
 
@@ -255,7 +263,7 @@ class EditableEventSourced:
             self.editschema_manual = editschema
         if self.editschema_manual:
             self.editschema_manual_df = DataFrame(
-                data=self.editschema_manual
+                data=[s.__dict__ for s in self.editschema_manual]
             ).set_index("name")
         else:
             self.editschema_manual_df = DataFrame(
@@ -274,10 +282,11 @@ class EditableEventSourced:
         self.__save_custom_fields__(self.editlog_ds_name)
         self.__setup_editlog_downstream__()
 
-    def get_original_df(self) -> DataFrame:
+        self.editlog_appender = EditLogAppenderFactory().create(self.editlog_ds)
+
+    def get_original_df(self):
         """
         Returns the original data without any edits.
-
         Returns:
             pandas.DataFrame: The original data.
         """
@@ -362,11 +371,13 @@ class EditableEventSourced:
         # TODO: read row that was not edited too! This can be done via Dataiku API
         return self.get_edited_cells_df_indexed().loc[key]
 
-    def __log_edit__(self, key, column, value, action="update"):
+    def __log_edit__(
+        self, key, column, value, action="update"
+    ) -> EditSuccess | EditFailure | EditUnauthorized:
         # if the type of column_name is a boolean, make sure we read it correctly
         for col in self.schema_columns:
             if col["name"] == column:
-                if type(value) == str and col.get("type") == "boolean":
+                if isinstance(value, str) and col.get("type") == "boolean":
                     if value == "":
                         value = None
                     else:
@@ -374,35 +385,47 @@ class EditableEventSourced:
                 break
 
         # store value as a string, unless it's None
-        if value != None:
+        if value is not None:
             value_string = str(value)
         else:
             value_string = value
 
-        user_identifier = get_user_identifier()
-        if self.authorized_users and not user_identifier in self.authorized_users:
-            info = "Unauthorized"
+        user_identifier = try_get_user_identifier()
+        if self.authorized_users and (
+            user_identifier is None or user_identifier not in self.authorized_users
+        ):
+            logging.debug(
+                f"""Logging {action} action unauthorized ('{user_identifier}'): column {column} set to value {value} where {self.primary_keys} is {key}."""
+            )
+            return EditUnauthorized()
         else:
             if column in self.editable_column_names or action == "delete":
                 # add to the editlog
-                self.editlog_ds.spec_item["appendMode"] = True
-                edit_data = {
-                    "key": [str(key)],
-                    "column_name": [column],
-                    "value": [value_string],
-                    "date": [datetime.now(timezone("UTC")).isoformat()],
-                    "user": [user_identifier],
-                }
-                if "action" in [col["name"] for col in self.editlog_columns]:
-                    edit_data.update({"action": [action]})
-                self.editlog_ds.write_dataframe(DataFrame(data=edit_data))
-                info = f"""Logging {action} action: column {column} set to value {value} where {self.primary_keys} is {key}."""
-
+                try:
+                    self.editlog_appender.append(
+                        EditLog(
+                            str(key),
+                            column,
+                            value_string,
+                            datetime.now(timezone("UTC")).isoformat(),
+                            "unknown" if user_identifier is None else user_identifier,
+                            action,
+                        )
+                    )
+                    logging.debug(
+                        f"""Logging {action} action success: column {column} set to value {value} where {self.primary_keys} is {key}."""
+                    )
+                    return EditSuccess()
+                except Exception:
+                    logging.exception("Failed to append edit log.")
+                    return EditFailure(
+                        "Internal server error, failed to append edit log."
+                    )
             else:
-                info = f"""{column} isn't an editable column"""
-
-        logging.info(info)
-        return info
+                logging.info(
+                    f"""Logging {action} action failed: column {column} set to value {value} where {self.primary_keys} is {key}."""
+                )
+                return EditFailure(f"""{column} isn't an editable column.""")
 
     def create_row(self, primary_keys: dict, column_values: dict) -> str:
         """
@@ -427,7 +450,9 @@ class EditableEventSourced:
             )
         return "Row successfully created"
 
-    def update_row(self, primary_keys: dict, column: str, value: str) -> str:
+    def update_row(
+        self, primary_keys: dict, column: str, value: str
+    ) -> EditSuccess | EditFailure | EditUnauthorized:
         """
         Updates a row.
 
@@ -443,10 +468,11 @@ class EditableEventSourced:
             This method doesn't implement data validation. It doesn't check that the value is allowed for the specified column.
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
-        self.__log_edit__(key, column, value, action="update")
-        return "Row successfully updated"
+        return self.__log_edit__(key, column, value, action="update")
 
-    def delete_row(self, primary_keys: dict):
+    def delete_row(
+        self, primary_keys: dict
+    ) -> EditSuccess | EditFailure | EditUnauthorized:
         """
         Deletes a row identified by the given primary key(s).
 
@@ -457,5 +483,4 @@ class EditableEventSourced:
             str: A message indicating that the row was deleted.
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
-        self.__log_edit__(key, None, None, action="delete")
-        return "Row successfully deleted"
+        return self.__log_edit__(key, None, None, action="delete")
