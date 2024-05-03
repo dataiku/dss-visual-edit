@@ -40,4 +40,5 @@ class Config(BaseModel):
     group_column_names: List[str]
     linked_records_count: int = 0
     authorized_users: List[str] = []
+    # it can in fact be: null, "", [] -> empty or not, and "[]" json in a string.
     editschema: Any = []

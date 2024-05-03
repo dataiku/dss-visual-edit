@@ -1,11 +1,12 @@
 from __future__ import annotations
+import json
 import logging
 import os
 from typing import Any, List
 from dataiku.customwebapp import get_webapp_config
 from json import load
 from os import getenv
-from webapp.config.models import Config, LinkedRecordInfo, LinkedRecord
+from webapp.config.models import Config, EditSchema, LinkedRecordInfo, LinkedRecord
 
 
 class WebAppConfig:
@@ -35,10 +36,15 @@ class WebAppConfig:
         self.linked_records = self.__get_linked_records__(
             dic_config, self.linked_records_count
         )
-        if isinstance(typed_config.editschema, str) or typed_config.editschema is None:
-            self.editschema_manual = []
+        if not typed_config.editschema:
+            self.editschema_manual: List[EditSchema] = []
+        elif isinstance(typed_config.editschema, str):
+            # in case it is a string, a json object can be hidden in there. So deserialize again.
+            self.editschema_manual: List[EditSchema] = json.loads(
+                typed_config.editschema
+            )
         else:
-            self.editschema_manual = typed_config.editschema
+            self.editschema_manual: List[EditSchema] = typed_config.editschema
 
         self.authorized_users = typed_config.authorized_users
 
