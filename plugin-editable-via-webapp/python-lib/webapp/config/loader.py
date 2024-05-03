@@ -1,4 +1,6 @@
 from __future__ import annotations
+import logging
+import os
 from typing import Any, List
 from dataiku.customwebapp import get_webapp_config
 from json import load
@@ -10,6 +12,7 @@ class WebAppConfig:
     def __init__(self) -> None:
         self.running_in_dss = getenv("DKU_CUSTOM_WEBAPP_CONFIG") is not None
         if self.running_in_dss:
+            logging.info(f"Config:{os.getenv('DKU_CUSTOM_WEBAPP_CONFIG')}")
             dic_config = get_webapp_config()
             typed_config = Config(**dic_config)
             self.__validate_original_dataset_name__(typed_config.original_dataset)
