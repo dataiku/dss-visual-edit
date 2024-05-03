@@ -1,9 +1,8 @@
 {
     "acceptedPythonInterpreters": [
-        "PYTHON37",
         "PYTHON39"
     ],
-    "corePackagesSet": "PANDAS10",
+    "corePackagesSet": "PANDAS15",
     "installCorePackages": true,
     "installJupyterSupport": false,
     "basePackagesInstallMethod": "PRE_BUILT",
