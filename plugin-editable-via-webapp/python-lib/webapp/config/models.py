@@ -1,7 +1,7 @@
 from __future__ import annotations
 from pydantic import BaseModel
 from dataclasses import dataclass
-from typing import List
+from typing import Any, List
 from DatasetSQL import DatasetSQL
 from pandas import DataFrame
 
@@ -40,4 +40,4 @@ class Config(BaseModel):
     group_column_names: List[str]
     linked_records_count: int = 0
     authorized_users: List[str] = []
-    editschema: List[EditSchema] = []
+    editschema: Any = []

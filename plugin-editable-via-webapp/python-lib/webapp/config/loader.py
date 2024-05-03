@@ -32,7 +32,10 @@ class WebAppConfig:
         self.linked_records = self.__get_linked_records__(
             dic_config, self.linked_records_count
         )
-        self.editschema_manual = typed_config.editschema
+        if isinstance(typed_config.editschema, str) or typed_config.editschema is None:
+            self.editschema_manual = []
+        else:
+            self.editschema_manual = typed_config.editschema
 
         self.authorized_users = typed_config.authorized_users
 
