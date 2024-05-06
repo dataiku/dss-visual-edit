@@ -6,6 +6,10 @@ import "tabulator-tables/dist/css/tabulator.min.css";
 import "tabulator-tables/dist/css/tabulator_semanticui.min.css";
 import "../../../assets/custom_tabulator.js";
 import "../../../assets/tabulator_dataiku.css";
+import "../../../assets/jquery-3.5.1.min.js";
+import "../../../assets/luxon.min.js";
+import "../../../assets/semantic-ui-react.min.js";
+import "../../../assets/semantic.min.css";
 
 const crypto = require('crypto');
 

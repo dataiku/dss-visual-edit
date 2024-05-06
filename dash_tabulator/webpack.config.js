@@ -79,6 +79,28 @@ module.exports = (env, argv) => {
                         },
                     ],
                 },
+                {
+                    test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+                    use: [
+                        {
+                            loader: 'file-loader'
+                        }
+                    ]
+                },
+                {
+                    test: /\.(png)$/i,
+                    use: [
+                        {
+                            loader: 'file-loader',
+                        },
+                    ],
+                },
+                {
+                    test: /jquery-3.5.1.min.js|luxon.min.js|semantic-ui-react.min.js/,
+                    use: {
+                        loader: 'script-loader',
+                    },
+                },
             ],
         },
         optimization: {
