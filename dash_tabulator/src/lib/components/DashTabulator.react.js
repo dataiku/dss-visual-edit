@@ -29,15 +29,11 @@ export default class DashTabulator extends React.Component {
             let header = columns[i];
             for (let key in header) {
                 let o = header[key];
-                console.log(key);
-                console.log(o);
                 if (o instanceof Object) {
                     header[key] = resolveProp(o, this);
                     if (!o.variable && !o.arrow) {
                         for (let key2 in o) {
                             let o2 = o[key2]
-                            console.log(key2);
-                            console.log(o2);
                             if (o2 instanceof Object) {
                                 o[key2] = resolveProp(o2, this);
                             }
@@ -64,8 +60,6 @@ export default class DashTabulator extends React.Component {
         });
 
         this.tabulator.on("cellEdited", (cell) => {
-            console.log("Cell edited!")
-            console.log('cellEdited', cell)
             var edited = new Object()
             edited.field = cell.getField()
             edited.type = cell.getColumn().getDefinition()["editor"]
@@ -91,7 +85,6 @@ export default class DashTabulator extends React.Component {
     }
 
     render() {
-        console.log("Rendering!")
         try {
             window.parent.WT1SVC.event("lca-datatable-viewed", {
                 "dataset_name_hash": md5(this.props.datasetName),

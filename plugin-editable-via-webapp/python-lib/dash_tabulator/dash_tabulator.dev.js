@@ -129,7 +129,7 @@ window["dash_tabulator"] =
 /******/ 	        var srcFragments = src.split('/');
 /******/ 	        var fileFragments = srcFragments.slice(-1)[0].split('.');
 /******/
-/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1713259439");
+/******/ 	        fileFragments.splice(1, 0, "v0_0_1m1715000548");
 /******/ 	        srcFragments.splice(-1, 1, fileFragments.join('.'))
 /******/
 /******/ 	        return srcFragments.join('/');
@@ -78721,8 +78721,6 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
 
         for (var key in header) {
           var o = header[key];
-          console.log(key);
-          console.log(o);
 
           if (o instanceof Object) {
             header[key] = Object(dash_extensions__WEBPACK_IMPORTED_MODULE_2__["resolveProp"])(o, this);
@@ -78730,8 +78728,6 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
             if (!o.variable && !o.arrow) {
               for (var key2 in o) {
                 var o2 = o[key2];
-                console.log(key2);
-                console.log(o2);
 
                 if (o2 instanceof Object) {
                   o[key2] = Object(dash_extensions__WEBPACK_IMPORTED_MODULE_2__["resolveProp"])(o2, this);
@@ -78758,8 +78754,6 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
         "footerElement": "<button class='tabulator-page' onclick='localStorage.clear(); window.location.reload();'>Reset View</button>"
       });
       this.tabulator.on("cellEdited", function (cell) {
-        console.log("Cell edited!");
-        console.log('cellEdited', cell);
         var edited = new Object();
         edited.field = cell.getField();
         edited.type = cell.getColumn().getDefinition()["editor"];
@@ -78786,8 +78780,6 @@ var DashTabulator = /*#__PURE__*/function (_React$Component) {
     key: "render",
     value: function render() {
       var _this3 = this;
-
-      console.log("Rendering!");
 
       try {
         window.parent.WT1SVC.event("lca-datatable-viewed", {
