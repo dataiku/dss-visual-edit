@@ -6,7 +6,12 @@ from typing import Any, List
 from dataiku.customwebapp import get_webapp_config
 from json import load
 from os import getenv
-from webapp.config.models import Config, EditSchema, LinkedRecordInfo, LinkedRecord
+from webapp.config.models import (
+    Config,
+    EditSchema,
+    LinkedRecordInfo,
+    LinkedRecord,
+)
 
 
 class WebAppConfig:
@@ -36,19 +41,30 @@ class WebAppConfig:
         self.linked_records = self.__get_linked_records__(
             dic_config, self.linked_records_count
         )
-        if not typed_config.editschema:
-            self.editschema_manual: List[EditSchema] = []
-        elif isinstance(typed_config.editschema, str):
-            # in case it is a string, a json object can be hidden in there. So deserialize again.
-            self.editschema_manual: List[EditSchema] = json.loads(
-                typed_config.editschema
-            )
-        else:
-            self.editschema_manual: List[EditSchema] = typed_config.editschema
+
+        self.editschema_manual = self.__cast_editschema__(typed_config)
 
         self.authorized_users = typed_config.authorized_users
 
         self.project_key = self.__get_project_key__()
+
+    # editschema is a weird case. It can be a JSON object or array.
+    # It can also be those two but as string, so we need to deserialize once more.
+    def __cast_editschema__(self, config: Config) -> List[EditSchema]:
+        editschema_dict = []
+        if not config.editschema:
+            editschema_dict = []
+        elif isinstance(config.editschema, str):
+            # in case it is a string, a json object can be hidden in there. So deserialize again.
+            # it can either be an object directly or an array of objects.
+            editschema_dict = json.loads(config.editschema)
+        else:
+            editschema_dict = config.editschema
+
+        if not isinstance(editschema_dict, list):
+            editschema_dict = [editschema_dict]
+
+        return [EditSchema(**s) for s in editschema_dict]
 
     def __validate_original_dataset_name__(self, name: Any) -> str:
         if name is None or not isinstance(name, str):
