@@ -1,10 +1,11 @@
 # Editschema
 
-The editschema can be used to add specific UI behavior to editable colums.
+The editschema can be used to add specific UI behavior to editable columns. It is a JSON array of objects, each object representing a column of the original dataset.
 
 ## Fields
 
 For each column of the original dataset you can set the following fields:
+
 * `name`: name of a column of the original dataset.
 * `type`: allows to override the column's type inferred from the original dataset's schema, or to refine it:
   * `boolean_tick`: formatting and editing of boolean values behaves like a toggle with only 2 states: `true` represented by a green tick icon, and no icon at all otherwise.

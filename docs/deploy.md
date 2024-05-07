@@ -35,9 +35,9 @@ A simple way to initialize the editlog is with a _reset edits_ scenario as descr
 >**For audit purposes, we strongly encourage to follow this procedure.**
 
 In the context of audit, it is especially critical to make sure no tampering is possible. Three layers of security can be put in place for this:
-- from a dataiku permissions standpoint, limit access to the editlog dataset.
-- use an SQL connection that is only allowed to select or insert rows.
-- set up your editlog database so the `date` cannot be set freely (otherwise one may insert events "in the past").
+
+- From a Dataiku permissions standpoint, limit access to the editlog dataset.
+- Set up your editlog table so the `date` cannot be set freely (otherwise one may insert events "in the past"), and so that it is append-only.
 
 We illustrate with SQL code for a Postgresql database.
 
