@@ -1,6 +1,6 @@
-from typing import Any, List, Optional
+from typing import List, Optional
 import dataiku
-from dataiku.sql import Column, Constant, toSQL, List as ListBuilder
+from dataiku.sql import Column, toSQL, List as ListBuilder, Expression
 
 
 def quote_identifier(string: str) -> str:
@@ -45,7 +45,7 @@ class InsertQueryBuilder:
         self.dataset = dataset
         self.table_name = get_table_name_from_dataset(dataset=dataset)
         self.columns: List[str] = []
-        self.values: List[List[str]] = []
+        self.values: List[List[Expression]] = []
         self.TO_PARAM = "?"
 
     def add_column(self, column: str):
@@ -57,15 +57,10 @@ class InsertQueryBuilder:
             self.add_column(column)
         return self
 
-    def add_value(self, value: List[Any]):
+    def add_value(self, value: List[Expression]):
         if len(value) != len(self.columns):
             raise ValueError("Cannot add values to insert query")
         self.values.append([val for val in value])
-        return self
-
-    def add_values(self, values: List[List[Any]]):
-        for value in values:
-            self.add_value(value=value)
         return self
 
     def _query_start(self) -> str:
@@ -79,10 +74,9 @@ class InsertQueryBuilder:
             return result
         return ""
 
-    def get_wrapped_value(self, value: List[str]):
-        args = [Constant(val) for val in value]
-        if len(args) > 0:
-            builder = ListBuilder(*args)
+    def get_wrapped_value(self, value: List[Expression]):
+        if len(value) > 0:
+            builder = ListBuilder(*value)
             result = toSQL(builder, dataset=self.dataset)
             return result
         return None
