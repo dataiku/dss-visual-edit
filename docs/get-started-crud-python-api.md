@@ -6,6 +6,10 @@ As an alternative to using the Data Editing Visual Webapp, you can build a custo
 
 Let's take a quick tour of how to use this. We strongly recommend following the [Visual Webapp guide](get-started) first, to get an initial understanding of the plugin's features and concepts.
 
+## Requirement: code environment
+
+When running the code below in a notebook or a webapp in Dataiku, a code environment must be specified. A code environment was created upon installation of the plugin, but it can't be selected from the list of available code environments as it can only be used by the plugin's visual components (Visual Webapp and Recipes). You'll need to create a new code environment and to make sure it contains the same packages as the plugin's.
+
 ## Instantiate the `EditableEventSourced` class
 
 ```python
