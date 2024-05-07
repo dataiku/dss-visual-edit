@@ -1,10 +1,10 @@
 {
     "id": "editable-via-webapp",
-    "version": "1.8.11",
+    "version": "1.8.12",
     "meta": {
         "label": "Editable via webapp",
         "description": "Edit dataset records via a webapp and replay edits in the Flow",
-        "author": "Dataiku (Louis Dorard, Julien Hobeika)",
+        "author": "Dataiku (Louis Dorard, Julien Hobeika, Fabien Daoulas)",
         "icon": "icon-edit-sign",
         "tags": [],
         "url": "http://dataiku.github.io/lca/",
