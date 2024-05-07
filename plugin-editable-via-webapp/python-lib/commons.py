@@ -1,6 +1,6 @@
 from __future__ import annotations
 import dataiku
-from pandas import DataFrame, concat, pivot_table, options
+from pandas import DataFrame, concat, pivot_table, options, Int64Dtype
 from pandas.api.types import is_integer_dtype, is_float_dtype
 from flask import request
 import logging
@@ -211,7 +211,10 @@ def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
             original_dtype = original_df[col].dtypes.name
             if col in primary_keys + display_columns + editable_columns:
                 if is_integer_dtype(original_dtype):
-                    editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(int)
+                    # there may be missing values so choose a dtype supporting them.
+                    editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(
+                        Int64Dtype()
+                    )
                 elif is_float_dtype(original_dtype):
                     editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(float)
                 else:
