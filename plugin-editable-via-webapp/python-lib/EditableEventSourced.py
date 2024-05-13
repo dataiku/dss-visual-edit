@@ -450,7 +450,7 @@ class EditableEventSourced:
 
     def update_row(
         self, primary_keys: dict, column: str, value: str
-    ) -> EditSuccess | EditFailure | EditUnauthorized:
+    ) -> List[EditSuccess | EditFailure | EditUnauthorized]:
         """
         Updates a row.
 
@@ -460,13 +460,23 @@ class EditableEventSourced:
             value (str): The value to set for the cell identified by key and column.
 
         Returns:
-            str: A message indicating that the row was edited.
+            list: A list of objects indicating the success or failure to insert an editlog.
 
         Note:
             This method doesn't implement data validation. It doesn't check that the value is allowed for the specified column.
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
-        return self.__log_edit__(key, column, value, action="update")
+
+        # for reviewed column, create an editlog for each columns to enforce values even after a change in the original.
+        if column == "Reviewed" or column == "reviewed":
+            results = []
+            for col in self.editable_column_names:
+                if col != "Comments" and col != "comments":
+                    # contains values for primary keys — and other columns too, but they'll be discarded
+                    results.append(self.__log_edit__(key, col, primary_keys[col]))
+            return results
+        else:
+            return [self.__log_edit__(key, column, value, action="update")]
 
     def delete_row(
         self, primary_keys: dict
