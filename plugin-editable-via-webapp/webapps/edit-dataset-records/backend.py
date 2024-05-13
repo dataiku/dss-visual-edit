@@ -35,22 +35,12 @@ webapp_config = WebAppConfig()
 
 logging.info(f"Web app starting inside DSS:{webapp_config.running_in_dss}.")
 
-stylesheets = ["https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css"]
-scripts = [
-    "https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js",
-    "https://code.jquery.com/jquery-3.5.1.min.js",  # used by inline javascript code found in tabulator_utils (__get_column_tabulator_formatter_linked_record__)
-    "https://cdn.jsdelivr.net/npm/luxon@3.0.4/build/global/luxon.min.js",
-]
-
 if webapp_config.running_in_dss:
     server = app.server
 else:
     server = Flask(__name__)
     app = Dash(__name__, server=server)
     app.enable_dev_tools(debug=True, dev_tools_ui=True)
-
-app.config.external_stylesheets = stylesheets
-app.config.external_scripts = scripts
 
 project_key = webapp_config.project_key
 project = dss_client.get_project(project_key)
