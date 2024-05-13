@@ -26,14 +26,17 @@ See [here](data-table-features) for more information on the editing experience.
 - If a lookup column is the same as the primary key column, then the lookup value will not be shown in the dropdown widget. Otherwise it will work as expected.
 
 ## Example
+
 Given a dataset named PRODUCTS containing a list of products and another dataset named COMPANIES containing a list of companies, we want users of the web app to link products to a specific company.
 
 ***Original dataset***
+
 | product_name  | company_name |
 | ------------- | ------------- |
 | DSS  |   |
 
 ***Dataset with linked records***
+
 | company_name | industry |
 | ------------- | ------------- |
 | dataiku  | tech  |
@@ -48,11 +51,13 @@ The configuration could look like this:
 resulting in the following edited dataset one DSS is linked to dataiku.
 
 ***Original dataset edited (after building the flow)***
+
 | product_name  | company_name |
 | ------------- | ------------- |
 | DSS  | dataiku   |
 
 ***Dataset with linked records***
+
 | company_name | industry |
 | ------------- | ------------- |
 | dataiku  | tech  |
