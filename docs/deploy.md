@@ -44,23 +44,26 @@ We illustrate with SQL code for a Postgresql database.
 * Use the `date` column as the primary key and make sure it's always set to the current date/time when data is inserted in this table (we're assuming that the date of the system running the database can't be tampered with).
 
 ```sql
-CREATE TABLE editlog (
-    date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP PRIMARY KEY,
-    user VARCHAR(255),
-    key VARCHAR(255)
+CREATE TABLE "editlog" (
+    "key" VARCHAR(255),
+    "column_name" VARCHAR(255), --set the length according to the expected size of values.
+    "value" VARCHAR(255), --set the length according to the size of the columns.
+    "date" VARCHAR(255),
+    "user" VARCHAR(255),
+    "action" VARCHAR(255)
 );
 
-CREATE OR REPLACE FUNCTION set_timestamp_id()
+CREATE FUNCTION set_timestamp_id()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.date = CURRENT_TIMESTAMP;
+    NEW."date" = to_char (CURRENT_TIMESTAMP::timestamp at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US+00:00');
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER set_timestamp_id_trigger
 BEFORE INSERT ON editlog
-FOR EACH ROW EXECUTE FUNCTION set_timestamp_id();
+FOR EACH ROW EXECUTE PROCEDURE set_timestamp_id();
 ```
 
 * Set this table to be append-only.
@@ -73,7 +76,7 @@ GRANT SELECT, INSERT ON TABLE editlog TO your_user;
 * Optional: raise an error if someone tries to update or delete data
 
 ```sql
-CREATE OR REPLACE FUNCTION prevent_updates()
+CREATE FUNCTION prevent_updates()
 RETURNS TRIGGER AS $$
 BEGIN
     IF TG_OP = 'UPDATE' OR TG_OP = 'DELETE' THEN
@@ -85,7 +88,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER prevent_updates_trigger
 BEFORE UPDATE OR DELETE ON editlog
-FOR EACH ROW EXECUTE FUNCTION prevent_updates();
+FOR EACH ROW EXECUTE PROCEDURE prevent_updates();
 ```
 
 * Set up a Connection to this database, using the credentials of a database user with limited permissions (only SELECTs and INSERTs).
