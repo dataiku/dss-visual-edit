@@ -16,7 +16,7 @@ We start this article with a demo video and we explain how to replicate it using
 
 How to replicate:
 
-* [Install the Data Editing plugin](install-plugin).
+* [Install the Visual Edit plugin](install-plugin).
 * [Download project bundle](dss-bundle-JOIN_COMPANIES_SIMPLE-webapp-based.zip) and import on your instance. Note: the project uses the managed Amazon S3 data connection provided on Dataiku Online — you may have to remap to one of your own data connections.
 * Build dataset `companies_joined_prepared_edited` (recursive build).
 * Go to Webapps and start "Edit Matches Uncertain".
@@ -37,7 +37,7 @@ This section presents how the project works in its current state. Alternatively,
 
 ### Webapp Setup
 
-As you can see in the datasets above, comparing company names can work in some cases but not all (e.g. "TheFacebook" and "Meta"). We set up a data editing webapp to have a human assign matches that the machine couldn't find.
+As you can see in the datasets above, comparing company names can work in some cases but not all (e.g. "TheFacebook" and "Meta"). We set up a Visual Edit webapp to have a human assign matches that the machine couldn't find.
 
 <iframe src="https://www.loom.com/embed/d28df84ca26b49a2a25f802c92cfbb5e" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
@@ -51,7 +51,7 @@ The project's Flow includes recipes to automatically (fuzzy) match companies bas
 
 #### Editlog
 
-The Flow includes an editlog dataset and recipes provided by the Data Editing plugin (those in red). If you're not familiar with them, check out this video for a live demonstration:
+The Flow includes an editlog dataset and recipes provided by the Visual Edit plugin (those in red). If you're not familiar with them, check out this video for a live demonstration:
 
 <iframe src="https://www.loom.com/embed/17b4c5bf685f4f30a00a51c53d4d006f" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 

@@ -1,4 +1,4 @@
-# Plugin: Data Editing | Dataiku
+# Plugin: Visual Edit | Dataiku
 
 ## Build apps to edit data and write it back to the Flow
 

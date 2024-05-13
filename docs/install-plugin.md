@@ -1,4 +1,4 @@
-# Installation | Plugin: Data Editing | Dataiku
+# Installation | Plugin: Visual Edit | Dataiku
 
 ## Requirements
 
@@ -16,7 +16,7 @@
   * ![](add_plugin_upload.png)
   * ![](add_plugin_select_zip.png)
 * Create the code environment for this plugin
-  * Select the types of containers you plan to use as backend for data editing webapps or for running recipes provided by the plugin. The easiest is to choose All. ![](add_plugin_creating_code_env.png)
+  * Select the types of containers you plan to use as backend for Visual Edit webapps or for running recipes provided by the plugin. The easiest is to choose All. ![](add_plugin_creating_code_env.png)
   * ![](add_plugin_creating_code_env_2.png)
   * ![](add_plugin_creating_code_env_done.png)
   * ![](add_plugin_creating_code_env_done_2.png)

@@ -1,4 +1,4 @@
-# Reviewing machine-generated data | Plugin: Data Editing | Dataiku
+# Reviewing machine-generated data | Plugin: Visual Edit | Dataiku
 
 ## Use case description
 
@@ -28,7 +28,7 @@ As a result, there will be no missing value in the machine-generated and human-r
 You must be familiar with the getting started guide and how to use the plugin to make corrections on source data.
 
 * **Add feedback columns to the dataset to review**: this can be done via code in the existing data pipeline, or with an additional Prepare recipe, as columns with missing values to serve as placeholders in the webapp.
-* **When creating a Data Editing webapp**: make sure to select all machine-generated columns and feedback columns as editable.
+* **When creating a Visual Edit webapp**: make sure to select all machine-generated columns and feedback columns as editable.
 * **When using the webapp**: you would review values in generated columns (mark as reviewed, or edit values and add notes when necessary) and fill in missing values.
 * **When building the Flow and defining the _update source_ scenario**: you would typically want to notify end-users via email if there is new data to review.
 * **Test with IT**: share the _editlog\_pivoted_ dataset with IT for them to propagate or leverage edits in other IT systems (see the sub use cases mentioned at the beginning of this document); columns of this dataset include primary keys, machine-generated and human-reviewed columns, a boolean Reviewed column, and additional human feedback columns.

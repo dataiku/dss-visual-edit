@@ -1,8 +1,8 @@
-# Getting started: CRUD Python API | Plugin: Data Editing | Dataiku
+# Getting started: CRUD Python API | Plugin: Visual Edit | Dataiku
 
 <iframe src="https://www.loom.com/embed/3d899ce5f7544850abe91d088b969331" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
-As an alternative to using the Data Editing Visual Webapp, you can build a custom webapp that uses the CRUD (Create, Read, Update, Delete) methods provided by the `EditableEventSourced` Python class.
+As an alternative to using the Visual Edit Webapp, you can build a custom webapp that uses the CRUD (Create, Read, Update, Delete) methods provided by the `EditableEventSourced` Python class.
 
 Let's take a quick tour of how to use this. We strongly recommend following the [Visual Webapp guide](get-started) first, to get an initial understanding of the plugin's features and concepts.
 

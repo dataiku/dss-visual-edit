@@ -1,4 +1,4 @@
-# Getting started | Plugin: Data Editing | Dataiku
+# Getting started | Plugin: Visual Edit | Dataiku
 
 ## Use case description
 
@@ -12,7 +12,7 @@ In this guide, we focus on the former. The latter is slightly more complex and w
 Here, we want business users (aka end-users) to edit data based on their domain expertise, and we want to use the edited data for better downstream analytics and reporting. Instead of doing this in Excel, we want end-users to access a web interface. Therefore we need a front-end for them to see and enter data, and we need to "connect" the data entered via the web front-end with the analytics pipeline. This guide is structured as follows:
 
 * Preliminary steps
-* Create a Data Editing webapp
+* Create a Visual Edit webapp
 * Start the webapp
 * Test the webapp
 * Use edits in the Flow
@@ -28,9 +28,9 @@ Here, we want business users (aka end-users) to edit data based on their domain 
   * Use a “Text” meaning for both free-text input and for dropdowns (this will be specified in the Visual Webapp's settings), text-based filtering, and sorting by alphabetical order.
 
 
-## Create a Data Editing webapp
+## Create a Visual Edit webapp
 
-* Go to Webapps, create New Visual Webapp, pick Data Editing (this component is provided by the plugin).
+* Go to Webapps, create New Visual Webapp, pick Visual Edit (this component is provided by the plugin).
   * ![](new_visual_webapp.png)
   * ![](new_visual_webapp_2.png)
 * Settings:
@@ -43,7 +43,7 @@ Here, we want business users (aka end-users) to edit data based on their domain 
 
 ## Start the webapp
 
-Here is an example of what a data editing webapp would look like:
+Here is an example of what a Visual Edit webapp would look like:
 
 ![](webapp_orders.png)
 
@@ -66,7 +66,7 @@ Their names start with the original dataset's name. Let's review them by their s
 
 The datasets are created on the same connection as the original dataset. If not already the case, we recommend using a SQL connection for fast and reliable edits. For edits to be recorded by the webapp, this has to be a write connection. If that's not the case, you can change the connection of these datasets as soon as they've been added to the Flow.
 
-Settings such as primary keys and editable columns are copied into the _Data Editing_ fields of the original and the _editlog_ datasets ([custom fields provided by the plugin](https://doc.dataiku.com/dss/latest/plugins/reference/custom-fields.html) — see the bottom right corner of the screenshot above). This is how the recipes have access to settings defined in the webapp.
+Settings such as primary keys and editable columns are copied into the _Visual Edit_ fields of the original and the _editlog_ datasets ([custom fields provided by the plugin](https://doc.dataiku.com/dss/latest/plugins/reference/custom-fields.html) — see the bottom right corner of the screenshot above). This is how the recipes have access to settings defined in the webapp.
 
 ## Test the webapp on your own
 
@@ -94,7 +94,7 @@ In most use cases, however, you would first use the _edited_ dataset as input to
 
 * Edits would not be instantly reflected in your reporting, as the _edited_ dataset is not updated in real-time. You decide when you want this to happen.
 * We recommend creating a **_commit edits_** scenario that builds all that is downstream of the _editlog_ and updates the reporting based on edited data. Its execution can be scheduled, or it can be triggered manually. If you have a _reset edits_ scenario, add a step at the end to also run the _commit edits_ scenario.
-* If you want to allow end-users to trigger this scenario on their own, you can embed the data editing webapp in a Dashboard to which you will add a Scenario tile (more on this in the next section).
+* If you want to allow end-users to trigger this scenario on their own, you can embed the Visual Edit webapp in a Dashboard to which you will add a Scenario tile (more on this in the next section).
 * Reporting is materialized by a dashboard built from the edited dataset or other datasets downstream. This dashboard would be accessed by business users via the web, or it would be scheduled to be converted to a pdf and sent by email via a dedicated scenario. We recommend creating an **_update source_** scenario to take into account any changes or additional data from source systems, re-build the dataset used by the webapp, and re-run the _commit edits_ scenario.
 
 ## Test the webapp with a business user
@@ -115,7 +115,7 @@ The Scenario tile is displayed as a button to run a chosen scenario (typically t
 
 ## Next
 
-* If you need to customize the way the webapp displays data and create your own data editing front-end, check out the guide to our [CRUD Python API](get-started-crud-python-api) and the examples it contains to learn how to use the plugin's data persistence layer for your webapp's backend.
+* If you need to customize the way the webapp displays data and create your own Visual Edit front-end, check out the guide to our [CRUD Python API](get-started-crud-python-api) and the examples it contains to learn how to use the plugin's data persistence layer for your webapp's backend.
 * Because we're building a project with an interface where users can enter data and this gets processed, we'll need to have two instances of the project leveraging the plugin: one for development, one for production; each will have its own set of edits. Once all your tests are successful, the next step is to [deploy your project](deploy) on an automation node, or as a duplicate project on your design node.
 * If you're interested in the use case of reviewing machine-generated data, check out the [dedicated guide](reviewing).
 * You can also check out the [FAQ](faq) to learn more about the plugin.
