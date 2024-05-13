@@ -2,3 +2,4 @@ dash>=2.4.0
 dash_extensions
 pydantic
 flask
+pandas==1.5.3

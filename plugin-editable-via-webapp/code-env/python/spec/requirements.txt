@@ -1,3 +1,4 @@
 dash>=2.4.0
 dash_extensions
 pydantic
+pandas==1.5.3
