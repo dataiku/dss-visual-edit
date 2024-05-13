@@ -214,7 +214,6 @@ def __get_column_tabulator_linked_record__(ees, linked_record_name):
 
     # If a label column was provided, use a lookup formatter
     if linked_ds_label_column != "" and linked_ds_label_column != linked_ds_key_column:
-        # TODO: use paramLookup function from custom_tabulator.js instead of inline javascript function
         t_col["formatter"] = assign(
             f"""
             function(cell){{

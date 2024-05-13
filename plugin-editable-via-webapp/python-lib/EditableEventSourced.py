@@ -367,8 +367,6 @@ class EditableEventSourced:
                 - If no row was created, editable columns are those defined in the initial data editing setup.
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
-        # TODO: implementation can be optimized, so that we only load one row of the original dataset, and only load rows of the editlog that match the provided primary key values
-        # TODO: read row that was not edited too! This can be done via Dataiku API
         return self.get_edited_cells_df_indexed().loc[key]
 
     def __log_edit__(

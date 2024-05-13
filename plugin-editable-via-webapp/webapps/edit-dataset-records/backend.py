@@ -252,7 +252,6 @@ def create_endpoint():
     """
     primary_keys_values = request.get_json().get("primaryKeys")
     column_values = request.get_json().get("columnValues")
-    # TODO: check set of primary key values is unique?
     ees.create_row(primary_keys_values, column_values)
     response = jsonify({"msg": "New row created"})
     return response
