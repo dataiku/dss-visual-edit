@@ -1,6 +1,6 @@
 {
     "meta": {
-        "label": "Data Editing",
+        "label": "Visual Edit",
         "description": "Webapp to edit records of a dataset and maintain an editlog dataset.",
         "icon": "icon-edit-sign"
     },

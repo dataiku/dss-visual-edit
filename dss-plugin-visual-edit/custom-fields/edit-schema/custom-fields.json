@@ -1,7 +1,7 @@
 {
     "meta": {
-        "label": "Data Editing",
-        "description": "Properties managed by a Data Editing webapp. Do not modify directly — use the corresponding webapp's settings to make changes.",
+        "label": "Visual Edit",
+        "description": "Properties managed by a Visual Edit webapp. Do not modify directly — use the corresponding webapp's settings to make changes.",
         "icon": "icon-columns"
     },
     "customFields": [

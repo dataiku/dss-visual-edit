@@ -29,7 +29,7 @@
         {
             "name": "sep",
             "label": "⚠️ DO NOT EDIT THIS RECIPE",
-            "description": "This recipe is controlled by a data editing webapp (see URL in the recipe details, by clicking on the (i) icon in the vertical menu bar on the right-hand side).",
+            "description": "This recipe is controlled by a Visual Edit webapp (see URL in the recipe details, by clicking on the (i) icon in the vertical menu bar on the right-hand side).",
             "type": "SEPARATOR"
         }
     ],
