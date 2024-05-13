@@ -35,7 +35,7 @@ Here, we want business users (aka end-users) to edit data based on their domain 
   * ![](new_visual_webapp_2.png)
 * Settings:
   * _Data_:
-    * Select a dataset, list primary keys and editable columns (note that a column can't be both). ![](data_editing_webapp_params_orders.png)
+    * Select a dataset, list primary keys and editable columns (note that a column can't be both). ![](visual_edit_webapp_params_orders.png)
     * Double check the selection of primary keys and editable columns: ground-truth values of editable columns should be fixed for a given (set of) primary key(s) value(s).
   * _Linked Records_: for columns where the editor should be a dropdown widget — see dedicated page [here](linked-records).
   * _Layout_: here you can choose to freeze editable columns to the right-hand side (which is useful when there are many columns), and to group rows by one or more columns.
