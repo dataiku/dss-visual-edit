@@ -14,6 +14,10 @@ react-tabulator/lib
 **/.build_cache
 **/node_modules
 *.log
+dss-plugin-visual-edit/.vscode/launch.json
+dss-plugin-visual-edit/webapps/visual-edit/assets/dashExtensions_default.js
+dss-plugin-visual-edit/webapp-settings/*.json
+dss-plugin-visual-edit/venv/
 plugin-editable-via-webapp/.vscode/launch.json
 plugin-editable-via-webapp/webapps/edit-dataset-records/assets/dashExtensions_default.js
 plugin-editable-via-webapp/webapp-settings/*.json
