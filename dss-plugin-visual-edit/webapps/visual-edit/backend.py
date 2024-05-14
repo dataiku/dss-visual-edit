@@ -18,11 +18,11 @@ from pandas.api.types import is_integer_dtype, is_float_dtype
 from commons import get_last_build_date, try_get_user_identifier
 from dash import Dash, Input, Output, State, dcc, html
 from dataiku_utils import get_dataframe_filtered, client as dss_client
-from EditableEventSourced import (
+from DataEditor import (
     EditSuccess,
     EditFailure,
     EditUnauthorized,
-    EditableEventSourced,
+    DataEditor,
 )
 from flask import Flask, jsonify, make_response, request
 from tabulator_utils import get_columns_tabulator, get_values_from_df
@@ -49,7 +49,7 @@ editable_column_names = webapp_config.editable_column_names
 authorized_users = webapp_config.authorized_users
 original_ds_name = webapp_config.original_ds_name
 
-ees = EditableEventSourced(
+de = DataEditor(
     original_ds_name=original_ds_name,
     project_key=project_key,
     primary_keys=webapp_config.primary_keys,
@@ -221,7 +221,7 @@ def create_endpoint():
     Create a new row.
 
     Params:
-    - primaryKeys: dict containing values for all primary keys defined in the initial data editing setup; the set of values must be unique.
+    - primaryKeys: dict containing values for all primary keys defined in the initial Visual Edit setup; the set of values must be unique.
     - columnValues: dict containing values for all other columns.
 
     Example request JSON:
@@ -269,7 +269,7 @@ def read_endpoint():
 
     Returns: JSON representation of the values of editable columns.
     - If some rows of the dataset were created, then by definition all columns are editable (including primary keys) .
-    - If no row was created, editable columns are those defined in the initial data editing setup.
+    - If no row was created, editable columns are those defined in the initial Visual Edit setup.
     - Example API response:
     ```json
     {

@@ -41,7 +41,7 @@ class EditUnauthorized:
     pass
 
 
-class EditableEventSourced:
+class DataEditor:
     """
     This class provides CRUD methods to make a dataset editable using the Event Sourcing pattern: edits are stored in a separate dataset called the editlog. The source dataset is never changed. Both the source dataset and the editlog are used to compute the edited state.
     """
@@ -346,7 +346,7 @@ class EditableEventSourced:
         Retrieve a single row from the dataset that was created, updated or deleted.
 
         Args:
-            primary_keys (dict): A dictionary containing values for all primary keys defined in the initial data editing setup. The set of values must be unique. Example:
+            primary_keys (dict): A dictionary containing values for all primary keys defined in the initial Visual Edit setup. The set of values must be unique. Example:
                 {
                     "key1": "cat",
                     "key2": "2022-12-21",
@@ -364,7 +364,7 @@ class EditableEventSourced:
             - The current implementation loads all edited rows in memory, then filters the rows that match the provided primary key values.
             - This method does not read rows that were not edited, and it does not read columns which are not editable.
                 - If some rows of the dataset were created, then by definition all columns are editable (including primary keys).
-                - If no row was created, editable columns are those defined in the initial data editing setup.
+                - If no row was created, editable columns are those defined in the initial Visual Edit setup.
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         return self.get_edited_cells_df_indexed().loc[key]

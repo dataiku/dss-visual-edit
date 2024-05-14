@@ -14,9 +14,9 @@ original_schema = original_ds.read_schema()
 original_schema_df = DataFrame(original_schema).set_index("name")
 
 # %%
-from EditableEventSourced import EditableEventSourced
+from DataEditor import DataEditor
 
-ees = EditableEventSourced(
+de = DataEditor(
     original_ds_name=original_ds_name,
     primary_keys=["name"],
     editable_column_names=["address", "machine_type", "household", "dob", "label"],

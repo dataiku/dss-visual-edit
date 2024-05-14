@@ -6,7 +6,7 @@ from flask import request
 import logging
 
 
-# Editlog utils - used by Empty Editlog step and by EES for initialization of editlog
+# Editlog utils - used by Empty Editlog step and by DataEditor for initialization of editlog
 
 
 def write_empty_editlog(editlog_ds):
@@ -17,7 +17,7 @@ def write_empty_editlog(editlog_ds):
     )
 
 
-# Utils for EES and plugin components (recipes and scenario steps)
+# Utils for DataEditor and plugin components (recipes and scenario steps)
 
 
 # Used by pivot_editlog method below
@@ -81,7 +81,7 @@ def get_dataframe(mydataset):
     return mydataset_df
 
 
-# Used by Pivot recipe and by EES for getting edited cells
+# Used by Pivot recipe and by DataEditor for getting edited cells
 
 
 def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
@@ -144,7 +144,7 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
     return editlog_pivoted_df
 
 
-# Used by get_original_df below and by EES for init
+# Used by get_original_df below and by DataEditor for init
 def get_display_column_names(schema, primary_keys, editable_column_names):
     return [
         col.get("name")
@@ -153,7 +153,7 @@ def get_display_column_names(schema, primary_keys, editable_column_names):
     ]
 
 
-# Used by EES and by merge_edits_from_log_pivoted_df method below
+# Used by DataEditor and by merge_edits_from_log_pivoted_df method below
 def get_original_df(original_ds):
     original_df = get_dataframe(original_ds)
 
@@ -178,7 +178,7 @@ def get_original_df(original_ds):
     )
 
 
-# Used by Merge recipe and by EES for getting edited data
+# Used by Merge recipe and by DataEditor for getting edited data
 def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
     original_df, primary_keys, display_columns, editable_columns = get_original_df(
         original_ds

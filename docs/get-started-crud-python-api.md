@@ -2,7 +2,7 @@
 
 <iframe src="https://www.loom.com/embed/3d899ce5f7544850abe91d088b969331" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
-As an alternative to using the Visual Edit Webapp, you can build a custom webapp that uses the CRUD (Create, Read, Update, Delete) methods provided by the `EditableEventSourced` Python class.
+As an alternative to using the Visual Edit Webapp, you can build a custom webapp that uses the CRUD (Create, Read, Update, Delete) methods provided by the `DataEditor` Python class.
 
 Let's take a quick tour of how to use this. We strongly recommend following the [Visual Webapp guide](get-started) first, to get an initial understanding of the plugin's features and concepts.
 
@@ -10,16 +10,16 @@ Let's take a quick tour of how to use this. We strongly recommend following the 
 
 When running the code below in a notebook or a webapp in Dataiku, a code environment must be specified. A code environment was created upon installation of the plugin, but it can't be selected from the list of available code environments as it can only be used by the plugin's visual components (Visual Webapp and Recipes). You'll need to create a new code environment and to make sure it contains the same packages as the plugin's.
 
-## Instantiate the `EditableEventSourced` class
+## Instantiate the `DataEditor` class
 
 ```python
 import dataiku
 dataiku.use_plugin_libs("visual-edit")
-EditableEventSourced = dataiku.import_from_plugin("visual-edit", "EditableEventSourced")
+DataEditor = dataiku.import_from_plugin("visual-edit", "DataEditor")
 ```
 
 ```python
-ees = EditableEventSourced.EditableEventSourced(
+de = DataEditor.DataEditor(
     original_ds_name="my_dataset",
     primary_keys=["id"],
     editable_column_names=["existing_editable_col", "new_editable_col"]
@@ -69,7 +69,7 @@ At dataset level:
 
 This example is based on the tshirt orders dataset from the [Basics 101 course](https://academy.dataiku.com/basics-101).
 
-Import `EditableEventSourced` as shown previously, then use it in the Dash app code:
+Import `DataEditor` as shown previously, then use it in the Dash app code:
 
 ```python
 from dash import html, Input, Output
@@ -81,7 +81,7 @@ ORIGINAL_DATASET = "orders"
 PRIMARY_KEYS = ["order_id"]
 EDITABLE_COLUMN_NAMES = ["tshirt_price", "tshirt_quantity"]
 
-ees = EditableEventSourced.EditableEventSourced(
+de = DataEditor.DataEditor(
     original_ds_name=ORIGINAL_DATASET,
     primary_keys=PRIMARY_KEYS,
     editable_column_names=EDITABLE_COLUMN_NAMES,
@@ -164,6 +164,6 @@ return parseInt(data.tshirt_quantity) + 2;
 
 The implementation of these methods is based on the [Event Sourcing pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing): instead of directly storing the current state of the edited data, we use an append-only store to record the full series of actions on that data. This store is a dataset that we call the "editlog".
 
-When the `EditableEventSourced` class is instantiated on a given dataset, it creates an "editlog" dataset and 2 recipes that create an "editlog pivoted" and an "edited" dataset (if they don't already exist). Those datasets are created on the same connection as the original dataset.
+When the `DataEditor` class is instantiated on a given dataset, it creates an "editlog" dataset and 2 recipes that create an "editlog pivoted" and an "edited" dataset (if they don't already exist). Those datasets are created on the same connection as the original dataset.
 
 Edits made via CRUD methods instantly add rows to the editlog. The editlog pivoted and the edited datasets are only updated when the recipes that build them are run.

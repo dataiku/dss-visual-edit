@@ -2,7 +2,7 @@
 
 ## Preliminary remarks
 
-* When deploying a project with a data editing webapp, there would be two different editlog datasets: one on the Design node, one on the Automation node. This way, edits made on the Design node won't have any impact in production. These two editlog datasets would have the same name, but they should be on different data connections.
+* When deploying a project with a Visual Edit webapp, there would be two different editlog datasets: one on the Design node, one on the Automation node. This way, edits made on the Design node won't have any impact in production. These two editlog datasets would have the same name, but they should be on different data connections.
 * While the datasets in a Dataiku project are typically on analytics database connections and managed by Dataiku, you may prefer to change the connection of the _editlog_ and _editlog\_pivoted_ datasets to an operational database, with constraints for the database used in Automation that would prevent accidental deletions and tampering with edits.
 * We recommend using SQL connections for these datasets.
 
