@@ -14,8 +14,8 @@ When running the code below in a notebook or a webapp in Dataiku, a code environ
 
 ```python
 import dataiku
-dataiku.use_plugin_libs("editable-via-webapp")
-EditableEventSourced = dataiku.import_from_plugin("editable-via-webapp", "EditableEventSourced")
+dataiku.use_plugin_libs("visual-edit")
+EditableEventSourced = dataiku.import_from_plugin("visual-edit", "EditableEventSourced")
 ```
 
 ```python
@@ -87,13 +87,13 @@ ees = EditableEventSourced.EditableEventSourced(
     editable_column_names=EDITABLE_COLUMN_NAMES,
 )
 
-tabulator_utils = dataiku.import_from_plugin("editable-via-webapp", "tabulator_utils")
+tabulator_utils = dataiku.import_from_plugin("visual-edit", "tabulator_utils")
 columns = tabulator_utils.get_columns_tabulator(ees)
 
 # Define Dash layout and callbacks
 ###
 
-dash_tabulator = dataiku.import_from_plugin("editable-via-webapp", "dash_tabulator")
+dash_tabulator = dataiku.import_from_plugin("visual-edit", "dash_tabulator")
 
 def serve_layout():
     return html.Div([
