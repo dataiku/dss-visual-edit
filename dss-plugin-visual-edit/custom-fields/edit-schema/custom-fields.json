@@ -1,14 +1,16 @@
 {
     "meta": {
         "label": "Visual Edit",
-        "description": "Properties managed by a Visual Edit webapp. Do not modify directly — use the corresponding webapp's settings to make changes.",
+        "description": "Dataset fields used by the Visual Edit functionality: primary keys, editable columns, linked records (aka foreign keys). Do not modify directly.",
         "icon": "icon-columns"
     },
     "customFields": [
         {
             "applyToObjects": {
                 "mode": "SOME",
-                "includedObjectTypes": ["DATASET", "RECIPE"]
+                "includedObjectTypes": [
+                    "DATASET"
+                ]
             },
             "field": {
                 "name": "webapp_url",
@@ -20,7 +22,9 @@
         {
             "applyToObjects": {
                 "mode": "SOME",
-                "includedObjectTypes": ["DATASET"]
+                "includedObjectTypes": [
+                    "DATASET"
+                ]
             },
             "field": {
                 "name": "original_ds",
@@ -28,10 +32,13 @@
                 "description": "",
                 "type": "DATASET"
             }
-        },{
+        },
+        {
             "applyToObjects": {
                 "mode": "SOME",
-                "includedObjectTypes": ["DATASET"]
+                "includedObjectTypes": [
+                    "DATASET"
+                ]
             },
             "field": {
                 "name": "editlog_ds",
@@ -39,10 +46,13 @@
                 "description": "",
                 "type": "DATASET"
             }
-        },{
+        },
+        {
             "applyToObjects": {
                 "mode": "SOME",
-                "includedObjectTypes": ["DATASET"]
+                "includedObjectTypes": [
+                    "DATASET"
+                ]
             },
             "field": {
                 "name": "primary_keys",
@@ -51,10 +61,13 @@
                 "type": "COLUMNS",
                 "datasetParamName": "original_ds"
             }
-        },{
+        },
+        {
             "applyToObjects": {
                 "mode": "SOME",
-                "includedObjectTypes": ["DATASET"]
+                "includedObjectTypes": [
+                    "DATASET"
+                ]
             },
             "field": {
                 "name": "editable_column_names",

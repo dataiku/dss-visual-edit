@@ -21,7 +21,7 @@ original_ds = original_datasets[0]
 original_schema = original_ds.read_schema()
 original_schema_df = DataFrame(original_schema).set_index("name")
 
-pivoted_names = get_input_names_for_role("editlog_pivoted")
+pivoted_names = get_input_names_for_role("edits")
 pivoted_datasets = [dataiku.Dataset(name) for name in pivoted_names]
 pivoted_ds = pivoted_datasets[0]
 
@@ -33,13 +33,13 @@ edited_ds = edited_datasets[0]
 # %% Read input data
 ###
 
-editlog_pivoted_df = get_dataframe(pivoted_ds) # this dataframe was written by the pivot-editlog recipe which inferred the schema upon writing: let's use this schema when reading this dataset
+edits_df = get_dataframe(pivoted_ds) # this dataframe was written by the pivot-editlog recipe which inferred the schema upon writing: let's use this schema when reading this dataset
 
 
 # %% Compute output data
 ###
 
-edited_df = merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df)
+edited_df = merge_edits_from_log_pivoted_df(original_ds, edits_df)
 
 
 # %% Write output data

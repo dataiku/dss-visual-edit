@@ -105,23 +105,23 @@ class DataEditor:
         self.editlog_columns = self.editlog_ds.get_config().get("schema").get("columns")
 
     def __setup_editlog_downstream__(self):
-        editlog_pivoted_ds_creator = DSSManagedDatasetCreationHelper(
-            self.project, self.editlog_pivoted_ds_name
+        edits_ds_creator = DSSManagedDatasetCreationHelper(
+            self.project, self.edits_ds_name
         )
-        if editlog_pivoted_ds_creator.already_exists():
+        if edits_ds_creator.already_exists():
             logging.debug("Found editlog pivoted")
         else:
             logging.debug("No editlog pivoted found, creating it...")
-            editlog_pivoted_ds_creator.with_store_into(
+            edits_ds_creator.with_store_into(
                 connection=self.__connection_name__
             )
-            editlog_pivoted_ds_creator.create()
-            self.editlog_pivoted_ds = Dataset(
-                self.editlog_pivoted_ds_name, self.project_key
+            edits_ds_creator.create()
+            self.edits_ds = Dataset(
+                self.edits_ds_name, self.project_key
             )
             logging.debug("Done.")
 
-        pivot_recipe_name = "compute_" + self.editlog_pivoted_ds_name
+        pivot_recipe_name = "compute_" + self.edits_ds_name
         pivot_recipe_creator = DSSRecipeCreator(
             "CustomCode_pivot-editlog", pivot_recipe_name, self.project
         )
@@ -133,7 +133,7 @@ class DataEditor:
             pivot_recipe = pivot_recipe_creator.create()
             pivot_settings = pivot_recipe.get_settings()
             pivot_settings.add_input("editlog", self.editlog_ds_name)
-            pivot_settings.add_output("editlog_pivoted", self.editlog_pivoted_ds_name)
+            pivot_settings.add_output("edits", self.edits_ds_name)
             pivot_settings.custom_fields["webapp_url"] = self.webapp_url
             pivot_settings.save()
             logging.debug("Done.")
@@ -163,7 +163,7 @@ class DataEditor:
             merge_recipe = merge_recipe_creator.create()
             merge_settings = merge_recipe.get_settings()
             merge_settings.add_input("original", self.original_ds_name)
-            merge_settings.add_input("editlog_pivoted", self.editlog_pivoted_ds_name)
+            merge_settings.add_input("edits", self.edits_ds_name)
             merge_settings.add_output("edited", self.edited_ds_name)
             merge_settings.custom_fields["webapp_url"] = self.webapp_url
             merge_settings.save()
@@ -192,7 +192,7 @@ class DataEditor:
         self.schema_columns = self.original_ds.get_config().get("schema").get("columns")
 
         self.editlog_ds_name = self.original_ds_name + "_editlog"
-        self.editlog_pivoted_ds_name = self.editlog_ds_name + "_pivoted"
+        self.edits_ds_name = self.editlog_ds_name + "_pivoted"
         self.edited_ds_name = self.original_ds_name + "_edited"
 
         self.__connection_name__ = (

@@ -1,34 +1,25 @@
 {
     "meta": {
-        "label": "Merge edits",
-        "description": "Merge values edited via the webapp into a copy of the original dataset.",
-        "icon": "icon-plus"
+        "label": "Replay edits",
+        "description": "Create a dataset of edited cells from the raw event log maintained by the Visual Edit functionality. When the same cell was edited multiple times, the last edit is kept.",
+        "icon": "icon-repeat"
     },
     "kind": "PYTHON",
     "inputRoles": [
         {
-            "name": "original",
-            "label": "Original dataset",
-            "description": "Contains the data to be made editable via webapp",
-            "arity": "UNARY",
-            "required": true,
-            "acceptsDataset": true
-        },
-        {
-            "name": "editlog_pivoted",
-            "label": "Pivoted edit log",
-            "description": "Created by webapp and associated pivot recipe",
+            "name": "editlog",
+            "label": "Edit log",
+            "description": "Managed by the Visual Edit functionality",
             "arity": "UNARY",
             "required": true,
             "acceptsDataset": true
         }
     ],
-
     "outputRoles": [
         {
-            "name": "edited",
-            "label": "Edited dataset",
-            "description": "",
+            "name": "edits",
+            "label": "Edits",
+            "description": "Dataset of edits, containing the edited rows and editable columns",
             "arity": "UNARY",
             "required": true,
             "acceptsDataset": true

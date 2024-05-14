@@ -15,13 +15,13 @@ from commons import pivot_editlog
 ###
 
 editlog_names = get_input_names_for_role('editlog')
-editlog_pivoted_names = get_output_names_for_role('editlog_pivoted')
+edits_names = get_output_names_for_role('edits')
 
 editlog_datasets = [dataiku.Dataset(name) for name in editlog_names]
 editlog_ds = editlog_datasets[0]
 
-editlog_pivoted_datasets = [dataiku.Dataset(name) for name in editlog_pivoted_names]
-editlog_pivoted_ds = editlog_pivoted_datasets[0]
+edits_datasets = [dataiku.Dataset(name) for name in edits_names]
+edits_ds = edits_datasets[0]
 
 
 #%% Compute output data
@@ -29,10 +29,10 @@ editlog_pivoted_ds = editlog_pivoted_datasets[0]
 
 primary_keys = editlog_ds.get_config()["customFields"]["primary_keys"]
 editable_column_names = editlog_ds.get_config()["customFields"]["editable_column_names"]
-editlog_pivoted_df = pivot_editlog(editlog_ds, primary_keys, editable_column_names)
+edits_df = pivot_editlog(editlog_ds, primary_keys, editable_column_names)
 
 
 #%% Write output data
 ###
 
-editlog_pivoted_ds.write_dataframe(editlog_pivoted_df, infer_schema=True, dropAndCreate=True) # the schema is inferred upon writing and might be different from that of the original dataset: this will be reconciled by the merge recipe/method
+edits_ds.write_dataframe(edits_df, infer_schema=True, dropAndCreate=True) # the schema is inferred upon writing and might be different from that of the original dataset: this will be reconciled by the merge recipe/method

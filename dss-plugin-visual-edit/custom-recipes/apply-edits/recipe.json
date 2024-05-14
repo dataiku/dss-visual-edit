@@ -1,15 +1,23 @@
 {
     "meta": {
-        "label": "Pivot editlog",
-        "description": "Create a dataset whose rows correspond to unique keys from the editlog, columns are the original dataset's editable columns, and values are the last edits.",
-        "icon": "icon-repeat"
+        "label": "Apply edits",
+        "description": "Copy the original dataset and override cells with values coming from the edits dataset.",
+        "icon": "icon-plus"
     },
     "kind": "PYTHON",
     "inputRoles": [
         {
-            "name": "editlog",
-            "label": "Edit log",
-            "description": "Managed by webapp",
+            "name": "original",
+            "label": "Original dataset",
+            "description": "Dataset made available to the Visual Edit functionality",
+            "arity": "UNARY",
+            "required": true,
+            "acceptsDataset": true
+        },
+        {
+            "name": "edits",
+            "label": "Edits to apply",
+            "description": "Dataset of edits created by the 'replay-edits' recipe on an editlog",
             "arity": "UNARY",
             "required": true,
             "acceptsDataset": true
@@ -17,8 +25,8 @@
     ],
     "outputRoles": [
         {
-            "name": "editlog_pivoted",
-            "label": "Pivoted edit log",
+            "name": "edited",
+            "label": "Edited dataset",
             "description": "",
             "arity": "UNARY",
             "required": true,
