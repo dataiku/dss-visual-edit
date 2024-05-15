@@ -15,8 +15,8 @@
     "start": "webpack-serve --config ./webpack.serve.config.js --open",
     "validate-init": "python _validate_init.py",
     "prepublishOnly": "npm run validate-init",
-    "build:js": "webpack --mode development",
-    "build:backends": "dash-generate-components ./src/lib/components dash_tabulator -p package-info.json --r-prefix '' --jl-prefix '' --ignore \\.test\\.",
+    "build:js": "webpack --mode production",
+    "build:backends": "dash-generate-components ./src/lib/components dash_tabulator -p package-info.json --ignore \\.test\\.",
     "build:backends-activated": "(. venv/bin/activate || venv\\scripts\\activate && npm run build:py_and_r)",
     "build": "npm run build:js && npm run build:backends",
     "build:activated": "npm run build:js && npm run build:backends-activated",
@@ -28,7 +28,7 @@
     "dash-extensions": "^0.0.1",
     "ramda": "^0.26.1",
     "set-blocking": "^2.0.0",
-    "tabulator-tables": "5.4.2"
+    "tabulator-tables": "5.4.4"
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",
@@ -45,10 +45,12 @@
     "eslint-config-prettier": "^6.0.0",
     "eslint-plugin-import": "^2.18.0",
     "eslint-plugin-react": "^7.14.2",
+    "file-loader": "^6.2.0",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-docgen": "^4.1.1",
     "react-dom": "^16.8.6",
+    "script-loader": "^0.7.2",
     "style-loader": "^0.23.1",
     "styled-jsx": "^3.2.1",
     "terser-webpack-plugin": "^2.3.0",
