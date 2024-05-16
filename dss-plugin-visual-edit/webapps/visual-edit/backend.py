@@ -60,7 +60,7 @@ de = DataEditor(
 )
 
 
-columns = get_columns_tabulator(ees, webapp_config.freeze_editable_columns)
+columns = get_columns_tabulator(de, webapp_config.freeze_editable_columns)
 
 last_build_date_initial = ""
 last_build_date_ok = False
@@ -125,7 +125,7 @@ def serve_layout():  # This function is called upon loading/refreshing the page 
                     id="datatable",
                     datasetName=original_ds_name,
                     columns=columns,
-                    data=ees.get_edited_df().to_dict(
+                    data=de.get_edited_df().to_dict(
                         "records"
                     ),  # this gets the most up-to-date edited data
                     groupBy=webapp_config.group_column_names,
@@ -202,7 +202,7 @@ def add_edit(cell):
     row_dic = cell["row"]
     updated_field = cell["field"]
     updated_value = cell["value"]
-    results = ees.update_row(row_dic, updated_field, updated_value)
+    results = de.update_row(row_dic, updated_field, updated_value)
 
     info = ""
     for res in results:
@@ -244,7 +244,7 @@ def create_endpoint():
     """
     primary_keys_values = request.get_json().get("primaryKeys")
     column_values = request.get_json().get("columnValues")
-    ees.create_row(primary_keys_values, column_values)
+    de.create_row(primary_keys_values, column_values)
     response = jsonify({"msg": "New row created"})
     return response
 
@@ -282,7 +282,7 @@ def read_endpoint():
     ```
     """
     primary_keys_values = request.get_json().get("primaryKeys")
-    response = ees.get_row(primary_keys_values).to_json()
+    response = de.get_row(primary_keys_values).to_json()
     return response
 
 
@@ -293,7 +293,7 @@ def read_all_edits_endpoint():
 
     Returns: CSV-formatted dataset with rows that were created or edited, and values of primary key and editable columns. See remarks of the `read` endpoint.
     """
-    response = make_response(ees.get_edited_cells_df_indexed().to_csv())
+    response = make_response(de.get_edited_cells_df_indexed().to_csv())
     response.headers["Content-Disposition"] = (
         "attachment; filename=" + original_ds_name + "_edits.csv"
     )
@@ -332,7 +332,7 @@ def update_endpoint():
         primary_keys_values = request.args.get("primaryKeys", "")
         column = request.args.get("column", "")
         value = request.args.get("value", "")
-    results = ees.update_row(primary_keys_values, column, value)
+    results = de.update_row(primary_keys_values, column, value)
     info = ""
     for res in results:
         info += __edit_result_to_message__(res) + "\n"
@@ -354,7 +354,7 @@ def delete_endpoint():
         primary_keys = request.get_json().get("primaryKeys")
     else:
         primary_keys = request.args.get("primaryKeys", "")
-    result = ees.delete_row(primary_keys)
+    result = de.delete_row(primary_keys)
     response = jsonify({"msg": __edit_result_to_message__(result)})
     return response
 
@@ -381,7 +381,7 @@ def label_endpoint(linked_ds_name):
     label = ""
 
     linked_record: LinkedRecord | None = None
-    for lr in ees.linked_records:
+    for lr in de.linked_records:
         if linked_ds_name == lr.ds_name:
             linked_record = lr
             break
@@ -394,7 +394,7 @@ def label_endpoint(linked_ds_name):
     linked_ds_label = linked_record.ds_label
 
     # Cast provided key value into appropriate type, necessary for integers for example.
-    original_df, primary_keys, display_columns, editable_columns = ees.get_original_df()
+    original_df, primary_keys, display_columns, editable_columns = de.get_original_df()
 
     key_dtype = original_df[linked_record.name].dtype
     try:
@@ -453,7 +453,7 @@ def lookup_endpoint(linked_ds_name):
         n_results = 1000  # show more options if no search term is provided
 
     linked_record: LinkedRecord | None = None
-    for lr in ees.linked_records:
+    for lr in de.linked_records:
         if linked_ds_name == lr.ds_name:
             linked_record = lr
             break

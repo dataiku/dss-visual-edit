@@ -89,7 +89,7 @@ de = DataEditor.DataEditor(
 
 tabulator_utils = dataiku.import_from_plugin("visual-edit", "tabulator_utils")
 tabulator_utils = dataiku.import_from_plugin("visual-edit", "tabulator_utils")
-columns = tabulator_utils.get_columns_tabulator(ees)
+columns = tabulator_utils.get_columns_tabulator(de)
 
 # Define Dash layout and callbacks
 ###
@@ -102,7 +102,7 @@ def serve_layout():
         dash_tabulator.DashTabulator(
             id="quickstart-datatable",
             datasetName=ORIGINAL_DATASET,
-            data=ees.get_edited_df().to_dict("records"),
+            data=de.get_edited_df().to_dict("records"),
             columns=columns
         ),
         html.Div(id="quickstart-output")
@@ -121,7 +121,7 @@ def log_edit(cell):
 
     cell is a dict with the following properties: row, field, value
     """
-    return ees.update_row(cell["row"], cell["field"], cell["value"])
+    return de.update_row(cell["row"], cell["field"], cell["value"])
 ```
 
 ### Example with advanced Tabulator features

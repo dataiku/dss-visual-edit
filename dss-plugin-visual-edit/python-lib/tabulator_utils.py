@@ -1,6 +1,7 @@
 """
 This file contains functions used to generate the Tabulator columns configuration for a given dataset.
 """
+
 from typing import Union
 from pandas import DataFrame
 from dash_extensions.javascript import Namespace
@@ -11,7 +12,7 @@ from dash_extensions.javascript import assign
 __ns__ = Namespace("myNamespace", "tabulator")
 
 
-def __get_column_tabulator_type__(ees, col_name):
+def __get_column_tabulator_type__(de, col_name):
     # Determine column type as string, boolean, boolean_tick, or number
     # - based on the type given in editschema_manual, if any
     # - the dataset's schema, otherwise
@@ -19,11 +20,11 @@ def __get_column_tabulator_type__(ees, col_name):
 
     t_type = "string"  # default type
     if (
-        not ees.editschema_manual_df.empty
-        and "type" in ees.editschema_manual_df.columns
-        and col_name in ees.editschema_manual_df.index
+        not de.editschema_manual_df.empty
+        and "type" in de.editschema_manual_df.columns
+        and col_name in de.editschema_manual_df.index
     ):
-        editschema_manual_type = ees.editschema_manual_df.loc[col_name, "type"]
+        editschema_manual_type = de.editschema_manual_df.loc[col_name, "type"]
     else:
         editschema_manual_type = None
 
@@ -31,7 +32,7 @@ def __get_column_tabulator_type__(ees, col_name):
     if editschema_manual_type and editschema_manual_type == editschema_manual_type:
         t_type = editschema_manual_type
     else:
-        schema_df = DataFrame(data=ees.schema_columns).set_index("name")
+        schema_df = DataFrame(data=de.schema_columns).set_index("name")
         if "meaning" in schema_df.columns.to_list():
             schema_meaning = schema_df.loc[col_name, "meaning"]
         else:
@@ -198,10 +199,10 @@ def get_values_from_df(
     )
 
 
-def __get_column_tabulator_linked_record__(ees, linked_record_name):
+def __get_column_tabulator_linked_record__(de, linked_record_name):
     """Define Tabulator formatter and editor settings for a column whose type is linked record"""
 
-    linked_records_df = ees.linked_records_df
+    linked_records_df = de.linked_records_df
     linked_ds_name = linked_records_df.loc[linked_record_name, "ds_name"]
     linked_ds_key_column = linked_records_df.loc[linked_record_name, "ds_key"]
     linked_ds_label_column = linked_records_df.loc[linked_record_name, "ds_label"]
@@ -262,20 +263,20 @@ def __get_column_tabulator_linked_record__(ees, linked_record_name):
     return t_col
 
 
-def get_columns_tabulator(ees, freeze_editable_columns=False):
+def get_columns_tabulator(de, freeze_editable_columns=False):
     """Prepare column settings to pass to Tabulator"""
 
     linked_record_names = []
-    if ees.linked_records:
+    if de.linked_records:
         try:
-            linked_records_df = ees.linked_records_df
+            linked_records_df = de.linked_records_df
             linked_record_names = linked_records_df.index.values.tolist()
         except Exception:
             logging.exception("Failed to get linked record names.")
 
     t_cols = []
     for col_name in (
-        ees.primary_keys + ees.display_column_names + ees.editable_column_names
+        de.primary_keys + de.display_column_names + de.editable_column_names
     ):
         # Properties to be shared by all columns
         t_col = {
@@ -287,19 +288,19 @@ def get_columns_tabulator(ees, freeze_editable_columns=False):
         }
 
         # Define formatter and header filters based on type
-        t_type = __get_column_tabulator_type__(ees, col_name)
+        t_type = __get_column_tabulator_type__(de, col_name)
         if col_name not in linked_record_names:
             t_col.update(__get_column_tabulator_formatter__(t_type))
-        if col_name in ees.primary_keys:
+        if col_name in de.primary_keys:
             t_col["frozen"] = True
 
         # Define editor, if it's an editable column
-        if col_name in ees.editable_column_names:
+        if col_name in de.editable_column_names:
             if freeze_editable_columns:
                 t_col["frozen"] = True  # freeze to the right
             if col_name in linked_record_names:
                 t_type = "linked_record"
-                t_col.update(__get_column_tabulator_linked_record__(ees, col_name))
+                t_col.update(__get_column_tabulator_linked_record__(de, col_name))
             else:
                 t_col.update(__get_column_tabulator_editor__(t_type))
         pretty_types = {

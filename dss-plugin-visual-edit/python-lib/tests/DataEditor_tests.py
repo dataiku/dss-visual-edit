@@ -28,19 +28,19 @@ user = "API"
 # user = get_user_details() # use this when in the context of a request sent by a client/browser via http
 
 # %%
-ees.get_edited_df()
+de.get_edited_df()
 
 # %%
-ees.create_row(
+de.create_row(
     primary_keys={"name": "New name"}, column_values={"address": "New address"}
 )
 
 # %%
-ees.update_row(primary_keys={"name": "toto"}, column="label", value="hey2")
+de.update_row(primary_keys={"name": "toto"}, column="label", value="hey2")
 # %%
-ees.get_edited_cells_df()
+de.get_edited_cells_df()
 
 
 # %%
-ees.delete_row(primary_keys={"name": "New name"})
+de.delete_row(primary_keys={"name": "New name"})
 # %%
