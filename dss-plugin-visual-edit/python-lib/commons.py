@@ -81,7 +81,7 @@ def get_dataframe(mydataset):
     return mydataset_df
 
 
-# Used by Pivot recipe and by DataEditor for getting edited cells
+# Used by Replay recipe and by DataEditor for getting edited cells
 
 
 def replay_edits(editlog_ds, primary_keys, editable_column_names):
@@ -178,7 +178,7 @@ def get_original_df(original_ds):
     )
 
 
-# Used by Merge recipe and by DataEditor for getting edited data
+# Used by Apply recipe and by DataEditor for getting edited data
 def apply_edits_from_df(original_ds, edits_df):
     original_df, primary_keys, display_columns, editable_columns = get_original_df(
         original_ds
@@ -224,7 +224,7 @@ def apply_edits_from_df(original_ds, edits_df):
         if not edits_df.index.name:  # if index has no name, i.e. it's a range index
             edits_df.set_index(primary_keys, inplace=True)
 
-        # "Replay" edits: Join and Merge
+        # Join and "Merge"
         ###
 
         # Join -> this adds _value_last columns
