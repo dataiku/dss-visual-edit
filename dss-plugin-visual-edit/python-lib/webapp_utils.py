@@ -9,8 +9,12 @@ def call_rest_api(path):
     PORT = dataiku.base.remoterun.get_env_var("DKU_BASE_PORT")
     if PORT is None:
         PORT = "11200"
-    BASE_API_URL = "http://127.0.0.1:" + PORT + \
-        "/public/api/projects/" + getenv("DKU_CURRENT_PROJECT_KEY")
+    BASE_API_URL = (
+        "http://127.0.0.1:"
+        + PORT
+        + "/public/api/projects/"
+        + getenv("DKU_CURRENT_PROJECT_KEY")
+    )
     return loads(
         requests.get(
             url=BASE_API_URL + path,

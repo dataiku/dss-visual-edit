@@ -88,11 +88,13 @@ de = DataEditor.DataEditor(
 )
 
 tabulator_utils = dataiku.import_from_plugin("visual-edit", "tabulator_utils")
+tabulator_utils = dataiku.import_from_plugin("visual-edit", "tabulator_utils")
 columns = tabulator_utils.get_columns_tabulator(ees)
 
 # Define Dash layout and callbacks
 ###
 
+dash_tabulator = dataiku.import_from_plugin("visual-edit", "dash_tabulator")
 dash_tabulator = dataiku.import_from_plugin("visual-edit", "dash_tabulator")
 
 def serve_layout():

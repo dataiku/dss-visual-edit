@@ -73,7 +73,7 @@ export default class DashTabulator extends React.Component {
             edited.row = cell.getData()
             this.props.setProps({ cellEdited: edited })
             try {
-                window.parent.WT1SVC.event("lca-datatable-edited", {
+                window.parent.WT1SVC.event("visualedit-edit-cell", {
                     "dataset_name_hash": md5(datasetName),
                     "column_name_hash": md5(edited.field),
                     "column_type": edited.type,
@@ -90,7 +90,7 @@ export default class DashTabulator extends React.Component {
 
     render() {
         try {
-            window.parent.WT1SVC.event("lca-datatable-viewed", {
+            window.parent.WT1SVC.event("visualedit-display-table", {
                 "dataset_name_hash": md5(this.props.datasetName),
                 // create columns_hashed as a copy of the columns array where each item's "field" property has been hashed and other properties have been kept as they were
                 "rows_count": this.props.data.length,
