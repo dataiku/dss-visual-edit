@@ -20,7 +20,7 @@ def write_empty_editlog(editlog_ds):
 # Utils for DataEditor and plugin components (recipes and scenario steps)
 
 
-# Used by pivot_editlog method below
+# Used by replay_edits method below
 def __unpack_keys__(df, new_key_names, old_key_name="key"):
     if len(new_key_names) == 1:
         df.rename(columns={old_key_name: new_key_names[0]}, inplace=True)
@@ -84,8 +84,8 @@ def get_dataframe(mydataset):
 # Used by Pivot recipe and by DataEditor for getting edited cells
 
 
-def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
-    # Create empty dataframe with the proper editlog pivoted schema: all primary keys, all editable columns, and "date" column
+def replay_edits(editlog_ds, primary_keys, editable_column_names):
+    # Create empty dataframe with the proper edits dataset schema: all primary keys, all editable columns, and "date" column
     # This helps ensure that the dataframe we return always has the right schema
     # (even if some columns of the input dataset were never edited)
     cols = (
@@ -153,7 +153,7 @@ def get_display_column_names(schema, primary_keys, editable_column_names):
     ]
 
 
-# Used by DataEditor and by merge_edits_from_log_pivoted_df method below
+# Used by DataEditor and by apply_edits_from_df method below
 def get_original_df(original_ds):
     original_df = get_dataframe(original_ds)
 
@@ -179,11 +179,11 @@ def get_original_df(original_ds):
 
 
 # Used by Merge recipe and by DataEditor for getting edited data
-def merge_edits_from_log_pivoted_df(original_ds, edits_df):
+def apply_edits_from_df(original_ds, edits_df):
     original_df, primary_keys, display_columns, editable_columns = get_original_df(
         original_ds
     )
-    # this will contain the list of new columns coming from editlog pivoted but not found in the original dataset's schema
+    # this will contain the list of new columns coming from edits dataset but not found in the original dataset's schema
     editable_columns_new = []
 
     if not edits_df.size:  # i.e. if empty editlog
@@ -212,22 +212,16 @@ def merge_edits_from_log_pivoted_df(original_ds, edits_df):
             if col in primary_keys + display_columns + editable_columns:
                 if is_integer_dtype(original_dtype):
                     # there may be missing values so choose a dtype supporting them.
-                    edits_df[col] = edits_df[col].astype(
-                        Int64Dtype()
-                    )
+                    edits_df[col] = edits_df[col].astype(Int64Dtype())
                 elif is_float_dtype(original_dtype):
                     edits_df[col] = edits_df[col].astype(float)
                 else:
-                    edits_df[col] = edits_df[col].astype(
-                        original_dtype
-                    )
+                    edits_df[col] = edits_df[col].astype(original_dtype)
             else:
                 editable_columns_new.append(col)
 
         original_df.set_index(primary_keys, inplace=True)
-        if (
-            not edits_df.index.name
-        ):  # if index has no name, i.e. it's a range index
+        if not edits_df.index.name:  # if index has no name, i.e. it's a range index
             edits_df.set_index(primary_keys, inplace=True)
 
         # "Replay" edits: Join and Merge

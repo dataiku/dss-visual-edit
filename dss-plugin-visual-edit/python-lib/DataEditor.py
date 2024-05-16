@@ -11,8 +11,8 @@ from commons import (
     get_dataframe,
     write_empty_editlog,
     get_display_column_names,
-    merge_edits_from_log_pivoted_df,
-    pivot_editlog,
+    apply_edits_from_df,
+    replay_edits,
     get_key_values_from_dict,
 )
 from webapp.db.editlogs import EditLog, EditLogAppenderFactory
@@ -109,33 +109,29 @@ class DataEditor:
             self.project, self.edits_ds_name
         )
         if edits_ds_creator.already_exists():
-            logging.debug("Found editlog pivoted")
+            logging.debug("Found edits dataset")
         else:
-            logging.debug("No editlog pivoted found, creating it...")
-            edits_ds_creator.with_store_into(
-                connection=self.__connection_name__
-            )
+            logging.debug("No edits dataset found, creating it...")
+            edits_ds_creator.with_store_into(connection=self.__connection_name__)
             edits_ds_creator.create()
-            self.edits_ds = Dataset(
-                self.edits_ds_name, self.project_key
-            )
+            self.edits_ds = Dataset(self.edits_ds_name, self.project_key)
             logging.debug("Done.")
 
-        pivot_recipe_name = "compute_" + self.edits_ds_name
-        pivot_recipe_creator = DSSRecipeCreator(
-            "CustomCode_pivot-editlog", pivot_recipe_name, self.project
+        replay_recipe_name = "compute_" + self.edits_ds_name
+        replay_recipe_creator = DSSRecipeCreator(
+            "CustomCode_replay-edits", replay_recipe_name, self.project
         )
-        if recipe_already_exists(pivot_recipe_name, self.project):
-            logging.debug("Found recipe to create editlog pivoted")
-            pivot_recipe = self.project.get_recipe(pivot_recipe_name)
+        if recipe_already_exists(replay_recipe_name, self.project):
+            logging.debug("Found recipe to create edits dataset")
+            replay_recipe = self.project.get_recipe(replay_recipe_name)
         else:
-            logging.debug("No recipe to create editlog pivoted, creating it...")
-            pivot_recipe = pivot_recipe_creator.create()
-            pivot_settings = pivot_recipe.get_settings()
-            pivot_settings.add_input("editlog", self.editlog_ds_name)
-            pivot_settings.add_output("edits", self.edits_ds_name)
-            pivot_settings.custom_fields["webapp_url"] = self.webapp_url
-            pivot_settings.save()
+            logging.debug("No recipe to create edits dataset, creating it...")
+            replay_recipe = replay_recipe_creator.create()
+            replay_settings = replay_recipe.get_settings()
+            replay_settings.add_input("editlog", self.editlog_ds_name)
+            replay_settings.add_output("edits", self.edits_ds_name)
+            replay_settings.custom_fields["webapp_url"] = self.webapp_url
+            replay_settings.save()
             logging.debug("Done.")
 
         edited_ds_creator = DSSManagedDatasetCreationHelper(
@@ -151,22 +147,22 @@ class DataEditor:
             self.edited_ds = Dataset(self.edited_ds_name, self.project_key)
             logging.debug("Done.")
 
-        merge_recipe_name = "compute_" + self.edited_ds_name
-        merge_recipe_creator = DSSRecipeCreator(
-            "CustomCode_merge-edits", merge_recipe_name, self.project
+        apply_recipe_name = "compute_" + self.edited_ds_name
+        apply_recipe_creator = DSSRecipeCreator(
+            "CustomCode_apply-edits", apply_recipe_name, self.project
         )
-        if recipe_already_exists(merge_recipe_name, self.project):
+        if recipe_already_exists(apply_recipe_name, self.project):
             logging.debug("Found recipe to create edited dataset")
-            merge_recipe = self.project.get_recipe(merge_recipe_name)
+            apply_recipe = self.project.get_recipe(apply_recipe_name)
         else:
             logging.debug("No recipe to create edited dataset, creating it...")
-            merge_recipe = merge_recipe_creator.create()
-            merge_settings = merge_recipe.get_settings()
-            merge_settings.add_input("original", self.original_ds_name)
-            merge_settings.add_input("edits", self.edits_ds_name)
-            merge_settings.add_output("edited", self.edited_ds_name)
-            merge_settings.custom_fields["webapp_url"] = self.webapp_url
-            merge_settings.save()
+            apply_recipe = apply_recipe_creator.create()
+            apply_settings = apply_recipe.get_settings()
+            apply_settings.add_input("original", self.original_ds_name)
+            apply_settings.add_input("edits", self.edits_ds_name)
+            apply_settings.add_output("edited", self.edited_ds_name)
+            apply_settings.custom_fields["webapp_url"] = self.webapp_url
+            apply_settings.save()
             logging.debug("Done.")
 
     def __init__(
@@ -192,7 +188,7 @@ class DataEditor:
         self.schema_columns = self.original_ds.get_config().get("schema").get("columns")
 
         self.editlog_ds_name = self.original_ds_name + "_editlog"
-        self.edits_ds_name = self.editlog_ds_name + "_pivoted"
+        self.edits_ds_name = self.original_ds_name + "_edits"
         self.edited_ds_name = self.original_ds_name + "_edited"
 
         self.__connection_name__ = (
@@ -315,9 +311,7 @@ class DataEditor:
         Returns:
             pandas.DataFrame: A DataFrame with the original data and any edited values.
         """
-        return merge_edits_from_log_pivoted_df(
-            self.original_ds, self.get_edited_cells_df()
-        )
+        return apply_edits_from_df(self.original_ds, self.get_edited_cells_df())
 
     def get_edited_cells_df_indexed(self) -> DataFrame:
         """
@@ -337,7 +331,7 @@ class DataEditor:
             pandas.DataFrame:
                 A DataFrame containing only the edited rows and columns.
         """
-        return pivot_editlog(
+        return replay_edits(
             self.editlog_ds, self.primary_keys, self.editable_column_names
         )
 

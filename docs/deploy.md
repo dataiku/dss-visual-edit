@@ -113,7 +113,7 @@ When authentication is required:
 * You can restrict access to specified (groups of) users at the project level, via the Project > Security settings: only those with "Read Dashboard" permission will be able to use the webapp (i.e. see and edit data).
 * You can restrict access at the webapp level, via the "Authorized users" property of the Visual Webapp settings. It is presented as a list; if it is not empty, only users whose identifiers are included in the list will be able to use the webapp (i.e. see and edit data).
 
-Remember that the webapp only writes data to the editlog, not to the original dataset (which stays unchanged). The editlog pivoted and the edited datasets can only be changed by running the recipes that build them.
+Remember that the webapp only writes data to the editlog, not to the original dataset (which stays unchanged). The edits and the edited datasets can only be changed by running the recipes that build them.
 
 ## Tips for production usage
 

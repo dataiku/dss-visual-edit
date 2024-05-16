@@ -166,6 +166,6 @@ return parseInt(data.tshirt_quantity) + 2;
 
 The implementation of these methods is based on the [Event Sourcing pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing): instead of directly storing the current state of the edited data, we use an append-only store to record the full series of actions on that data. This store is a dataset that we call the "editlog".
 
-When the `DataEditor` class is instantiated on a given dataset, it creates an "editlog" dataset and 2 recipes that create an "editlog pivoted" and an "edited" dataset (if they don't already exist). Those datasets are created on the same connection as the original dataset.
+When the `DataEditor` class is instantiated on a given dataset, it creates an "editlog" dataset and 2 recipes that create an "edits" and an "edited" dataset (if they don't already exist). Those datasets are created on the same connection as the original dataset.
 
-Edits made via CRUD methods instantly add rows to the editlog. The editlog pivoted and the edited datasets are only updated when the recipes that build them are run.
+Edits made via CRUD methods instantly add rows to the editlog. The edits and the edited datasets are only updated when the recipes that build them are run.

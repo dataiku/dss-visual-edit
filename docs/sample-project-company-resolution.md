@@ -80,7 +80,7 @@ id_companies_ref,id_companies_ext,reviewed,comments
 114233,MEIZ,True,""
 ```
 
-* We used the plugin's Merge recipe with `matches` and `corrected_data` as inputs, and created `matches_edited`. This required to set the “primary_keys” custom field of `matches`, so that the Merge recipe knows how to join its inputs.
+* We used the plugin's "Apply Edits" recipe with `matches` and `corrected_data` as inputs, and created `matches_edited`. This required to set the “primary_keys” custom field of `matches`, so that the "Apply Edits" recipe knows how to join its inputs.
 * We added a `to_be_reviewed` column computed by a Prepare recipe, and used it to Split `matches_edited` into two datasets, for certain and uncertain matches.
 * Finally, a 3-way join between the `companies_ref`, `companies_ext` and `matches_certain` produces the output we were looking for: a dataset of companies that has both the `notes` and `fte_count` columns.
 
@@ -105,7 +105,7 @@ Reviewing could be made in a spreadsheet program. It involves:
 * Use webapp.
 * Implement update mechanism:
   * Preliminary remarks:
-    * The webapp uses the same code as the Merge edits recipe that we have in our flow, except that it uses `matches_uncertain` instead of `matches`. Also, it uses a "live" version of the editlog pivoted, instead of the dataset found in the flow and computed from the editlog.
+    * The webapp uses the same code as the "Apply Edits" recipe that we have in our flow, except that it uses `matches_uncertain` instead of `matches`. Also, it uses a "live" version of the edits dataset, instead of the dataset found in the flow and computed from the editlog.
     * Marking a match as approved doesn't automatically move it from `matches_uncertain` to `matches_certain`. We need to rebuild these datasets. For this, we need to make sure that the edits dataset has been rebuilt.
   * Steps:
     * Create an Update scenario with a force-rebuild of `matches_uncertain_edits` and a rebuild of `matches_uncertain`.

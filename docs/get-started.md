@@ -51,14 +51,14 @@ Here is an example of what a Visual Edit webapp would look like:
 Their names start with the original dataset's name. Let's review them by their suffix:
 
 1. **_editlog_** is the raw record of all edit events captured by the webapp. It also serves as an audit trail, for governance purposes. The schema of this dataset is fixed, whatever the original dataset. Here is an example: ![](editlog.png)
-2. **_edits_** is the output of the _pivot-editlog_ recipe (provided by the plugin) and the user-friendly view of edits. In the previous example: ![](edits.png)
+2. **_edits_** is the output of the _replay-edits_ recipe (provided by the plugin) and the user-friendly view of edits. In the previous example: ![](edits.png)
   * Its schema is a subset of the original dataset's: it doesn't have columns that are display-only, but it has the same key columns and the same editable columns, plus a _last\_edit\_date_ column.
   * Its rows are a subset of the original dataset's: it doesn't contain rows where no edits were made.
   * You can think of it as...
     * A "diff" between edited and original data.
     * A dataset of overrides to apply to the original dataset.
     * The result of "replaying" edit events stored in the log: we only see the last edited values.
-3. **_edited_** is the output of the _merge-edits_ recipe (provided by the plugin) that feeds from the original dataset and the _edits_.
+3. **_edited_** is the output of the _apply-edits_ recipe (provided by the plugin) that feeds from the original dataset and the _edits_.
   * It corresponds to the edited data that you are seeing via the webapp.
   * However, it is not in sync with the webapp: it's up to you to decide when to build it in the Flow.
   * It contains the same number of rows as in the original dataset. For any given cell identified by its column and primary key values, if a non-empty value is found in _edits_, this value is used instead of the original one.
