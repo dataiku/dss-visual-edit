@@ -2,21 +2,22 @@
 
 ## Plugin documentation
 
-The documentation website for Visual Edit is at [https://dataiku.github.io/dss-visual-edit/](https://dataiku.github.io/dss-visual-edit/). Quick Links:
+The documentation website for Visual Edit is at [https://dataiku.github.io/dss-visual-edit/](https://dataiku.github.io/dss-visual-edit/).
 
+Quick Links:
 * For Data Experts:
-  * [Installation](install-plugin)
+  * [Installation](https://dataiku.github.io/dss-visual-edit/install-plugin)
   * User guides:
-    * [Use Case #1: Correcting Source Data](get-started)
-    * [Use Case #2: Reviewing Machine-Generated Data](reviewing)
-    * [Deploying in Production](deploy)
+    * [Use Case #1: Correcting Source Data](https://dataiku.github.io/dss-visual-edit/get-started)
+    * [Use Case #2: Reviewing Machine-Generated Data](https://dataiku.github.io/dss-visual-edit/reviewing)
+    * [Deploying in Production](https://dataiku.github.io/dss-visual-edit/deploy)
   * Advanced features:
-    * [Linked Records](linked-records)
-    * [Editschema](editschema)
-    * [Python API](get-started-crud-python-api)
+    * [Linked Records](https://dataiku.github.io/dss-visual-edit/linked-records)
+    * [Editschema](https://dataiku.github.io/dss-visual-edit/editschema)
+    * [Python API](https://dataiku.github.io/dss-visual-edit/get-started-crud-python-api)
   * [FAQ](faq)
 * For Business Users:
-  * [How to use the data table](data-table-features)
+  * [How to use the data table](https://dataiku.github.io/dss-visual-edit/data-table-features)
 
 ## Contents of this repository
 
