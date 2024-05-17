@@ -11,8 +11,8 @@ from commons import (
     get_dataframe,
     write_empty_editlog,
     get_display_column_names,
-    merge_edits_from_log_pivoted_df,
-    pivot_editlog,
+    apply_edits_from_df,
+    replay_edits,
     get_key_values_from_dict,
 )
 from webapp.db.editlogs import EditLog, EditLogAppenderFactory
@@ -41,7 +41,7 @@ class EditUnauthorized:
     pass
 
 
-class EditableEventSourced:
+class DataEditor:
     """
     This class provides CRUD methods to make a dataset editable using the Event Sourcing pattern: edits are stored in a separate dataset called the editlog. The source dataset is never changed. Both the source dataset and the editlog are used to compute the edited state.
     """
@@ -105,37 +105,33 @@ class EditableEventSourced:
         self.editlog_columns = self.editlog_ds.get_config().get("schema").get("columns")
 
     def __setup_editlog_downstream__(self):
-        editlog_pivoted_ds_creator = DSSManagedDatasetCreationHelper(
-            self.project, self.editlog_pivoted_ds_name
+        edits_ds_creator = DSSManagedDatasetCreationHelper(
+            self.project, self.edits_ds_name
         )
-        if editlog_pivoted_ds_creator.already_exists():
-            logging.debug("Found editlog pivoted")
+        if edits_ds_creator.already_exists():
+            logging.debug("Found edits dataset")
         else:
-            logging.debug("No editlog pivoted found, creating it...")
-            editlog_pivoted_ds_creator.with_store_into(
-                connection=self.__connection_name__
-            )
-            editlog_pivoted_ds_creator.create()
-            self.editlog_pivoted_ds = Dataset(
-                self.editlog_pivoted_ds_name, self.project_key
-            )
+            logging.debug("No edits dataset found, creating it...")
+            edits_ds_creator.with_store_into(connection=self.__connection_name__)
+            edits_ds_creator.create()
+            self.edits_ds = Dataset(self.edits_ds_name, self.project_key)
             logging.debug("Done.")
 
-        pivot_recipe_name = "compute_" + self.editlog_pivoted_ds_name
-        pivot_recipe_creator = DSSRecipeCreator(
-            "CustomCode_pivot-editlog", pivot_recipe_name, self.project
+        replay_recipe_name = "compute_" + self.edits_ds_name
+        replay_recipe_creator = DSSRecipeCreator(
+            "CustomCode_replay-edits", replay_recipe_name, self.project
         )
-        if recipe_already_exists(pivot_recipe_name, self.project):
-            logging.debug("Found recipe to create editlog pivoted")
-            pivot_recipe = self.project.get_recipe(pivot_recipe_name)
+        if recipe_already_exists(replay_recipe_name, self.project):
+            logging.debug("Found recipe to create edits dataset")
+            replay_recipe = self.project.get_recipe(replay_recipe_name)
         else:
-            logging.debug("No recipe to create editlog pivoted, creating it...")
-            pivot_recipe = pivot_recipe_creator.create()
-            pivot_settings = pivot_recipe.get_settings()
-            pivot_settings.add_input("editlog", self.editlog_ds_name)
-            pivot_settings.add_output("editlog_pivoted", self.editlog_pivoted_ds_name)
-            pivot_settings.custom_fields["webapp_url"] = self.webapp_url
-            pivot_settings.save()
+            logging.debug("No recipe to create edits dataset, creating it...")
+            replay_recipe = replay_recipe_creator.create()
+            replay_settings = replay_recipe.get_settings()
+            replay_settings.add_input("editlog", self.editlog_ds_name)
+            replay_settings.add_output("edits", self.edits_ds_name)
+            replay_settings.custom_fields["webapp_url"] = self.webapp_url
+            replay_settings.save()
             logging.debug("Done.")
 
         edited_ds_creator = DSSManagedDatasetCreationHelper(
@@ -151,22 +147,22 @@ class EditableEventSourced:
             self.edited_ds = Dataset(self.edited_ds_name, self.project_key)
             logging.debug("Done.")
 
-        merge_recipe_name = "compute_" + self.edited_ds_name
-        merge_recipe_creator = DSSRecipeCreator(
-            "CustomCode_merge-edits", merge_recipe_name, self.project
+        apply_recipe_name = "compute_" + self.edited_ds_name
+        apply_recipe_creator = DSSRecipeCreator(
+            "CustomCode_apply-edits", apply_recipe_name, self.project
         )
-        if recipe_already_exists(merge_recipe_name, self.project):
+        if recipe_already_exists(apply_recipe_name, self.project):
             logging.debug("Found recipe to create edited dataset")
-            merge_recipe = self.project.get_recipe(merge_recipe_name)
+            apply_recipe = self.project.get_recipe(apply_recipe_name)
         else:
             logging.debug("No recipe to create edited dataset, creating it...")
-            merge_recipe = merge_recipe_creator.create()
-            merge_settings = merge_recipe.get_settings()
-            merge_settings.add_input("original", self.original_ds_name)
-            merge_settings.add_input("editlog_pivoted", self.editlog_pivoted_ds_name)
-            merge_settings.add_output("edited", self.edited_ds_name)
-            merge_settings.custom_fields["webapp_url"] = self.webapp_url
-            merge_settings.save()
+            apply_recipe = apply_recipe_creator.create()
+            apply_settings = apply_recipe.get_settings()
+            apply_settings.add_input("original", self.original_ds_name)
+            apply_settings.add_input("edits", self.edits_ds_name)
+            apply_settings.add_output("edited", self.edited_ds_name)
+            apply_settings.custom_fields["webapp_url"] = self.webapp_url
+            apply_settings.save()
             logging.debug("Done.")
 
     def __init__(
@@ -192,7 +188,7 @@ class EditableEventSourced:
         self.schema_columns = self.original_ds.get_config().get("schema").get("columns")
 
         self.editlog_ds_name = self.original_ds_name + "_editlog"
-        self.editlog_pivoted_ds_name = self.editlog_ds_name + "_pivoted"
+        self.edits_ds_name = self.original_ds_name + "_edits"
         self.edited_ds_name = self.original_ds_name + "_edited"
 
         self.__connection_name__ = (
@@ -315,9 +311,7 @@ class EditableEventSourced:
         Returns:
             pandas.DataFrame: A DataFrame with the original data and any edited values.
         """
-        return merge_edits_from_log_pivoted_df(
-            self.original_ds, self.get_edited_cells_df()
-        )
+        return apply_edits_from_df(self.original_ds, self.get_edited_cells_df())
 
     def get_edited_cells_df_indexed(self) -> DataFrame:
         """
@@ -337,7 +331,7 @@ class EditableEventSourced:
             pandas.DataFrame:
                 A DataFrame containing only the edited rows and columns.
         """
-        return pivot_editlog(
+        return replay_edits(
             self.editlog_ds, self.primary_keys, self.editable_column_names
         )
 
@@ -346,7 +340,7 @@ class EditableEventSourced:
         Retrieve a single row from the dataset that was created, updated or deleted.
 
         Args:
-            primary_keys (dict): A dictionary containing values for all primary keys defined in the initial data editing setup. The set of values must be unique. Example:
+            primary_keys (dict): A dictionary containing values for all primary keys defined in the initial Visual Edit setup. The set of values must be unique. Example:
                 {
                     "key1": "cat",
                     "key2": "2022-12-21",
@@ -364,7 +358,7 @@ class EditableEventSourced:
             - The current implementation loads all edited rows in memory, then filters the rows that match the provided primary key values.
             - This method does not read rows that were not edited, and it does not read columns which are not editable.
                 - If some rows of the dataset were created, then by definition all columns are editable (including primary keys).
-                - If no row was created, editable columns are those defined in the initial data editing setup.
+                - If no row was created, editable columns are those defined in the initial Visual Edit setup.
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         return self.get_edited_cells_df_indexed().loc[key]

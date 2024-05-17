@@ -3,11 +3,11 @@
     "version": "1.8.12",
     "meta": {
         "label": "Visual Edit",
-        "description": "Edit dataset records via a webapp and replay edits in the Flow",
+        "description": "Build apps to edit records of data within pipelines",
         "author": "Dataiku (Louis Dorard, Julien Hobeika, Fabien Daoulas)",
         "icon": "icon-edit-sign",
         "tags": [],
-        "url": "http://dataiku.github.io/lca/",
+        "url": "http://dataiku.github.io/dss-visual-edit/",
         "licenseInfo": "Apache Software License",
         "supportLevel": "NOT_SUPPORTED"
     }

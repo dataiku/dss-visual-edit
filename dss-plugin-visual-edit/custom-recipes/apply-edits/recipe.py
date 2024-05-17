@@ -9,7 +9,7 @@ from pandas import DataFrame
 # import sys
 # sys.path.append('../../python-lib')
 
-from commons import merge_edits_from_log_pivoted_df, get_dataframe
+from commons import apply_edits_from_df, get_dataframe
 
 
 # %% Get recipe parameters
@@ -21,9 +21,9 @@ original_ds = original_datasets[0]
 original_schema = original_ds.read_schema()
 original_schema_df = DataFrame(original_schema).set_index("name")
 
-pivoted_names = get_input_names_for_role("editlog_pivoted")
-pivoted_datasets = [dataiku.Dataset(name) for name in pivoted_names]
-pivoted_ds = pivoted_datasets[0]
+edits_names = get_input_names_for_role("edits")
+edits_datasets = [dataiku.Dataset(name) for name in edits_names]
+edits_ds = edits_datasets[0]
 
 edited_names = get_output_names_for_role("edited")
 edited_datasets = [dataiku.Dataset(name) for name in edited_names]
@@ -33,13 +33,15 @@ edited_ds = edited_datasets[0]
 # %% Read input data
 ###
 
-editlog_pivoted_df = get_dataframe(pivoted_ds) # this dataframe was written by the pivot-editlog recipe which inferred the schema upon writing: let's use this schema when reading this dataset
+edits_df = get_dataframe(
+    edits_ds
+)  # this dataframe was written by the replay-edits recipe which inferred the schema upon writing: let's use this schema when reading this dataset
 
 
 # %% Compute output data
 ###
 
-edited_df = merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df)
+edited_df = apply_edits_from_df(original_ds, edits_df)
 
 
 # %% Write output data

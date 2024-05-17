@@ -6,7 +6,7 @@ from flask import request
 import logging
 
 
-# Editlog utils - used by Empty Editlog step and by EES for initialization of editlog
+# Editlog utils - used by Empty Editlog step and by DataEditor for initialization of editlog
 
 
 def write_empty_editlog(editlog_ds):
@@ -17,10 +17,10 @@ def write_empty_editlog(editlog_ds):
     )
 
 
-# Utils for EES and plugin components (recipes and scenario steps)
+# Utils for DataEditor and plugin components (recipes and scenario steps)
 
 
-# Used by pivot_editlog method below
+# Used by replay_edits method below
 def __unpack_keys__(df, new_key_names, old_key_name="key"):
     if len(new_key_names) == 1:
         df.rename(columns={old_key_name: new_key_names[0]}, inplace=True)
@@ -46,7 +46,7 @@ def __unpack_keys__(df, new_key_names, old_key_name="key"):
             keys_df = concat([keys_df, DataFrame(data=d, index=[i1])])
             i1 += 1
 
-        # 3. Add a column to editlog_pivoted for each key listed in primary_keys
+        # 3. Add a column to edits for each key listed in primary_keys
         df[new_key_names] = keys_df
 
         # 4. Remove the old key column
@@ -81,11 +81,11 @@ def get_dataframe(mydataset):
     return mydataset_df
 
 
-# Used by Pivot recipe and by EES for getting edited cells
+# Used by Replay recipe and by DataEditor for getting edited cells
 
 
-def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
-    # Create empty dataframe with the proper editlog pivoted schema: all primary keys, all editable columns, and "date" column
+def replay_edits(editlog_ds, primary_keys, editable_column_names):
+    # Create empty dataframe with the proper edits dataset schema: all primary keys, all editable columns, and "date" column
     # This helps ensure that the dataframe we return always has the right schema
     # (even if some columns of the input dataset were never edited)
     cols = (
@@ -97,7 +97,7 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
 
     editlog_df = get_dataframe(editlog_ds)
     if not editlog_df.size:  # i.e. if empty editlog
-        editlog_pivoted_df = all_columns_df
+        edits_df = all_columns_df
     else:
         editlog_df.rename(columns={"date": "edit_date"}, inplace=True)
         editlog_df = __unpack_keys__(editlog_df, primary_keys).sort_values("edit_date")
@@ -123,7 +123,7 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
             editlog_grouped_first, on=primary_keys
         )
 
-        editlog_pivoted_df = pivot_table(
+        edits_df = pivot_table(
             editlog_df,
             index=primary_keys,
             columns="column_name",
@@ -133,18 +133,18 @@ def pivot_editlog(editlog_ds, primary_keys, editable_column_names):
         ).join(editlog_grouped_df, on=primary_keys)
 
         # Drop any columns from the pivot that may not be one of the editable_column_names
-        for col in editlog_pivoted_df.columns:
+        for col in edits_df.columns:
             if col not in cols:
-                editlog_pivoted_df.drop(columns=[col], inplace=True)
+                edits_df.drop(columns=[col], inplace=True)
 
-        editlog_pivoted_df.reset_index(inplace=True)
+        edits_df.reset_index(inplace=True)
         # this makes sure that all (editable) columns are here and in the right order
-        editlog_pivoted_df = concat([all_columns_df, editlog_pivoted_df])
+        edits_df = concat([all_columns_df, edits_df])
 
-    return editlog_pivoted_df
+    return edits_df
 
 
-# Used by get_original_df below and by EES for init
+# Used by get_original_df below and by DataEditor for init
 def get_display_column_names(schema, primary_keys, editable_column_names):
     return [
         col.get("name")
@@ -153,7 +153,7 @@ def get_display_column_names(schema, primary_keys, editable_column_names):
     ]
 
 
-# Used by EES and by merge_edits_from_log_pivoted_df method below
+# Used by DataEditor and by apply_edits_from_df method below
 def get_original_df(original_ds):
     original_df = get_dataframe(original_ds)
 
@@ -169,7 +169,7 @@ def get_original_df(original_ds):
         schema, primary_keys, editable_column_names
     )
 
-    # make sure that primary keys will be in the same order for original_df and editlog_pivoted_df, and that we'll return a dataframe where editable columns are last
+    # make sure that primary keys will be in the same order for original_df and edits_df, and that we'll return a dataframe where editable columns are last
     return (
         original_df[primary_keys + display_column_names + editable_column_names],
         primary_keys,
@@ -178,63 +178,57 @@ def get_original_df(original_ds):
     )
 
 
-# Used by Merge recipe and by EES for getting edited data
-def merge_edits_from_log_pivoted_df(original_ds, editlog_pivoted_df):
+# Used by Apply recipe and by DataEditor for getting edited data
+def apply_edits_from_df(original_ds, edits_df):
     original_df, primary_keys, display_columns, editable_columns = get_original_df(
         original_ds
     )
-    # this will contain the list of new columns coming from editlog pivoted but not found in the original dataset's schema
+    # this will contain the list of new columns coming from edits dataset but not found in the original dataset's schema
     editable_columns_new = []
 
-    if not editlog_pivoted_df.size:  # i.e. if empty editlog
+    if not edits_df.size:  # i.e. if empty editlog
         edited_df = original_df
     else:
-        created = editlog_pivoted_df["first_action"] == "create"
-        not_deleted = editlog_pivoted_df["last_action"] != "delete"
-        created_df = editlog_pivoted_df[not_deleted & created]
+        created = edits_df["first_action"] == "create"
+        not_deleted = edits_df["last_action"] != "delete"
+        created_df = edits_df[not_deleted & created]
 
-        # Prepare editlog_pivoted_df
+        # Prepare edits_df
         ###
-        editlog_pivoted_df = editlog_pivoted_df[not_deleted & ~created]
+        edits_df = edits_df[not_deleted & ~created]
 
         # Drop columns which are not primary keys nor editable columns
         options.mode.chained_assignment = None  # this helps prevent SettingWithCopyWarnings that are triggered by the drops below
-        if "last_edit_date" in editlog_pivoted_df.columns:
-            editlog_pivoted_df.drop(columns=["last_edit_date"], inplace=True)
-        if "last_action" in editlog_pivoted_df.columns:
-            editlog_pivoted_df.drop(columns=["last_action"], inplace=True)
-        if "first_action" in editlog_pivoted_df.columns:
-            editlog_pivoted_df.drop(columns=["first_action"], inplace=True)
+        if "last_edit_date" in edits_df.columns:
+            edits_df.drop(columns=["last_edit_date"], inplace=True)
+        if "last_action" in edits_df.columns:
+            edits_df.drop(columns=["last_action"], inplace=True)
+        if "first_action" in edits_df.columns:
+            edits_df.drop(columns=["first_action"], inplace=True)
 
         # Change types to match those of original_df
-        for col in editlog_pivoted_df.columns:
+        for col in edits_df.columns:
             original_dtype = original_df[col].dtypes.name
             if col in primary_keys + display_columns + editable_columns:
                 if is_integer_dtype(original_dtype):
                     # there may be missing values so choose a dtype supporting them.
-                    editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(
-                        Int64Dtype()
-                    )
+                    edits_df[col] = edits_df[col].astype(Int64Dtype())
                 elif is_float_dtype(original_dtype):
-                    editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(float)
+                    edits_df[col] = edits_df[col].astype(float)
                 else:
-                    editlog_pivoted_df[col] = editlog_pivoted_df[col].astype(
-                        original_dtype
-                    )
+                    edits_df[col] = edits_df[col].astype(original_dtype)
             else:
                 editable_columns_new.append(col)
 
         original_df.set_index(primary_keys, inplace=True)
-        if (
-            not editlog_pivoted_df.index.name
-        ):  # if index has no name, i.e. it's a range index
-            editlog_pivoted_df.set_index(primary_keys, inplace=True)
+        if not edits_df.index.name:  # if index has no name, i.e. it's a range index
+            edits_df.set_index(primary_keys, inplace=True)
 
-        # "Replay" edits: Join and Merge
+        # Join and "Merge"
         ###
 
         # Join -> this adds _value_last columns
-        edited_df = original_df.join(editlog_pivoted_df, rsuffix="_value_last")
+        edited_df = original_df.join(edits_df, rsuffix="_value_last")
 
         # "Merge" -> this creates _original columns
         # all last_ and first_ columns have already been dropped

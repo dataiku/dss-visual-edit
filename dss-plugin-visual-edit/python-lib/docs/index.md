@@ -1,3 +1,3 @@
-This is the technical documentation for the backend of the Data Editing plugin. [Return to the main documentation](../).
+This is the technical documentation for the backend of the Visual Edit plugin. [Return to the main documentation](../).
 
-::: EditableEventSourced
+::: DataEditor

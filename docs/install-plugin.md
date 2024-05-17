@@ -8,16 +8,19 @@
   * Make sure the "code env" feature is activated; if it's not, use the contents of the requirements file to create your first environment
   * Enable maintenance access so that someone can install the plugin for you
 
-## How to install
+## How to install the plugin
 
-* TODO: instructions to install via Git
-* Create the code environment for this plugin
-  * Select the types of containers you plan to use as backend for data editing webapps or for running recipes provided by the plugin. The easiest is to choose All. ![](add_plugin_creating_code_env.png)
-  * ![](add_plugin_creating_code_env_2.png)
-  * ![](add_plugin_creating_code_env_done.png)
-  * ![](add_plugin_creating_code_env_done_2.png)
-  * ![](add_plugin_done.png)
+* From the Plugins page of your Dataiku instance, click on the "Add Plugin" button in the top right corner and choose "Fetch from Git repository":
+  * Repository URL: `git@github.com:dataiku/dss-visual-edit.git`
+  * Development mode: leave unticked
+  * Checkout: `master`
+  * Path in repository: `dss-plugin-visual-edit`
+* Create the code environment for this plugin. Select the types of containers you plan to use as backend for data editing webapps or for running recipes provided by the plugin (the easiest is to choose All).
 * The plugin is installed! ![](plugin_installed.png) We'll see how to use each of its components in the next section.
+
+## How to update the plugin
+
+From the Plugins page of your Dataiku instance, go to the "Installed" tab, find "Visual Edit" in the list and click on the "Update from repository" link. ![](update_plugin_git.png)
 
 ## Next
 

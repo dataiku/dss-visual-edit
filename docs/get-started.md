@@ -51,18 +51,18 @@ Here is an example of what a Visual Edit webapp would look like:
 Their names start with the original dataset's name. Let's review them by their suffix:
 
 1. **_editlog_** is the raw record of all edit events captured by the webapp. It also serves as an audit trail, for governance purposes. The schema of this dataset is fixed, whatever the original dataset. Here is an example: ![](editlog.png)
-2. **_editlog\_pivoted_** is the output of the _pivot-editlog_ recipe (provided by the plugin) and the user-friendly view of edits. In the previous example: ![](editlog_pivoted.png)
+2. **_edits_** is the output of the _replay-edits_ recipe (provided by the plugin) and the user-friendly view of edits. In the previous example: ![](edits.png)
   * Its schema is a subset of the original dataset's: it doesn't have columns that are display-only, but it has the same key columns and the same editable columns, plus a _last\_edit\_date_ column.
   * Its rows are a subset of the original dataset's: it doesn't contain rows where no edits were made.
   * You can think of it as...
     * A "diff" between edited and original data.
     * A dataset of overrides to apply to the original dataset.
     * The result of "replaying" edit events stored in the log: we only see the last edited values.
-3. **_edited_** is the output of the _merge-edits_ recipe (provided by the plugin) that feeds from the original dataset and the _editlog\_pivoted_.
+3. **_edited_** is the output of the _apply-edits_ recipe (provided by the plugin) that feeds from the original dataset and the _edits_.
   * It corresponds to the edited data that you are seeing via the webapp.
   * However, it is not in sync with the webapp: it's up to you to decide when to build it in the Flow.
-  * It contains the same number of rows as in the original dataset. For any given cell identified by its column and primary key values, if a non-empty value is found in _editlog\_pivoted_, this value is used instead of the original one.
-  * Note that, as a result of the above, it is impossible to empty a non-empty cell with the plugin’s Visual Webapp and recipes. This is because empty values in _editlog\_pivoted_ are ignored.
+  * It contains the same number of rows as in the original dataset. For any given cell identified by its column and primary key values, if a non-empty value is found in _edits_, this value is used instead of the original one.
+  * Note that, as a result of the above, it is impossible to empty a non-empty cell with the plugin’s Visual Webapp and recipes. This is because empty values in _edits_ are ignored.
 
 The datasets are created on the same connection as the original dataset. If not already the case, we recommend using a SQL connection for fast and reliable edits. For edits to be recorded by the webapp, this has to be a write connection. If that's not the case, you can change the connection of these datasets as soon as they've been added to the Flow.
 
@@ -84,11 +84,11 @@ Create and run a _reset edits_ scenario with an "Initialize editlog" Step. This 
 
 When opening the webapp in your browser, the same code as in the recipes is executed, from the original dataset and the editlog, in order to present an edited view of the data.
 
-Edits made via the webapp instantly add rows to the _editlog_. The _editlog\_pivoted_ and _edited_ datasets are updated only when you run the corresponding recipes.
+Edits made via the webapp instantly add rows to the _editlog_. The _edits_ and _edited_ datasets are updated only when you run the corresponding recipes.
 
 ## Use edits in the Flow
 
-You may want to leverage the _editlog\_pivoted_ dataset to write corrections back to the IT system that holds source data.
+You may want to leverage the _edits_ dataset to write corrections back to the IT system that holds source data.
 
 In most use cases, however, you would first use the _edited_ dataset as input to recipes, for analytics and reporting purposes. Here are a few tips when doing that:
 

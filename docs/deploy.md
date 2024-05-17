@@ -2,8 +2,8 @@
 
 ## Preliminary remarks
 
-* When deploying a project with a data editing webapp, there would be two different editlog datasets: one on the Design node, one on the Automation node. This way, edits made on the Design node won't have any impact in production. These two editlog datasets would have the same name, but they should be on different data connections.
-* While the datasets in a Dataiku project are typically on analytics database connections and managed by Dataiku, you may prefer to change the connection of the _editlog_ and _editlog\_pivoted_ datasets to an operational database, with constraints for the database used in Automation that would prevent accidental deletions and tampering with edits.
+* When deploying a project with a Visual Edit webapp, there would be two different editlog datasets: one on the Design node, one on the Automation node. This way, edits made on the Design node won't have any impact in production. These two editlog datasets would have the same name, but they should be on different data connections.
+* While the datasets in a Dataiku project are typically on analytics database connections and managed by Dataiku, you may prefer to change the connection of the _editlog_ and _edits_ datasets to an operational database, with constraints for the database used in Automation that would prevent accidental deletions and tampering with edits.
 * We recommend using SQL connections for these datasets.
 
 ## Deployment steps
@@ -113,7 +113,7 @@ When authentication is required:
 * You can restrict access to specified (groups of) users at the project level, via the Project > Security settings: only those with "Read Dashboard" permission will be able to use the webapp (i.e. see and edit data).
 * You can restrict access at the webapp level, via the "Authorized users" property of the Visual Webapp settings. It is presented as a list; if it is not empty, only users whose identifiers are included in the list will be able to use the webapp (i.e. see and edit data).
 
-Remember that the webapp only writes data to the editlog, not to the original dataset (which stays unchanged). The editlog pivoted and the edited datasets can only be changed by running the recipes that build them.
+Remember that the webapp only writes data to the editlog, not to the original dataset (which stays unchanged). The edits and the edited datasets can only be changed by running the recipes that build them.
 
 ## Tips for production usage
 
