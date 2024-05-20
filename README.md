@@ -23,5 +23,5 @@ Quick Links:
 ## Contents of this repository
 
 * `dash_tabulator`: source code for the Dash component powering Visual Edit's "data table", based on the Tabulator Javascript library. Read more in the [dash_tabulator README](dash_tabulator/README.md).
-* `plugin-dss-visual-edit`: actual plugin code; when installing the plugin in Dataiku, we would provide this directory only. Read more in the [plugin-dss-visual-edit README](plugin-dss-visual-edit/README.md).
+* `dss-plugin-visual-edit`: actual plugin code; when installing the plugin in Dataiku, we would provide this directory only. Read more in the [dss-plugin-visual-edit README](dss-plugin-visual-edit/README.md).
 * `docs/`: source code in Markdown for the documentation website.
