@@ -40,7 +40,7 @@ Structure of `webapps/visual-edit/backend.py`:
 * Add a `dash_tabulator` component to the layout, for the data table, with data coming from `DataEditor`
 * Add a callback triggered upon edits, using `DataEditor` to log edits.
 
-Overview of components and callbacks: ![callback graph](callback_graph.png).
+See below for how to run the webapp locally and have access to Dash dev tools in the browser, including the callback graph: it provides a visual overview of the components and callbacks, which helps understand the logic behind the automatic detection of changes in the original dataset.
 
 ## Modifying the plugin
 
