@@ -31,7 +31,11 @@ Features:
   * Advanced features:
     * [Linked Records](linked-records)
     * [Editschema](editschema)
-    * [Python API](get-started-crud-python-api)
+  * For Developers:
+    * [Introduction to Visual Edit's CRUD Python API](CRUD_example_usage.ipynb)
+    * [Low-code webapp customizations with Dash](dash-examples)
+    * [Reference API documentation]([backend/](https://dataiku.github.io/dss-visual-edit/backend/#DataEditor))
+    * Full-code webapp customizations: see [dash_tabulator documentation](https://github.com/dataiku/dss-visual-edit/blob/master/dash_tabulator/README.md) and [Plugin Developer Documentation](https://github.com/dataiku/dss-visual-edit/blob/master/dss-plugin-visual-edit/README.md)
   * [FAQ](faq)
 * For Business Users:
   * [How to use the data table](data-table-features)

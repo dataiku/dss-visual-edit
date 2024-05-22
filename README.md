@@ -15,7 +15,10 @@ Quick Links:
   * Advanced features:
     * [Linked Records](https://dataiku.github.io/dss-visual-edit/linked-records)
     * [Editschema](https://dataiku.github.io/dss-visual-edit/editschema)
-    * [Python API](https://dataiku.github.io/dss-visual-edit/get-started-crud-python-api)
+  * For Developers:
+    * [Introduction to Visual Edit's CRUD Python API](docs/CRUD_example_usage.ipynb)
+    * [Low-code webapp customizations with Dash](https://dataiku.github.io/dss-visual-edit/dash-examples)
+    * [Reference API documentation]([backend/](https://dataiku.github.io/dss-visual-edit/backend/#DataEditor))
   * [FAQ](faq)
 * For Business Users:
   * [How to use the data table](https://dataiku.github.io/dss-visual-edit/data-table-features)
