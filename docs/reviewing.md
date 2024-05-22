@@ -36,5 +36,5 @@ You must be familiar with the getting started guide and how to use the plugin to
 ## Next
 
 * If you haven't already, check out the guide to [deploy your project in production](deploy).
-* If you need to customize the webapp's front-end, see the [introduction to Visual Edit's CRUD Python API](CRUD_example_usage.ipynb) and examples of [low-code webapp customizations with Dash](dash-examples).
+* If you need to customize the webapp's front-end, see the [introduction to Visual Edit's CRUD Python API](https://github.com/dataiku/dss-visual-edit/blob/master/docs/CRUD_example_usage.ipynb) and examples of [low-code webapp customizations with Dash](dash-examples).
 * If you want to learn more about the plugin, you can also check out the [FAQ](faq).

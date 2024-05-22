@@ -115,7 +115,7 @@ The Scenario tile is displayed as a button to run a chosen scenario (typically t
 
 ## Next
 
-* If you need to customize the way the webapp displays data and create your own Visual Edit front-end, check out the [introduction to Visual Edit's CRUD Python API](CRUD_example_usage.ipynb) and examples of [low-code webapp customizations with Dash](dash-examples) to learn how to use the plugin's data persistence layer for your webapp's backend.
+* If you need to customize the way the webapp displays data and create your own Visual Edit front-end, check out the [introduction to Visual Edit's CRUD Python API](https://github.com/dataiku/dss-visual-edit/blob/master/docs/CRUD_example_usage.ipynb) and examples of [low-code webapp customizations with Dash](dash-examples) to learn how to use the plugin's data persistence layer for your webapp's backend.
 * Because we're building a project with an interface where users can enter data and this gets processed, we'll need to have two instances of the project leveraging the plugin: one for development, one for production; each will have its own set of edits. Once all your tests are successful, the next step is to [deploy your project](deploy) on an automation node, or as a duplicate project on your design node.
 * If you're interested in the use case of [reviewing machine-generated data](reviewing), check out the dedicated guide.
 * You can also check out the [FAQ](faq) to learn more about the plugin.
