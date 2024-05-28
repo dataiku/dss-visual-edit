@@ -20,6 +20,12 @@ Features:
 * Ability to leverage human feedback for continuous AI improvement.
 * Audit trail of all edits.
 
+## Plugin information
+
+* Author: Dataiku (Louis Dorard, Julien Hobeika, Fabien Daoulas)
+* [Source code](https://github.com/dataiku/dss-visual-edit/)
+* [Reporting issues](https://github.com/dataiku/dss-visual-edit/issues)
+
 ## Quick links
 
 * For Data Experts:
