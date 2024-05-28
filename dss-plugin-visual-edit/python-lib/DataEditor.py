@@ -43,7 +43,7 @@ class EditUnauthorized:
 
 class DataEditor:
     """
-    This class provides CRUD methods to make a dataset editable using the Event Sourcing pattern: edits are stored in a separate dataset called the editlog. The source dataset is never changed. Both the source dataset and the editlog are used to compute the edited state.
+    This class provides CRUD methods to edit data from a Dataiku Dataset using the Event Sourcing pattern: edits are stored in a separate Dataset called the editlog. The original Dataset is never changed. Both Datasets are used to compute the edited state of the data.
     """
 
     def __save_custom_fields__(self, dataset_name):
@@ -176,6 +176,23 @@ class DataEditor:
         editschema=None,
         authorized_users: List[str] | None = None,
     ):
+        """
+        Initializes Datasets (original and editlog) and properties used for data editing.
+
+        Args:
+            original_ds_name (str): The name of the original dataset.
+            primary_keys (list): A list of column names that uniquely identify a row in the dataset.
+            editable_column_names (list): A list of column names that can be edited. If None, all columns are editable.
+            project_key (str): The key of the project where the dataset is located. If None, the current project is used.
+            authorized_users (list): A list of user identifiers who are authorized to make edits. If None, all users are authorized.
+            linked_records (list): (Optional) A list of LinkedRecord objects that represent linked datasets or dataframes.
+            editschema_manual (list): (Optional) A list of EditSchema objects that define the primary keys and editable columns.
+            editschema (list): (Optional) A list of EditSchema objects that define the primary keys and editable columns.
+
+        Notes:
+            - If they don't already exist, the editlog, edits and edited Datasets are created on the same Dataiku Connection as the original Dataset. The Recipes in between (replay and apply edits) are also created.
+            - Edits made via CRUD methods will instantly add rows to the editlog, but the edits and the edited Datasets won't be kept in "sync": they are only updated when the Recipes are run.
+        """
         self.original_ds_name = original_ds_name
         if project_key is None:
             self.project_key = getenv("DKU_CURRENT_PROJECT_KEY")
@@ -282,7 +299,8 @@ class DataEditor:
 
     def get_original_df(self):
         """
-        Returns the original data without any edits.
+        Returns the original dataframe without any edits.
+
         Returns:
             pandas.DataFrame: The original data.
         """
@@ -306,19 +324,19 @@ class DataEditor:
 
     def get_edited_df_indexed(self) -> DataFrame:
         """
-        Returns the original dataframe with any edited values, indexed by the primary keys.
+        Returns the edited dataframe, indexed by the primary keys.
 
         Returns:
-            pandas.DataFrame: A DataFrame with the original data and any edited values, indexed by the primary keys.
+            pandas.DataFrame: A DataFrame with all rows and columns from the original data, edits applied, and primary keys as index.
         """
         return self.get_edited_df().set_index(self.primary_keys)
 
     def get_edited_df(self) -> DataFrame:
         """
-        Returns the original dataframe with any edited values.
+        Returns the edited dataframe.
 
         Returns:
-            pandas.DataFrame: A DataFrame with the original data and any edited values.
+            pandas.DataFrame: A DataFrame with all rows and columns from the original data, and edits applied.
         """
         return apply_edits_from_df(self.original_ds, self.get_edited_cells_df())
 
@@ -328,7 +346,7 @@ class DataEditor:
 
         Returns:
             pandas.DataFrame
-                A DataFrame containing only the edited rows and columns, indexed by the primary keys.
+                A DataFrame containing only the edited rows and editable columns, indexed by the primary keys.
         """
         return self.get_edited_cells_df().set_index(self.primary_keys)
 
@@ -338,7 +356,7 @@ class DataEditor:
 
         Returns:
             pandas.DataFrame:
-                A DataFrame containing only the edited rows and columns.
+                A DataFrame containing only the edited rows and editable columns.
         """
         return replay_edits(
             self.editlog_ds, self.primary_keys, self.editable_column_names
@@ -441,8 +459,9 @@ class DataEditor:
         Returns:
             str: A message indicating that the row was created.
 
-        Note:
-            This method does not implement data validation or check that the values are allowed for the specified columns.
+        Notes:
+            - No data validation: this method does not check that the values are allowed for the specified columns.
+            - Attribution of the 'create' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         for col in column_values.keys():
@@ -466,7 +485,8 @@ class DataEditor:
             list: A list of objects indicating the success or failure to insert an editlog.
 
         Note:
-            This method doesn't implement data validation. It doesn't check that the value is allowed for the specified column.
+            - No data validation: this method does not check that the value is allowed for the specified column.
+            - Attribution of the 'update' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
 
@@ -501,6 +521,9 @@ class DataEditor:
 
         Returns:
             str: A message indicating that the row was deleted.
+
+        Notes:
+            Attribution of the 'delete' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         return self.__log_edit__(key, None, None, action="delete")
