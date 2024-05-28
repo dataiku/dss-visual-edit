@@ -14,16 +14,17 @@ Being a Dash component, it comes as a Python module that includes a `DashTabulat
 brew install pyenv pyenv-virtualenv
 ```
 
-* Create a Python virtual environment:
+* Create and activate a Python virtual environment (we use the same Python version as for the Visual Edit plugin, for simplicity):
 
 ```bash
 pyenv virtualenv 3.9.19 dash_tabulator
+pyenv activate dash_tabulator
 ```
 
 * Install packages:
 
 ```bash
-pyenv activate dash_tabulator
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 

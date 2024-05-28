@@ -51,35 +51,33 @@ As a pre-requisite to running the webapp locally, you should configure your mach
 
 ### Create a Python environment
 
-* Create a Python 3.9 environment (to match `code-env/python/desc.json`) and activate it. On a Mac:
+* Pre-requisite: install pyenv-virtualenv. On a Mac:
 
 ```bash
-brew install python@3.9
-/usr/local/bin/python3.9 -m venv venv
-source venv/bin/activate
+brew install pyenv pyenv-virtualenv
 ```
 
-* Install Pandas 1.5 (to match `code-env/python/desc.json`) and the other requirements:
+* Create and activate a Python 3.9 virtual environment (to match the Python version used by the plugin, specified in `code-env/python/desc.json`):
+
+```bash
+pyenv virtualenv 3.9.19 visual-edit
+pyenv activate visual-edit
+```
+
+* Install plugin requirements and dev requirements:
 
 ```bash
 pip install --upgrade pip
-pip install pandas==1.5.3
 pip install -r code-env/python/spec/requirements.txt
+pip install -r code-env/python/spec/requirements.dev.39.txt
 ```
 
-* Install Dataiku internal client:
+* Install Dataiku internal client (this would be done automatically when creating a code environment within Dataiku):
 
 ```bash
 instance_name=$(jq -r '.default_instance' ~/.dataiku/config.json)
 DKU_DSS_URL=$(jq -r --arg instance $instance_name '.dss_instances[$instance].url' ~/.dataiku/config.json)
 pip install $DKU_DSS_URL/public/packages/dataiku-internal-client.tar.gz
-```
-
-* Install dev requirements:
-
-```bash
-pip install dataiku-api-client
-pip install ipykernel
 ```
 
 ### Store webapp settings in a JSON file
