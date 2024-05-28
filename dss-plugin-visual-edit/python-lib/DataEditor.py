@@ -288,6 +288,15 @@ class DataEditor:
         """
         return get_original_df(self.original_ds)
 
+    def get_editlog_df(self) -> DataFrame:
+        """
+        Returns the contents of the editlog.
+
+        Returns:
+            pandas.DataFrame: A DataFrame containing the editlog.
+        """
+        return get_dataframe(self.editlog_ds)
+
     def empty_editlog(self):
         """
         Writes an empty dataframe to the editlog dataset.
