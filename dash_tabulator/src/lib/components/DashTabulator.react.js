@@ -13,7 +13,7 @@ import "../../../assets/semantic.min.css";
 
 const crypto = require('crypto');
 
-const plugin_version = "1.8.11";
+const plugin_version = "2.0.0";
 
 function md5(string) {
     return crypto.createHash('md5').update(string).digest('hex');
