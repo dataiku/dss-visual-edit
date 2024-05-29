@@ -1,6 +1,6 @@
 {
     "id": "visual-edit",
-    "version": "1.8.12",
+    "version": "2.0.0",
     "meta": {
         "label": "Visual Edit",
         "description": "Build apps to edit records of data within pipelines",
