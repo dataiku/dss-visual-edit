@@ -22,13 +22,13 @@
   * Checkout: choose `master` under "Branch", to install the latest version of the plugin; alternatively, choose a version number under "Tag"
   * Path in repository: `dss-plugin-visual-edit`
 * Create the code environment for this plugin. Select the types of containers you plan to use as backend for data editing webapps or for running recipes provided by the plugin (the easiest is to choose All).
-* The plugin is installed! ![](plugin_installed.png) We'll see how to use each of its components in the next section.
+* The plugin is installed! ![](plugin_installed.png) We'll see how to use each of its components in the next guide.
 
 ## How to update the plugin
 
 From the Plugins page of your Dataiku instance, go to the "Installed" tab, find "Visual Edit" in the list and click on the "Update from repository" link. ![](update_plugin_git.png)
 
-Release notes for all versions are available at https://github.com/dataiku/dss-visual-edit/releases.
+Release notes for all versions are available at [https://github.com/dataiku/dss-visual-edit/releases](https://github.com/dataiku/dss-visual-edit/releases).
 
 ## Next
 

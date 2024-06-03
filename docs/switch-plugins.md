@@ -1,6 +1,14 @@
 # Switching to the `visual-edit` plugin
 
-**Visual Edit** (plugin id `visual-edit`) is the public release of the previously private plugin **Data Editing** (plugin id `editable-via-webapp`). If you want your projects based on `editable-via-webapp` to switch to using `visual-edit`, follow the steps below:
+**Visual Edit** (plugin id `visual-edit`) is the public release of the previously private plugin **Data Editing** (plugin id `editable-via-webapp`). The core functionalities have remained the same but some key components have been renamed:
+
+- The "editlog pivoted" dataset is now simply called the "edits" dataset
+- Recipes are now called "Replay Edits" and "Apply Edits"
+- The Visual Webapp is now called "Visual Edit"
+
+## Main instructions
+
+If you want your projects based on `editable-via-webapp` to switch to using `visual-edit`, follow the steps below:
 
 1. [Install the `visual-edit` plugin](install-plugin) (keep `editable-via-webapp` for now)
 2. Change the `project_key` variable in the code below
@@ -57,3 +65,7 @@ for webapp in project.list_webapps(as_type="objects"):
         )
         webapp.start_or_restart_backend()
 ```
+
+## Instructions for webapp coders
+
+The `EditableEventSourced` class of the plugin's python library was renamed `DataEditor`. If you were using this class in a code webapp, make sure to rename both the class and the plugin id used to import the class.
