@@ -45,3 +45,4 @@ Features:
   * [FAQ](faq)
 * For Business Users:
   * [How to use the data table](data-table-features)
+* [Migrating from older versions](migration)
