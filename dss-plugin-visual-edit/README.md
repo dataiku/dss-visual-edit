@@ -73,12 +73,21 @@ pip install -r code-env/python/spec/requirements.dev.39.txt
 ```
 
 * Install Dataiku internal client (this would be done automatically when creating a code environment within Dataiku):
+  * Bash:
 
-```bash
-instance_name=$(jq -r '.default_instance' ~/.dataiku/config.json)
-DKU_DSS_URL=$(jq -r --arg instance $instance_name '.dss_instances[$instance].url' ~/.dataiku/config.json)
-pip install $DKU_DSS_URL/public/packages/dataiku-internal-client.tar.gz
-```
+    ```bash
+    instance_name=$(jq -r '.default_instance' ~/.dataiku/config.json)
+    DKU_DSS_URL=$(jq -r --arg instance $instance_name '.dss_instances[$instance].url' ~/.dataiku/config.json)
+    pip install $DKU_DSS_URL/public/packages/dataiku-internal-client.tar.gz
+    ```
+
+  * Fish:
+
+    ```fish
+    set instance_name (jq -r '.default_instance' ~/.dataiku/config.json)
+    set DKU_DSS_URL (jq -r --arg instance $instance_name '.dss_instances[$instance].url' ~/.dataiku/config.json)
+    pip install $DKU_DSS_URL/public/packages/dataiku-internal-client.tar.gz
+    ```
 
 ### Store webapp settings in a JSON file
 
