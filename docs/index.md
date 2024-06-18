@@ -1,6 +1,6 @@
 # Plugin: Visual Edit | Dataiku
 
-## Build apps to edit records of data within pipelines
+## Build apps to validate and edit data within pipelines
 
 <iframe src="https://www.loom.com/embed/7b79e45e755544f8baf1ff3ed1bf60ee" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height: 400px; width: 600px"></iframe>
 
