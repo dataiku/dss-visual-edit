@@ -1,5 +1,6 @@
 {
     "acceptedPythonInterpreters": [
+        "PYTHON38",
         "PYTHON39"
     ],
     "corePackagesSet": "PANDAS15",
