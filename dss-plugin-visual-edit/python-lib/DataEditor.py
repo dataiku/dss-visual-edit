@@ -119,7 +119,7 @@ class DataEditor:
 
         replay_recipe_name = "compute_" + self.edits_ds_name
         replay_recipe_creator = DSSRecipeCreator(
-            "CustomCode_replay-edits", replay_recipe_name, self.project
+            "CustomCode_visual-edit-replay-edits", replay_recipe_name, self.project
         )
         if recipe_already_exists(replay_recipe_name, self.project):
             logging.debug("Found recipe to create edits dataset")
@@ -149,7 +149,7 @@ class DataEditor:
 
         apply_recipe_name = "compute_" + self.edited_ds_name
         apply_recipe_creator = DSSRecipeCreator(
-            "CustomCode_apply-edits", apply_recipe_name, self.project
+            "CustomCode_visual-edit-apply-edits", apply_recipe_name, self.project
         )
         if recipe_already_exists(apply_recipe_name, self.project):
             logging.debug("Found recipe to create edited dataset")

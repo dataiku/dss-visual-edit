@@ -1,6 +1,6 @@
 {
     "id": "visual-edit",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "meta": {
         "label": "Visual Edit",
         "description": "Build apps to validate and edit data within pipelines",
