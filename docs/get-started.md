@@ -1,5 +1,12 @@
 # Correcting Source Data | Plugin: Visual Edit | Dataiku
 
+This guide is structured as follows:
+
+* Use case description
+* Preliminary steps
+* Create a Visual Edit webapp
+* Use edits in the Flow
+
 ## Use case description
 
 There are two main types of use cases for the plugin's Visual Webapp:
@@ -9,31 +16,24 @@ There are two main types of use cases for the plugin's Visual Webapp:
 
 In this guide, we focus on the former. The latter is slightly more complex and will be covered in a separate guide.
 
-Here, we want business users (aka end-users) to edit data based on their domain expertise, and we want to use the edited data for better downstream analytics and reporting. Instead of doing this in Excel, we want end-users to access a web interface. Therefore we need a front-end for them to see and enter data, and we need to "connect" the data entered via the web front-end with the analytics pipeline. This guide is structured as follows:
-
-* Preliminary steps
-* Create a Visual Edit webapp
-* Start the webapp
-* Test the webapp
-* Use edits in the Flow
+Here, we want business users (aka end-users) to edit data based on their domain expertise, and we want to use the edited data for better downstream analytics and reporting. Instead of doing this in Excel, we want end-users to access a web interface. Therefore we need a front-end for them to see and enter data, and we need to "connect" the data entered via the web front-end with the analytics pipeline. 
 
 ## Preliminary steps
 
-* [Install the plugin](install-plugin), if not already available.
-* Create a new project and add a dataset (via an existing Connection, or file upload). The screen captures shown in this guide were taken on a new project where we uploaded the [orders CSV file](https://downloads.dataiku.com/public/website-additional-assets/data/orders.csv) found in the [Basics 101 course](https://academy.dataiku.com/path/core-designer/basics-101) of the Dataiku Academy. You could also apply the following to an existing project and dataset, which may appear as an input dataset or as the result of an existing recipe.
-* Review the dataset schema. The plugin's Visual Webapp uses it to display, sort, filter data and enable editing in the most appropriate way. When a column meaning was defined explicitly, the webapp will use it; otherwise it will consider the storage type instead.
+* [ ] [Install the plugin](install-plugin), if not already available.
+* [ ] Create a new project and add a dataset (via an existing Connection, or file upload). The screen captures shown in this guide were taken on a new project where we uploaded the [orders CSV file](https://downloads.dataiku.com/public/website-additional-assets/data/orders.csv) found in the [Basics 101 course](https://academy.dataiku.com/path/core-designer/basics-101) of the Dataiku Academy. You could also apply the following to an existing project and dataset, which may appear as an input dataset or as the result of an existing recipe. ![](orders_dataset.png)
+* [ ] Review the dataset schema. The plugin's Visual Webapp uses it to display, sort, filter data and enable editing in the most appropriate way. When a column meaning was defined explicitly, the webapp will use it; otherwise it will consider the storage type instead.
   * Use a “Boolean” meaning to show boolean values as ticks and crosses and to enable editing with checkboxes; filtering will be text-based;
   * Use a numerical meaning to restrict editing to numbers only, to enable sorting by numerical order, and filtering with min-max values;
   * Use a “Date” meaning to enable sorting by chronological order, editing and filtering with date pickers
   * Use a “Text” meaning for both free-text input and for dropdowns (this will be specified in the Visual Webapp's settings), text-based filtering, and sorting by alphabetical order.
 
-
 ## Create a Visual Edit webapp
 
-* Go to Webapps, create New Visual Webapp, pick Visual Edit (this component is provided by the plugin).
+* [ ] Go to Webapps, create New Visual Webapp, pick Visual Edit (this component is provided by the plugin).
   * ![](new_visual_webapp.png)
   * ![](new_visual_webapp_2.png)
-* Settings:
+* [ ] Settings:
   * _Data_:
     * Select a dataset, list primary keys and editable columns (note that a column can't be both). ![](visual_edit_webapp_params_orders.png)
     * Double check the selection of primary keys and editable columns: ground-truth values of editable columns should be fixed for a given (set of) primary key(s) value(s).
@@ -41,11 +41,23 @@ Here, we want business users (aka end-users) to edit data based on their domain 
   * _Layout_: here you can choose to freeze editable columns to the right-hand side (which is useful when there are many columns), and to group rows by one or more columns.
   * Advanced settings can be provided via the ["editschema" in JSON](editschema).
 
-## Start the webapp
-
-Here is an example of what a Visual Edit webapp would look like:
+The webapp should look like this:
 
 ![](webapp_orders.png)
+
+Note that tshirt price and quantities are not seen as numerical columns: column types are shown as "Text" in the webapp (see below column names) and as a result we can input any type of data in them. This is expected, because all storage types were "string" and no column meanings were set explicitly.
+
+### Fix column types
+
+* [ ] Let's set the column meanings for tshirt price and quantities as Decimal and Integer. ![](orders_dataset_column_meanings.png)
+* [ ] Restart the webapp. It will now consider these columns as numerical. The webapp should look like this:
+![](webapp_orders_fixed_types.png)
+
+### Test the webapp
+
+* [ ] Test the webapp with a few edits. Here, you should only be able to input numerical values when editing cells. See all end-user features of the webapp's data table [here](data-table-features).
+
+### Locate edits in the Flow
 
 3 datasets are created upon starting the webapp (if they don't already exist): ![](new_datasets.png)
 Their names start with the original dataset's name. Let's review them by their suffix:
@@ -64,13 +76,15 @@ Their names start with the original dataset's name. Let's review them by their s
   * It contains the same number of rows as in the original dataset. For any given cell identified by its column and primary key values, if a non-empty value is found in _edits_, this value is used instead of the original one.
   * Note that, as a result of the above, it is impossible to empty a non-empty cell with the plugin’s Visual Webapp and recipes. This is because empty values in _edits_ are ignored.
 
-The datasets are created on the same connection as the original dataset. If not already the case, we recommend using a SQL connection for fast and reliable edits. For edits to be recorded by the webapp, this has to be a write connection. If that's not the case, you can change the connection of these datasets as soon as they've been added to the Flow.
+#### Datasets' Connection
 
-Settings such as primary keys and editable columns are copied into the _Visual Edit_ fields of the original and the _editlog_ datasets ([custom fields provided by the plugin](https://doc.dataiku.com/dss/latest/plugins/reference/custom-fields.html) — see the bottom right corner of the screenshot above). This is how the recipes have access to settings defined in the webapp.
+The datasets are created on the same connection as the original dataset. If not already the case, **we recommend using a SQL connection** for fast and reliable edits. For edits to be recorded by the webapp, this has to be a write connection. If that's not the case, you can change the connection of these datasets as soon as they've been added to the Flow.
 
-## Test the webapp on your own
+#### Relationship between what you see in the webapp and in the Flow
 
-You may want to test the webapp with a few edits, then check the _editlog_ dataset to see the recorded changes. See all end-user features of the webapp's data table [here](data-table-features).
+* Edits made via the webapp instantly add rows to the _editlog_. The _edits_ and _edited_ datasets are updated only when you run the corresponding recipes.
+* When opening the webapp in your browser, the same code as in the recipes is executed, from the original dataset and the editlog, in order to present an edited view of the data.
+* Settings such as primary keys and editable columns are copied into the _Visual Edit_ fields of the original and the _editlog_ datasets ([custom fields provided by the plugin](https://doc.dataiku.com/dss/latest/plugins/reference/custom-fields.html) — see the bottom right corner of the screenshot above). This is how the recipes have access to settings defined in the webapp.
 
 ### How to reset edits
 
@@ -79,12 +93,6 @@ Only use this on a design node, if needed for your tests.
 Create and run a _reset edits_ scenario with an "Initialize editlog" Step. This type of scenario step is provided by the plugin and can be found toward the end of the list of available steps.
 
 ![](scenario_initialize_editlog.png)
-
-### Behind the scenes
-
-When opening the webapp in your browser, the same code as in the recipes is executed, from the original dataset and the editlog, in order to present an edited view of the data.
-
-Edits made via the webapp instantly add rows to the _editlog_. The _edits_ and _edited_ datasets are updated only when you run the corresponding recipes.
 
 ## Use edits in the Flow
 
