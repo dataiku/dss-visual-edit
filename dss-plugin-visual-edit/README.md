@@ -23,14 +23,14 @@ The code was developed in Python (environment specs are in `code-env/`) and is o
 We recommend reading the components' descriptions, available on your Dataiku instance once you've installed the plugin.
 
 * **`custom-recipes/` (Dataiku plugin components: Recipes)** leverage the data persistence layer and Custom Fields (see below) to replay edits found in an editlog dataset, and integrate them into a Dataiku Flow.
-* **`custom-fields/edit-schema/` (Dataiku plugin component: Custom Fields)** provides a place to store dataset settings such as primary keys and editable columns, which are used by the Recipes. Currently, these settings are duplicated across the original dataset and the editlog:
+* **`custom-fields/visual-edit-schema/` (Dataiku plugin component: Custom Fields)** provides a place to store dataset settings such as primary keys and editable columns, which are used by the Recipes. Currently, these settings are duplicated across the original dataset and the editlog:
   * original dataset:
     * `primary_keys` is used by the Apply Edits function/recipe, which joins the original and edits datasets
     * `editable_columns` is used to present columns in a certain order
     * Note: both properties are returned by the `get_original_df()` method in `commons.py`.
   * editlog dataset: 
     * `primary_keys` is used by the Replay Edits function/recipe to unpack key values into 1 column per primary key and to figure out key names.
-* **`python-steps/empty-editlog/` (Dataiku plugin component: Scenario step)** empties the editlog by deleting all rows (this is only used for testing purposes on a design instance).
+* **`python-steps/visual-edit-empty-editlog/` (Dataiku plugin component: Scenario step)** empties the editlog by deleting all rows (this is only used for testing purposes on a design instance).
 
 ### Dash Webapp
 
