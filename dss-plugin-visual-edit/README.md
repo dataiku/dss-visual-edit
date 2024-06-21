@@ -1,6 +1,6 @@
 # DSS Plugin: Visual Edit
 
-Visual Edit provides components to create data editing interfaces, packaged in a Dataiku plugin.
+Visual Edit provides components to create data validation and editing interfaces, packaged in a Dataiku plugin.
 
 This document serves as developer documentation. As a preliminary step, we recommend reading the [user documentation](https://dataiku.github.io/dss-visual-edit/) for data experts and for developers.
 
