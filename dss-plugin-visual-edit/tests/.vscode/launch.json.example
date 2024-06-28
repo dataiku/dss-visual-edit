@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Current behave file",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "behave",
+            "console": "integratedTerminal",
+            "args": [
+                "--no-logcapture",
+                "--logging-level=DEBUG",
+                "${file}"
+            ],
+            "justMyCode": false,
+            "env": {
+                "DKU_ANSWERS_RUN_ID": "tofill",
+                "DKU_ANSWERS_COOKIE": "tofill"
+            }
+        }
+    ]
+}
