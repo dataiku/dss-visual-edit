@@ -4,17 +4,17 @@ import os
 
 from dataikuapi.dss.webapp import DSSWebApp
 
-answers_run_id = os.getenv("DKU_ANSWERS_RUN_ID")
-answers_cookie = os.getenv("DKU_ANSWERS_COOKIE")
+webapp_run_id = os.getenv("DKU_WEBAPP_RUN_ID")
+webapp_cookie = os.getenv("DKU_WEBAPP_COOKIE")
 
 
 def get_cookie() -> str:
-    if answers_cookie:
-        return answers_cookie
-    return "tofill"
+    if webapp_cookie:
+        return webapp_cookie
+    raise Exception("Cookie must be specified in env var DKU_WEBAPP_COOKIE.")
 
 
 def create_webapp_backend_url(webapp: DSSWebApp):
-    if answers_run_id:
-        return f"/web-apps-backends/{webapp.project_key}/{answers_run_id}/"
-    return f"/web-apps-backends/{webapp.project_key}/cbrroHcg/"
+    if webapp_run_id:
+        return f"/web-apps-backends/{webapp.project_key}/{webapp_run_id}/"
+    raise Exception("Web app run id must be specified in env var DKU_WEBAPP_RUN_ID.")

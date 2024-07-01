@@ -14,8 +14,8 @@
             ],
             "justMyCode": false,
             "env": {
-                "DKU_ANSWERS_RUN_ID": "tofill",
-                "DKU_ANSWERS_COOKIE": "tofill"
+                "DKU_WEBAPP_RUN_ID": "tofill",
+                "DKU_WEBAPP_COOKIE": "tofill"
             }
         }
     ]
