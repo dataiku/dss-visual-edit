@@ -1,0 +1,9 @@
+behave
+behave-pandas
+dataiku-internal-client @ https://design.solutions.dataiku-dss.io/public/packages/dataiku-internal-client.tar.gz
+dataiku-api-client
+pandas==1.5.3
+python-socketio==5.11.2
+numpy==1.26.4
+websocket-client
+dssgherkin @ git+https://github.com/dataiku/dss-gherkin-steps.git@main#egg=dssgherkin
