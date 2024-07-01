@@ -14,7 +14,7 @@
             ],
             "justMyCode": false,
             "env": {
-                "DKU_WEBAPP_RUN_ID": "tofill",
+                "DKU_WEBAPP_RUN_IDS": "<webappId>:<runId>,<webappId>:<runId>",
                 "DKU_WEBAPP_COOKIE": "tofill"
             }
         }

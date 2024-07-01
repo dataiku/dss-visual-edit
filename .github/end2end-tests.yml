@@ -10,9 +10,10 @@ on:
       cookie:
         description: 'Cookie to authenticate to webapp'
         required: true
-      webapp_run_id:
-        description: 'Webapp instance to use during the tests'
+      run_ids:
+        description: 'Run ids'
         required: true
+        default: 'UyLsbJ6:<runId>,bodh8Xz:<runId>'
 
 permissions:
   contents: write
@@ -33,7 +34,7 @@ jobs:
       env:
         DKU_DSS_URL: ${{ inputs.url }}
         DKU_API_KEY: ${{ secrets.tests_integrations_api_key }}
-        DKU_WEBAPP_RUN_ID: ${{ inputs.webapp_run_id }}
+        DKU_WEBAPP_RUN_IDS: ${{ inputs.run_ids }}
         DKU_WEBAPP_COOKIE: ${{ inputs.cookie }}
       run: |
         python -m pip install --upgrade pip
