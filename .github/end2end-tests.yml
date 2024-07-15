@@ -4,12 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       url:
-        description: 'Url to dss instance where tests will run'
+        description: 'DSS instance url where test will run'
         required: true
         default: https://tests-integration.solutions.dataiku-dss.io/
-      cookie:
-        description: 'Cookie to authenticate to webapp'
-        required: true
       run_ids:
         description: 'Run ids'
         required: true
@@ -34,11 +31,13 @@ jobs:
       env:
         DKU_DSS_URL: ${{ inputs.url }}
         DKU_API_KEY: ${{ secrets.tests_integrations_api_key }}
+        DSS_USERNAME: ${{ secrets.tests_integrations_reader_user_name }}
+        DSS_PASSWORD: ${{ secrets.tests_integrations_reader_user_pwd }}
         DKU_WEBAPP_RUN_IDS: ${{ inputs.run_ids }}
-        DKU_WEBAPP_COOKIE: ${{ inputs.cookie }}
       run: |
         python -m pip install --upgrade pip
         cd dss-plugin-visual-edit/tests/end2end
         pip install -r requirements.txt
+        playwright install chromium
         behave --no-logcapture --logging-level=ERROR
 

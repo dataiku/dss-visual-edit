@@ -35,7 +35,7 @@ def edit_rows(ctx: AugmentedBehaveContext):
             "POST",
             url,
             json=body,
-            cookies={"Cookie": get_cookie()},
+            cookies={"Cookie": get_cookie(ctx)},
         )
 
         assert response.ok

@@ -1,6 +1,7 @@
 Feature: SQL, single primary key.
     Background:
-        Given an existing webapp "bodh8Xz" in project "VISUALEDITINTEGRATIONTESTS"
+        Given I login to DSS
+        And an existing webapp "bodh8Xz" in project "VISUALEDITINTEGRATIONTESTS"
         And an emptied existing dataset named "products_editlog"
         And an emptied existing dataset named "products_edits"
         And an emptied existing dataset named "products_edited"
