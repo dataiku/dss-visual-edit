@@ -2,6 +2,8 @@
 
 ## How to install the plugin
 
+The plugin can be installed via Git (it is not yet available through the plugin store).
+
 ### Dataiku Cloud
 
 * Enable maintenance access
@@ -11,8 +13,8 @@
 
 #### Requirements
 
-* Dataiku 9 or more recent
-* Ability to install plugins on your Dataiku instance and to create an associated code env based on Python 3.8 or 3.9.
+* **Dataiku V9+**
+* Ability to install plugins on your Dataiku instance and to create an associated code env based on **Python 3.8 or 3.9**.
 
 #### Instructions
 

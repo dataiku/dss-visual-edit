@@ -20,7 +20,7 @@ Here, we want business users (aka end-users) to edit data based on their domain 
 
 ## Preliminary steps
 
-* [ ] [Install the plugin](install-plugin), if not already available.
+* [ ] Confirm Visual Edit is available as a plugin on your Dataiku instance, or [Request Installation](https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1cgQ-IQ2k2eJMm6mUrZxabQgtPSSwaZ9TgNcHcnaUDvrqfweAkf-B7xzZbTSNyYeSRc2smgLbp).
 * [ ] Create a new project and add a dataset (via an existing Connection, or file upload). The screen captures shown in this guide were taken on a new project where we uploaded the [orders CSV file](https://downloads.dataiku.com/public/website-additional-assets/data/orders.csv) found in the [Basics 101 course](https://academy.dataiku.com/path/core-designer/basics-101) of the Dataiku Academy. You could also apply the following to an existing project and dataset, which could be an "input" dataset (nothing upstream), or the output of a recipe. ![](orders_dataset.png)
 * [ ] Review the dataset's schema. The plugin's Visual Webapp uses it to display, sort, filter data and enable editing in the most appropriate way. When a column meaning was defined explicitly, the webapp will use it; otherwise it will consider the storage type instead.
   * Use a “Boolean” meaning to show boolean values as ticks and crosses and to enable editing with checkboxes; filtering will be text-based;

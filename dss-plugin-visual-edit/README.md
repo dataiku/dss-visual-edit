@@ -45,7 +45,7 @@ See below for how to run the webapp locally and have access to Dash dev tools in
 
 ## Modifying the plugin
 
-Most changes to the code can be tested by running the webapp locally. You can then further test the integration with Dataiku by installing the plugin with your customizations. For this, you would change the repo URL used by the plugin installer to fetch from Git (see [installation instructions](https://dataiku.github.io/dss-visual-edit/install-plugin); DO NOT tick "development mode"). Alternatively, you can create a ZIP file from the `dss-plugin-visual-edit` directory and upload it to the plugin installer.
+Most changes to the code can be tested by running the webapp locally. You can then further test the integration with Dataiku by installing the plugin with your customizations. For this, you would change the repo URL used by the plugin installer to fetch from Git. Alternatively, you can create a ZIP file from the `dss-plugin-visual-edit` directory and upload it to the plugin installer.
 
 As a pre-requisite to running the webapp locally, you should configure your machine to [connect to your Dataiku instance](https://doc.dataiku.com/dss/latest/python-api/outside-usage.html#setting-up-the-connection-with-dss) (on a Mac, this is in `~/.dataiku/config.json`).
 

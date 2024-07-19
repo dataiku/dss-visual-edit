@@ -29,7 +29,7 @@ Features:
 ## Quick links
 
 * For Data Experts:
-  * [Installation](install-plugin)
+  * [Request Installation](https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1cgQ-IQ2k2eJMm6mUrZxabQgtPSSwaZ9TgNcHcnaUDvrqfweAkf-B7xzZbTSNyYeSRc2smgLbp)
   * User guides:
     * [Use Case #1: Correcting Source Data](get-started)
     * [Use Case #2: Reviewing Machine-Generated Data](reviewing)
