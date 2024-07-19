@@ -13,7 +13,7 @@ import "../../../assets/semantic.min.css";
 
 const crypto = require('crypto');
 
-const plugin_version = "2.0.0";
+const plugin_version = "2.0.2";
 
 function md5(string) {
     return crypto.createHash('md5').update(string).digest('hex');
@@ -81,6 +81,21 @@ export default class DashTabulator extends React.Component {
                 });
             } catch (e) { }
         })
+
+        window.addEventListener('message', function (event) {
+            const data = event.data;
+            if (data && data.type === 'filters' && data.filters.length > 0) {
+                filter = data.filters[0];
+                filterType = filter.filterType;
+                filterColumn = filter.column;
+                if (filterType === 'NUMERICAL_FACET') {
+                    filterMinValue = filter.minValue;
+                    filterMaxValue = filter.maxValue;
+                    console.log(filterMinValue + " <= " + filterColumn);
+                    this.tabulator.setFilter(filterColumn, ">=", filterMinValue);
+                }
+            }
+        });
     }
 
     constructor(props) {
