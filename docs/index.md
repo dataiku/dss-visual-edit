@@ -1,35 +1,12 @@
 # Plugin: Visual Edit | Dataiku
 
-## Build apps to validate and edit data within pipelines
+Welcome to the documentation website for Dataiku Visual Edit!
 
-![](demo_unmatched_entities.gif)
+This plugin helps spin up visual apps to validate and edit data. Learn more about use cases, features, and how to install at [dataiku.com/product/plugins/visual-edit/](https://www.dataiku.com/product/plugins/visual-edit/).
 
-[Book a demo!](https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1cgQ-IQ2k2eJMm6mUrZxabQgtPSSwaZ9TgNcHcnaUDvrqfweAkf-B7xzZbTSNyYeSRc2smgLbp){: .btn}
-
-Use Cases: enable domain experts to...
-
-* Validate the output of rules or AI used for
-  * Mass corrections/enrichment of source data: **entity resolution, deduplication, categorization**, etc.
-  * Operational processes: **log decisions on alerts, validate suggestions of amounts to pay or orders to place**, etc.
-* Make tactical corrections on source data, to ensure correctness of an analytics project.
-
-Features:
-
-* Powerful data table with rich editing experience and a special validation column.
-* Easy webapp setup (no-code and low-code options) and integration of edits in your pipeline.
-* Ability to leverage human feedback for continuous AI improvement.
-* Audit trail of all edits.
-
-## Plugin information
-
-* Author: Dataiku (Louis Dorard, Julien Hobeika, Fabien Daoulas)
-* [Source code](https://github.com/dataiku/dss-visual-edit/)
-* [Reporting issues](https://github.com/dataiku/dss-visual-edit/issues)
-
-## Quick links
+## Contents
 
 * For Data Experts:
-  * [Request Installation](https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1cgQ-IQ2k2eJMm6mUrZxabQgtPSSwaZ9TgNcHcnaUDvrqfweAkf-B7xzZbTSNyYeSRc2smgLbp)
   * User guides:
     * [Use Case #1: Correcting Source Data](get-started)
     * [Use Case #2: Reviewing Machine-Generated Data](reviewing)

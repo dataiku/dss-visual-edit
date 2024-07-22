@@ -3,7 +3,7 @@
     "version": "2.0.1",
     "meta": {
         "label": "Visual Edit",
-        "description": "Build apps to validate and edit data within pipelines",
+        "description": "Spin up a visual app to validate and edit data",
         "author": "Dataiku (Louis Dorard, Julien Hobeika, Fabien Daoulas)",
         "icon": "icon-edit-sign",
         "tags": [],
