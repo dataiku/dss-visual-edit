@@ -1,4 +1,4 @@
-# Installation | Plugin: Visual Edit | Dataiku
+# Installation
 
 ## How to install the plugin
 

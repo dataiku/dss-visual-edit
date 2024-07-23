@@ -1,4 +1,4 @@
-# Building a complete application to test with end-users | Plugin: Visual Edit | Dataiku
+# Building a complete application to test with end-users
 
 As a first step, make sure to read the [How to Use](https://www.dataiku.com/product/plugins/visual-edit/#how-to-use) guide on the plugin's presentation page.
 

@@ -1,4 +1,4 @@
-# Validating machine-generated data | Plugin: Visual Edit | Dataiku
+# Validating machine-generated data
 
 ## Use case description
 
@@ -25,16 +25,15 @@ As a result, there will be no missing value in the machine-generated and human-r
 
 ## How-to
 
-You must be familiar with the getting started guide and how to use the plugin to make corrections on source data.
+You must be familiar with the initial [How to Use guide](https://www.dataiku.com/product/plugins/visual-edit/#how-to-use) before following the steps below.
 
 * **Add feedback columns to the dataset to review**: this can be done via code in the existing data pipeline, or with an additional Prepare recipe, as columns with missing values to serve as placeholders in the webapp.
 * **When creating a Visual Edit webapp**: make sure to select all machine-generated columns and feedback columns as editable.
 * **When using the webapp**: you would review values in generated columns (mark as reviewed, or edit values and add notes when necessary) and fill in missing values.
 * **When building the Flow and defining the _update source_ scenario**: you would typically want to notify end-users via email if there is new data to review.
-* **Test with IT**: share the _edits_ dataset with IT for them to propagate or leverage edits in other IT systems (see the sub use cases mentioned at the beginning of this document); columns of this dataset include primary keys, machine-generated and human-reviewed columns, a boolean Reviewed column, and additional human feedback columns.
+* **Test with IT**: share the _edits_ dataset with IT for them to propagate or leverage edits in other IT systems; columns of this dataset include primary keys, machine-generated and human-reviewed columns, a boolean Reviewed column, and additional human feedback columns.
 
 ## Next
 
 * [Building a complete application to test with end-users](build-complete-application)
 * [Deploying to production](deploy)
-

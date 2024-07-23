@@ -1,4 +1,4 @@
-# Low-code webapp customizations with Dash | Plugin: Visual Edit | Dataiku
+# Low-code webapp customizations with Dash
 
 ## Basic usage
 
