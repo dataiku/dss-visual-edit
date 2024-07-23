@@ -31,7 +31,3 @@ The plugin can be installed via Git (it is not yet available through the plugin 
 From the Plugins page of your Dataiku instance, go to the "Installed" tab, find "Visual Edit" in the list and click on the "Update from repository" link. ![](update_plugin_git.png)
 
 Release notes for all versions are available at [https://github.com/dataiku/dss-visual-edit/releases](https://github.com/dataiku/dss-visual-edit/releases).
-
-## Next
-
-Check out the guide to [Get started](get-started) for an introduction to the plugin's components and how to use them.

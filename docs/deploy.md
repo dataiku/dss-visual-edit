@@ -1,12 +1,12 @@
-# Deploying to production (automation node)
+# Deploying to production
 
 ## Preliminary remarks
 
-* When deploying a project with a Visual Edit webapp, there would be two different editlog datasets: one on the Design node, one on the Automation node. This way, edits made on the Design node won't have any impact in production. These two editlog datasets would have the same name, but they should be on different data connections.
+* After deploying a project that uses a Visual Edit webapp to an Automation node, there would be two different editlog datasets: one on the Design node, one on the Automation node. This way, edits made on the Design node won't have any impact in production. These two editlog datasets would have the same name, but they should be on different data connections.
 * While the datasets in a Dataiku project are typically on analytics database connections and managed by Dataiku, you may prefer to change the connection of the _editlog_ and _edits_ datasets to an operational database, with constraints for the database used in Automation that would prevent accidental deletions and tampering with edits.
-* We recommend using SQL connections for these datasets.
+* **We strongly recommend switching these datasets to SQL connections**, if not already the case, before deploying your project. This is because writing edits to the editlog will be faster than with other types of connections, and because SQL databases allow for more control over the data (e.g. setting constraints, triggers, etc.). It is not necessary to change the connection of the Original Dataset.
 
-## Deployment steps
+## Overview of steps
 
 Initial deployment:
 
@@ -28,7 +28,7 @@ Demo videos:
 
 ### Simple procedure
 
-A simple way to initialize the editlog is with a _reset edits_ scenario as described in the getting started guide. You can then delete the scenario, to make sure that it won't be used accidentally in the future (which would cause losing all edits).
+A simple way to initialize the editlog is with a _Reset Edits_ scenario as described in the getting started guide. You can then delete the scenario, to make sure that it won't be used accidentally in the future (which would cause losing all edits).
 
 ### Secure procedure
 

@@ -1,8 +1,8 @@
-# Reviewing machine-generated data | Plugin: Visual Edit | Dataiku
+# Validating machine-generated data | Plugin: Visual Edit | Dataiku
 
 ## Use case description
 
-We want business users (aka end-users) to review machine-generated data and make corrections as needed, based on their domain expertise. From a business perspective, there are two sub use cases: we may use the human-reviewed, machine-generated data...
+We want business users (aka end-users) to validate/review machine-generated data and make corrections as needed, based on their domain expertise. From a business perspective, there are two sub use cases: we may use the human-reviewed, machine-generated data...
 
 * for mass corrections or enrichment of source data;
 * as input to an operational process.
@@ -13,9 +13,9 @@ Machine-generated data would be stored in the output dataset of an existing data
 * machine-generated columns, whose values would change if the pipeline or its algorithms change;
 * display-only columns, whose values would help the end-user figure out how to review/edit/provide feedback.
 
-Instead of exporting this dataset to Excel, we want end-users to access a web interface to review and correct the data. In addition to the above columns, we would want feedback columns to mark rows as “Reviewed” (via checkboxes) and to write comments.
+Instead of exporting this dataset to Excel, we want end-users to access a web interface to review and correct the data. In addition to the above columns, we would want 2 feedback columns: one to mark rows as “Reviewed” (via checkboxes) and one to write comments.
 
-## Special behavior of the Reviewed column
+## Special behavior of the validation column ("Reviewed")
 
 The webapp’s backend implements special behavior when a cell from a column named “Reviewed” is edited: values of all editable columns from the same row are logged (even if they weren’t edited).
 
@@ -35,6 +35,6 @@ You must be familiar with the getting started guide and how to use the plugin to
 
 ## Next
 
-* If you haven't already, check out the guide to [deploy your project in production](deploy).
-* If you need to customize the webapp's front-end, see the [introduction to Visual Edit's CRUD Python API](https://github.com/dataiku/dss-visual-edit/blob/master/docs/CRUD_example_usage.ipynb) and examples of [low-code webapp customizations with Dash](dash-examples).
-* If you want to learn more about the plugin, you can also check out the [FAQ](faq).
+* [Building a complete application to test with end-users](build-complete-application)
+* [Deploying to production](deploy)
+
