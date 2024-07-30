@@ -144,6 +144,37 @@
             "visibilityCondition": "model.linked_records_count > 1"
         },
         {
+            "name": "sep-feedback",
+            "label": "Feedback columns",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "notes_column_required",
+            "label": "Include a column for end-user notes",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "name": "notes_column_name",
+            "label": "↳ Column name",
+            "type": "TEXT",
+            "visibilityCondition": "model.notes_column_required",
+            "defaultValue": "Notes"
+        },
+        {
+            "name": "validation_column_required",
+            "label": "Include a column to mark rows as validated",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "name": "validation_column_name",
+            "label": "↳ Column name",
+            "type": "TEXT",
+            "visibilityCondition": "model.validation_column_required",
+            "defaultValue": "Validated"
+        },
+        {
             "name": "sep-layout",
             "label": "Layout",
             "type": "SEPARATOR"
