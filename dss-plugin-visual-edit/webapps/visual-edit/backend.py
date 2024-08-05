@@ -48,12 +48,16 @@ project = dss_client.get_project(project_key)
 editable_column_names = webapp_config.editable_column_names
 authorized_users = webapp_config.authorized_users
 original_ds_name = webapp_config.original_ds_name
+validation_column_name = webapp_config.validation_column_name
+notes_column_name = webapp_config.notes_column_name
 
 de = DataEditor(
     original_ds_name=original_ds_name,
     project_key=project_key,
     primary_keys=webapp_config.primary_keys,
     editable_column_names=editable_column_names,
+    validation_column_name=validation_column_name,
+    notes_column_name=notes_column_name,
     linked_records=webapp_config.linked_records,
     editschema_manual=webapp_config.editschema_manual,
     authorized_users=authorized_users,
