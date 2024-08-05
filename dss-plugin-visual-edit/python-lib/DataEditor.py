@@ -52,6 +52,12 @@ class DataEditor:
         settings.custom_fields["editlog_ds"] = self.editlog_ds_name
         settings.custom_fields["primary_keys"] = self.primary_keys
         settings.custom_fields["editable_column_names"] = self.editable_column_names
+        if self.validation_column_name:
+            settings.custom_fields["validation_column_name"] = (
+                self.validation_column_name
+            )
+        if self.notes_column_name:
+            settings.custom_fields["notes_column_name"] = self.notes_column_name
         if self.webapp_url:
             settings.custom_fields["webapp_url"] = self.webapp_url
         settings.save()
@@ -367,7 +373,11 @@ class DataEditor:
                 A DataFrame containing only the edited rows and editable columns.
         """
         return replay_edits(
-            self.editlog_ds, self.primary_keys, self.editable_column_names
+            self.editlog_ds,
+            self.primary_keys,
+            self.editable_column_names,
+            self.validation_column_name,
+            self.notes_column_name,
         )
 
     def get_row(self, primary_keys):

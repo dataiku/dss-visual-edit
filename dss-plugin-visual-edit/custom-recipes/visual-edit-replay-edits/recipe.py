@@ -29,7 +29,17 @@ edits_ds = edits_datasets[0]
 
 primary_keys = editlog_ds.get_config()["customFields"]["primary_keys"]
 editable_column_names = editlog_ds.get_config()["customFields"]["editable_column_names"]
-edits_df = replay_edits(editlog_ds, primary_keys, editable_column_names)
+validation_column_name = editlog_ds.get_config()["customFields"][
+    "validation_column_name"
+]
+notes_column_name = editlog_ds.get_config()["customFields"]["notes_column_name"]
+edits_df = replay_edits(
+    editlog_ds,
+    primary_keys,
+    editable_column_names,
+    validation_column_name,
+    notes_column_name,
+)
 
 
 # %% Write output data

@@ -84,13 +84,20 @@ def get_dataframe(mydataset):
 # Used by Replay recipe and by DataEditor for getting edited cells
 
 
-def replay_edits(editlog_ds, primary_keys, editable_column_names):
+def replay_edits(
+    editlog_ds,
+    primary_keys,
+    editable_column_names,
+    validation_column_name,
+    notes_column_name,
+):
     # Create empty dataframe with the proper edits dataset schema: all primary keys, all editable columns, and "date" column
     # This helps ensure that the dataframe we return always has the right schema
     # (even if some columns of the input dataset were never edited)
     cols = (
         primary_keys
         + editable_column_names
+        + [validation_column_name, notes_column_name]
         + ["last_edit_date", "last_action", "first_action"]
     )
     all_columns_df = DataFrame(columns=cols)
@@ -136,6 +143,12 @@ def replay_edits(editlog_ds, primary_keys, editable_column_names):
         for col in edits_df.columns:
             if col not in cols:
                 edits_df.drop(columns=[col], inplace=True)
+
+        # Make sure that there is a notes column
+        if notes_column_name not in edits_df.columns:
+            edits_df[notes_column_name] = ""
+
+        edits_df[validation_column_name] = edits_df["last_action"] == "validate"
 
         edits_df.reset_index(inplace=True)
         # this makes sure that all (editable) columns are here and in the right order
