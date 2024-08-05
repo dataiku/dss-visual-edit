@@ -321,4 +321,31 @@ def get_columns_tabulator(de, freeze_editable_columns=False):
 
         t_cols.append(t_col)
 
+    if de.validation_column_name:
+        t_col = {
+            "field": de.validation_column_name,
+            "title": de.validation_column_name,
+            "sorter": "exists",
+            "formatter": "tickCross",
+            "formatterParams": {"allowEmpty": True, "crossElement": " "},
+            "hozAlign": "center",
+            "headerFilter": "input",
+            "headerFilterParams": {},
+            "editor": "tickCross",
+        }
+        if freeze_editable_columns:
+            t_col["frozen"] = True  # freeze to the right
+        t_cols.append(t_col)
+
+    if de.notes_column_name:
+        t_col = {
+            "field": de.notes_column_name,
+            "title": de.notes_column_name,
+            "formatter": "textarea",
+            "editor": "textarea",
+        }
+        if freeze_editable_columns:
+            t_col["frozen"] = True
+        t_cols.append(t_col)
+
     return t_cols
