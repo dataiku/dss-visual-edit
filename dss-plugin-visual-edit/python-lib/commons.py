@@ -281,7 +281,11 @@ def try_get_user_identifier() -> str | None:
 
 def get_key_values_from_dict(row, primary_keys):
     """
-    Get values for a given row provided as a dict and a list of primary key column names
+    Get the values of the primary keys from a row, as a tuple.
+
+    Params:
+    - row: a dictionary representing a row of a dataset
+    - primary_keys: a list of strings representing the primary keys of the dataset
 
     Example params:
     - row:
@@ -292,6 +296,8 @@ def get_key_values_from_dict(row, primary_keys):
     }
     ```
     - primary_keys: `["key1", "key2"]`
+
+    Example output: `("cat", "2022-12-21")`
     """
     # we create a dataframe containing this single row, set the columns to use as index (i.e. primary key(s)), then get the value of the index for the first (and only) row
     return DataFrame(data=row, index=[0]).set_index(primary_keys).index[0]

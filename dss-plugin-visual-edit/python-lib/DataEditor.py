@@ -92,7 +92,7 @@ class DataEditor:
                 # not using date type, in case the editlog is CSV
                 {"name": "date", "type": "string", "meaning": "DateSource"},
                 {"name": "user", "type": "string", "meaning": "Text"},
-                # action can be "update", "create", or "delete"; currently it's ignored by the pivot method
+                # action can be "validate", "comment", "update", "create", or "delete"
                 {"name": "action", "type": "string", "meaning": "Text"},
                 {"name": "key", "type": "string", "meaning": "Text"},
                 {"name": "column_name", "type": "string", "meaning": "Text"},
@@ -398,9 +398,27 @@ class DataEditor:
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         return self.get_edited_cells_df_indexed().loc[key]
 
-    def __log_edit__(
+    def __append_to_editlog__(
         self, key, column, value, action="update"
     ) -> EditSuccess | EditFailure | EditUnauthorized:
+        """
+        Append an edit action to the editlog.
+
+        Actions can be "validate", "comment", "update", "create", or "delete".
+        - When the action is "validate" or "update" or "create", the column is one of the editable columns.
+        - When the action is "comment", the column is the notes column.
+        - When the action is "delete", the column and value are ignored.
+
+        Args:
+            key (tuple): A tuple containing primary key(s) value(s) that identify the row on which the action is performed.
+            column (str): The name of a column to create/validate/update. This would be None when the action is "delete".
+            value (str): The value to set for the cell identified by key and column.
+            action (str): The type of action to log.
+
+        Returns:
+            EditSuccess | EditFailure | EditUnauthorized: An object indicating the success or failure to insert an editlog.
+        """
+
         # if the type of column_name is a boolean, make sure we read it correctly
         for col in self.schema_columns:
             if col["name"] == column:
@@ -411,7 +429,7 @@ class DataEditor:
                         value = str(loads(value.lower()))
                 break
 
-        # store value as a string, unless it's None
+        # turn value into a string, unless it's None
         if value is not None:
             value_string = str(value)
         else:
@@ -426,7 +444,14 @@ class DataEditor:
             )
             return EditUnauthorized()
         else:
-            if column in self.editable_column_names or action == "delete":
+            if (
+                column in self.editable_column_names
+                or column == self.notes_column_name
+                or action == "delete"
+            ):
+                # make sure that edits to the notes column are stored with the "comment" action
+                if column == self.notes_column_name:
+                    action = "comment"
                 # add to the editlog
                 try:
                     self.editlog_appender.append(
@@ -473,14 +498,55 @@ class DataEditor:
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         for col in column_values.keys():
-            self.__log_edit__(
+            self.__append_to_editlog__(
                 key=key, column=col, value=column_values.get(col), action="create"
             )
         return "Row successfully created"
 
+    def comment_row(
+        self, primary_keys: dict, notes: str
+    ) -> EditSuccess | EditFailure | EditUnauthorized:
+        """
+        Comments on a row.
+
+        Args:
+            primary_keys (dict): A dictionary containing primary key(s) value(s) that identify the row to comment on.
+            notes (str): The comment to write in the notes column.
+
+        Notes:
+            Attribution of the 'comment' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
+        """
+        key = get_key_values_from_dict(primary_keys, self.primary_keys)
+        return self.__append_to_editlog__(
+            key, self.notes_column_name, notes, action="comment"
+        )
+
+    def validate_row(
+        self, row_dict: dict
+    ) -> List[EditSuccess | EditFailure | EditUnauthorized]:
+        """
+        Validates a row, by logging values for all editable columns under a "validation" action.
+
+        Args:
+            row_dict (dict): A dictionary containing all column values for a given row to validate (including its primary key(s)).
+
+        Returns:
+            list: A list of objects indicating the success or failure of insertions of all valid column values into the editlog.
+
+        Notes:
+            Attribution of the 'validate' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
+        """
+        key = get_key_values_from_dict(row_dict, self.primary_keys)
+        statuses = []
+        for col in self.editable_column_names:
+            statuses.append(
+                self.__append_to_editlog__(key, col, row_dict[col], action="validate")
+            )
+        return statuses
+
     def update_row(
         self, primary_keys: dict, column: str, value: str
-    ) -> List[EditSuccess | EditFailure | EditUnauthorized]:
+    ) -> EditSuccess | EditFailure | EditUnauthorized:
         """
         Updates a row.
 
@@ -497,26 +563,7 @@ class DataEditor:
             - Attribution of the 'update' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
-
-        def is_reviewed_column(column_name: str):
-            return column_name == "Reviewed" or column_name == "reviewed"
-
-        def is_comments_column(column_name: str):
-            return column_name == "Comments" or column_name == "comments"
-
-        # for reviewed column, create an editlog for each columns to enforce values even after a change in the original.
-        # Append the reviewed value change last in case something goes wrong during updates of the previous column values.
-        # To improve this, the best would be to do all the inserts in the same transaction.
-        if is_reviewed_column(column):
-            results = []
-            for col in self.editable_column_names:
-                if not is_comments_column(col) and not is_reviewed_column(col):
-                    # contains values for primary keys — and other columns too, but they'll be discarded
-                    results.append(self.__log_edit__(key, col, primary_keys[col]))
-            results.append(self.__log_edit__(key, column, primary_keys[column]))
-            return results
-        else:
-            return [self.__log_edit__(key, column, value, action="update")]
+        return self.__append_to_editlog__(key, column, value, action="update")
 
     def delete_row(
         self, primary_keys: dict
@@ -534,4 +581,4 @@ class DataEditor:
             Attribution of the 'delete' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
-        return self.__log_edit__(key, None, None, action="delete")
+        return self.__append_to_editlog__(key, None, None, action="delete")
