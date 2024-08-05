@@ -151,6 +151,7 @@
         {
             "name": "notes_column_required",
             "label": "Include a column for end-user notes",
+            "description": "Values will be empty by default",
             "type": "BOOLEAN",
             "defaultValue": false
         },
@@ -164,6 +165,7 @@
         {
             "name": "validation_column_required",
             "label": "Include a column to mark rows as validated",
+            "description": "Values will be false by default",
             "type": "BOOLEAN",
             "defaultValue": false
         },
