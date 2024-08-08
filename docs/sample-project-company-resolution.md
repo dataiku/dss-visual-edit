@@ -16,7 +16,6 @@ We start this article with a demo video and we explain how to replicate it using
 
 How to replicate:
 
-* [Install the Visual Edit plugin](install-plugin).
 * [Download project bundle](dss-bundle-JOIN_COMPANIES_SIMPLE-webapp-based.zip) and import on your instance. Note: the project uses the managed Amazon S3 data connection provided on Dataiku Online — you may have to remap to one of your own data connections.
 * Build dataset `companies_joined_prepared_edited` (recursive build).
 * Go to Webapps and start "Edit Matches Uncertain".
