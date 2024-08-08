@@ -1,21 +1,31 @@
 # Switching to the `visual-edit` plugin
 
+## Overview
+
 **Visual Edit** (plugin id `visual-edit`) is the public release of the previously private plugin **Data Editing** (plugin id `editable-via-webapp`). The core functionalities have remained the same but some key components have been renamed:
 
-- The "editlog pivoted" dataset is now simply called the "edits" dataset
-- Recipes are now called "Replay Edits" and "Apply Edits"
-- The Visual Webapp is now called "Visual Edit"
+* The plugin's Recipes are now called "Replay Edits" and "Apply Edits". They are represented with the same icons as previously in the Flow.
+* **The "editlog pivoted" dataset is now simply called the "edits" dataset. This is the most visible change in the Flow.**
+* The type of Visual Webapp provided by the plugin is now called "Visual Edit", and is technically identified as `visual-edit`.
 
-## Main instructions
+In this document we provide Python code to help switch to the new plugin. It consists, in a given project, in...
+* Deleting any `editable-via-webapp` recipes.
+* Renaming any "editlog pivoted" datasets.
+* Changing the type of Visual Webapp to `visual-edit` and restarting these webapps: this automatically creates new recipes using the new `visual-edit` plugin.
 
-If you want your projects based on `editable-via-webapp` to switch to using `visual-edit`, follow the steps below:
+We provide instructions to use this Python code. We also provide additional instructions for webapp coders who used `editable-via-webapp`'s Python library.
 
-1. [Install the `visual-edit` plugin](install-plugin) (keep `editable-via-webapp` for now)
-2. Change the `project_key` variable in the code below
-3. Create a bundle of your Dataiku project (to serve as backup if needed)
-4. Run the code below as a script, or block by block in a notebook environment, either from Dataiku DSS or from your local Python environment (provided it has the `dataiku` package installed)
-5. Repeat for all projects where you used `editable-via-webapp`. You can find a list of such projects at `/plugins/editable-via-webapp/usages/` in the Dataiku DSS web interface
-6. Once you've done this for all projects, you can uninstall the `editable-via-webapp` plugin.
+## Instructions
+
+* Preliminary step: [Install the `visual-edit` plugin](install-plugin) (keep `editable-via-webapp` for now).
+* For each project where you used `editable-via-webapp` (you can find a list of such projects at `/plugins/editable-via-webapp/usages/` in the Dataiku DSS web interface):
+    1. Change the `project_key` variable in the Python code.
+    2. Create a bundle of your Dataiku project (to serve as backup if needed).
+    3. Review the code below and run as a script, or block by block in a notebook environment, either from Dataiku DSS or from your local Python environment (provided it has the `dataiku` package installed).
+    4. If the project included Scenarios with a step to build the "editlog pivoted" dataset, adapt to the new name.
+* Once you've done this for all projects, you can uninstall the `editable-via-webapp` plugin.
+
+## Python code
 
 ```python
 # %%
@@ -50,7 +60,7 @@ for d in project.list_datasets():
         print(f"Renamed {dataset_name} to {new_name}")
 
 # %%
-# Stop visual webapps, change their types, and restart them: this re-creates the recipes we deleted but with the types from the new plugin
+# Stop Visual Webapps, change their types, and restart them: this re-creates the recipes we deleted but with the types from the new plugin
 for webapp in project.list_webapps(as_type="objects"):
     webapp_settings = webapp.get_settings()
     if (
@@ -68,4 +78,4 @@ for webapp in project.list_webapps(as_type="objects"):
 
 ## Instructions for webapp coders
 
-The `EditableEventSourced` class of the plugin's python library was renamed `DataEditor`. If you were using this class in a code webapp, make sure to rename both the class and the plugin id used to import the class.
+The `EditableEventSourced` class of the plugin's Python library was renamed `DataEditor`. If you were using this class in a code webapp, make sure to rename both the class and the plugin id used to import the class.
