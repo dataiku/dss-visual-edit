@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Current behave file",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "behave",
+            "console": "integratedTerminal",
+            "args": [
+                "--no-logcapture",
+                "--logging-level=DEBUG",
+                "${file}"
+            ],
+            "justMyCode": false,
+            "env": {
+                "DSS_USERNAME": "",
+                "DSS_PASSWORD": "",
+                "DKU_WEBAPP_RUN_IDS": "<webappId>:<runId>,<webappId>:<runId>"
+            }
+        }
+    ]
+}

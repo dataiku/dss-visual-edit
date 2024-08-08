@@ -18,3 +18,7 @@ dss-plugin-visual-edit/.vscode/launch.json
 dss-plugin-visual-edit/webapps/visual-edit/assets/dashExtensions_default.js
 dss-plugin-visual-edit/webapp-settings/*.json
 dss-plugin-visual-edit/venv/
+dss-plugin-visual-edit/tests/venv/
+dss-plugin-visual-edit/tests/.vscode/*
+!dss-plugin-visual-edit/tests/.vscode/settings.json.example
+!dss-plugin-visual-edit/tests/.vscode/launch.json.example
