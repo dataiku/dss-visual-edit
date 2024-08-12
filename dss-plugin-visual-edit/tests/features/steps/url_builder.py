@@ -1,36 +1,42 @@
 from __future__ import annotations
 
-import os
+from urllib.parse import urljoin
 
-from dataikuapi.dss.webapp import DSSWebApp
 from dssgherkin.typings.generic_context_type import AugmentedBehaveContext
 
-webapp_run_ids = os.getenv("DKU_WEBAPP_RUN_IDS")
-assert webapp_run_ids, "Expected DKU_WEBAPP_RUN_IDS to be set."
-webapp_id_to_run_id = {}
-for tuple in list(webapp_run_ids.split(",")):
-    arr = tuple.split(":")
-    webapp_id_to_run_id = webapp_id_to_run_id | {arr[0]: arr[1]}
-
-webapp_cookie = os.getenv("DKU_WEBAPP_COOKIE")
-cookies = ""
+cookies_as_dict = None
+cookies_as_str = ""
 
 
-def get_cookie(ctx: AugmentedBehaveContext) -> str:
+def get_cookie_as_str(ctx: AugmentedBehaveContext) -> str:
     assert ctx.dss_cookies
-    global cookies
-    if not cookies:
+    global cookies_as_str
+    if not cookies_as_str:
         for c in ctx.dss_cookies:
             name = c.get("name", "")
             value = c.get("value", "")
             if name and value:
-                cookies += f"{name}={value};"
+                cookies_as_str += f"{name}={value};"
 
-    return cookies
+    return cookies_as_str
 
 
-def create_webapp_backend_url(webapp: DSSWebApp):
-    match = webapp_id_to_run_id.get(webapp.webapp_id, "")
-    if not match:
-        raise Exception(f"Missing configuration for web app id {webapp.webapp_id}.")
-    return f"/web-apps-backends/{webapp.project_key}/{match}/"
+def get_cookie_as_dict(ctx: AugmentedBehaveContext) -> dict[str, str]:
+    assert ctx.dss_cookies
+    global cookies_as_dict
+    if not cookies_as_dict:
+        cookies_as_dict = {
+            cookie.get("name", ""): cookie.get("value", "")
+            for cookie in ctx.dss_cookies
+        }
+
+    return cookies_as_dict
+
+
+def create_backend_url(ctx: AugmentedBehaveContext):
+    return urljoin(ctx.dss_client.host, ctx.current_webapp_path)
+
+
+def create_api_url(ctx: AugmentedBehaveContext, path: str):
+    base = create_backend_url(ctx)
+    return urljoin(base, path)

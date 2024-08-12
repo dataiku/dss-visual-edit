@@ -14,9 +14,10 @@
             ],
             "justMyCode": false,
             "env": {
-                "DSS_USERNAME": "",
-                "DSS_PASSWORD": "",
-                "DKU_WEBAPP_RUN_IDS": "<webappId>:<runId>,<webappId>:<runId>"
+                // "DSS_USERNAME": "",
+                // "DSS_PASSWORD": "",
+                // "DKU_DSS_URL": "Optional: if not set will use configuration in .dataiku/config.json",
+                // "DKU_API_KEY": "Optional: if not set will use configuration in .dataiku/config.json"
             }
         }
     ]

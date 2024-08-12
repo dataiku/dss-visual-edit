@@ -20,9 +20,10 @@ def before_all(context: AugmentedBehaveContext):
 
     context.dss_credentials = Credentials(username, password)
 
-
-def before_scenario(context, scenario):
     use_fixture(create_dss_client, context)
+
+
+def before_scenario(context: AugmentedBehaveContext, scenario):
     for tag in scenario.tags:
         if tag == "cleanup_projects":
             use_fixture(cleanup_projects, context)
@@ -30,3 +31,34 @@ def before_scenario(context, scenario):
             use_fixture(cleanup_managed_folders, context)
         if tag == "delete_datasets":
             use_fixture(delete_datasets, context)
+
+    context.execute_steps(
+        """
+            Given I login to DSS
+            And a project created from export file "./assets/VISUALEDITINTEGRATIONTESTS.zip" with key "VISUALEDITINTEGRATIONTESTS"
+        """
+    )
+
+    project = context.current_project
+    assert project
+
+    project_permissions = project.get_permissions()
+    project_permissions["permissions"].append(
+        {
+            "group": "readers",
+            "admin": False,
+            "executeApp": True,
+            "exportDatasetsData": True,
+            "manageAdditionalDashboardUsers": True,
+            "manageDashboardAuthorizations": True,
+            "manageExposedElements": True,
+            "moderateDashboards": True,
+            "readDashboards": True,
+            "readProjectContent": True,
+            "runScenarios": True,
+            "shareToWorkspaces": True,
+            "writeDashboards": True,
+            "writeProjectContent": True,
+        }
+    )
+    project.set_permissions(project_permissions)

@@ -1,12 +1,17 @@
 {
     "cucumberautocomplete.steps": [
         "features/**/*.py",
-        "venv/lib/python3.10/site-packages/dssgherkin/steps/**/*.py"
+        "<YOUR_VENV>/lib/python3.10/site-packages/dssgherkin/steps/**/*.py"
     ],
     "cucumberautocomplete.strictGherkinCompletion": true,
     "editor.quickSuggestions": {
         "comments": false,
         "strings": true,
         "other": true
+    },
+    "files.associations": {
+        "*.feature.template": "feature",
+        "*.json.template": "json",
+        "*.json.example": "jsonc"
     }
 }

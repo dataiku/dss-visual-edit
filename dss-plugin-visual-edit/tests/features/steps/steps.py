@@ -1,7 +1,11 @@
 import behave
 from dssgherkin.typings.generic_context_type import AugmentedBehaveContext
+from requests import post
 
-from features.steps.url_builder import create_webapp_backend_url, get_cookie
+from features.steps.url_builder import (
+    create_api_url,
+    get_cookie_as_dict,
+)
 from dssgherkin.steps.helpers import get_webapp
 
 
@@ -30,12 +34,7 @@ def edit_rows(ctx: AugmentedBehaveContext):
             "value": edited_value,
         }
 
-        url = f"{ctx.dss_client.host}{create_webapp_backend_url(webapp)}update"
-        response = ctx.dss_client._session.request(
-            "POST",
-            url,
-            json=body,
-            cookies={"Cookie": get_cookie(ctx)},
-        )
+        url = create_api_url(ctx, "update")
+        response = post(url, json=body, cookies=get_cookie_as_dict(ctx))
 
-        assert response.ok
+        response.raise_for_status()
