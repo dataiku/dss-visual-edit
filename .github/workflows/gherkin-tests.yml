@@ -1,0 +1,38 @@
+name: Run Gherkin tests
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  checks: write
+  pull-requests: write
+
+jobs:
+  gherkin-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.client_payload.ref || github.ref }}
+      - name: Print current branch value
+        run: |
+          echo "The ref value is: ${{ github.event.client_payload.ref || github.ref }}"
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+      - name: Run Gherkin tests
+        env:
+          DKU_DSS_URL: ${{ secrets.tests_integrations_url }}
+          DKU_API_KEY: ${{ secrets.tests_integrations_api_key }}
+          DSS_USERNAME: ${{ secrets.tests_integrations_reader_user_name }}
+          DSS_PASSWORD: ${{ secrets.tests_integrations_reader_user_pwd }}
+        run: |
+          python -m pip install --upgrade pip
+          cd dss-plugin-visual-edit/tests
+          pip install -r requirements.txt
+          playwright install chromium
+          behave --no-logcapture --logging-level=ERROR
