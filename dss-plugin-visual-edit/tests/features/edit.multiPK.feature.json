@@ -1,0 +1,17 @@
+{
+    "linked_records_count": 0,
+    "freeze_editable_columns": false,
+    "authorized_users": [],
+    "debug_mode": false,
+    "primary_keys": [
+        "id",
+        "name"
+    ],
+    "editable_column_names": [
+        "company"
+    ],
+    "linked_record_lookup_columns_1": [],
+    "linked_record_lookup_columns_2": [],
+    "group_column_names": [],
+    "original_dataset": "products"
+}
