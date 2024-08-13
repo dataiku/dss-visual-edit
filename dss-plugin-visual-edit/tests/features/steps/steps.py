@@ -1,6 +1,6 @@
 import behave
 from dssgherkin.typings.generic_context_type import AugmentedBehaveContext
-from requests import post
+from requests import get, post
 
 from features.steps.url_builder import (
     create_api_url,
@@ -38,6 +38,20 @@ def edit_rows(ctx: AugmentedBehaveContext):
         response = post(url, json=body, cookies=get_cookie_as_dict(ctx))
 
         response.raise_for_status()
+
+
+@behave.then('the label for key "{key}" in dataset "{ds_name}" is "{label}"')
+def assert_label(ctx: AugmentedBehaveContext, key: str, ds_name: str, label: str):
+    webapp = get_webapp(ctx, None, None)
+    assert webapp
+
+    url = create_api_url(ctx, f"label/{ds_name}?key={key}")
+
+    response = get(url, cookies=get_cookie_as_dict(ctx))
+
+    response.raise_for_status()
+
+    assert response.text == label
 
 
 @behave.then("editing rows as such is unauthorized")
