@@ -13,8 +13,8 @@ Feature: Visual Edit works with a composite key.
         And I navigate to the webapp
         When I edit rows as such
             | primary_keys | primary_keys_values | edited_column | edited_value |
-            | id;name      | 10.1;Answers        | company       | dataiku      |
-            | id;name      | 10.2;DSS            | company       | dataiku      |
+            | id,name      | 10.1,Answers        | company       | dataiku      |
+            | id,name      | 10.2,DSS            | company       | dataiku      |
         And I do a forced recursive build of dataset "products_edited"
         Then the dataset "products_editlog" contains the following using compound key "key"
             | key                 | user   | column_name | value   | action |

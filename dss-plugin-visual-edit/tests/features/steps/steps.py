@@ -16,8 +16,8 @@ def edit_rows(ctx: AugmentedBehaveContext):
     assert ctx.table
 
     for row in ctx.table.rows:
-        primary_keys = row["primary_keys"].split(";")
-        values = row["primary_keys_values"].split(";")
+        primary_keys = row["primary_keys"].split(",")
+        values = row["primary_keys_values"].split(",")
         assert len(primary_keys) == len(values)
         edited_column = row["edited_column"]
         edited_value = row["edited_value"]
@@ -47,8 +47,8 @@ def unauthorized_edit_rows(ctx: AugmentedBehaveContext):
     assert ctx.table
 
     for row in ctx.table.rows:
-        primary_keys = row["primary_keys"].split(";")
-        values = row["primary_keys_values"].split(";")
+        primary_keys = row["primary_keys"].split(",")
+        values = row["primary_keys_values"].split(",")
         assert len(primary_keys) == len(values)
         edited_column = row["edited_column"]
         edited_value = row["edited_value"]
