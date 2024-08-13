@@ -1,10 +1,10 @@
-Feature: Test edition of a SQL dataset with two composite keys.
+Feature: Visual Edit works with a composite key.
     Background:
         Given the webapp "bodh8Xz" has the configuration from "./features/edit.multiPK.feature.json"
 
     @cleanup_projects
-    Scenario: Edit a string column.
-        Given a managed dataset "products" on connection "local_dku_pg"
+    Scenario Outline: A string column can be edited.
+        Given a managed dataset "products" on connection "<connection>"
             | float | string  | string    |
             | id    | name    | company   |
             | 10.1  | Answers | BS plugin |
@@ -41,3 +41,8 @@ Feature: Test edition of a SQL dataset with two composite keys.
             | id   | name    | company |
             | 10.1 | Answers | dataiku |
             | 10.2 | DSS     | dataiku |
+
+        Examples:
+            | connection         |
+            | local_dku_pg       |
+            | filesystem_managed |

@@ -1,10 +1,10 @@
-Feature: Test edition of a SQL dataset with a single INTEGER primary key.
+Feature: Visual Edit works with a single INTEGER primary key.
     Background:
         Given the webapp "bodh8Xz" has the configuration from "./features/edit.singlePK.feature.json"
 
     @cleanup_projects
-    Scenario: Edit a string column.
-        Given a managed dataset "products" on connection "local_dku_pg"
+    Scenario Outline: Edit a string column.
+        Given a managed dataset "products" on connection "<connection>"
             | int | string    |
             | id  | company   |
             | 10  | BS plugin |
@@ -40,9 +40,14 @@ Feature: Test edition of a SQL dataset with a single INTEGER primary key.
             | 10 | dataiku |
             | 12 | dataiku |
 
+        Examples:
+            | connection         |
+            | local_dku_pg       |
+            | filesystem_managed |
+
     @cleanup_projects
-    Scenario: Edit an integer column.
-        Given a managed dataset "products" on connection "local_dku_pg"
+    Scenario Outline: Edit an integer column.
+        Given a managed dataset "products" on connection "<connection>"
             | int | int     |
             | id  | company |
             | 10  | 10      |
@@ -78,9 +83,15 @@ Feature: Test edition of a SQL dataset with a single INTEGER primary key.
             | 10 | 42      |
             | 12 | 42      |
 
+
+        Examples:
+            | connection         |
+            | local_dku_pg       |
+            | filesystem_managed |
+
     @cleanup_projects
-    Scenario: Edit a float column.
-        Given a managed dataset "products" on connection "local_dku_pg"
+    Scenario Outline: Edit a float column.
+        Given a managed dataset "products" on connection "<connection>"
             | int | float   |
             | id  | company |
             | 10  | 10.0    |
@@ -116,9 +127,14 @@ Feature: Test edition of a SQL dataset with a single INTEGER primary key.
             | 10 | 42.0    |
             | 12 | 42.0    |
 
+        Examples:
+            | connection         |
+            | local_dku_pg       |
+            | filesystem_managed |
+
     @cleanup_projects
-    Scenario: Edit a boolean column.
-        Given a managed dataset "products" on connection "local_dku_pg"
+    Scenario Outline: Edit a boolean column.
+        Given a managed dataset "products" on connection "<connection>"
             | int | boolean |
             | id  | company |
             | 10  | false   |
@@ -153,3 +169,8 @@ Feature: Test edition of a SQL dataset with a single INTEGER primary key.
             | id | company |
             | 10 | True    |
             | 12 | True    |
+
+        Examples:
+            | connection         |
+            | local_dku_pg       |
+            | filesystem_managed |

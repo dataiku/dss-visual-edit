@@ -1,13 +1,14 @@
 {
     "linked_records_count": 0,
     "freeze_editable_columns": false,
-    "authorized_users": [],
+    "authorized_users": ["onlyMeIsAuthorized"],
     "debug_mode": false,
     "primary_keys": [
-        "name"
+        "id"
     ],
     "editable_column_names": [
-        "company"
+        "company",
+        "location"
     ],
     "linked_record_lookup_columns_1": [],
     "linked_record_lookup_columns_2": [],

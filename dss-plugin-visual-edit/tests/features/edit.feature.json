@@ -4,7 +4,7 @@
     "authorized_users": [],
     "debug_mode": false,
     "primary_keys": [
-        "name"
+        "id"
     ],
     "editable_column_names": [
         "company",
