@@ -1,4 +1,4 @@
-Feature: Visual Edit can lookup labels in a separate dataset.
+Feature: Visual Edit can get labels in a separate dataset.
     Background:
         Given the webapp "bodh8Xz" has the configuration from "./features/linked_dataset.label.feature.json"
 
