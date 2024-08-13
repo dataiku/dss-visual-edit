@@ -3,7 +3,7 @@ Feature: Visual Edit has special behavior for reviewed column.
         Given the webapp "bodh8Xz" has the configuration from "./features/edit.reviewed.feature.json"
 
     @cleanup_projects
-    Scenario Outline: Editing reviewed column creates one edit log for every column.
+    Scenario Outline: Editing reviewed column creates one edit log for all editable column.
         Given a managed dataset "products" on connection "<connection>"
             | string  | string    | string   | bool     |
             | id      | company   | location | reviewed |
