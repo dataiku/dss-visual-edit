@@ -26,10 +26,10 @@ jobs:
           cache: "pip"
       - name: Run Gherkin tests
         env:
-          DKU_DSS_URL: ${{ secrets.tests_integrations_url }}
-          DKU_API_KEY: ${{ secrets.tests_integrations_api_key }}
-          DSS_USERNAME: ${{ secrets.tests_integrations_reader_user_name }}
-          DSS_PASSWORD: ${{ secrets.tests_integrations_reader_user_pwd }}
+          DKU_DSS_URL: ${{ secrets.tests_integration_url }}
+          DKU_API_KEY: ${{ secrets.tests_integration_api_key }}
+          DSS_USERNAME: ${{ secrets.tests_integration_reader_user_name }}
+          DSS_PASSWORD: ${{ secrets.tests_integration_reader_user_pwd }}
         run: |
           python -m pip install --upgrade pip
           cd dss-plugin-visual-edit/tests
