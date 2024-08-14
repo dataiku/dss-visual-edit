@@ -19,7 +19,7 @@ This plugin helps spin up visual apps to validate and edit data. Learn more abou
 * For Developers:
   * [Introduction to Visual Edit's CRUD API](https://github.com/dataiku/dss-visual-edit/blob/master/docs/CRUD_example_usage.ipynb) (Python notebook)
   * [Low-code webapp customizations with Dash](dash-examples)
-  * [Reference API documentation]([backend/](https://dataiku.github.io/dss-visual-edit/backend/#DataEditor))
+  * [Reference API documentation](https://dataiku.github.io/dss-visual-edit/backend/#DataEditor)
   * Full-code webapp customizations: see [dash_tabulator documentation](https://github.com/dataiku/dss-visual-edit/blob/master/dash_tabulator/README.md) and [Plugin Developer Documentation](https://github.com/dataiku/dss-visual-edit/blob/master/dss-plugin-visual-edit/README.md)
 * For Business Users:
   * [How to use the data table](data-table-features)
