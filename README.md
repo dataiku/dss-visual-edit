@@ -1,4 +1,4 @@
-# README
+![Gherking tests](https://github.com/dataiku/dss-visual-edit/actions/workflows/gherkin-tests.yml/badge.svg)
 
 ## Plugin documentation
 
