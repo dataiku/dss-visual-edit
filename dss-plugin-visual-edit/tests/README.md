@@ -1,9 +1,9 @@
 # Integration tests
-These integrations tests are based on Gherkin language. It uses generic steps developed in a private repository. They are available as a python module.
 
-A CI is setup to run these tests on demand.
+These integrations tests are based on Gherkin language and they are run by a CI workflow. See the [parent folder's README](../README.md) for more context.
 
-## Setup local test run environment.
+## Setup local test run environment
+
 - Create pyhton env with its requirements.
 ```bash
 python -m venv venv
