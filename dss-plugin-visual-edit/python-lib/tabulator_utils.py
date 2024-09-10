@@ -276,7 +276,7 @@ def get_columns_tabulator(de, freeze_editable_columns=False):
 
     t_cols = []
     for col_name in (
-        de.primary_keys + de.display_column_names + de.editable_column_names
+        de.primary_key_column_names + de.display_column_names + de.editable_column_names
     ):
         # Properties to be shared by all columns
         t_col = {
@@ -291,7 +291,7 @@ def get_columns_tabulator(de, freeze_editable_columns=False):
         t_type = __get_column_tabulator_type__(de, col_name)
         if col_name not in linked_record_names:
             t_col.update(__get_column_tabulator_formatter__(t_type))
-        if col_name in de.primary_keys:
+        if col_name in de.primary_key_column_names:
             t_col["frozen"] = True
 
         # Define editor, if it's an editable column

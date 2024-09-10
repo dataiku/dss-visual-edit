@@ -13,7 +13,7 @@ from commons import (
     get_display_column_names,
     apply_edits_from_df,
     replay_edits,
-    get_key_values_from_dict,
+    get_key_values_as_tuple,
 )
 from webapp.db.editlogs import EditLog, EditLogAppenderFactory
 from webapp_utils import find_webapp_id, get_webapp_json
@@ -50,7 +50,7 @@ class DataEditor:
         settings = self.project.get_dataset(dataset_name).get_settings()
         settings.custom_fields["original_ds"] = self.original_ds_name
         settings.custom_fields["editlog_ds"] = self.editlog_ds_name
-        settings.custom_fields["primary_keys"] = self.primary_keys
+        settings.custom_fields["primary_keys"] = self.primary_key_column_names
         settings.custom_fields["editable_column_names"] = self.editable_column_names
         if self.webapp_url:
             settings.custom_fields["webapp_url"] = self.webapp_url
@@ -97,6 +97,8 @@ class DataEditor:
                 {"name": "key", "type": "string", "meaning": "Text"},
                 {"name": "column_name", "type": "string", "meaning": "Text"},
                 {"name": "value", "type": "string", "meaning": "Text"},
+                {"name": "previous_value", "type": "string", "meaning": "Text"},
+                {"name": "context", "type": "string", "meaning": "Object"},
             ]
             self.editlog_ds.write_schema(editlog_ds_schema)
             write_empty_editlog(self.editlog_ds)
@@ -214,7 +216,7 @@ class DataEditor:
         if self.__connection_name__ is None:
             self.__connection_name__ = "filesystem_managed"
 
-        self.primary_keys = primary_keys
+        self.primary_key_column_names = primary_keys
         if editable_column_names:
             self.editable_column_names = editable_column_names
 
@@ -271,7 +273,7 @@ class DataEditor:
         self.editschema_manual = editschema_manual
 
         if editschema:
-            self.primary_keys = get_primary_keys(editschema)
+            self.primary_key_column_names = get_primary_keys(editschema)
             self.editable_column_names = get_editable_column_names(editschema)
             self.editschema_manual = editschema
         if self.editschema_manual:
@@ -286,7 +288,9 @@ class DataEditor:
         self.authorized_users = authorized_users
 
         self.display_column_names = get_display_column_names(
-            self.schema_columns, self.primary_keys, self.editable_column_names
+            self.schema_columns,
+            self.primary_key_column_names,
+            self.editable_column_names,
         )
 
         # make sure that original dataset and editlog have up-to-date custom fields
@@ -329,7 +333,7 @@ class DataEditor:
         Returns:
             pandas.DataFrame: A DataFrame with all rows and columns from the original data, edits applied, and primary keys as index.
         """
-        return self.get_edited_df().set_index(self.primary_keys)
+        return self.get_edited_df().set_index(self.primary_key_column_names)
 
     def get_edited_df(self) -> DataFrame:
         """
@@ -348,7 +352,7 @@ class DataEditor:
             pandas.DataFrame
                 A DataFrame containing only the edited rows and editable columns, indexed by the primary keys.
         """
-        return self.get_edited_cells_df().set_index(self.primary_keys)
+        return self.get_edited_cells_df().set_index(self.primary_key_column_names)
 
     def get_edited_cells_df(self) -> DataFrame:
         """
@@ -359,7 +363,7 @@ class DataEditor:
                 A DataFrame containing only the edited rows and editable columns.
         """
         return replay_edits(
-            self.editlog_ds, self.primary_keys, self.editable_column_names
+            self.editlog_ds, self.primary_key_column_names, self.editable_column_names
         )
 
     def get_row(self, primary_keys):
@@ -387,12 +391,35 @@ class DataEditor:
                 - If some rows of the dataset were created, then by definition all columns are editable (including primary keys).
                 - If no row was created, editable columns are those defined in the initial Visual Edit setup.
         """
-        key = get_key_values_from_dict(primary_keys, self.primary_keys)
-        return self.get_edited_cells_df_indexed().loc[key]
+        primary_keys_tuple = get_key_values_as_tuple(
+            primary_keys, self.primary_key_column_names
+        )
+        return self.get_edited_cells_df_indexed().loc[primary_keys_tuple]
 
-    def __log_edit__(
-        self, key, column, value, action="update"
+    def __append_to_editlog__(
+        self,
+        primary_keys_tuple,
+        column,
+        value,
+        previous_value,
+        context=None,
+        action="update",
     ) -> EditSuccess | EditFailure | EditUnauthorized:
+        """
+        Appends an edit to the editlog.
+
+        Args:
+            primary_keys_tuple (tuple): A tuple containing values for all primary keys.
+            column (str): The name of the column to update. If None, the action is "delete".
+            value (str): The value to set for the cell identified by key and column. If None, the action is "delete".
+            previous_value (str): The previous value of that cell.
+            context (dict): A dictionary containing all column values of the row to update (including primary key(s)).
+            action (str): The action to log: "update", "create", or "delete".
+
+        Returns:
+            EditSuccess | EditFailure | EditUnauthorized: An object indicating the success or failure to insert an editlog.
+        """
+
         # if the type of column_name is a boolean, make sure we read it correctly
         for col in self.schema_columns:
             if col["name"] == column:
@@ -409,30 +436,47 @@ class DataEditor:
         else:
             value_string = value
 
+        # same for previous_value
+        if previous_value is not None:
+            previous_value_string = str(previous_value)
+        else:
+            previous_value_string = previous_value
+
+        # same for context
+        if context:
+            context_string = str(context)
+        else:
+            context_string = context
+
         user_identifier = try_get_user_identifier()
+        action_details = f"""column {column} set to value {value_string} (previously {previous_value_string}) where {self.primary_key_column_names} is {primary_keys_tuple}."""
         if self.authorized_users and (
             user_identifier is None or user_identifier not in self.authorized_users
         ):
             logging.debug(
-                f"""Logging {action} action unauthorized ('{user_identifier}'): column {column} set to value {value} where {self.primary_keys} is {key}."""
+                f"""Logging {action} action unauthorized ('{user_identifier}'): """
+                + action_details
             )
             return EditUnauthorized()
         else:
+
             if column in self.editable_column_names or action == "delete":
                 # add to the editlog
                 try:
                     self.editlog_appender.append(
                         EditLog(
-                            str(key),
+                            str(primary_keys_tuple),
                             column,
                             value_string,
+                            previous_value_string,
+                            context_string,
                             datetime.now(timezone("UTC")).isoformat(),
                             "unknown" if user_identifier is None else user_identifier,
                             action,
                         )
                     )
                     logging.debug(
-                        f"""Logging {action} action success: column {column} set to value {value} where {self.primary_keys} is {key}."""
+                        f"""Logging {action} action success: """ + action_details
                     )
                     return EditSuccess()
                 except Exception:
@@ -441,9 +485,7 @@ class DataEditor:
                         "Internal server error, failed to append edit log."
                     )
             else:
-                logging.info(
-                    f"""Logging {action} action failed: column {column} set to value {value} where {self.primary_keys} is {key}."""
-                )
+                logging.info(f"""Logging {action} action failed: """ + action_details)
                 return EditFailure(f"""{column} isn't an editable column.""")
 
     def create_row(self, primary_keys: dict, column_values: dict) -> str:
@@ -463,23 +505,37 @@ class DataEditor:
             - No data validation: this method does not check that the values are allowed for the specified columns.
             - Attribution of the 'create' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
         """
-        key = get_key_values_from_dict(primary_keys, self.primary_keys)
+        primary_keys_tuple = get_key_values_as_tuple(
+            primary_keys, self.primary_key_column_names
+        )
         for col in column_values.keys():
-            self.__log_edit__(
-                key=key, column=col, value=column_values.get(col), action="create"
+            self.__append_to_editlog__(
+                primary_keys_tuple=primary_keys_tuple,
+                column=col,
+                value=column_values.get(col),
+                previous_value=None,
+                context=None,
+                action="create",
             )
         return "Row successfully created"
 
     def update_row(
-        self, primary_keys: dict, column: str, value: str
+        self,
+        row: dict,
+        primary_keys: dict,
+        column: str,
+        value: str,
+        previous_value: str,
     ) -> List[EditSuccess | EditFailure | EditUnauthorized]:
         """
         Updates a row.
 
         Args:
-            primary_keys (dict): A dictionary containing primary key(s) value(s) that identify the row to update.
+            row (dict): A dictionary containing all column values of the row to update (including primary key(s)). This is optional if primary_keys is provided.
+            primary_keys (dict): A dictionary containing primary key(s) value(s) that identify the row to update. This is optional if row is provided.
             column (str): The name of the column to update.
             value (str): The value to set for the cell identified by key and column.
+            previous_value (str): The previous value of that cell.
 
         Returns:
             list: A list of objects indicating the success or failure to insert an editlog.
@@ -488,7 +544,14 @@ class DataEditor:
             - No data validation: this method does not check that the value is allowed for the specified column.
             - Attribution of the 'update' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
         """
-        key = get_key_values_from_dict(primary_keys, self.primary_keys)
+        if row:
+            primary_keys_tuple = get_key_values_as_tuple(
+                row, self.primary_key_column_names
+            )
+        else:
+            primary_keys_tuple = get_key_values_as_tuple(
+                primary_keys, self.primary_key_column_names
+            )
 
         def is_reviewed_column(column_name: str):
             return column_name == "Reviewed" or column_name == "reviewed"
@@ -501,14 +564,40 @@ class DataEditor:
         # To improve this, the best would be to do all the inserts in the same transaction.
         if is_reviewed_column(column):
             results = []
-            for col in self.editable_column_names:
-                if not is_comments_column(col) and not is_reviewed_column(col):
-                    # contains values for primary keys — and other columns too, but they'll be discarded
-                    results.append(self.__log_edit__(key, col, primary_keys[col]))
-            results.append(self.__log_edit__(key, column, primary_keys[column]))
+            for editable_col in self.editable_column_names:
+                if not is_comments_column(editable_col) and not is_reviewed_column(
+                    editable_col
+                ):
+                    results.append(
+                        self.__append_to_editlog__(
+                            primary_keys_tuple=primary_keys_tuple,
+                            column=editable_col,
+                            value=row[editable_col],
+                            previous_value=row[editable_col],
+                            # previous value is the same as the current value: this column wasn't edited, but we need to log its value
+                        )
+                    )
+            results.append(
+                self.__append_to_editlog__(
+                    primary_keys_tuple=primary_keys_tuple,
+                    column=column,
+                    value=value,
+                    previous_value=previous_value,
+                    context=row,
+                )
+            )
             return results
         else:
-            return [self.__log_edit__(key, column, value, action="update")]
+            return [
+                self.__append_to_editlog__(
+                    primary_keys_tuple=primary_keys_tuple,
+                    column=column,
+                    value=value,
+                    previous_value=previous_value,
+                    action="update",
+                    context=row,
+                )
+            ]
 
     def delete_row(
         self, primary_keys: dict
@@ -525,5 +614,14 @@ class DataEditor:
         Notes:
             Attribution of the 'delete' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
         """
-        key = get_key_values_from_dict(primary_keys, self.primary_keys)
-        return self.__log_edit__(key, None, None, action="delete")
+        primary_keys_tuple = get_key_values_as_tuple(
+            primary_keys, self.primary_key_column_names
+        )
+        return self.__append_to_editlog__(
+            primary_keys_tuple=primary_keys_tuple,
+            column=None,
+            value=None,
+            previous_value=None,
+            context=None,
+            action="delete",
+        )
