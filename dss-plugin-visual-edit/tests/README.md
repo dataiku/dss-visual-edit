@@ -2,24 +2,29 @@
 
 These integrations tests are based on Gherkin language and they are run by a CI workflow. See the [parent folder's README](../README.md) for more context.
 
-## Setup local test run environment
+## Contents
 
-- Create pyhton env with its requirements.
+We test the following:
+
+- Editing of columns of type int, float, and string.
+- Editing datasets with a single primary key and with several primary key columns.
+- Editing of a 'Reviewed' column (which should have a [special behavior](https://dataiku.github.io/dss-visual-edit/validate#special-behavior-of-the-validation-column-reviewed))
+- Impact of the `labels` and `lookup_columns` configuration variables of Linked Records
+- Impact of the `authorized_users` configuration variable on the ability to make edits.
+
+All tests are performed both on a FileSystem and on a PostgreSQL connection. We test that edits are stored in the editlog dataset as expected; we also build the edits and edited datasets and we test their contents as well.
+
+## How to set up an environment to run tests locally
+
+- Create a Pyhton environment with test requirements found in this directory.
 ```bash
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
-
-- Install [Cucumber vscode extension](https://marketplace.visualstudio.com/items?itemName=alexkrechik.cucumberautocomplete).
-
-
-- Setup vscode.
-
-In tests/.vscode, duplicate `settings.json.example` to `settings.json` and `launch.json.example` to `launch.json`.
-
+- VS Code:
+  - Install the [Cucumber extension](https://marketplace.visualstudio.com/items?itemName=alexkrechik.cucumberautocomplete).
+  - In `tests/.vscode/`, duplicate `settings.json.example` to `settings.json` and `launch.json.example` to `launch.json`.
+  - Fill in the environment variables in `settings.json`.
 - Configure `.dataiku/config.json` to select the instance where the tests will run.
-
-- Fill in the environment variables in `settings.json`.
-
-- Open a feature file, and press F5 to run the tests.
+- Open a `.feature` file and press F5 to run the tests.
