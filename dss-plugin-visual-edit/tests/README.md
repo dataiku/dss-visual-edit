@@ -1,6 +1,6 @@
 # Integration tests
 
-These integrations tests are based on Gherkin language and they are run by a CI workflow. See the [parent folder's README](../README.md) for more context.
+These tests are written using the Gherkin specification language and a [Dataiku library containing generic Gherkin steps](https://github.com/dataiku/dss-gherkin-steps/blob/main/README.md). See the [parent folder's README](../README.md) for more context.
 
 ## Contents
 
