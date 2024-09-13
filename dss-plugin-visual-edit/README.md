@@ -120,12 +120,8 @@ python backend.py
 
 ## Integration tests
 
-Visual Edit is validated against an integration test suite located in `dss-plugin-visual-edit/tests`.
-These tests are written using the Gherkin specification language. They are using [a dataiku library containing generic steps](https://github.com/dataiku/dss-gherkin-steps/blob/main/README.md).
-The tests run on [the test instance of Business Solutions](https://tests-integration.solutions.dataiku-dss.io/home/).
+Visual Edit is validated against an integration test suite located in `dss-plugin-visual-edit/tests` and run on a ["test" Dataiku instance managed by the Business Solutions](https://tests-integration.solutions.dataiku-dss.io/home/). This can be launched from the "Actions" tab of this repository, by clicking "Run Gherkin tests" in the side bar, then clicking on "Run workflow" and choosing the branch that contains the test suite to run.
 
-You can launch the tests from the "Actions" tab of this repository, then on the side bar click "Run Gherkin tests", then on the right, click on "Run workflow" and choose the branch that contains the test suite to run.
+**Note that the plugin is not updated automatically on the "test" Dataiku instance before each test run. To test a new version of the plugin, it should be updated on the test instance as a first step. This will be automated in the future.**
 
-**The plugin is not updated automatically before each test run. So to test a new version, you first have to update the plugin on the test instance. We will make that automatic in the future.**
-
-Tests can also be run locally. Read more in the `tests`' [README](tests/README.md).
+Head over to `tests`' [README](tests/README.md) for more information on how tests are implemented, what is being tested, and how to run tests locally.
