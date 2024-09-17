@@ -1,6 +1,6 @@
 # Switching to the `visual-edit` plugin
 
-## Overview
+## Background
 
 **Visual Edit** (plugin id `visual-edit`) is the public release of the previously private plugin **Data Editing** (plugin id `editable-via-webapp`). The core functionalities have remained the same but some key components have been renamed:
 
@@ -8,74 +8,44 @@
 * **The "editlog pivoted" dataset is now simply called the "edits" dataset. This is the most visible change in the Flow.**
 * The type of Visual Webapp provided by the plugin is now called "Visual Edit", and is technically identified as `visual-edit`.
 
-In this document we provide Python code to help switch to the new plugin. It consists, in a given project, in...
-* Deleting any `editable-via-webapp` recipes.
-* Renaming any "editlog pivoted" datasets.
-* Changing the type of Visual Webapp to `visual-edit` and restarting these webapps: this automatically creates new recipes using the new `visual-edit` plugin.
+We recommend reading this guide entirely before starting the switch.
 
-We provide instructions to use this Python code. We also provide additional instructions for webapp coders who used `editable-via-webapp`'s Python library.
+## Steps for a single project
 
-## Instructions
+* Preliminary: make sure that `visual-edit` is installed on your Dataiku instances (design and automation).
+* Create a bundle of your Dataiku project (to serve as backup if needed).
+* Clone this [Python notebook](https://github.com/dataiku/dss-visual-edit/blob/master/docs/switch-plugins.ipynb) into your Dataiku project:
+    * In the Notebooks section of your project, click on "+ New Notebook" and "Import from Git".
+    * Fill "Remote URL" with `git@github.com:dataiku/dss-visual-edit.git` and click on "List Notebooks".
+    * Select "switch-plugins" from the list and click on "Import 1 Notebook".
+* Review the notebook's warnings and run block by block. This will:
+    * Delete any `editable-via-webapp` recipes.
+    * Rename any "editlog pivoted" datasets.
+    * Change the type of Visual Webapp to `visual-edit` and restart: this automatically creates new recipes using the new `visual-edit` plugin.
+* If the project includes Scenarios with steps to build the "editlog pivoted" dataset, adapt to the new name.
+* If the project includes Code Webapps that leverage the `EditableEventSourced` class of the `editable-via-webapp` plugin's Python library
+    * Change the code to use the `DataEditor` class of the `visual-edit` plugin's Python library (this means renaming the class _and_ the plugin id used to import the class).
+    * Restart the webapps.
 
-* Preliminary step: [Install the `visual-edit` plugin](install-plugin) (keep `editable-via-webapp` for now).
-* For each project where you used `editable-via-webapp` (you can find a list of such projects at `/plugins/editable-via-webapp/usages/` in the Dataiku DSS web interface):
-    1. Change the `project_key` variable in the Python code.
-    2. Create a bundle of your Dataiku project (to serve as backup if needed).
-    3. Review the code below and run as a script, or block by block in a notebook environment, either from Dataiku DSS or from your local Python environment (provided it has the `dataiku` package installed).
-    4. If the project included Scenarios with a step to build the "editlog pivoted" dataset, adapt to the new name.
-* Once you've done this for all projects, you can uninstall the `editable-via-webapp` plugin.
+## Switching all projects
 
-## Python code
+You can find a list of projects that use `editable-via-webapp` at `/plugins/editable-via-webapp/usages/` in the Dataiku web interface. This can also be accessed programmatically using the Python client:
 
 ```python
-# %%
-# Initialize dataiku client and project
-import dataiku
-
-project_key = "ML_FEEDBACK_LOOP"
-dss_client = dataiku.api_client()
-project = dss_client.get_project(project_key)
-
-# %%
-# Delete plugin recipes
-for recipe in project.list_recipes(as_type="objects"):
-    # print(recipe)
-    recipe_type = recipe.get_settings().type
-    if (
-        recipe_type == "CustomCode_merge-edits"
-        or recipe_type == "CustomCode_pivot-editlog"
-    ):
-        recipe.delete()
-
-# %%
-# Rename all datasets ending with '_editlog_pivoted' to end with '_edits'
-for d in project.list_datasets():
-    dataset_name = d["name"]
-    dataset = project.get_dataset(dataset_name)
-    # if the name ends with '_editlog_pivoted', rename it to change the suffix to '_edits'
-    if dataset_name.endswith("_editlog_pivoted"):
-        new_name = dataset_name.replace("_editlog_pivoted", "_edits")
-        # add to list of datasets to build
-        dataset.rename(new_name)
-        print(f"Renamed {dataset_name} to {new_name}")
-
-# %%
-# Stop Visual Webapps, change their types, and restart them: this re-creates the recipes we deleted but with the types from the new plugin
-for webapp in project.list_webapps(as_type="objects"):
-    webapp_settings = webapp.get_settings()
-    if (
-        webapp_settings.get_raw()["type"]
-        == "webapp_editable-via-webapp_edit-dataset-records"
-    ):
-        webapp.stop_backend()
-        webapp_settings.get_raw()["type"] = "webapp_visual-edit_visual-edit"
-        webapp_settings.save()
-        print(
-            f"Changed type of {webapp_settings.get_raw()['name']} to 'webapp_visual-edit_visual-edit'"
-        )
-        webapp.start_or_restart_backend()
+usages = client.get_plugin("editable-via-webapp").list_usages()
+for usage in usages.usages:
+    if usage.element_kind == "webapps":
+        project_key = usage.project_key
+        print(project_key)
 ```
 
-## Instructions for webapp coders
+You could combine this and the Python notebook to switch all projects at once, but prior to this we recommend to...
 
-The `EditableEventSourced` class of the plugin's Python library was renamed `DataEditor`. If you were using this class in a code webapp, make sure to rename both the class and the plugin id used to import the class.
+* Notify project owners.
+* Inform them of the procedure: share this guide with them, along with the Python notebook, and highlight its warnings.
+* Make sure that a backup is created for each project.
+* Get project owners' approval.
+
+Once all of these projects have switched to the new `visual-edit` plugin, you can uninstall the `editable-via-webapp` plugin from your Dataiku design instances. This will prevent any new projects from using the old plugin.
+
+Once all of these projects have been deployed to your Dataiku automation instances, you can list usages of the `editable-via-webapp` plugin on these instances; if none, you can uninstall.
