@@ -44,7 +44,7 @@ You could combine this and the Python notebook to switch all projects at once, b
 * Notify project owners.
 * Inform them of the procedure: share this guide with them, along with the Python notebook, and highlight its warnings.
 * Make sure that a backup is created for each project.
-* Get project owners' approval.
+* Get project owners approval.
 
 Once all of these projects have switched to the new `visual-edit` plugin, you can uninstall the `editable-via-webapp` plugin from your Dataiku design instances. This will prevent any new projects from using the old plugin.
 
