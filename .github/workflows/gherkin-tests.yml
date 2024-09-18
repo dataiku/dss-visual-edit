@@ -34,8 +34,8 @@ jobs:
           cache: "pip"
       - name: Update plugin on test instance
         env:
-          DSS_HOST: ${{ secrets.tests_integrations_url }}
-          DSS_API_KEY: ${{ secrets.tests_integrations_api_key }}
+          DSS_HOST: ${{ secrets.tests_integration_url }}
+          DSS_API_KEY: ${{ secrets.tests_integration_api_key }}
           PLUGIN_ID: visual-edit
         run: |
           pip install dataiku-api-client
