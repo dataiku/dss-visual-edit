@@ -148,7 +148,9 @@ def replay_edits(
         if notes_column_name not in edits_df.columns:
             edits_df[notes_column_name] = ""
 
-        edits_df[validation_column_name] = edits_df["last_action"] == "validate"
+        edits_df[validation_column_name] = (
+            edits_df["last_action"] == "validate"
+        )  # this makes sure that the validation column has no missing values
 
         edits_df.reset_index(inplace=True)
         # this makes sure that all (editable) columns are here and in the right order

@@ -327,9 +327,12 @@ def get_columns_tabulator(de, freeze_editable_columns=False):
             "title": de.validation_column_name,
             "sorter": "exists",
             "formatter": "tickCross",
-            "formatterParams": {"allowEmpty": True, "crossElement": " "},
+            "formatterParams": {
+                "allowEmpty": False,
+                "crossElement": " ",
+            },  # by definition of the validation column (see replay_edits method), it cannot have missing values, and we want to make sure that there are only 2 possible statuses: valid or invalid
             "hozAlign": "center",
-            "headerFilter": "input",
+            "headerFilter": "tickCross",
             "headerFilterParams": {},
             "editor": "tickCross",
         }
