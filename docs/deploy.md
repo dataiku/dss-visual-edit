@@ -98,8 +98,8 @@ FOR EACH ROW EXECUTE PROCEDURE prevent_updates();
 ### Protecting the editlog from interference
 
 * The credentials used to write to the editlog have limited permissions. An audit trail from the database provider helps ensure that these permissions aren't altered.
-* These credentials are not known by the Dataiku project designer, so they can't write to the database by sending requests directly to it.
-* The only way for the project designer to tamper with the editlog is to make changes to the webapp code which leverages the Connection that writes to the database. Dataiku Govern guards around deploying projects that were tampered with (either at the Flow level, or at the Webapp and code level).
+* The Dataiku project designer does not know these credentials, so they can’t write to the database by sending requests directly to it.
+* The only way for the project designer to tamper with the editlog is to make changes to the webapp code which leverages the Connection that writes to the database. Dataiku Govern guards against deploying projects that were tampered with (either at the Flow level, or at the Webapp and code level).
 
 ### Restricting access to the webapp
 
