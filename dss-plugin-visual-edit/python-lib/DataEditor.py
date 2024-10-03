@@ -406,12 +406,17 @@ class DataEditor:
         action="update",
     ) -> EditSuccess | EditFailure | EditUnauthorized:
         """
-        Append an edit to the editlog.
+        Append an edit action to the editlog.
+
+        Actions can be "validate", "comment", "update", "create", or "delete".
+        - When the action is "validate" or "update" or "create", the column is one of the editable columns.
+        - When the action is "comment", the column is the notes column.
+        - When the action is "delete", the column and value are ignored.
 
         Args:
-            primary_keys_tuple (tuple): A tuple containing values for all primary keys, identifying the row on which the action is performed.
+            primary_keys_tuple (tuple): A tuple containing primary key(s) value(s) that identify the row on which the action is performed.
             column (str): The name of the column to create/update (it must be one of the editable columns). This would be None for other actions.
-            value (str): The value to set for the cell identified by key and column. This would be None for validate/invalidate/delete actions.
+            value (str): The value to set for the cell identified by key and column. This would be None when the action is "delete" or "validate" or "invalidate".
             previous_value (str): The previous value of that cell.
             context (dict): A dictionary containing all column values of the row to update (including primary key(s)).
             action (str): The type of action to log: "validate, "invalidate", "update", "create", or "delete".
@@ -442,8 +447,12 @@ class DataEditor:
         else:
             previous_value_string = previous_value
 
-        # same for context
-        if context:
+        # turn context into a string
+        if context is not None:
+            # remove the primary key columns from the context dictionary
+            context = context.copy()
+            for key in self.primary_key_column_names:
+                context.pop(key, None)
             context_string = str(context)
         else:
             context_string = context
