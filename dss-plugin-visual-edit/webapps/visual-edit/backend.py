@@ -207,6 +207,8 @@ def add_edit(cell):
             res = de.validate_row(row)
         elif value.lower() == "false":
             res = de.invalidate_row(row)
+    elif column_name.lower() == "comments":
+        res = de.comment_row(row, value)
     else:
         res = de.update_row(
             row=row,
