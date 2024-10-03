@@ -133,8 +133,9 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
                         return rowValue <= headerValue.end;
                     }
                 }
+            } else {
+                return false; // empty values should not be included in the filter
             }
-            return true; //must return a boolean, true if it passes the filter.
         },
 
         minMaxFilterEditor: function (cell, onRendered, success, cancel, editorParams) {
