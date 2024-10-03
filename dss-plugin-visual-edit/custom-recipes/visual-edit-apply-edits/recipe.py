@@ -51,7 +51,8 @@ edited_ds.write_with_schema(
     edited_df, drop_and_create=True
 )  # the dataframe's types were set explicitly, so let's use them to write this dataset's schema
 edited_schema = edited_ds.read_schema()
-# for each item of edited_schema, make sure its type is the same as the one given by original_schema
+# for each item of edited_schema, if it is also in original_schema, make sure its type is the same
 for item in edited_schema:
-    item["type"] = original_schema_df.loc[item["name"]]["type"]
+    if item["name"] in original_schema_df.index():
+        item["type"] = original_schema_df.loc[item["name"]]["type"]
 edited_ds.write_schema(edited_schema)
