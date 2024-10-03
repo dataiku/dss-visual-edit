@@ -5,6 +5,14 @@ from pandas.api.types import is_integer_dtype, is_float_dtype
 from flask import request
 import logging
 
+feedback_columns = ["validated", "comments"]
+
+metadata_columns = [
+    "last_edit_date",
+    "last_edited_by",
+    "last_action",
+    "first_action",
+]
 
 # Editlog utils - used by Empty Editlog step and by DataEditor for initialization of editlog
 
@@ -85,43 +93,82 @@ def get_dataframe(mydataset):
 
 
 def replay_edits(editlog_ds, primary_keys, editable_column_names):
+    replay_edits_from_df(get_dataframe(editlog_ds), primary_keys, editable_column_names)
+
+
+def replay_edits_from_df(editlog_df, primary_keys, editable_column_names):
+
     # Create empty dataframe with the proper edits dataset schema: all primary keys, all editable columns, and "date" column
     # This helps ensure that the dataframe we return always has the right schema
     # (even if some columns of the input dataset were never edited)
-    cols = (
-        primary_keys
-        + editable_column_names
-        + ["last_edit_date", "last_action", "first_action"]
-    )
+    cols = primary_keys + editable_column_names + feedback_columns + metadata_columns
     all_columns_df = DataFrame(columns=cols)
 
-    editlog_df = get_dataframe(editlog_ds)
     if not editlog_df.size:  # i.e. if empty editlog
         edits_df = all_columns_df
     else:
         editlog_df.rename(columns={"date": "edit_date"}, inplace=True)
         editlog_df = __unpack_keys__(editlog_df, primary_keys).sort_values("edit_date")
 
-        # if "action" is not in the editlog's columns, we add it and set all values to "update"
+        # If "action" is not in the editlog's columns, we add it and set all values to "update"
         if "action" not in editlog_df.columns:
             editlog_df["action"] = "update"
 
-        # for each key, compute last edit date, last action and first action
+        # Compute comments column for each key
+        ###
+
+        editlog_comments = editlog_df[editlog_df["action"] == "comment"]
+        editlog_last_comments = (
+            editlog_comments[primary_keys + ["value"]]
+            .groupby(primary_keys)
+            .last()
+            .rename(columns={"value": "comments"})
+        )
+
+        # remove rows where the "action" column is "comment"
+        editlog_df = editlog_df[editlog_df["action"] != "comment"]
+
+        # Compute metadata columns for each key
+        ###
+
+        # Last edit date, user, and action
         editlog_grouped_last = (
-            editlog_df[primary_keys + ["edit_date", "action"]]
+            editlog_df[primary_keys + ["edit_date", "user", "action"]]
             .groupby(primary_keys)
             .last()
             .add_prefix("last_")
         )
+        editlog_grouped_last.rename(
+            columns={"last_user": "last_edited_by"}, inplace=True
+        )
+        # First action
         editlog_grouped_first = (
             editlog_df[primary_keys + ["action"]]
             .groupby(primary_keys)
             .first()
             .add_prefix("first_")
         )
+        # Join the two grouped dataframes
         editlog_grouped_df = editlog_grouped_last.join(
             editlog_grouped_first, on=primary_keys
         )
+
+        # Compute the pivot table
+        ###
+
+        # On validated rows, copy context to "value" column so that it will be included in the pivot table
+        def copy_context(log_entry):
+            # based on the values of primary_keys for that log_entry, get the last action
+            last_action = editlog_grouped_df.loc[
+                get_key_values_as_tuple(log_entry.to_dict(), primary_keys),
+                "last_action",
+            ]
+            if last_action == "validate":
+                log_entry["column_name"] = "context"
+                log_entry["value"] = log_entry["context"]
+            return log_entry
+
+        editlog_df = editlog_df.apply(copy_context, axis=1)
 
         edits_df = pivot_table(
             editlog_df,
@@ -130,15 +177,36 @@ def replay_edits(editlog_ds, primary_keys, editable_column_names):
             values="value",
             # for each named column, we only keep the last value
             aggfunc=lambda values: values.iloc[-1] if not values.empty else None,
-        ).join(editlog_grouped_df, on=primary_keys)
+        )
 
-        # Drop any columns from the pivot that may not be one of the editable_column_names
+        # Unpack context column
+        def unpack_context(row):
+            if row["context"] == row["context"]:  # checking that it's not NaN
+                context = eval(row["context"])
+                for k, v in context.items():
+                    row[k] = v
+            return row
+
+        edits_df = edits_df.apply(unpack_context, axis=1)
+
+        # Drop any columns from the pivot that may not be one of the editable_column_names or the context column
         for col in edits_df.columns:
-            if col not in cols:
+            if col not in primary_keys + editable_column_names:
                 edits_df.drop(columns=[col], inplace=True)
 
+        # Add metadata and comments columns to the pivot table
+        ###
+
+        edits_df = edits_df.join(editlog_grouped_df, on=primary_keys).join(
+            editlog_last_comments, on=primary_keys
+        )
+
+        # Compute the "validated" column (boolean with no missing values)
+        edits_df["validated"] = edits_df["last_action"] == "validate"
+
         edits_df.reset_index(inplace=True)
-        # this makes sure that all (editable) columns are here and in the right order
+
+        # Make sure that all (editable) columns are here and in the right order
         edits_df = concat([all_columns_df, edits_df])
 
     return edits_df
@@ -183,8 +251,10 @@ def apply_edits_from_df(original_ds, edits_df):
     original_df, primary_keys, display_columns, editable_columns = get_original_df(
         original_ds
     )
-    # this will contain the list of new columns coming from edits dataset but not found in the original dataset's schema
+    # We create an editable_columns_new variable to store the list of new columns coming from edits dataset but not found in the original dataset's schema
     editable_columns_new = []
+    # We create an editable_columns_original variable to store the list of columns that will be used to store the original values of the editable columns
+    editable_columns_original = []
 
     if not edits_df.size:  # i.e. if empty editlog
         edited_df = original_df
@@ -196,15 +266,6 @@ def apply_edits_from_df(original_ds, edits_df):
         # Prepare edits_df
         ###
         edits_df = edits_df[not_deleted & ~created]
-
-        # Drop columns which are not primary keys nor editable columns
-        options.mode.chained_assignment = None  # this helps prevent SettingWithCopyWarnings that are triggered by the drops below
-        if "last_edit_date" in edits_df.columns:
-            edits_df.drop(columns=["last_edit_date"], inplace=True)
-        if "last_action" in edits_df.columns:
-            edits_df.drop(columns=["last_action"], inplace=True)
-        if "first_action" in edits_df.columns:
-            edits_df.drop(columns=["first_action"], inplace=True)
 
         # Change types to match those of original_df
         for col in edits_df.columns:
@@ -233,12 +294,22 @@ def apply_edits_from_df(original_ds, edits_df):
         # "Merge" -> this creates _original columns
         # all last_ and first_ columns have already been dropped
         for col in editable_columns:
-            # copy col to a new column whose name is suffixed by "_original"
-            edited_df[col + "_original"] = edited_df[col]
-            # merge original and last edited values
-            edited_df.loc[:, col] = edited_df[col + "_value_last"].where(
-                edited_df[col + "_value_last"].notnull(), edited_df[col + "_original"]
+            col_value_last = col + "_value_last"
+            # col_value_last already has values, due to the join
+
+            col_original = col + "_original"
+            # when col_value_last is not null, we want col_original to have the value in col; otherwise we want an empty value
+            edited_df[col_original] = edited_df[col].where(
+                edited_df[col_value_last].notnull(), None
             )
+
+            # when col_value_last is not null, we also want col to have the value in col_value_last
+            edited_df[col] = edited_df[col_value_last].where(
+                edited_df[col_value_last].notnull(), edited_df[col]
+            )
+
+            # add col_original to the list of columns used to store editable columns' original values
+            editable_columns_original.append(col_original)
 
         edited_df.reset_index(inplace=True)
 
@@ -248,9 +319,15 @@ def apply_edits_from_df(original_ds, edits_df):
         if created_df.size:
             edited_df = concat([created_df, edited_df])
 
-        # Drop the _original and _value_last columns
+        # Drop the _value_last columns
         edited_df = edited_df[
-            primary_keys + display_columns + editable_columns + editable_columns_new
+            primary_keys
+            + display_columns
+            + editable_columns
+            + editable_columns_new
+            + editable_columns_original
+            + feedback_columns
+            + metadata_columns
         ]
 
     return edited_df
