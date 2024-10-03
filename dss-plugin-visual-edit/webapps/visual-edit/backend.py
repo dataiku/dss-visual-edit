@@ -340,11 +340,8 @@ def update_endpoint():
         primary_keys = request.args.get("primaryKeys", "")
         column = request.args.get("column", "")
         value = request.args.get("value", "")
-    results = de.update_row(primary_keys=primary_keys, column=column, value=value)
-    info = ""
-    for res in results:
-        info += __edit_result_to_message__(res) + "\n"
-    response = jsonify({"msg": info})
+    res = de.update_row(primary_keys=primary_keys, column=column, value=value)
+    response = jsonify({"msg": __edit_result_to_message__(res)})
     return response
 
 
