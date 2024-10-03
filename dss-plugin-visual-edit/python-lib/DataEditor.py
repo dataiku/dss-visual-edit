@@ -552,6 +552,30 @@ class DataEditor:
             action="validate",
         )
 
+    def comment_row(self, row: dict, comment: str) -> EditSuccess | EditFailure:
+        """
+        Comments a row.
+
+        Args:
+            row (dict): A dictionary containing all column values of the row to comment. This includes primary key(s), which serve to identify the row in the editlog; all the rest is the "context".
+            comment (str): The comment to add to the row.
+
+        Returns:
+            EditSuccess | EditFailure: An object indicating the success or failure to insert an editlog.
+
+        Notes:
+            - Attribution of the 'comment' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
+        """
+        primary_keys_tuple = get_key_values_as_tuple(row, self.primary_key_column_names)
+        return self.__append_to_editlog__(
+            primary_keys_tuple=primary_keys_tuple,
+            column=None,
+            value=comment,
+            previous_value=None,
+            context=row,
+            action="comment",
+        )
+
     def invalidate_row(self, row: dict) -> EditSuccess | EditFailure:
         """
         Invalidates a row. To be used when a row was validated by error.
