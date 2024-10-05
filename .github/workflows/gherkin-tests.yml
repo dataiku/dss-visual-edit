@@ -54,7 +54,7 @@ jobs:
           cd dss-plugin-visual-edit/tests
           pip install -r requirements.txt
           playwright install chromium
-          TMPDIR=/tmp/ behavex --output-folder=../../tests-out --parallel-processes=5 --parallel-scheme=feature --no-logcapture --logging-level=DEBUG --show-progress-bar
+          TMPDIR=/tmp/ behavex --output-folder=../../tests-out --parallel-processes=10 --parallel-scheme=feature --no-logcapture --logging-level=DEBUG --show-progress-bar
       - name: Zip tests results
         if: always()
         run: |
