@@ -1,6 +1,9 @@
 import os
+from pathlib import Path
+import re
 from behave import use_fixture
 from behave.configuration import Configuration
+from behave.model import Scenario
 from dssgherkin.fixtures.cleanup_managed_folders import cleanup_managed_folders
 from dssgherkin.fixtures.cleanup_projects_fixture import cleanup_projects
 from dssgherkin.fixtures.delete_datasets import delete_datasets
@@ -23,7 +26,7 @@ def before_all(context: AugmentedBehaveContext):
     use_fixture(create_dss_client, context)
 
 
-def before_scenario(context: AugmentedBehaveContext, scenario):
+def before_scenario(context: AugmentedBehaveContext, scenario: Scenario):
     for tag in scenario.tags:
         if tag == "cleanup_projects":
             use_fixture(cleanup_projects, context)
@@ -32,10 +35,15 @@ def before_scenario(context: AugmentedBehaveContext, scenario):
         if tag == "delete_datasets":
             use_fixture(delete_datasets, context)
 
+    project_key_suffix = re.sub(
+        r"[^A-Za-z0-9]", "", Path(scenario.filename).stem
+    ).upper()
+    project_key = f"VISUALEDIT{project_key_suffix}"
+
     context.execute_steps(
-        """
+        f"""
             Given I login to DSS
-            And a project created from export file "./assets/VISUALEDITINTEGRATIONTESTS.zip" with key "VISUALEDITINTEGRATIONTESTS"
+            And a project created from export file "./assets/VISUALEDITINTEGRATIONTESTS.zip" with key "{project_key}"
         """
     )
 

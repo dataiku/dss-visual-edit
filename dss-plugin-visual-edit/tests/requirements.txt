@@ -1,5 +1,6 @@
 behave
 behave-pandas
+behavex
 dataiku-internal-client @ https://design.solutions.dataiku-dss.io/public/packages/dataiku-internal-client.tar.gz
 dataiku-api-client
 pandas==1.5.3

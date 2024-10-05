@@ -54,4 +54,15 @@ jobs:
           cd dss-plugin-visual-edit/tests
           pip install -r requirements.txt
           playwright install chromium
-          behave --no-logcapture --logging-level=ERROR
+          TMPDIR=/tmp/ behavex --output-folder=../../tests-out --parallel-processes=5 --parallel-scheme=feature --no-logcapture --logging-level=DEBUG --show-progress-bar
+      - name: Zip tests results
+        if: always()
+        run: |
+          zip -r out.zip tests-out
+      - name: Upload test results to workflow artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gherkin-tests-result-${{ github.ref_name }}
+          path: out.zip
+          retention-days: 1
