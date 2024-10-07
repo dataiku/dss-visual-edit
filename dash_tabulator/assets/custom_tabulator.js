@@ -121,20 +121,28 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
             //rowValue - the value of the column in this row
             //rowData - the data for the row being filtered
             //filterParams - params object passed to the headerFilterFuncParams property
-            if (rowValue) {
-                if (headerValue.start != "") {
-                    if (headerValue.end != "") {
-                        return rowValue >= headerValue.start && rowValue <= headerValue.end;
-                    } else {
-                        return rowValue >= headerValue.start;
-                    }
+
+            // No filter set, all values pass.
+            if (headerValue.start === "" && headerValue.end === "") {
+                return true
+            }
+
+            // Filter set, empty or NaN values fail.
+            if (rowValue == null || rowValue === "" || isNaN(Number(rowValue))) {
+                return false;
+            }
+
+            if (headerValue.start != "") {
+                if (headerValue.end != "") {
+                    return rowValue >= headerValue.start && rowValue <= headerValue.end;
                 } else {
-                    if (headerValue.end != "") {
-                        return rowValue <= headerValue.end;
-                    }
+                    return rowValue >= headerValue.start;
+                }
+            } else {
+                if (headerValue.end != "") {
+                    return rowValue <= headerValue.end;
                 }
             }
-            return true; //must return a boolean, true if it passes the filter.
         },
 
         minMaxFilterEditor: function (cell, onRendered, success, cancel, editorParams) {
