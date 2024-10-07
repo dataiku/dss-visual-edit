@@ -212,7 +212,8 @@ def apply_edits_from_df(original_ds, edits_df):
             if col in primary_keys + display_columns + editable_columns:
                 if is_integer_dtype(original_dtype):
                     # there may be missing values so choose a dtype supporting them.
-                    edits_df[col] = edits_df[col].astype(Int64Dtype())
+                    # Cast as float first to work around issue with pandas 1.3 https://stackoverflow.com/a/60024263
+                    edits_df[col] = edits_df[col].astype(float).astype(Int64Dtype())
                 elif is_float_dtype(original_dtype):
                     edits_df[col] = edits_df[col].astype(float)
                 else:
