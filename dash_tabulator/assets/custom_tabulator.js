@@ -121,8 +121,15 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
             //rowValue - the value of the column in this row
             //rowData - the data for the row being filtered
             //filterParams - params object passed to the headerFilterFuncParams property
+
+            // No filter set, all values pass.
+            if (headerValue.start === "" && headerValue.end === "") {
+                return true
+            }
+
+            // Filter set, empty or NaN values fail.
             if (rowValue == null || rowValue === "" || isNaN(Number(rowValue))) {
-                return true;
+                return false;
             }
 
             if (headerValue.start != "") {
