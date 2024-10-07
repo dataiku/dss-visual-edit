@@ -1,6 +1,6 @@
 {
     "id": "visual-edit",
-    "version": "2.0.2",
+    "version": "2.0.3",
     "meta": {
         "label": "Visual Edit",
         "description": "Spin up a visual app to validate and edit data",
