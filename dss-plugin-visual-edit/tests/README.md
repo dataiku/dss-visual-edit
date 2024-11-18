@@ -8,7 +8,7 @@ We test the following:
 
 - Editing of columns of type int, float, and string.
 - Editing datasets with a single primary key and with several primary key columns.
-- Editing of a 'Reviewed' column (which should have a [special behavior](https://dataiku.github.io/dss-visual-edit/validate#special-behavior-of-the-validation-column-reviewed))
+- Editing of a validation column (which should have a [special behavior](https://dataiku.github.io/dss-visual-edit/validate#special-behavior-of-the-validation-column))
 - Impact of the `labels` and `lookup_columns` configuration variables of Linked Records
 - Impact of the `authorized_users` configuration variable on the ability to make edits.
 

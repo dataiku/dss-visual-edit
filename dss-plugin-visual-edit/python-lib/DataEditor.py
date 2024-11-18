@@ -490,19 +490,21 @@ class DataEditor:
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
 
-        def is_reviewed_column(column_name: str):
-            return column_name == "Reviewed" or column_name == "reviewed"
+        def is_validation_column(column_name: str):
+            return (
+                column_name.lower() == "reviewed" or column_name.lower() == "validated"
+            )
 
         def is_comments_column(column_name: str):
             return column_name == "Comments" or column_name == "comments"
 
-        # for reviewed column, create an editlog for each columns to enforce values even after a change in the original.
-        # Append the reviewed value change last in case something goes wrong during updates of the previous column values.
+        # When updating the validation column, we first create a log entry for each editable column, to enforce values even after a change in the original.
+        # We then log the new value of the validation column.
         # To improve this, the best would be to do all the inserts in the same transaction.
-        if is_reviewed_column(column):
+        if is_validation_column(column):
             results = []
             for col in self.editable_column_names:
-                if not is_comments_column(col) and not is_reviewed_column(col):
+                if not is_comments_column(col) and not is_validation_column(col):
                     # contains values for primary keys — and other columns too, but they'll be discarded
                     results.append(self.__log_edit__(key, col, primary_keys[col]))
             results.append(self.__log_edit__(key, column, primary_keys[column]))

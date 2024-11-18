@@ -17,7 +17,7 @@ For each column of the original dataset you can set the following fields:
 ```json
 [
   {
-    "name": "reviewed",
+    "name": "validated",
     "type": "boolean_tick"
   }
 ]
