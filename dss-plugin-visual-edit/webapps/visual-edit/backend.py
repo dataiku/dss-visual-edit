@@ -11,6 +11,7 @@
 # 3. Define Dash webapp layout and components.
 from __future__ import annotations
 import logging
+import os
 from webapp.config.models import LinkedRecord
 import webapp.logging.setup  # noqa: F401 necessary to setup logging basicconfig before dataiku module sets a default config
 from datetime import datetime
@@ -24,7 +25,7 @@ from DataEditor import (
     EditUnauthorized,
     DataEditor,
 )
-from flask import Flask, jsonify, make_response, request
+from flask import Flask, jsonify, make_response, request, send_from_directory
 from tabulator_utils import get_columns_tabulator, get_values_from_df
 
 from webapp.config.loader import WebAppConfig
@@ -490,6 +491,16 @@ def lookup_endpoint(linked_ds_name):
         linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns
     )
     return jsonify(editor_values_param)
+
+
+FONTS_FOLDER = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "assets", "fonts"
+)
+
+
+@server.route("/static/fonts/<path:filename>", methods=["GET"])
+def serve_fonts(filename):
+    return send_from_directory(FONTS_FOLDER, filename)
 
 
 logging.info("Webapp OK")
