@@ -1,6 +1,8 @@
 /* define SourceSansPro */
 @font-face {
-    src: url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,500,600');
+    font-family: 'dataiku';
+    src: url('/static/fonts/SourceSansPro-Regular.woff');
+    font-weight: 400;
 }
 
 body {
@@ -9,7 +11,8 @@ body {
 }
 
 body, button, select.tabulator-page-size, input[type=search] {
-    font-family: 'Source Sans Pro' !important;
+    font-family: 'dataiku' !important;
+    font-size: 13px;
 }
 
 .tabulator {
