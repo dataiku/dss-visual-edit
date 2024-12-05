@@ -11,6 +11,13 @@ We recommend creating the following automation Scenarios:
   * If you want to allow end-users to trigger this scenario on their own, you can embed the Visual Edit webapp in a Dashboard to which you will add a Scenario tile (more on this in the next section).
 * **_Update Source_**, to take into account any changes or additional data from source systems, re-build the Original Dataset used by the webapp, and re-run the _Commit Edits_ scenario.
 
+## Lifecycle: handling updates to the original dataset
+
+It is important to note the following on the behavior of the webapp and of the Apply Edits recipe (which produces the edited dataset):
+
+* If a cell was edited, the edited value will override any updates made on the original dataset, even if they are posterior to the edit.
+* Similarly, if a row was validated, the validated values from that row will override any updates made on editable columns of the original dataset, even if they are posterior to the validation.
+
 ## Publishing the webapp to a Dashboard
 
 The best way to make the webapp accessible to business users is by publishing it to a Dashboard. There can be 2 separate Dashboards for Editing and for Reporting purposes, or there can be a single Dashboard with 2 pages.
