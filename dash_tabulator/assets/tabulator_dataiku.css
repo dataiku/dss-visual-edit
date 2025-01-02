@@ -1,7 +1,6 @@
-/* define SourceSansPro */
 @font-face {
     font-family: 'dataiku';
-    src: url('/static/fonts/SourceSansPro-Regular.woff');
+    src: url('themes/default/assets/fonts/SourceSansPro-Regular.woff');
     font-weight: 400;
 }
 
