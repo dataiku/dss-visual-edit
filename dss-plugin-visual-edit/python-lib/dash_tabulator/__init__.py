@@ -75,13 +75,18 @@ _js_dist.extend(
     ]
 )
 
-_css_dist = [
+_css_dist = []
+
+woff_files = [
     {
-        "relative_package_path": "74ddb2b07a7f05bded6da1fb93301a05.woff",
+        "relative_package_path": f,
         "namespace": package_name,
         "dynamic": True,
     }
+    for f in _os.listdir(_basepath)
+    if f.endswith(".woff")
 ]
+_css_dist.extend(woff_files)
 
 
 for _component in __all__:
