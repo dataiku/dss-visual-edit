@@ -1,5 +1,17 @@
 @font-face {
     font-family: 'dataiku';
+    src: url('themes/default/assets/fonts/SourceSansPro-Bold.woff');
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: 'dataiku';
+    src: url('themes/default/assets/fonts/SourceSansPro-Semibold.woff');
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: 'dataiku';
     src: url('themes/default/assets/fonts/SourceSansPro-Regular.woff');
     font-weight: 400;
 }
@@ -9,7 +21,10 @@ body {
     background-color: rgb(242, 242, 242);
 }
 
-body, button, select.tabulator-page-size, input[type=search] {
+body,
+button,
+select.tabulator-page-size,
+input[type=search] {
     font-family: 'dataiku' !important;
     font-size: 13px;
 }
@@ -26,8 +41,8 @@ body, button, select.tabulator-page-size, input[type=search] {
     position: absolute;
 }
 
-.tabulator-col-title{
-    font-weight: 600;
+.tabulator-col-title {
+    font-weight: 500;
 }
 
 .tabulator-row {
@@ -44,11 +59,13 @@ body, button, select.tabulator-page-size, input[type=search] {
     font-weight: 500;
 }
 
-.tabulator .tabulator-footer, .tabulator .tabulator-header .tabulator-col {
+.tabulator .tabulator-footer,
+.tabulator .tabulator-header .tabulator-col {
     background-color: white;
 }
 
-.tabulator .tabulator-footer, .tabulator .tabulator-header .tabulator-col:hover {
+.tabulator .tabulator-footer,
+.tabulator .tabulator-header .tabulator-col:hover {
     background-color: rgb(245, 245, 245) !important;
 }
 
