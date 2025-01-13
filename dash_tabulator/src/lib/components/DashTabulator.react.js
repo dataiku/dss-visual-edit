@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { resolveProp } from 'dash-extensions';
-import { TabulatorFull as Tabulator } from "tabulator-tables"; //import Tabulator library
+import { TabulatorFull as Tabulator } from "tabulator-tables";
 import "tabulator-tables/dist/css/tabulator.min.css";
 import "tabulator-tables/dist/css/tabulator_semanticui.min.css";
 import "../../../assets/custom_tabulator.js";
@@ -11,35 +11,50 @@ import "../../../assets/luxon.min.js";
 import "../../../assets/semantic-ui-react.min.js";
 import "../../../assets/semantic.min.css";
 
-const crypto = require('crypto');
-
 const plugin_version = "2.0.3";
+
+/**
+ * We define a function to hash a string using the MD5 algorithm.
+ * This is used to hash the dataset name and column names before sending them to WT1.
+ */
+
+const crypto = require('crypto');
 
 function md5(string) {
     return crypto.createHash('md5').update(string).digest('hex');
 }
 
+/**
+ * We define a wrapper around the Tabulator library as a React component.
+ * We also define the properties that can be passed to this component, their types, and default values.
+ */
+
 export default class DashTabulator extends React.Component {
-    el = React.createRef();
-    tabulator = null; //variable to hold your table
+    el = React.createRef(); // ref to the DOM element that will contain the table
+    tabulator = null; // variable to hold the Tabulator instance
 
+    /**
+     * Create the Tabulator instance when the React component mounts.
+     */
     componentDidMount() {
-        // Instantiate Tabulator when element is mounted
-
         const { id, datasetName, data, columns, groupBy, cellEdited } = this.props;
 
-        // Interpret column formatters as function handles.
-        for (let i = 0; i < columns.length; i++) {
-            let header = columns[i];
-            for (let key in header) {
-                let o = header[key];
-                if (o instanceof Object) {
-                    header[key] = resolveProp(o, this);
-                    if (!o.variable && !o.arrow) {
-                        for (let key2 in o) {
-                            let o2 = o[key2]
-                            if (o2 instanceof Object) {
-                                o[key2] = resolveProp(o2, this);
+        /**
+         * Resolve column properties as functions when relevant.
+         */
+        for (let i = 0; i < columns.length; i++) { // iterate over columns
+            let column = columns[i];
+            for (let property in column) { // iterate over column properties
+                let value = column[property];
+                if (value instanceof Object) {
+                    // value could be an arrow function (e.g. when property is "headerFilter") or a nested object (e.g. when property is "editorParams")
+                    column[property] = resolveProp(o, this);
+                    if (!value.variable && !value.arrow) {
+                        // value is a nested object and we iterate over its properties
+                        for (let sub_property in value) {
+                            let sub_value = value[sub_property]
+                            if (sub_value instanceof Object) { // this is likely to be an arrow function (e.g. when property is "editorParams" and sub_property is "itemFormatter")
+                                o[key2] = resolveProp(o2, this); // resolve as such
                             }
                         }
                     }
@@ -47,12 +62,19 @@ export default class DashTabulator extends React.Component {
             }
         }
 
+        /**
+         * Create the Tabulator instance:
+         * Pass the DOM element that will contain the table.
+         * Pass fixed data table options, and options from props.
+         */
         this.tabulator = new Tabulator(this.el, {
-            "data": data,
             "datasetName": datasetName,
-            "reactiveData": true,
+            "data": data,
             "columns": columns,
             "groupBy": groupBy,
+            "reactiveData": true,
+
+            // Fixed options
             "selectable": 1,
             "layout": "fitDataTable",
             "pagination": "local",
@@ -63,6 +85,9 @@ export default class DashTabulator extends React.Component {
             "footerElement": "<button class='tabulator-page' onclick='localStorage.clear(); window.location.reload();'>Reset View</button>"
         });
 
+        /**
+         * Tabulator event listener for cell editing
+         */
         this.tabulator.on("cellEdited", (cell) => {
             var edited = new Object()
             edited.field = cell.getField()
@@ -83,12 +108,20 @@ export default class DashTabulator extends React.Component {
         })
     }
 
+    /**
+     * 
+     * @param {*} props 
+     */
     constructor(props) {
         super(props);
         this.ref = null;
     }
 
+    /**
+     * Update table data when component receives new props
+     */
     render() {
+        // Send event to parent window to log the display of the table
         try {
             window.parent.WT1SVC.event("visualedit-display-table", {
                 "dataset_name_hash": md5(this.props.datasetName),
@@ -105,9 +138,7 @@ export default class DashTabulator extends React.Component {
         }
         catch (e) { }
 
-        // const {id, data, columns, groupBy, cellEdited} = this.props;
-        // if (this.tabulator) this.tabulator.setData(data)
-
+        // Use the ref attribute to assign the element to this instance
         return (
             <div ref={el => (this.el = el)} />
         )
