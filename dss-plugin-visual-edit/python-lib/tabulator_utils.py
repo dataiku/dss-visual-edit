@@ -12,65 +12,86 @@ from dash_extensions.javascript import assign
 __ns__ = Namespace("myNamespace", "tabulator")
 
 
-def __get_column_tabulator_type__(de, col_name):
-    # Determine column type as string, boolean, boolean_tick, or number
-    # - based on the type given in editschema_manual, if any
-    # - the dataset's schema, otherwise
-    ###
+def __get_column_type__(de, col_name):
+    """
+    Determine column type as linked_record, string, boolean, boolean_tick, number, or date.
 
-    t_type = "string"  # default type
-    if (
-        not de.editschema_manual_df.empty
-        and "type" in de.editschema_manual_df.columns
-        and col_name in de.editschema_manual_df.index
-    ):
-        editschema_manual_type = de.editschema_manual_df.loc[col_name, "type"]
-    else:
-        editschema_manual_type = None
+    The type is used to define the column's formatter and editor settings in Tabulator.
+    It is based on...
+    - linked record definitions, if any
+    - the type given in editschema_manual, if any
+    - the dataset's schema, otherwise:
+        - the column meaning, if any
+        - the column storage type, otherwise
+    """
 
-    # this tests that 1) editschema_manual_type isn't None, and 2) it isn't a nan
-    if editschema_manual_type and editschema_manual_type == editschema_manual_type:
-        t_type = editschema_manual_type
+    linked_record_names = []
+    if de.linked_records:
+        try:
+            linked_records_df = de.linked_records_df
+            linked_record_names = linked_records_df.index.values.tolist()
+        except Exception:
+            logging.exception("Failed to get linked record names.")
+    if col_name in linked_record_names:
+        t_type = "linked_record"
     else:
-        schema_df = DataFrame(data=de.schema_columns).set_index("name")
-        if "meaning" in schema_df.columns.to_list():
-            schema_meaning = schema_df.loc[col_name, "meaning"]
+        t_type = "string"  # default type
+        if (
+            not de.editschema_manual_df.empty
+            and "type" in de.editschema_manual_df.columns
+            and col_name in de.editschema_manual_df.index
+        ):
+            editschema_manual_type = de.editschema_manual_df.loc[col_name, "type"]
         else:
-            schema_meaning = None
-        # If a meaning has been defined, we use it to infer t_type
-        if schema_meaning and schema_meaning == schema_meaning:
-            if schema_meaning == "Boolean":
-                t_type = "boolean"
-            if (
-                schema_meaning == "DoubleMeaning"
-                or schema_meaning == "LongMeaning"
-                or schema_meaning == "IntMeaning"
-            ):
-                t_type = "number"
-            if schema_meaning == "Date":
-                t_type = "date"
+            editschema_manual_type = None
+
+        # this tests that 1) editschema_manual_type isn't None, and 2) it isn't a nan
+        if editschema_manual_type and editschema_manual_type == editschema_manual_type:
+            t_type = editschema_manual_type
         else:
-            # type coming from schema
-            schema_type = schema_df.loc[col_name, "type"]
-            if schema_type == "boolean":
-                t_type = "boolean"
-            if schema_type in [
-                "tinyint",
-                "smallint",
-                "int",
-                "bigint",
-                "float",
-                "double",
-            ]:
-                t_type = "number"
-            if schema_type == "date":
-                t_type = "date"
+            schema_df = DataFrame(data=de.schema_columns).set_index("name")
+            if "meaning" in schema_df.columns.to_list():
+                schema_meaning = schema_df.loc[col_name, "meaning"]
+            else:
+                schema_meaning = None
+            # If a meaning has been defined, we use it to infer t_type
+            if schema_meaning and schema_meaning == schema_meaning:
+                if schema_meaning == "Boolean":
+                    t_type = "boolean"
+                if (
+                    schema_meaning == "DoubleMeaning"
+                    or schema_meaning == "LongMeaning"
+                    or schema_meaning == "IntMeaning"
+                ):
+                    t_type = "number"
+                if schema_meaning == "Date":
+                    t_type = "date"
+            else:
+                # type coming from schema
+                schema_type = schema_df.loc[col_name, "type"]
+                if schema_type == "boolean":
+                    t_type = "boolean"
+                if schema_type in [
+                    "tinyint",
+                    "smallint",
+                    "int",
+                    "bigint",
+                    "float",
+                    "double",
+                ]:
+                    t_type = "number"
+                if schema_type == "date":
+                    t_type = "date"
 
     return t_type
 
 
 def __get_column_tabulator_formatter__(t_type):
-    # IDEA: improve this code with a dict to do matching (instead of if/else)?
+    """Define Tabulator formatter settings for a column based on its type
+
+    Returns:
+        dict: Tabulator column settings
+    """
     t_col = {}
     if t_type == "boolean":
         t_col["sorter"] = "boolean"
@@ -97,6 +118,11 @@ def __get_column_tabulator_formatter__(t_type):
 
 
 def __get_column_tabulator_editor__(t_type):
+    """Define Tabulator editor settings for a column based on its type
+
+    Returns:
+        dict: Tabulator column settings
+    """
     t_col = {}
     if t_type == "boolean":
         t_col["editor"] = "list"
@@ -266,19 +292,13 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
 def get_columns_tabulator(de, freeze_editable_columns=False):
     """Prepare column settings to pass to Tabulator"""
 
-    linked_record_names = []
-    if de.linked_records:
-        try:
-            linked_records_df = de.linked_records_df
-            linked_record_names = linked_records_df.index.values.tolist()
-        except Exception:
-            logging.exception("Failed to get linked record names.")
-
     t_cols = []
     for col_name in (
         de.primary_keys + de.display_column_names + de.editable_column_names
     ):
-        # Properties to be shared by all columns
+        t_type = __get_column_type__(de, col_name)
+
+        # Properties to be shared by all columns: enable header filters, column resizing, and a special menu on right-click of column header
         t_col = {
             "field": col_name,
             "title": col_name,
@@ -286,23 +306,12 @@ def get_columns_tabulator(de, freeze_editable_columns=False):
             "resizable": True,
             "headerContextMenu": __ns__("headerMenu"),
         }
-
-        # Define formatter and header filters based on type
-        t_type = __get_column_tabulator_type__(de, col_name)
-        if col_name not in linked_record_names:
-            t_col.update(__get_column_tabulator_formatter__(t_type))
-        if col_name in de.primary_keys:
+        if col_name in de.primary_keys or (
+            col_name in de.editable_column_names and freeze_editable_columns
+        ):
             t_col["frozen"] = True
 
-        # Define editor, if it's an editable column
-        if col_name in de.editable_column_names:
-            if freeze_editable_columns:
-                t_col["frozen"] = True  # freeze to the right
-            if col_name in linked_record_names:
-                t_type = "linked_record"
-                t_col.update(__get_column_tabulator_linked_record__(de, col_name))
-            else:
-                t_col.update(__get_column_tabulator_editor__(t_type))
+        # Define the column's "title formatter" to show the column type below its name
         pretty_types = {
             "number": "Number",
             "string": "Text",
@@ -318,6 +327,14 @@ def get_columns_tabulator(de, freeze_editable_columns=False):
             }}
             """
         )
+
+        # Define the column's formatter, header filters, and editor (if editable)
+        t_col.update(__get_column_tabulator_formatter__(t_type))
+        if col_name in de.editable_column_names:
+            if t_type == "linked_record":
+                t_col.update(__get_column_tabulator_linked_record__(de, col_name))
+            else:
+                t_col.update(__get_column_tabulator_editor__(t_type))
 
         t_cols.append(t_col)
 
