@@ -117,7 +117,7 @@ columns = [
 ]
 ```
 
-### Using AG Grid
+## Using AG Grid
 
 As a preliminary step, make sure to run `pip install dash-ag-grid`.
 
