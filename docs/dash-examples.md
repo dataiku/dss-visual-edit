@@ -1,8 +1,17 @@
 # Low-code webapp customizations with Dash
 
-## Basic usage
+As seen in the [Introduction to Visual Edit's CRUD Python API](https://github.com/dataiku/dss-visual-edit/blob/master/docs/CRUD_example_usage.ipynb), one can use the Visual Edit API to add a data persistence layer to any webapp.
 
-This example is based on the tshirt orders dataset from the [Basics 101 course](https://academy.dataiku.com/basics-101) of the Dataiku Academy. We use the plugin's [`dash_tabulator` component](https://github.com/dataiku/dss-visual-edit/blob/master/dash_tabulator/README.md) for the webapp's data table.
+The plugin's Visual Webapp consists of a single data table component.  In this guide, we show how to customize the layout of a data editing and validation webapp in Dash, based on such a component. This can be to:
+
+* **Add other components to the layout**. The first section of this guide shows the minimal Dash code to use in order to get the same data table as in the Visual Webapp. This is based on the plugin's [`dash_tabulator` component](https://github.com/dataiku/dss-visual-edit/blob/master/dash_tabulator/README.md). You can then add other components to the Dash layout.
+* **Customize the settings of the data table**. `dash_tabulator` is based on the [Tabulator](https://tabulator.info/) JavaScript library. The second section gives an example of how to leverage some of its advanced features by customizing column definitions.
+* **Use a different data table component**. The third section shows how to use a different data table component in Dash, such as [AG Grid](https://dash.plotly.com/dash-ag-grid).
+
+
+## Basic usage of `dash_tabulator`
+
+This example is based on the tshirt orders dataset from the [Basics 101 course](https://academy.dataiku.com/basics-101) of the Dataiku Academy.
 
 Import classes from dash and from the plugin's library:
 
@@ -29,10 +38,14 @@ de = DataEditor.DataEditor(
 )
 ```
 
-Define the columns to use in the data table. This is an object that tells `dash_tabulator` how to render each column, based on its type.
+Define a function that creates a data table from a `DataEditor` object, which will be called when rendering the layout:
 
 ```python
-columns = tabulator_utils.get_columns_tabulator(de)
+def create_data_table(id, dataset_name, data_editor):
+    data = data_editor.get_edited_df().to_dict("records")
+    # Define the columns to use in the data table. This is an object that tells dash_tabulator how to render each column, based on its type.
+    columns = tabulator_utils.get_columns_tabulator(data_editor)
+    return dash_tabulator.DashTabulator(id, dataset_name, data, columns)
 ```
 
 Define the webapp's layout and components:
@@ -40,11 +53,10 @@ Define the webapp's layout and components:
 ```python
 def serve_layout():
     return html.Div([
-        dash_tabulator.DashTabulator(
+        create_data_table(
             id="quickstart-datatable",
-            datasetName=ORIGINAL_DATASET,
-            data=de.get_edited_df().to_dict("records"),
-            columns=columns
+            dataset_name=ORIGINAL_DATASET,
+            data_editor=de
         ),
         html.Div(id="quickstart-output")
     ])
@@ -71,8 +83,6 @@ def log_edit(cell):
 
 ## Leveraging advanced Tabulator features
 
-`dash_tabulator` is based on [Tabulator](https://tabulator.info/). You can leverage Tabulator's advanced features by defining columns with custom properties.
-
 Here we define a calculated column using the Tabulator `mutator` feature and a Javascript function that implements the calculation to perform (here: adding 2 to the values of the `tshirt_quantity` column). We also demonstrate usage of Tabulator's `headerFilter` and `sorter` features.
 
 In the previous webapp example, replace the definition of `columns` with the following:
@@ -98,13 +108,35 @@ columns = [
         "title": "calculated",
         "mutator": javascript.assign(
             """
-function(value, data){
-return parseInt(data.tshirt_quantity) + 2;
-}
-"""
+            function(value, data){
+            return parseInt(data.tshirt_quantity) + 2;
+            }
+            """
         ),
     },
 ]
+```
+
+### Using AG Grid
+
+As a preliminary step, make sure to run `pip install dash-ag-grid`.
+
+Replace the `create_data_table` function with the following:
+
+```python
+import dash_ag_grid as dag
+
+def create_data_table(id, dataset_name, data_editor):
+    df = data_editor.get_edited_df()
+    return dag.AgGrid(
+        id=id,
+        rowData=df.to_dict("records"),
+        columnDefs=[{"field": i} for i in df.columns],
+        defaultColDef={"editable": True, "resizable": True, "sortable": True, "filter": True},
+        columnSize="sizeToFit",
+        getRowId="params.data.index",
+        dashGridOptions={"domLayout": "autoHeight"}
+    )
 ```
 
 ## Deeper customizations
