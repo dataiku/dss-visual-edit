@@ -77,7 +77,7 @@ class BigQueryEditLogAppender:
     def append(self, log: EditLog):
         insert_query = (
             BigQueryInsertQueryBuilder(self.dataset)
-            .add_columns(["key", "column_name", "value", "date", "user", "action"])
+            .add_columns(COLUMNS)
             .add_value([
                 Constant(log.key),
                 Constant(log.column_name),

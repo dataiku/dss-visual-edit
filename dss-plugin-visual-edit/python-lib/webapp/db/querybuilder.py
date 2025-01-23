@@ -41,21 +41,12 @@ def get_table_name_from_dataset(dataset: dataiku.Dataset):
 
 def get_table_name_from_bq_dataset(dataset: dataiku.Dataset):
     loc = dataset.get_location_info()
-    
-    if loc.get("locationInfoType") != "BIGQUERY":
+    databaseType = loc.get("info", "").get("databaseType", "")
+    if databaseType.lower() != "bigquery":
         raise ValueError("Can only execute query on a BigQuery dataset")
-    
-    info = loc.get("info", {})
-    project_id = info.get("project")
-    dataset_name = info.get("dataset")
-    table_name = info.get("table")
-
-    if not (project_id and dataset_name and table_name):
-        raise ValueError(
-            f"Cannot determine full BigQuery table path. Found: project={project_id}, "
-            f"dataset={dataset_name}, table={table_name}"
-        )
-    return f"`{project_id}.{dataset_name}.{table_name}`"
+    table_name = loc.get("info").get("table")
+    schema_name = loc.get("info").get("schema")
+    return schema_name + "." + table_name
 
 class InsertQueryBuilder:
     def __init__(self, dataset: dataiku.Dataset):
@@ -147,11 +138,10 @@ class BigQueryInsertQueryBuilder:
 
     def get_wrapped_cols(self) -> str:
         """
-        Converts each column into a properly backticked identifier list for BigQuery.
+        Gets each column into a properly backticked identifier list for BigQuery.
         E.g. ( `col1`, `col2`, `col3` )
         """
-        # Wrap columns in backticks for BQ
-        col_expressions = [Column(f"`{col}`") for col in self.columns]
+        col_expressions = [Column(f"{col}") for col in self.columns]
         if col_expressions:
             builder = ListBuilder(*col_expressions)
             return toSQL(builder, dataset=self.dataset)
