@@ -4,8 +4,8 @@ from dataiku import Dataset, SQLExecutor2
 from dataiku.sql import Constant, InlineSQL
 from abc import ABC, abstractmethod
 from pandas import DataFrame
-from dataiku_utils import is_sql_dataset
-from webapp.db.querybuilder import InsertQueryBuilder
+from dataiku_utils import is_sql_dataset, is_bigquery_dataset
+from webapp.db.querybuilder import InsertQueryBuilder, BigQueryInsertQueryBuilder
 
 
 COLUMNS = ["key", "column_name", "value", "date", "user", "action"]
@@ -69,10 +69,33 @@ class SQLEditLogAppender(EditLogAppender):
         )
         self.executor.query_to_df(insert_query, post_queries=["COMMIT"])
 
+class BigQueryEditLogAppender:
+    def __init__(self, dataset: Dataset) -> None:
+        self.dataset = dataset
+        self.executor = SQLExecutor2(dataset=self.dataset)  
+
+    def append(self, log: EditLog):
+        insert_query = (
+            BigQueryInsertQueryBuilder(self.dataset)
+            .add_columns(["key", "column_name", "value", "date", "user", "action"])
+            .add_value([
+                Constant(log.key),
+                Constant(log.column_name),
+                Constant(log.value),
+                # Using InlineSQL like in SQLEditLogAppender's append() method
+                InlineSQL(f"'{log.date}'"),
+                Constant(log.user),
+                Constant(log.action),
+            ])
+            .build()
+        )
+        self.executor.query_to_df(insert_query, post_queries=["COMMIT"])
 
 class EditLogAppenderFactory:
     def create(self, dataset: Dataset) -> EditLogAppender:
-        if is_sql_dataset(dataset):
+        if is_bigquery_dataset(dataset):
+            return BigQueryEditLogAppender(dataset)
+        elif is_sql_dataset(dataset):
             return SQLEditLogAppender(dataset)
         else:
             return GenericEditLogAppender(dataset)
