@@ -69,7 +69,7 @@ class SQLEditLogAppender(EditLogAppender):
         )
         self.executor.query_to_df(insert_query, post_queries=["COMMIT"])
 
-class BigQueryEditLogAppender:
+class BigQueryEditLogAppender(EditLogAppender):
     def __init__(self, dataset: Dataset) -> None:
         self.dataset = dataset
         self.executor = SQLExecutor2(dataset=self.dataset)  
