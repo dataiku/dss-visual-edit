@@ -5,3 +5,4 @@ flask
 mkdocstrings-python
 mkdocs-material
 pytest==8.3.4
+dataiku
