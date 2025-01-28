@@ -29,9 +29,10 @@ jobs:
         with:
           python-version: "3.10"
           cache: "pip"
-      - name: Set up dependencies
+      - name: Set up dependencies & run tests
+        env:
+          PYTHONPATH: python-lib
         run: |
-          pip install -r dss-plugin-visual-edit/code-env/python/spec/requirements.dev.39.txt
-      - name: Run Unit tests
-        run: |
-          pytest dss-plugin-visual-edit/python-lib
+          cd dss-plugin-visual-edit
+          pip install -r code-env/python/spec/requirements.dev.39.txt
+          pytest ./unit-tests

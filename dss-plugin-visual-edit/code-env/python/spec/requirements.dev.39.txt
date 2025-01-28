@@ -1,3 +1,4 @@
+-r requirements.txt
 dataiku-api-client
 ipykernel
 flask
