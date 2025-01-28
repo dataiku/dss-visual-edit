@@ -34,5 +34,5 @@ jobs:
           PYTHONPATH: python-lib
         run: |
           cd dss-plugin-visual-edit
-          pip install -r code-env/python/spec/requirements.dev.39.txt
+          pip install -r code-env/python/spec/requirements.ci.39.txt
           pytest ./unit-tests
