@@ -1,4 +1,7 @@
--r requirements.txt
+dash>=2.4.0
+dash_extensions
+pydantic
+pandas==2.2.3
 dataiku-api-client
 ipykernel
 flask
