@@ -242,7 +242,7 @@ class DataEditor:
                     pass
 
                 MIN_SQL_ROWS = 1000
-                MAX_IN_MEMORY_ROWS = 20000
+                MAX_IN_MEMORY_ROWS = 10000
                 if is_sql_dataset(linked_ds):
                     if count_records is not None and count_records <= MIN_SQL_ROWS:
                         logging.debug(
