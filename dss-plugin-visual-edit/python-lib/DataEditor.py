@@ -203,6 +203,7 @@ class DataEditor:
         self.project = client.get_project(self.project_key)
         self.original_ds = Dataset(self.original_ds_name, self.project_key)
         self.schema_columns = self.original_ds.get_config().get("schema").get("columns")
+        self.schema_columns_df = DataFrame(data=self.schema_columns).set_index("name")
 
         self.editlog_ds_name = self.original_ds_name + "_editlog"
         self.edits_ds_name = self.original_ds_name + "_edits"

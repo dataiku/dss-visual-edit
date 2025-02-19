@@ -17,6 +17,7 @@ from datetime import datetime
 from pandas.api.types import is_integer_dtype, is_float_dtype
 from commons import get_last_build_date, try_get_user_identifier
 from dash import Dash, Input, Output, State, dcc, html
+from dataiku.core.schema_handling import CASTERS
 from dataiku_utils import get_dataframe_filtered, client as dss_client
 from DataEditor import (
     EditSuccess,
@@ -387,20 +388,19 @@ def label_endpoint(linked_ds_name):
             break
 
     if linked_record is None:
-        return "Unnknown linked dataset.", 404
+        return "Unknown linked dataset.", 404
 
     # Return data only when it's a linked dataset
     linked_ds_key = linked_record.ds_key
     linked_ds_label = linked_record.ds_label
 
     # Cast provided key value into appropriate type, necessary for integers for example.
-    original_df, primary_keys, display_columns, editable_columns = de.get_original_df()
-
-    key_dtype = original_df[linked_record.name].dtype
+    linked_key_type = de.schema_columns_df.loc[linked_record.name, "type"]
+    linked_key_dtype = CASTERS.get(linked_key_type)
     try:
-        if is_integer_dtype(key_dtype):
+        if linked_key_dtype and is_integer_dtype(linked_key_dtype):
             key = int(key)
-        if is_float_dtype(key_dtype):
+        if linked_key_dtype and is_float_dtype(linked_key_dtype):
             key = float(key)
     except Exception:
         return "Invalid key type.", 400
