@@ -450,18 +450,18 @@ def lookup_endpoint(linked_ds_name):
     else:
         n_results = 1000  # show more options if no search term is provided
 
+    # Find the linked record whose linked dataset is requested
     linked_record: LinkedRecord | None = None
     for lr in de.linked_records:
         if linked_ds_name == lr.ds_name:
             linked_record = lr
             break
-
     if linked_record is None:
         return "Unknown linked dataset.", 404
-
     linked_ds_key = linked_record.ds_key
     linked_ds_label = linked_record.ds_label
     linked_ds_lookup_columns = linked_record.ds_lookup_columns
+
     if linked_record.ds:
         # Use the Dataiku API to filter the dataset
         linked_df_filtered = get_dataframe_filtered(
@@ -476,11 +476,11 @@ def lookup_endpoint(linked_ds_name):
         if linked_df is None:
             return "Something went wrong. Try restarting the backend.", 500
         if term == "":
-            linked_df_filtered = linked_df
+            linked_df_filtered = linked_df.head(n_results)
         else:
-            # Filter linked_df for rows whose label contains the search term
+            # Filter linked_df for rows whose label starts with the search term
             linked_df_filtered = linked_df[
-                linked_df[linked_ds_label].str.lower().str.contains(term)
+                linked_df[linked_ds_label].str.lower().str.startswith(term)
             ].head(n_results)
 
     logging.debug(f"Found {linked_df_filtered.size} entries")
