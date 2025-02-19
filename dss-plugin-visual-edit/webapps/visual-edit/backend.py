@@ -415,11 +415,9 @@ def label_endpoint(linked_ds_name):
             except Exception:
                 return "Something went wrong fetching label of linked value.", 500
         else:
-            linked_record_df = linked_record.df
-            if linked_record_df is None:
+            linked_df = linked_record.df
+            if linked_df is None:
                 return "Something went wrong. Try restarting the backend.", 500
-
-            linked_df = linked_record_df.set_index(linked_ds_key)
             try:
                 label = linked_df.loc[key, linked_ds_label]
             except Exception:
