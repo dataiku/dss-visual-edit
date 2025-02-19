@@ -6,7 +6,7 @@ Visual Edit can load your original data regardless of the underlying connection.
 
 We strongly recommend using an SQL connection for the editlog, as explained in the [deployment guide](deploy). The edits and edited datasets can be on a different connection.
 
-If [linked records](linked-records) are needed, and if the linked dataset has more than 1,000 rows or if lookup columns are needed, then the linked dataset must also be on an SQL connection.
+If [linked records](linked-records) are needed, and if the linked dataset has more than 10,000 rows or if lookup columns are needed, then the linked dataset must also be on an SQL connection.
 
 ## Can the webapp be used by several users simultaneously?
 

@@ -18,7 +18,7 @@ See [here](data-table-features) for more information on the editing experience.
 
 ## Known limitations
 
-- The linked dataset must have less than 1,000 records OR the linked dataset must be on an SQL connection.
+- The linked dataset must have less than 10,000 records OR the linked dataset must be on an SQL connection.
 - The storage type of the linked data set primary key must be of storage type **string** or **integer**.
 - The maximum number of lookup columns is two.
 - The linked dataset primary key and lookup columns values should not be empty.
