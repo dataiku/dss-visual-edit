@@ -46,4 +46,5 @@ Feature: Visual Edit has special behavior for reviewed column.
         Examples:
             | connection         |
             | local_dku_pg       |
+            | bs-bigquery        |
             | filesystem_managed |
