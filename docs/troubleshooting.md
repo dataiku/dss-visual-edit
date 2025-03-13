@@ -27,6 +27,10 @@ Tshirt price and quantities are not seen as numerical columns: column types are 
 
 You can now test the webapp with a few edits. Here, you should only be able to input numerical values when editing tshirt price and quantities.
 
+## My Linked Record is stuck on "Searching" when trying to edit
+
+Make sure that the column type for the Linked Record, in the Original Dataset, is the same as the column type for the Primary Key in the Linked Dataset.
+
 ## The plugin's webapp/recipes are not behaving as expected
 
 ### Relationship between webapp and recipes

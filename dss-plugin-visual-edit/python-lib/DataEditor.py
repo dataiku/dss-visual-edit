@@ -203,6 +203,7 @@ class DataEditor:
         self.project = client.get_project(self.project_key)
         self.original_ds = Dataset(self.original_ds_name, self.project_key)
         self.schema_columns = self.original_ds.get_config().get("schema").get("columns")
+        self.schema_columns_df = DataFrame(data=self.schema_columns).set_index("name")
 
         self.editlog_ds_name = self.original_ds_name + "_editlog"
         self.edits_ds_name = self.original_ds_name + "_edits"
@@ -226,6 +227,7 @@ class DataEditor:
             ).set_index("name")
             for linked_record in self.linked_records:
                 linked_ds_name = linked_record.ds_name
+                linked_ds_key = linked_record.ds_key
                 linked_ds = Dataset(linked_ds_name, self.project_key)
                 # Get the number of records in the linked dataset
                 count_records = None
@@ -239,16 +241,19 @@ class DataEditor:
                 except Exception:
                     pass
 
-                # If the linked dataset is on an SQL connection and if it has more than 1000 records, load it as a DatasetSQL object
+                MIN_SQL_ROWS = 1000
+                MAX_IN_MEMORY_ROWS = 10000
                 if is_sql_dataset(linked_ds):
-                    if count_records is not None and count_records <= 1000:
+                    if count_records is not None and count_records <= MIN_SQL_ROWS:
                         logging.debug(
-                            f"""Loading linked dataset "{linked_ds_name}" in memory since it has less than 1000 records"""
+                            f"""Loading linked dataset "{linked_ds_name}" in memory since it has less than {MIN_SQL_ROWS} records"""
                         )
-                        linked_record.df = linked_ds.get_dataframe()
+                        linked_record.df = get_dataframe(linked_ds).set_index(
+                            linked_ds_key
+                        )
                     else:
                         logging.debug(
-                            f"""Loading linked dataset "{linked_ds_name}" as a DatasetSQL object since it has more than 1000 records or an unknown number of records"""
+                            f"""Loading linked dataset "{linked_ds_name}" as a DatasetSQL object since it has more than {MIN_SQL_ROWS} records or an unknown number of records"""
                         )
                         linked_record.ds = DatasetSQL(linked_ds_name, self.project_key)
                 else:
@@ -259,13 +264,14 @@ class DataEditor:
                         logging.warning(
                             f"Unknown number of records for linked dataset {linked_ds_name}"
                         )
-                    elif count_records > 1000:
+                    elif count_records > MAX_IN_MEMORY_ROWS:
                         logging.warning(
-                            f"Linked dataset {linked_ds_name} has {count_records} records — capping at 1,000 rows to avoid memory issues"
+                            f"Linked dataset {linked_ds_name} has {count_records} records — capping at {MAX_IN_MEMORY_ROWS} rows to avoid memory issues"
                         )
-                    # get the first 1000 rows of the dataset
-                    linked_record.df = linked_ds.get_dataframe(
-                        sampling="head", limit=1000
+                    linked_record.df = (
+                        get_dataframe(linked_ds)
+                        .set_index(linked_ds_key)
+                        .head(MAX_IN_MEMORY_ROWS)
                     )
 
         self.editschema_manual = editschema_manual
