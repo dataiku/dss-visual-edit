@@ -4,7 +4,7 @@
 
 * After deploying a project that uses a Visual Edit webapp to an Automation node, there will be two different editlog datasets: one on the Design node, one on the Automation node. This way, edits made on the Design node won't have any impact in production. These two editlog datasets would have the same name, but they should be on different data connections.
 * While the datasets in a Dataiku project are typically on analytics database connections and managed by Dataiku, you may prefer to change the connection of the _editlog_ and _edits_ datasets to an operational database, with constraints for the database used in Automation that would prevent accidental deletions and tampering with edits.
-* **We strongly recommend switching these datasets to SQL connections**, if not already the case, before deploying your project. This is because writing edits to the _editlog_ will be faster than with other types of connections, and because SQL databases allow for more control over the data (e.g. setting constraints and triggers as shown in the secure _editlog_ initialization section below).
+* **We strongly recommend switching these datasets to [compatible SQL connections](compatibility)**, if not already the case, before deploying your project. This is because writing edits to the _editlog_ will be faster than with other types of connections, and because SQL databases allow for more control over the data (e.g. setting constraints and triggers as shown in the secure _editlog_ initialization section below).
   * For each dataset, once you've switched its connection, make sure to create its associated table from the dataset settings.
   * Restart the webapp so that it takes into account the new connection, and test with a few edits.
   * It is not necessary to change the connection of the Original Dataset nor of the _edited_ dataset.
@@ -31,7 +31,7 @@ Demo videos:
 
 ### Simple procedure
 
-A simple way to initialize the editlog is with a _Reset Edits_ scenario as described in the getting started guide. You can then delete the scenario, to make sure that it won't be used accidentally in the future (which would cause losing all edits).
+A simple way to initialize the editlog is with a _Reset Edits_ scenario as described in [Building a complete application to test with end-users](build-complete-application).
 
 ### Secure procedure
 

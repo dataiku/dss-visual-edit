@@ -7,10 +7,12 @@ This plugin helps spin up visual apps to validate and edit data. Learn more abou
 ## Contents of this website
 
 * For Data Experts:
+  * [Compatibility](compatibility)
   * User guides:
     * [Validating machine-generated data](validate)
     * [Building a complete application to test with end-users](build-complete-application)
     * [Deploying to production](deploy)
+  * Case study: Entity Resolution (coming soon)
   * Advanced features:
     * [Linked Records](linked-records)
     * [Editschema](editschema)

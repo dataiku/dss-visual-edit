@@ -1,8 +1,6 @@
 # Installation
 
-## How to install the plugin
-
-The plugin can be installed via Git (it is not yet available through the plugin store).
+## How to install the plugin via Git
 
 ### Dataiku Cloud
 
@@ -13,8 +11,9 @@ The plugin can be installed via Git (it is not yet available through the plugin 
 
 #### Requirements
 
-* **Dataiku V9+**
-* Ability to install plugins on your Dataiku instance and to create an associated code env based on **Python 3.8 or 3.9** and **pandas 1.5**.
+* Compatible version of Dataiku, Python, and compatible SQL data connection. See [Compatibility](compatibility.md).
+* Ability to install plugins on your Dataiku instance.
+* Ability to create a code environment.
 
 #### Instructions
 
@@ -26,7 +25,7 @@ The plugin can be installed via Git (it is not yet available through the plugin 
 * Create the code environment for this plugin. Select the version of Python you want to use and the types of containers you plan to use as backend for Visual Edit webapps or for running recipes provided by the plugin (the easiest is to choose All).
 * The plugin is installed! ![](plugin_installed.png) We'll see how to use each of its components in the next guide.
 
-## How to update the plugin
+## How to update the plugin via Git
 
 From the Plugins page of your Dataiku instance, go to the "Installed" tab, find "Visual Edit" in the list and click on the "Update from repository" link. ![](update_plugin_git.png)
 
