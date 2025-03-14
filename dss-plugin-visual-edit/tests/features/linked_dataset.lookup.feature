@@ -24,6 +24,7 @@ Feature: Visual Edit can lookup labels in a separate dataset.
         Examples:
             | connection         |
             | local_dku_pg       |
+            | bs-bigquery        |
             | filesystem_managed |
 
     @cleanup_projects
@@ -48,6 +49,7 @@ Feature: Visual Edit can lookup labels in a separate dataset.
         Examples:
             | connection         |
             | local_dku_pg       |
+            | bs-bigquery        |
             | filesystem_managed |
 
     @cleanup_projects
@@ -71,4 +73,5 @@ Feature: Visual Edit can lookup labels in a separate dataset.
         Examples:
             | connection         |
             | local_dku_pg       |
+            | bs-bigquery        |
             | filesystem_managed |

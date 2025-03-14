@@ -45,4 +45,5 @@ Feature: Visual Edit works with a composite key.
         Examples:
             | connection         |
             | local_dku_pg       |
+            | bs-bigquery        |
             | filesystem_managed |

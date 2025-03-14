@@ -42,6 +42,7 @@ Feature: Visual Edit works with a single STRING primary key.
         Examples:
             | connection         |
             | local_dku_pg       |
+            | bs-bigquery        |
             | filesystem_managed |
 
     @cleanup_projects
@@ -84,6 +85,7 @@ Feature: Visual Edit works with a single STRING primary key.
         Examples:
             | connection         |
             | local_dku_pg       |
+            | bs-bigquery        |
             | filesystem_managed |
 
     @cleanup_projects
@@ -126,6 +128,7 @@ Feature: Visual Edit works with a single STRING primary key.
         Examples:
             | connection         |
             | local_dku_pg       |
+            | bs-bigquery        |
             | filesystem_managed |
 
     @cleanup_projects
@@ -168,4 +171,5 @@ Feature: Visual Edit works with a single STRING primary key.
         Examples:
             | connection         |
             | local_dku_pg       |
+            | bs-bigquery        |
             | filesystem_managed |

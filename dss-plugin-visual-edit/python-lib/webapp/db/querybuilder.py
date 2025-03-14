@@ -39,6 +39,14 @@ def get_table_name_from_dataset(dataset: dataiku.Dataset):
         catalog=catalog_name, schema=schema_name, table=table_name
     )
 
+def get_table_name_from_bq_dataset(dataset: dataiku.Dataset):
+    loc = dataset.get_location_info()
+    databaseType = loc.get("info", "").get("databaseType", "")
+    if databaseType.lower() != "bigquery":
+        raise ValueError("Can only execute query on a BigQuery dataset")
+    table_name = loc.get("info").get("table")
+    schema_name = loc.get("info").get("schema")
+    return schema_name + "." + table_name
 
 class InsertQueryBuilder:
     def __init__(self, dataset: dataiku.Dataset):
@@ -101,3 +109,67 @@ class InsertQueryBuilder:
             + self.get_wrapped_cols()
             + self.parameterized_value()
         )
+
+class BigQueryInsertQueryBuilder:
+    def __init__(self, dataset: dataiku.Dataset):
+        self.dataset = dataset
+        self.table_name = get_table_name_from_bq_dataset(dataset=self.dataset)
+        self.columns: List[str] = []
+        self.values: List[List[Expression]] = []
+
+    def add_column(self, column: str):
+        self.columns.append(column)
+        return self
+
+    def add_columns(self, columns: List[str]):
+        for column in columns:
+            self.add_column(column)
+        return self
+
+    def add_value(self, value: List[Expression]):
+        if len(value) != len(self.columns):
+            raise ValueError("Number of values does not match number of columns.")
+        self.values.append(value)
+        return self
+
+    def _query_start(self) -> str:
+        # Wrap the fully qualified table name in backticks
+        return f"INSERT INTO `{self.table_name}`"
+
+    def get_wrapped_cols(self) -> str:
+        """
+        Gets each column into a properly backticked identifier list for BigQuery.
+        E.g. ( `col1`, `col2`, `col3` )
+        """
+        col_expressions = [Column(f"{col}") for col in self.columns]
+        if col_expressions:
+            builder = ListBuilder(*col_expressions)
+            return toSQL(builder, dataset=self.dataset)
+        return ""
+
+    def get_wrapped_value(self, value: List[Expression]) -> str:
+        if value:
+            builder = ListBuilder(*value)
+            return toSQL(builder, dataset=self.dataset)
+        return ""
+
+    def get_wrapped_values(self) -> str:
+        """
+        Builds a comma-separated list of value tuples:
+        (val1, val2, ...), (val1, val2, ...)
+        """
+        rows_sql = []
+        for row in self.values:
+            rows_sql.append(self.get_wrapped_value(row))
+        return ",".join(rows_sql)
+
+    def build(self) -> str:
+        if not self.columns:
+            raise ValueError("No columns defined for INSERT query.")
+        query = (
+            self._query_start()                # INSERT INTO `project.dataset.table`
+            + " " + self.get_wrapped_cols()    # (`col1`,`col2`,...)
+            + " VALUES " + self.get_wrapped_values()  # VALUES (val1,val2,...),(val1,val2,...)
+            + ";"
+        )
+        return query
