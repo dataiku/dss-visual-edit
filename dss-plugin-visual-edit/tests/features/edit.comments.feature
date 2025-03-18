@@ -46,6 +46,7 @@ Feature: Visual Edit has special behavior for comments column.
         Examples:
             | connection         |
             | local_dku_pg       |
+            | bs-bigquery        |
             | filesystem_managed |
 
     @cleanup_projects
@@ -94,4 +95,5 @@ Feature: Visual Edit has special behavior for comments column.
         Examples:
             | connection         |
             | local_dku_pg       |
+            | bs-bigquery        |
             | filesystem_managed |

@@ -22,4 +22,5 @@ Feature: On first startup Visual Edit initializes the flow.
         Examples:
             | connection         |
             | local_dku_pg       |
+            | bs-bigquery        |
             | filesystem_managed |

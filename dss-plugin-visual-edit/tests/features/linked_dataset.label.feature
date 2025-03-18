@@ -21,6 +21,7 @@ Feature: Visual Edit can get labels in a separate dataset.
         Examples:
             | connection         |
             | local_dku_pg       |
+            | bs-bigquery        |
             | filesystem_managed |
 
     @cleanup_projects
@@ -42,6 +43,7 @@ Feature: Visual Edit can get labels in a separate dataset.
         Examples:
             | connection         |
             | local_dku_pg       |
+            | bs-bigquery        |
             | filesystem_managed |
 
     @cleanup_projects
@@ -63,4 +65,5 @@ Feature: Visual Edit can get labels in a separate dataset.
         Examples:
             | connection         |
             | local_dku_pg       |
+            | bs-bigquery        |
             | filesystem_managed |
