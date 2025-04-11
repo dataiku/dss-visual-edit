@@ -112,6 +112,9 @@ def __get_column_tabulator_editor__(t_type):
     elif t_type == "date":
         t_col["editor"] = "date"
         t_col["editorParams"] = {"format": "yyyy-MM-dd"}
+    elif t_type == "textarea":
+        t_col["formatter"] = "textarea"
+        t_col["editor"] = "textarea"
     else:
         t_col["editor"] = "input"
     return t_col
@@ -305,6 +308,7 @@ def get_columns_tabulator(de, freeze_editable_columns=False):
         pretty_types = {
             "number": "Number",
             "string": "Text",
+            "textarea": "Text",
             "boolean": "Checkbox",
             "boolean_tick": "Checkbox",
             "date": "Date",
