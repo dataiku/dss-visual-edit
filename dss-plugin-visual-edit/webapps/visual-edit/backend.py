@@ -61,7 +61,9 @@ de = DataEditor(
 )
 
 
-columns = get_columns_tabulator(de, webapp_config.freeze_editable_columns)
+columns = get_columns_tabulator(
+    de, webapp_config.show_header_filter, webapp_config.freeze_editable_columns
+)
 
 last_build_date_initial = ""
 last_build_date_ok = False
