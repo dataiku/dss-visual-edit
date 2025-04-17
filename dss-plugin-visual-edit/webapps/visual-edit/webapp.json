@@ -150,7 +150,7 @@
         },
         {
             "name": "show_header_filter",
-            "label": "Show header filter",
+            "label": "Show header filters",
             "description": "Show/hide header filters below each column header",
             "type": "BOOLEAN",
             "defaultValue": true
