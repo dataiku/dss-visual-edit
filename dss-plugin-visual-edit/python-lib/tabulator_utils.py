@@ -265,7 +265,7 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
     return t_col
 
 
-def get_columns_tabulator(de, freeze_editable_columns=False):
+def get_columns_tabulator(de, show_header_filter=True, freeze_editable_columns=False):
     """Prepare column settings to pass to Tabulator"""
 
     linked_record_names = []
@@ -284,7 +284,7 @@ def get_columns_tabulator(de, freeze_editable_columns=False):
         t_col = {
             "field": col_name,
             "title": col_name,
-            "headerFilter": True,
+            "headerFilter": show_header_filter,
             "resizable": True,
             "headerContextMenu": __ns__("headerMenu"),
         }

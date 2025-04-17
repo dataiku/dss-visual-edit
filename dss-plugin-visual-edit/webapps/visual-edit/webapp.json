@@ -149,6 +149,13 @@
             "type": "SEPARATOR"
         },
         {
+            "name": "show_header_filter",
+            "label": "Show header filter",
+            "description": "Show/hide header filters below each column header",
+            "type": "BOOLEAN",
+            "defaultValue": true
+        },
+        {
             "name": "freeze_editable_columns",
             "label": "Freeze editable columns",
             "description": "Freezing to the right-hand side",
