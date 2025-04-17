@@ -10,6 +10,7 @@ import "../../../assets/jquery-3.5.1.min.js";
 import "../../../assets/luxon.min.js";
 import "../../../assets/semantic-ui-react.min.js";
 import "../../../assets/semantic.min.css";
+import { extractFilterValues } from '../helpers/dashboardFilters.js'
 
 const crypto = require('crypto');
 
@@ -112,19 +113,9 @@ export default class DashTabulator extends React.Component {
             return;
         }
 
-        const { includedValues, excludedValues } = this.extractFilterValues(filter);
+        const { includedValues, excludedValues } = extractFilterValues(filter);
         this.updateFilterState(includedValues, excludedValues);
         this.applyTableFilter(filter, includedValues, excludedValues);
-    }
-
-    extractFilterValues = (filter) => {
-        const includedValues = filter.selectedValues
-            ? Object.keys(filter.selectedValues).filter(key => filter.selectedValues[key])
-            : [];
-        const excludedValues = filter.excludedValues
-            ? Object.keys(filter.excludedValues).filter(key => filter.excludedValues[key])
-            : [];
-        return { includedValues, excludedValues };
     }
 
     updateFilterState = (includedValues, excludedValues) => {
