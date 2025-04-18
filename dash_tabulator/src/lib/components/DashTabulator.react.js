@@ -96,24 +96,28 @@ export default class DashTabulator extends React.Component {
     }
 
     handleFilterEvent = (event) => {
-        console.log(`AMJ -`,event)
         const data = event.data;
         if (!data || data.type !== 'filters') return;
-
+    
         const filters = data.filters;
         if (filters.length === 0) {
             this.setState({ includedNoteIds: [], excludedNoteIds: [] });
             this.tabulator.clearFilter();
             return;
         }
-
+    
         const filter = filters[0];
         if (!filter.active || filter.filterType !== 'ALPHANUM_FACET') {
             this.setState({ includedNoteIds: [], excludedNoteIds: [] });
             this.tabulator.clearFilter();
             return;
         }
-
+    
+        const columnFields = this.props.columns.map(col => col.field);
+        if (!columnFields.includes(filter.column)) {
+            return;
+        }
+    
         const { includedValues, excludedValues } = extractFilterValues(filter);
         this.updateFilterState(includedValues, excludedValues);
         this.applyTableFilter(filter, includedValues, excludedValues);
