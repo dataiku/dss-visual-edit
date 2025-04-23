@@ -101,14 +101,12 @@ export default class DashTabulator extends React.Component {
     
         const filters = data.filters;
         if (filters.length === 0) {
-            this.setState({ includedNoteIds: [], excludedNoteIds: [] });
             this.tabulator.clearFilter();
             return;
         }
     
         const filter = filters[0];
         if (!filter.active || filter.filterType !== 'ALPHANUM_FACET') {
-            this.setState({ includedNoteIds: [], excludedNoteIds: [] });
             this.tabulator.clearFilter();
             return;
         }
@@ -119,18 +117,15 @@ export default class DashTabulator extends React.Component {
         }
     
         const { includedValues, excludedValues } = extractFilterValues(filter);
-        this.updateFilterState(includedValues, excludedValues);
         this.applyTableFilter(filter, includedValues, excludedValues);
     }
 
-    updateFilterState = (includedValues, excludedValues) => {
-        this.setState({
-            includedNoteIds: includedValues,
-            excludedNoteIds: excludedValues
-        });
-    }
-
     applyTableFilter = (filter, includedValues, excludedValues) => {
+
+        console.log(`AMJ - : ${JSON.stringify(filter)}`)
+        console.log(`AMJ - : ${JSON.stringify(includedValues)}`)
+        console.log(`AMJ - : ${JSON.stringify(excludedValues)}`)
+
         if (includedValues.length > 0) {
             if (includedValues.length === 1) {
                 this.tabulator.setFilter(filter.column, "=", includedValues[0]);
