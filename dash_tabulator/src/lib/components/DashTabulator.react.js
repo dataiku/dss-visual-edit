@@ -122,28 +122,20 @@ export default class DashTabulator extends React.Component {
     }
 
     applyTableFilter = (filter, includedValues, excludedValues) => {
-
-        console.log(`AMJ - : ${JSON.stringify(filter)}`)
-        console.log(`AMJ - : ${JSON.stringify(includedValues)}`)
-        console.log(`AMJ - : ${JSON.stringify(excludedValues)}`)
-
         if (includedValues.length > 0) {
-            if (includedValues.length === 1) {
-                this.tabulator.setFilter(filter.column, "=", includedValues[0]);
-            } else {
-                this.tabulator.setFilter(filter.column, "in", includedValues);
-            }
+            const includeFilters = includedValues.map(value => ({
+                field: filter.column,
+                type: "=",
+                value: value
+            }));
+            this.tabulator.setFilter(includeFilters, "OR");
         } else if (excludedValues.length > 0) {
-            if (excludedValues.length === 1) {
-                this.tabulator.setFilter(filter.column, "!=", excludedValues[0]);
-            } else {
-                const excludeFilters = excludedValues.map(value => ({
-                    field: filter.column,
-                    type: "!=",
-                    value: value
-                }));
-                this.tabulator.setFilter(excludeFilters);
-            }
+            const excludeFilters = excludedValues.map(value => ({
+                field: filter.column,
+                type: "!=",
+                value: value
+            }));
+            this.tabulator.setFilter(excludeFilters);
         } else {
             this.tabulator.clearFilter();
         }
