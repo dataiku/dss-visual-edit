@@ -33,7 +33,9 @@ Release notes for all versions are available at [https://github.com/dataiku/dss-
 
 ## How to install the plugin via ZIP file
 
-- Download the source code of the latest release at <https://github.com/dataiku/dss-visual-edit/releases>.
-- Open the archive and find the folder `dss-plugin-visual-edit`.
-- Create a zip archive of this folder.
-- From the Plugins page of your Dataiku instance, click on the "Add Plugin" button in the top right corner, choose "Upload", and choose the zip archive you just created.
+- Find the latest release at <https://github.com/dataiku/dss-visual-edit/releases>. Under **Assets**, click **Source code (zip)** to download `dss-visual-edit-X.Y.Z.zip` (where `X.Y.Z` is the version number of the release).
+- Open the zip file and find the folder `dss-plugin-visual-edit`.
+- Create a zip archive of this folder and name it `dss-plugin-visual-edit.zip`
+From the **Plugins page** of your Dataiku instance, click the **Add Plugin** button at the top right corner and choose **Upload**.
+- **Choose the `dss-plugin-visual-edit.zip` archive you just created.**
+- ⚠️ Do not use `dss-visual-edit-X.Y.Z.zip`.
