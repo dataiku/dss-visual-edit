@@ -97,7 +97,6 @@ export default class DashTabulator extends React.Component {
 
     handleFilterEvent = (event) => {
         const data = event.data;
-        console.log(`AMJ event data: ${JSON.stringify(event.data)}`)
         if (!data || data.type !== 'filters') return;
     
         const filters = data.filters;
@@ -162,7 +161,7 @@ export default class DashTabulator extends React.Component {
         // if (this.tabulator) this.tabulator.setData(data)
 
         return (
-                <div ref={el => (this.el = el)} />
+            <div ref={el => (this.el = el)} />
         )
     }
 }
