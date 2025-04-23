@@ -69,7 +69,7 @@ Run `NODE_OPTIONS=--openssl-legacy-provider npm run build` instead.
 
 ## Testing
 
-The project includes unit tests to ensure the reliability of key functionality, such as the `extractFilterValues` utility function used for processing single-select and multi-select filter events from dataiku native dashboard filters in `DashTabulator.js`. Tests are written using [Jest](https://jestjs.io/).
+The project includes unit tests to ensure the reliability of key functionality, such as the `extractFilterValues` utility function used for processing single-select and multi-select filter events from dataiku native dashboard filters in `DashTabulator.react.js`. Tests are written using [Jest](https://jestjs.io/).
 
 ### Setup
 
@@ -80,7 +80,7 @@ The project includes unit tests to ensure the reliability of key functionality, 
    ```
 
 2. **Configuration**:
-   The project includes Jest configuration in `jest.config.js` and Babel configuration in `.babelrc` to support ES modules, JSX, and a browser-like environment (via `jsdom`).
+   The project includes Babel configuration in `.babelrc` to support ES modules, JSX, and a browser-like environment (via `jsdom`).
 
 3. **Test Files**:
    Unit tests are located in `src/**/*.test.*`
