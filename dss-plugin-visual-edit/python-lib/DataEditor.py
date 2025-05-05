@@ -40,6 +40,9 @@ class EditFailure:
 class EditUnauthorized:
     pass
 
+class EditFreezed:
+    pass
+
 
 class DataEditor:
     """
@@ -402,7 +405,10 @@ class DataEditor:
 
     def __log_edit__(
         self, key, column, value, action="update"
-    ) -> EditSuccess | EditFailure | EditUnauthorized:
+    ) -> EditSuccess | EditFailure | EditUnauthorized | EditFreezed:
+        if self.freeze_edits:
+            return EditFreezed()
+        
         # if the type of column_name is a boolean, make sure we read it correctly
         for col in self.schema_columns:
             if col["name"] == column:
@@ -420,42 +426,41 @@ class DataEditor:
             value_string = value
 
         user_identifier = try_get_user_identifier()
-        if not self.freeze_edits:
-            if self.authorized_users and (
-                user_identifier is None or user_identifier not in self.authorized_users
-            ):
-                logging.debug(
-                    f"""Logging {action} action unauthorized ('{user_identifier}'): column {column} set to value {value} where {self.primary_keys} is {key}."""
-                )
-                return EditUnauthorized()
-            else:
-                if column in self.editable_column_names or action == "delete":
-                    # add to the editlog
-                    try:
-                        self.editlog_appender.append(
-                            EditLog(
-                                str(key),
-                                column,
-                                value_string,
-                                datetime.now(timezone("UTC")).isoformat(),
-                                "unknown" if user_identifier is None else user_identifier,
-                                action,
-                            )
+        if self.authorized_users and (
+            user_identifier is None or user_identifier not in self.authorized_users
+        ):
+            logging.debug(
+                f"""Logging {action} action unauthorized ('{user_identifier}'): column {column} set to value {value} where {self.primary_keys} is {key}."""
+            )
+            return EditUnauthorized()
+        else:
+            if column in self.editable_column_names or action == "delete":
+                # add to the editlog
+                try:
+                    self.editlog_appender.append(
+                        EditLog(
+                            str(key),
+                            column,
+                            value_string,
+                            datetime.now(timezone("UTC")).isoformat(),
+                            "unknown" if user_identifier is None else user_identifier,
+                            action,
                         )
-                        logging.debug(
-                            f"""Logging {action} action success: column {column} set to value {value} where {self.primary_keys} is {key}."""
-                        )
-                        return EditSuccess()
-                    except Exception:
-                        logging.exception("Failed to append edit log.")
-                        return EditFailure(
-                            "Internal server error, failed to append edit log."
-                        )
-                else:
-                    logging.info(
-                        f"""Logging {action} action failed: column {column} set to value {value} where {self.primary_keys} is {key}."""
                     )
-                    return EditFailure(f"""{column} isn't an editable column.""")
+                    logging.debug(
+                        f"""Logging {action} action success: column {column} set to value {value} where {self.primary_keys} is {key}."""
+                    )
+                    return EditSuccess()
+                except Exception:
+                    logging.exception("Failed to append edit log.")
+                    return EditFailure(
+                        "Internal server error, failed to append edit log."
+                    )
+            else:
+                logging.info(
+                    f"""Logging {action} action failed: column {column} set to value {value} where {self.primary_keys} is {key}."""
+                )
+                return EditFailure(f"""{column} isn't an editable column.""")
 
     def create_row(self, primary_keys: dict, column_values: dict) -> str:
         """
@@ -474,6 +479,9 @@ class DataEditor:
             - No data validation: this method does not check that the values are allowed for the specified columns.
             - Attribution of the 'create' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
         """
+        if self.freeze_edits:
+            return "Edits are disabled."
+        
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         for col in column_values.keys():
             self.__log_edit__(
@@ -483,7 +491,7 @@ class DataEditor:
 
     def update_row(
         self, primary_keys: dict, column: str, value: str
-    ) -> List[EditSuccess | EditFailure | EditUnauthorized]:
+    ) -> List[EditSuccess | EditFailure | EditUnauthorized | EditFreezed]:
         """
         Updates a row.
 
