@@ -429,33 +429,33 @@ class DataEditor:
                 )
                 return EditUnauthorized()
             else:
-            if column in self.editable_column_names or action == "delete":
-                # add to the editlog
-                try:
-                    self.editlog_appender.append(
-                        EditLog(
-                            str(key),
-                            column,
-                            value_string,
-                            datetime.now(timezone("UTC")).isoformat(),
-                            "unknown" if user_identifier is None else user_identifier,
-                            action,
+                if column in self.editable_column_names or action == "delete":
+                    # add to the editlog
+                    try:
+                        self.editlog_appender.append(
+                            EditLog(
+                                str(key),
+                                column,
+                                value_string,
+                                datetime.now(timezone("UTC")).isoformat(),
+                                "unknown" if user_identifier is None else user_identifier,
+                                action,
+                            )
                         )
+                        logging.debug(
+                            f"""Logging {action} action success: column {column} set to value {value} where {self.primary_keys} is {key}."""
+                        )
+                        return EditSuccess()
+                    except Exception:
+                        logging.exception("Failed to append edit log.")
+                        return EditFailure(
+                            "Internal server error, failed to append edit log."
+                        )
+                else:
+                    logging.info(
+                        f"""Logging {action} action failed: column {column} set to value {value} where {self.primary_keys} is {key}."""
                     )
-                    logging.debug(
-                        f"""Logging {action} action success: column {column} set to value {value} where {self.primary_keys} is {key}."""
-                    )
-                    return EditSuccess()
-                except Exception:
-                    logging.exception("Failed to append edit log.")
-                    return EditFailure(
-                        "Internal server error, failed to append edit log."
-                    )
-            else:
-                logging.info(
-                    f"""Logging {action} action failed: column {column} set to value {value} where {self.primary_keys} is {key}."""
-                )
-                return EditFailure(f"""{column} isn't an editable column.""")
+                    return EditFailure(f"""{column} isn't an editable column.""")
 
     def create_row(self, primary_keys: dict, column_values: dict) -> str:
         """
