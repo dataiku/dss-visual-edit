@@ -36,6 +36,7 @@ class Config(BaseModel):
     original_dataset: str = ""  # may be set by an environment variable
     primary_keys: List[str]
     editable_column_names: List[str]
+    show_header_filter: bool = True
     freeze_editable_columns: bool
     group_column_names: List[str]
     linked_records_count: int = 0
