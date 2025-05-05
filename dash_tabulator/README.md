@@ -67,6 +67,30 @@ npm run postbuild
 Run `NODE_OPTIONS=--openssl-legacy-provider npm run build` instead.
 * Errors when building dash_tabulator at line 79 of dash.development.component_generator.py. This executes a `node` command which fails (dash.extract_meta.js, around lines 137 and 172). Use debug config in VS Code to find out more.
 
+## Testing
+
+The project includes unit tests to ensure the reliability of key functionality, such as the `extractFilterValues` utility function used for processing single-select and multi-select filter events from dataiku native dashboard filters in `DashTabulator.react.js`. Tests are written using [Jest](https://jestjs.io/).
+
+### Setup
+
+1. **Install Testing Dependencies**:
+   Ensure all dependencies are installed by running:
+   ```bash
+   npm install
+   ```
+
+2. **Configuration**:
+   The project includes Babel configuration in `.babelrc` to support ES modules, JSX, and a browser-like environment (via `jsdom`).
+
+3. **Test Files**:
+   Unit tests are located in `src/**/*.test.*`
+
+### Running Tests
+
+```bash
+npm test
+```
+
 ## React component walkthrough
 
 The component code is in `src/lib/components/DashTabulator.react.js`. Tabulator is wrapped into a React component, taking in properties that match those of the Dash component in Python: `id`, `data`, `columns`, `datasetName`, `groupBy`, `setProps`, and `cellEdited`.
