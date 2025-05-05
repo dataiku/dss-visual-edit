@@ -46,6 +46,8 @@ class WebAppConfig:
 
         self.authorized_users = typed_config.authorized_users
 
+        self.freeze_edits = typed_config.freeze_edits
+
         self.project_key = self.__get_project_key__()
 
     # editschema is a weird case. It can be a JSON object or array.

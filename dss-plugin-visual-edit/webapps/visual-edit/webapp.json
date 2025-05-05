@@ -173,6 +173,12 @@
             "type": "ARRAY"
         },
         {
+            "name": "freeze_edits",
+            "label": "Freeze edits",
+            "description": "If set to true, the webapp will not allow any edits to be made.",
+            "type": "BOOLEAN"
+        },
+        {
             "name": "debug_mode",
             "label": "Debug mode",
             "type": "BOOLEAN"

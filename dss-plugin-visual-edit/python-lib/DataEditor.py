@@ -175,6 +175,7 @@ class DataEditor:
         project_key: str | None = None,
         editschema=None,
         authorized_users: List[str] | None = None,
+        freeze_edits: bool = False,
     ):
         """
         Initializes Datasets (original and editlog) and properties used for data editing.
@@ -185,6 +186,7 @@ class DataEditor:
             editable_column_names (list): A list of column names that can be edited. If None, all columns are editable.
             project_key (str): The key of the project where the dataset is located. If None, the current project is used.
             authorized_users (list): A list of user identifiers who are authorized to make edits. If None, all users are authorized.
+            freeze_edits (bool): If True, it won't be possible to make any edits.
             linked_records (list): (Optional) A list of LinkedRecord objects that represent linked datasets or dataframes.
             editschema_manual (list): (Optional) A list of EditSchema objects that define the primary keys and editable columns.
             editschema (list): (Optional) A list of EditSchema objects that define the primary keys and editable columns.
@@ -290,6 +292,8 @@ class DataEditor:
             )  # this will be an empty dataframe
 
         self.authorized_users = authorized_users
+        
+        self.freeze_edits = freeze_edits
 
         self.display_column_names = get_display_column_names(
             self.schema_columns, self.primary_keys, self.editable_column_names
@@ -416,14 +420,15 @@ class DataEditor:
             value_string = value
 
         user_identifier = try_get_user_identifier()
-        if self.authorized_users and (
-            user_identifier is None or user_identifier not in self.authorized_users
-        ):
-            logging.debug(
-                f"""Logging {action} action unauthorized ('{user_identifier}'): column {column} set to value {value} where {self.primary_keys} is {key}."""
-            )
-            return EditUnauthorized()
-        else:
+        if not self.freeze_edits:
+            if self.authorized_users and (
+                user_identifier is None or user_identifier not in self.authorized_users
+            ):
+                logging.debug(
+                    f"""Logging {action} action unauthorized ('{user_identifier}'): column {column} set to value {value} where {self.primary_keys} is {key}."""
+                )
+                return EditUnauthorized()
+            else:
             if column in self.editable_column_names or action == "delete":
                 # add to the editlog
                 try:

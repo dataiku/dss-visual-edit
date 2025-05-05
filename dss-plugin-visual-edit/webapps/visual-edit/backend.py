@@ -48,6 +48,7 @@ project = dss_client.get_project(project_key)
 
 editable_column_names = webapp_config.editable_column_names
 authorized_users = webapp_config.authorized_users
+freeze_edits = webapp_config.freeze_edits
 original_ds_name = webapp_config.original_ds_name
 
 de = DataEditor(
@@ -58,6 +59,7 @@ de = DataEditor(
     linked_records=webapp_config.linked_records,
     editschema_manual=webapp_config.editschema_manual,
     authorized_users=authorized_users,
+    freeze_edits=freeze_edits
 )
 
 
