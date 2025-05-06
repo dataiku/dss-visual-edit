@@ -40,6 +40,9 @@ class EditFailure:
 class EditUnauthorized:
     pass
 
+class EditFreezed:
+    pass
+
 
 class DataEditor:
     """
@@ -175,6 +178,7 @@ class DataEditor:
         project_key: str | None = None,
         editschema=None,
         authorized_users: List[str] | None = None,
+        freeze_edits: bool = False,
     ):
         """
         Initializes Datasets (original and editlog) and properties used for data editing.
@@ -185,6 +189,7 @@ class DataEditor:
             editable_column_names (list): A list of column names that can be edited. If None, all columns are editable.
             project_key (str): The key of the project where the dataset is located. If None, the current project is used.
             authorized_users (list): A list of user identifiers who are authorized to make edits. If None, all users are authorized.
+            freeze_edits (bool): If True, it won't be possible to make any edits.
             linked_records (list): (Optional) A list of LinkedRecord objects that represent linked datasets or dataframes.
             editschema_manual (list): (Optional) A list of EditSchema objects that define the primary keys and editable columns.
             editschema (list): (Optional) A list of EditSchema objects that define the primary keys and editable columns.
@@ -290,6 +295,8 @@ class DataEditor:
             )  # this will be an empty dataframe
 
         self.authorized_users = authorized_users
+        
+        self.freeze_edits = freeze_edits
 
         self.display_column_names = get_display_column_names(
             self.schema_columns, self.primary_keys, self.editable_column_names
@@ -398,7 +405,10 @@ class DataEditor:
 
     def __log_edit__(
         self, key, column, value, action="update"
-    ) -> EditSuccess | EditFailure | EditUnauthorized:
+    ) -> EditSuccess | EditFailure | EditUnauthorized | EditFreezed:
+        if self.freeze_edits:
+            return EditFreezed()
+        
         # if the type of column_name is a boolean, make sure we read it correctly
         for col in self.schema_columns:
             if col["name"] == column:
@@ -469,6 +479,9 @@ class DataEditor:
             - No data validation: this method does not check that the values are allowed for the specified columns.
             - Attribution of the 'create' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
         """
+        if self.freeze_edits:
+            return "Edits are disabled."
+        
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         for col in column_values.keys():
             self.__log_edit__(
@@ -478,7 +491,7 @@ class DataEditor:
 
     def update_row(
         self, primary_keys: dict, column: str, value: str
-    ) -> List[EditSuccess | EditFailure | EditUnauthorized]:
+    ) -> List[EditSuccess | EditFailure | EditUnauthorized | EditFreezed]:
         """
         Updates a row.
 

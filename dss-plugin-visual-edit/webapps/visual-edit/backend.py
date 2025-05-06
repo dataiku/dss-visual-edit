@@ -20,6 +20,7 @@ from dash import Dash, Input, Output, State, dcc, html
 from dataiku.core.schema_handling import CASTERS
 from dataiku_utils import get_dataframe_filtered, client as dss_client
 from DataEditor import (
+    EditFreezed,
     EditSuccess,
     EditFailure,
     EditUnauthorized,
@@ -48,6 +49,7 @@ project = dss_client.get_project(project_key)
 
 editable_column_names = webapp_config.editable_column_names
 authorized_users = webapp_config.authorized_users
+freeze_edits = webapp_config.freeze_edits
 original_ds_name = webapp_config.original_ds_name
 
 de = DataEditor(
@@ -58,6 +60,7 @@ de = DataEditor(
     linked_records=webapp_config.linked_records,
     editschema_manual=webapp_config.editschema_manual,
     authorized_users=authorized_users,
+    freeze_edits=freeze_edits
 )
 
 
@@ -78,6 +81,8 @@ def __edit_result_to_message__(
         return r.message
     elif isinstance(r, EditUnauthorized):
         return "Unauthorized"
+    elif isinstance(r, EditFreezed):
+        return "Edits are disabled."
     else:
         return "Unexpected update result"
 
