@@ -213,8 +213,7 @@ def add_edit(cell):
         res = de.update_row(
             row=row,
             column=column_name,
-            value=value,
-            previous_value=cell["oldValue"],
+            value=value
         )
     return __edit_result_to_message__(res)
 

@@ -92,12 +92,11 @@ class DataEditor:
                 # not using date type, in case the editlog is CSV
                 {"name": "date", "type": "string", "meaning": "DateSource"},
                 {"name": "user", "type": "string", "meaning": "Text"},
-                # action can be "validate", "invalidate", "update", "create", or "delete"
+                # action can be "update", "create", or "delete"
                 {"name": "action", "type": "string", "meaning": "Text"},
                 {"name": "key", "type": "string", "meaning": "Text"},
                 {"name": "column_name", "type": "string", "meaning": "Text"},
                 {"name": "value", "type": "string", "meaning": "Text"},
-                {"name": "previous_value", "type": "string", "meaning": "Text"},
                 {"name": "context", "type": "string", "meaning": "Object"},
             ]
             self.editlog_ds.write_schema(editlog_ds_schema)
@@ -401,7 +400,6 @@ class DataEditor:
         primary_keys_tuple,
         column,
         value,
-        previous_value,
         context=None,
         action="update",
     ) -> EditSuccess | EditFailure | EditUnauthorized:
@@ -417,7 +415,6 @@ class DataEditor:
             primary_keys_tuple (tuple): A tuple containing primary key(s) value(s) that identify the row on which the action is performed.
             column (str): The name of the column to create/update (it must be one of the editable columns). This would be None for other actions.
             value (str): The value to set for the cell identified by key and column. This would be None when the action is "delete" or "validate" or "invalidate".
-            previous_value (str): The previous value of that cell.
             context (dict): A dictionary containing all column values of the row to update (including primary key(s)).
             action (str): The type of action to log: "validate, "invalidate", "update", "create", or "delete".
 
@@ -441,12 +438,6 @@ class DataEditor:
         else:
             value_string = value
 
-        # same for previous_value
-        if previous_value is not None:
-            previous_value_string = str(previous_value)
-        else:
-            previous_value_string = previous_value
-
         # turn context into a string
         if context is not None:
             # remove the primary key columns from the context dictionary
@@ -458,7 +449,7 @@ class DataEditor:
             context_string = context
 
         user_identifier = try_get_user_identifier()
-        action_details = f"""column {column} set to value {value_string} (previously {previous_value_string}) where {self.primary_key_column_names} is {primary_keys_tuple}."""
+        action_details = f"""column {column} set to value {value_string} where {self.primary_key_column_names} is {primary_keys_tuple}."""
         if self.authorized_users and (
             user_identifier is None or user_identifier not in self.authorized_users
         ):
@@ -477,7 +468,6 @@ class DataEditor:
                             str(primary_keys_tuple),
                             column,
                             value_string,
-                            previous_value_string,
                             context_string,
                             datetime.now(timezone("UTC")).isoformat(),
                             "unknown" if user_identifier is None else user_identifier,
@@ -522,7 +512,6 @@ class DataEditor:
                 primary_keys_tuple=primary_keys_tuple,
                 column=col,
                 value=column_values.get(col),
-                previous_value=None,
                 context=None,
                 action="create",
             )
@@ -547,7 +536,6 @@ class DataEditor:
             primary_keys_tuple=primary_keys_tuple,
             column=None,
             value=None,
-            previous_value=None,
             context=row,
             action="validate",
         )
@@ -571,7 +559,6 @@ class DataEditor:
             primary_keys_tuple=primary_keys_tuple,
             column=None,
             value=comment,
-            previous_value=None,
             context=row,
             action="comment",
         )
@@ -595,7 +582,6 @@ class DataEditor:
             primary_keys_tuple=primary_keys_tuple,
             column=None,
             value=None,
-            previous_value=None,
             context=None,
             action="invalidate",
         )
@@ -605,8 +591,7 @@ class DataEditor:
         row: dict,
         primary_keys: dict,
         column: str,
-        value: str,
-        previous_value: str,
+        value: str
     ) -> EditSuccess | EditFailure | EditUnauthorized:
         """
         Updates a row.
@@ -616,7 +601,6 @@ class DataEditor:
             primary_keys (dict): A dictionary containing primary key(s) value(s) that identify the row to update. This is optional if row is provided.
             column (str): The name of the column to update.
             value (str): The value to set for the cell identified by key and column.
-            previous_value (str): The previous value of that cell.
 
         Returns:
             list: A list of objects indicating the success or failure to insert an editlog.
@@ -638,7 +622,6 @@ class DataEditor:
                 primary_keys_tuple=primary_keys_tuple,
                 column=column,
                 value=value,
-                previous_value=previous_value,
                 action="update",
                 context=row,
             )
@@ -666,7 +649,6 @@ class DataEditor:
             primary_keys_tuple=primary_keys_tuple,
             column=None,
             value=None,
-            previous_value=None,
             context=None,
             action="delete",
         )

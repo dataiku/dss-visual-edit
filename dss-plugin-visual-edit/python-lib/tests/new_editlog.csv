@@ -1,5 +1,5 @@
-date;user;key;action;context;column_name;value;previous_value
-2023-06-02T09:45:16.297516+00:00;louis.dorard@dataiku.com;0010Y00001Jw1YK;comment;;;OK;
-2023-06-02T09:43:55.981641+00:00;louis.dorard@dataiku.com;0010Y00001Jw1YK;validate;{'Matched Entity': 1008284584, 'Company Name': 'Toto'};;;
-2023-06-02T09:45:32.307683+00:00;louis.dorard@dataiku.com;0010Y00000OTVyP;update;;Matched Entity;1012043265;2001100075
-2023-06-02T09:48:59.505325+00:00;louis.dorard@dataiku.com;0016M00002J3RDh;update;;Matched Entity;1028784954;
+date;user;key;action;context;column_name;value
+2023-06-02T09:45:16.297516+00:00;louis.dorard@dataiku.com;0010Y00001Jw1YK;comment;;;
+2023-06-02T09:43:55.981641+00:00;louis.dorard@dataiku.com;0010Y00001Jw1YK;validate;{'Matched Entity': 1008284584, 'Company Name': 'Toto'};;
+2023-06-02T09:45:32.307683+00:00;louis.dorard@dataiku.com;0010Y00000OTVyP;update;;Matched Entity;1012043265
+2023-06-02T09:48:59.505325+00:00;louis.dorard@dataiku.com;0016M00002J3RDh;update;;Matched Entity;1028784954
