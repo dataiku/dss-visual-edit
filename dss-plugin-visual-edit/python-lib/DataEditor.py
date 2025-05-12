@@ -430,9 +430,6 @@ class DataEditor:
     def __append_to_editlog__(
         self, key, column, value, action="update"
     ) -> EditSuccess | EditFailure | EditUnauthorized | EditFreezed:
-        if self.freeze_edits:
-            return EditFreezed()
-        
         """
         Append an edit action to the editlog.
 
@@ -447,8 +444,11 @@ class DataEditor:
             action (str): The type of action to log.
 
         Returns:
-            EditSuccess | EditFailure | EditUnauthorized: An object indicating the success or failure to insert an editlog.
+            EditSuccess | EditFailure | EditUnauthorized | EditFreezed: An object indicating the success or failure to insert an editlog.
         """
+
+        if self.freeze_edits:
+            return EditFreezed()
 
         # if the type of column_name is a boolean, make sure we read it correctly
         for col in self.schema_columns:
