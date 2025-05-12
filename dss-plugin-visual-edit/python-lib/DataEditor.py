@@ -319,7 +319,7 @@ class DataEditor:
 
     def get_original_df(self):
         """
-        Returns the original dataframe without any edits.
+        Returns the original dataframe without any edits, plus default notes and validation columns if required.
 
         Returns:
             pandas.DataFrame: The original data.

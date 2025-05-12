@@ -170,15 +170,36 @@ def get_display_column_names(schema, primary_keys, editable_column_names):
 
 # Used by DataEditor and by apply_edits_from_df method below
 def get_original_df(original_ds):
-    original_df = get_dataframe(original_ds)
+    """
+    Get the original dataset as a dataframe
+    
+    Columns ordered as follows: primary keys, display columns, editable columns, plus validation and notes columns if required (with default values set to empty string and False respectively).
 
+    The dataset's configuration specifies the primary keys, editable columns, and whether validation and notes columns are required. The display columns are all other columns in the dataset.
+
+    :param original_ds: the original dataset
+    :return: a tuple containing the original dataframe, the primary keys, display columns and editable columns.
+    """
+
+    # Read the dataset configuration
     original_ds_config = original_ds.get_config()
     primary_keys = original_ds_config["customFields"]["primary_keys"]
-    editable_column_names = [
+    editable_column_names = [ # filter out column names that are not in the original dataset
         col
         for col in original_ds_config["customFields"]["editable_column_names"]
         if col in original_df.columns
     ]
+    validation_column_required = original_ds_config["customFields"]["validation_column_required"]
+    notes_column_required = original_ds_config["customFields"]["notes_column_required"]
+
+    # Get the original dataset as a dataframe and add the validation and notes columns if required
+    original_df = get_dataframe(original_ds)
+    if notes_column_required:
+        original_df[self.notes] = ""
+    if validation_column_required:
+        original_df[self.validated] = False
+
+    # Get the display column names
     schema = original_ds_config.get("schema").get("columns")
     display_column_names = get_display_column_names(
         schema, primary_keys, editable_column_names
