@@ -37,9 +37,9 @@ class Config(BaseModel):
     primary_keys: List[str]
     editable_column_names: List[str]
     notes_column_required: bool
-    notes_column_name: str
+    notes_column_display_name: str
     validation_column_required: bool
-    validation_column_name: str
+    validation_column_display_name: str
     show_header_filter: bool = True
     freeze_editable_columns: bool
     group_column_names: List[str]

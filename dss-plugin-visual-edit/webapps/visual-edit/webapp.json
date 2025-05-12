@@ -156,7 +156,7 @@
             "defaultValue": false
         },
         {
-            "name": "notes_column_name",
+            "name": "notes_column_display_name",
             "label": "↳ Display name",
             "description": "Column name used in the webapp interface (underlying storage will use 'notes')",
             "type": "TEXT",
@@ -171,7 +171,7 @@
             "defaultValue": false
         },
         {
-            "name": "validation_column_name",
+            "name": "validation_column_display_name",
             "label": "↳ Display name",
             "description": "Column name used in the webapp interface (underlying storage will use 'validated')",
             "type": "TEXT",
@@ -218,7 +218,8 @@
             "name": "freeze_edits",
             "label": "Freeze edits",
             "description": "If set to true, the webapp will not allow any edits to be made.",
-            "type": "BOOLEAN"
+            "type": "BOOLEAN",
+            "defaultValue": false
         },
         {
             "name": "debug_mode",
