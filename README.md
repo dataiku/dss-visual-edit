@@ -14,19 +14,21 @@ Quick Links:
 
 * For Data Experts:
   * [Compatibility](https://dataiku.github.io/dss-visual-edit/compatibility)
-  * [Installation](https://dataiku.github.io/dss-visual-edit/install-plugin)
   * User guides:
-    * [Use Case #1: Correcting Source Data](https://dataiku.github.io/dss-visual-edit/get-started)
-    * [Use Case #2: Reviewing Machine-Generated Data](https://dataiku.github.io/dss-visual-edit/reviewing)
-    * [Deploying in Production](https://dataiku.github.io/dss-visual-edit/deploy)
+    * [Getting started](https://www.dataiku.com/product/plugins/visual-edit/)
+    * [Validating machine-generated data](https://dataiku.github.io/dss-visual-edit/validate)
+    * [Building a complete application to test with end-users](https://dataiku.github.io/dss-visual-edit/build-complete-application)
+    * [Deploying to production](https://dataiku.github.io/dss-visual-edit/deploy)
   * Case study: Entity Resolution (coming soon)
   * Advanced features:
     * [Linked Records](https://dataiku.github.io/dss-visual-edit/linked-records)
     * [Editschema](https://dataiku.github.io/dss-visual-edit/editschema)
-  * For Developers:
-    * [Introduction to Visual Edit's CRUD Python API](docs/CRUD_example_usage.ipynb)
-    * [Low-code webapp customizations with Dash](https://dataiku.github.io/dss-visual-edit/dash-examples)
-    * [Reference API documentation](https://dataiku.github.io/dss-visual-edit/backend/#DataEditor)
-  * [FAQ](faq)
+  * [FAQ](https://dataiku.github.io/dss-visual-edit/faq)
+  * [Troubleshooting](https://dataiku.github.io/dss-visual-edit/troubleshooting)
+* For Developers:
+  * [Introduction to Visual Edit's CRUD API](https://github.com/dataiku/dss-visual-edit/blob/master/docs/CRUD_example_usage.ipynb) (Python notebook)
+  * [Low-code webapp customizations with Dash](https://dataiku.github.io/dss-visual-edit/dash-examples)
+  * [Reference API documentation](https://dataiku.github.io/dss-visual-edit/backend/#DataEditor)
+  * Full-code webapp customizations: see [dash_tabulator documentation](https://github.com/dataiku/dss-visual-edit/blob/master/dash_tabulator/README.md) and [Plugin Developer Documentation](https://github.com/dataiku/dss-visual-edit/blob/master/dss-plugin-visual-edit/README.md)
 * For Business Users:
   * [How to use the data table](https://dataiku.github.io/dss-visual-edit/data-table-features)
