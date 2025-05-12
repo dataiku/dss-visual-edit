@@ -321,10 +321,10 @@ def get_columns_tabulator(de, freeze_editable_columns=False):
 
         t_cols.append(t_col)
 
-    if de.validation_column_name:
+    if de.validation_column_required:
         t_col = {
-            "field": de.validation_column_name,
-            "title": de.validation_column_name,
+            "field": "validated",
+            "title": de.validation_column_display_name,
             "sorter": "exists",
             "formatter": "tickCross",
             "formatterParams": {
@@ -340,10 +340,10 @@ def get_columns_tabulator(de, freeze_editable_columns=False):
             t_col["frozen"] = True  # freeze to the right
         t_cols.append(t_col)
 
-    if de.notes_column_name:
+    if de.notes_column_required:
         t_col = {
-            "field": de.notes_column_name,
-            "title": de.notes_column_name,
+            "field": "notes",
+            "title": de.notes_column_display_name,
             "formatter": "textarea",
             "editor": "textarea",
         }

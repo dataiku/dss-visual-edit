@@ -172,8 +172,10 @@ class DataEditor:
         original_ds_name: str,
         primary_keys: List[str],
         editable_column_names: List[str] | None = None,
-        notes_column_name: str | None = None,
-        validation_column_name: str | None = None,
+        notes_column_required: bool = False,
+        notes_column_display_name: str | None = None,
+        validation_column_required: bool = False,
+        validation_column_display_name: str | None = None,
         linked_records: List[LinkedRecord] | None = None,
         editschema_manual: List[EditSchema] | None = None,
         project_key: str | None = None,
@@ -187,8 +189,8 @@ class DataEditor:
             original_ds_name (str): The name of the original dataset.
             primary_keys (list): A list of column names that uniquely identify a row in the dataset.
             editable_column_names (list): A list of column names that can be edited. If None, all columns are editable.
-            notes_column_name (str): The name of a column for end-user to write notes about each row.
-            validation_column_name (str): The name of a column for end-user to mark rows as validated.
+            notes_column_display_name (str): The name of a column for end-user to write notes about each row.
+            validation_column_display_name (str): The name of a column for end-user to mark rows as validated.
             project_key (str): The key of the project where the dataset is located. If None, the current project is used.
             authorized_users (list): A list of user identifiers who are authorized to make edits. If None, all users are authorized.
             linked_records (list): (Optional) A list of LinkedRecord objects that represent linked datasets or dataframes.
@@ -223,10 +225,18 @@ class DataEditor:
         self.primary_keys = primary_keys
         if editable_column_names:
             self.editable_column_names = editable_column_names
-        if notes_column_name:
-            self.notes_column_name = notes_column_name
-        if validation_column_name:
-            self.validation_column_name = validation_column_name
+        self.notes_column_required = notes_column_required
+        if self.notes_column_required:
+            if notes_column_display_name:
+                self.notes_column_display_name = notes_column_display_name
+            else:
+                self.notes_column_display_name = "notes"
+        self.validation_column_required = validation_column_required
+        if self.validation_column_required:
+            if validation_column_display_name:
+                self.validation_column_display_name = validation_column_display_name
+            else:
+                self.validation_column_display_name = "validated"
 
         # For each linked record, add linked dataset/dataframe as attribute
         self.linked_records = linked_records if linked_records is not None else []
@@ -372,8 +382,8 @@ class DataEditor:
             self.editlog_ds,
             self.primary_keys,
             self.editable_column_names,
-            self.validation_column_name,
-            self.notes_column_name,
+            self.validation_column_required,
+            self.notes_column_required
         )
 
     def get_row(self, primary_keys):
