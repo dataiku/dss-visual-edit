@@ -88,32 +88,54 @@ def replay_edits(
     editlog_ds,
     primary_keys,
     editable_column_names,
-    validation_column_name,
-    notes_column_name,
+    validation_column_required = False,
+    notes_column_required = False,
 ):
-    # Create empty dataframe with the proper edits dataset schema: all primary keys, all editable columns, and "date" column
-    # This helps ensure that the dataframe we return always has the right schema
-    # (even if some columns of the input dataset were never edited)
+    """
+    Get the edited cells from an editlog dataset.
+
+    :param editlog_ds: the editlog dataset
+    :param primary_keys: the primary keys of the dataset
+    :param editable_column_names: the editable columns of the dataset
+    :param validation_column_required: whether the validation column is required
+    :param notes_column_required: whether the notes column is required
+    :return: a DataFrame containing only the edited rows and editable columns.
+    - The DataFrame will contain the following columns: primary keys, editable columns, feedback columns ("validated" and "notes", if required), metadata columns ("last_edit_date", "last_action", "first_action").
+    - When the same cell was edited multiple times, the last edit is kept.
+    """
+
+    feedback_columns = []
+    validation_column_name = "validated"
+    notes_column_name = "notes"
+    if validation_column_required:
+        feedback_columns.append(validation_column_name)
+    if notes_column_name_required:
+        feedback_columns.append(notes_column_name)
+
+    metadata_columns = ["last_edit_date", "last_action", "first_action"]
+
+    # Create empty dataframe with the expected columns. This helps ensure that the dataframe we return always has the right schema, even if some columns of the input dataset were never edited.
     cols = (
         primary_keys
         + editable_column_names
-        + [validation_column_name, notes_column_name]
-        + ["last_edit_date", "last_action", "first_action"]
+        + feedback_columns
+        + metadata_columns
     )
     all_columns_df = DataFrame(columns=cols)
 
-    editlog_df = get_dataframe(editlog_ds)
     if not editlog_df.size:  # i.e. if empty editlog
         edits_df = all_columns_df
+
     else:
+        editlog_df = get_dataframe(editlog_ds)
         editlog_df.rename(columns={"date": "edit_date"}, inplace=True)
         editlog_df = __unpack_keys__(editlog_df, primary_keys).sort_values("edit_date")
 
-        # if "action" is not in the editlog's columns, we add it and set all values to "update"
+        # make sure "action" column is present
         if "action" not in editlog_df.columns:
             editlog_df["action"] = "update"
 
-        # for each key, compute last edit date, last action and first action
+        # create metadata columns
         editlog_grouped_last = (
             editlog_df[primary_keys + ["edit_date", "action"]]
             .groupby(primary_keys)
@@ -139,21 +161,33 @@ def replay_edits(
             aggfunc=lambda values: values.iloc[-1] if not values.empty else None,
         ).join(editlog_grouped_df, on=primary_keys)
 
-        # Drop any columns from the pivot that may not be one of the editable_column_names
+        # Drop any columns from the pivot that may not be one of the expected columns
         for col in edits_df.columns:
-            if col not in cols:
+            if col not in editable_column_names + feedback_columns:
+                logging.warning(
+                    f"Column {col} not found in editable columns or feedback columns. Dropping it from the editlog."
+                )
                 edits_df.drop(columns=[col], inplace=True)
 
-        # Make sure that there is a notes column
-        if notes_column_name not in edits_df.columns:
-            edits_df[notes_column_name] = ""
+        if notes_column_required:
+            # Make sure that there is a notes column
+            if notes_column_name not in edits_df.columns:
+                edits_df[notes_column_name] = ""
+            # Fill its missing values with empty strings
+            edits_df[notes_column_name] = edits_df[notes_column_name].fillna("")
 
-        edits_df[validation_column_name] = (
-            edits_df["last_action"] == "validate"
-        )  # this makes sure that the validation column has no missing values
+        if validation_column_required:
+            # Make sure that there is a validation column
+            if validation_column_name not in edits_df.columns:
+                edits_df[validation_column_name] = False
+            # Fill its missing values with False
+            edits_df[validation_column_name] = edits_df[
+                validation_column_name
+            ].fillna(False)
 
         edits_df.reset_index(inplace=True)
-        # this makes sure that all (editable) columns are here and in the right order
+
+        # Make sure that all columns are here and in the right order
         edits_df = concat([all_columns_df, edits_df])
 
     return edits_df
