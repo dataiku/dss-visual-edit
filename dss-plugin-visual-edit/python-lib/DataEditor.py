@@ -52,12 +52,8 @@ class DataEditor:
         settings.custom_fields["editlog_ds"] = self.editlog_ds_name
         settings.custom_fields["primary_keys"] = self.primary_keys
         settings.custom_fields["editable_column_names"] = self.editable_column_names
-        if self.validation_column_name:
-            settings.custom_fields["validation_column_name"] = (
-                self.validation_column_name
-            )
-        if self.notes_column_name:
-            settings.custom_fields["notes_column_name"] = self.notes_column_name
+        settings.custom_fields["validation_column_required"] = self.validation_column_required
+        settings.custom_fields["notes_column_required"] = self.notes_column_required
         if self.webapp_url:
             settings.custom_fields["webapp_url"] = self.webapp_url
         settings.save()
