@@ -98,7 +98,7 @@ class DataEditor:
                 # not using date type, in case the editlog is CSV
                 {"name": "date", "type": "string", "meaning": "DateSource"},
                 {"name": "user", "type": "string", "meaning": "Text"},
-                # action can be "validate", "comment", "update", "create", or "delete"
+                # action can be "update", "create", or "delete"
                 {"name": "action", "type": "string", "meaning": "Text"},
                 {"name": "key", "type": "string", "meaning": "Text"},
                 {"name": "column_name", "type": "string", "meaning": "Text"},
@@ -414,9 +414,8 @@ class DataEditor:
         """
         Append an edit action to the editlog.
 
-        Actions can be "validate", "comment", "update", "create", or "delete".
-        - When the action is "validate" or "update" or "create", the column is one of the editable columns.
-        - When the action is "comment", the column is the notes column.
+        Actions can be "update", "create", or "delete".
+        - When the action is "update" or "create", the column is one of the editable columns.
         - When the action is "delete", the column and value are ignored.
 
         Args:
@@ -456,12 +455,10 @@ class DataEditor:
         else:
             if (
                 column in self.editable_column_names
-                or column == self.notes_column_name
+                or self.notes_column_required and column == "notes"
+                or self.validation_column_required and column == "validated"
                 or action == "delete"
             ):
-                # make sure that edits to the notes column are stored with the "comment" action
-                if column == self.notes_column_name:
-                    action = "comment"
                 # add to the editlog
                 try:
                     self.editlog_appender.append(
@@ -513,50 +510,9 @@ class DataEditor:
             )
         return "Row successfully created"
 
-    def comment_row(
-        self, primary_keys: dict, notes: str
-    ) -> EditSuccess | EditFailure | EditUnauthorized:
-        """
-        Comments on a row.
-
-        Args:
-            primary_keys (dict): A dictionary containing primary key(s) value(s) that identify the row to comment on.
-            notes (str): The comment to write in the notes column.
-
-        Notes:
-            Attribution of the 'comment' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
-        """
-        key = get_key_values_from_dict(primary_keys, self.primary_keys)
-        return self.__append_to_editlog__(
-            key, self.notes_column_name, notes, action="comment"
-        )
-
-    def validate_row(
-        self, row_dict: dict
-    ) -> List[EditSuccess | EditFailure | EditUnauthorized]:
-        """
-        Validates a row, by logging values for all editable columns under a "validation" action.
-
-        Args:
-            row_dict (dict): A dictionary containing all column values for a given row to validate (including its primary key(s)).
-
-        Returns:
-            list: A list of objects indicating the success or failure of insertions of all valid column values into the editlog.
-
-        Notes:
-            Attribution of the 'validate' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
-        """
-        key = get_key_values_from_dict(row_dict, self.primary_keys)
-        statuses = []
-        for col in self.editable_column_names:
-            statuses.append(
-                self.__append_to_editlog__(key, col, row_dict[col], action="validate")
-            )
-        return statuses
-
     def update_row(
         self, primary_keys: dict, column: str, value: str
-    ) -> EditSuccess | EditFailure | EditUnauthorized:
+    ) -> List[EditSuccess | EditFailure | EditUnauthorized]:
         """
         Updates a row.
 
@@ -573,7 +529,23 @@ class DataEditor:
             - Attribution of the 'update' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
-        return self.__append_to_editlog__(key, column, value, action="update")
+
+        if column_name == "validated":
+            results = []
+
+            # When setting the validation column to True, start by logging the values of other editable columns
+            for col in self.editable_column_names:
+                results.append(self.__append_to_editlog__(key, col, primary_keys[col])) # contains values for primary keys — and other columns too, but they'll be discarded
+            
+            # End by logging that validation is True
+            results.append(self.__append_to_editlog__(key, column, primary_keys[column]))
+            
+            # Note: To improve this, it would be best to group all the inserts in the same transaction
+            
+            return results
+
+        else:
+            return [self.__append_to_editlog__(key, column, value, action="update")]
 
     def delete_row(
         self, primary_keys: dict
