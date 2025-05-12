@@ -35,6 +35,10 @@ class WebAppConfig:
         self.original_ds_name = typed_config.original_dataset
         self.primary_keys = typed_config.primary_keys
         self.editable_column_names = typed_config.editable_column_names
+        self.notes_column_required = typed_config.notes_column_required
+        self.notes_column_name = typed_config.notes_column_name
+        self.validation_column_required = typed_config.validation_column_required
+        self.validation_column_name = typed_config.validation_column_name
         self.freeze_editable_columns = typed_config.freeze_editable_columns
         self.group_column_names = typed_config.group_column_names
         self.linked_records_count = typed_config.linked_records_count
