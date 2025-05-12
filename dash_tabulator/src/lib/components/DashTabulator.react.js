@@ -72,10 +72,15 @@ export default class DashTabulator extends React.Component {
             edited.value = cell.getValue()
             edited.row = cell.getData()
             this.props.setProps({ cellEdited: edited })
+            if (edited.field == "validated" | edited.field == "notes") {
+                column_name_hash = edited.field
+            } else {
+                column_name_hash = md5(edited.field)
+            }
             try {
                 window.parent.WT1SVC.event("visualedit-edit-cell", {
                     "dataset_name_hash": md5(datasetName),
-                    "column_name_hash": md5(edited.field),
+                    "column_name_hash": column_name_hash,
                     "column_type": edited.type,
                     "plugin_version": plugin_version
                 });
