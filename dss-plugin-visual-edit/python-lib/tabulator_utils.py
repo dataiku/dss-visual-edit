@@ -112,6 +112,9 @@ def __get_column_tabulator_editor__(t_type):
     elif t_type == "date":
         t_col["editor"] = "date"
         t_col["editorParams"] = {"format": "yyyy-MM-dd"}
+    elif t_type == "textarea":
+        t_col["formatter"] = "textarea"
+        t_col["editor"] = "textarea"
     else:
         t_col["editor"] = "input"
     return t_col
@@ -121,13 +124,13 @@ def __get_column_tabulator_editor__(t_type):
 
 
 def get_values_from_df(
-    df: DataFrame,
+    linked_df: DataFrame,
     key_col: str,
     label_col: str,
     lookup_cols: Union[list, None] = None,
 ) -> list:
     """
-    Get values of specified columns in a given dataframe, to be read by the `itemFormatter` provided to Tabulator when defining a linked record:
+    Get values of specified columns in the dataframe of a linked dataset, to be read by the `itemFormatter` provided to Tabulator when defining a linked record:
 
     - If no label column and no lookup columns are specified, the return value is a sorted list of key column values
     - Otherwise, the return value is a list of dicts sorted by label
@@ -135,7 +138,7 @@ def get_values_from_df(
     The `itemFormatter` function is defined in `custom_tabulator.js`. It is called by Tabulator for each table column which is defined as a linked record, for each row. It formats values of such columns into HTML elements, whose contents come from the dict whose `value` key matches the value of the linked record column.
 
     Example params:
-    - df: a dataframe
+    - linked_df: the indexed dataframe of a linked dataset
     - key_col: "id"
     - label_col: "name"
     - lookup_cols: ["col1", "col2"]
@@ -183,19 +186,18 @@ def get_values_from_df(
     if lookup_cols is not None:
         selected_columns += lookup_cols
 
-    # Select specific columns from df
-    selected_df = df[selected_columns]
-
-    # Sort the rows by the values in the label column
-    selected_df = selected_df.sort_values(label_col)
+    selected_df = (
+        linked_df.reset_index()[selected_columns]
+        .fillna("")  # the data table component does not handle NaN values
+        .astype(str)  # it also expects all values to be strings
+        .sort_values(label_col)
+    )
 
     if len(selected_columns) == 1:
         return selected_df[selected_columns[0]].to_list()
 
-    return (
-        selected_df[selected_columns]
-        .rename(columns={key_col: "value", label_col: "label"})
-        .to_dict("records")
+    return selected_df.rename(columns={key_col: "value", label_col: "label"}).to_dict(
+        "records"
     )
 
 
@@ -263,7 +265,7 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
     return t_col
 
 
-def get_columns_tabulator(de, freeze_editable_columns=False):
+def get_columns_tabulator(de, show_header_filter=True, freeze_editable_columns=False):
     """Prepare column settings to pass to Tabulator"""
 
     linked_record_names = []
@@ -282,7 +284,7 @@ def get_columns_tabulator(de, freeze_editable_columns=False):
         t_col = {
             "field": col_name,
             "title": col_name,
-            "headerFilter": True,
+            "headerFilter": show_header_filter,
             "resizable": True,
             "headerContextMenu": __ns__("headerMenu"),
         }
@@ -306,6 +308,7 @@ def get_columns_tabulator(de, freeze_editable_columns=False):
         pretty_types = {
             "number": "Number",
             "string": "Text",
+            "textarea": "Text",
             "boolean": "Checkbox",
             "boolean_tick": "Checkbox",
             "date": "Date",

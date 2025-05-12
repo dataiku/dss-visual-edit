@@ -69,7 +69,7 @@
         {
             "name": "linked_record_ds_name_1",
             "label": "Linked Dataset",
-            "description": "Must be on a SQL connection or contain less than 1,000 records.",
+            "description": "Must be on a SQL connection or contain less than 10,000 records.",
             "type": "DATASET",
             "mandatory": true,
             "visibilityCondition": "model.linked_records_count > 0"
@@ -116,7 +116,7 @@
         {
             "name": "linked_record_ds_name_2",
             "label": "Linked Dataset",
-            "description": "Must be on a SQL connection or contain less than 1,000 records.",
+            "description": "Must be on a SQL connection or contain less than 10,000 records.",
             "type": "DATASET",
             "mandatory": true,
             "visibilityCondition": "model.linked_records_count > 1"
@@ -182,6 +182,13 @@
             "name": "sep-layout",
             "label": "Layout",
             "type": "SEPARATOR"
+        },
+        {
+            "name": "show_header_filter",
+            "label": "Show header filters",
+            "description": "Show/hide header filters below each column header",
+            "type": "BOOLEAN",
+            "defaultValue": true
         },
         {
             "name": "freeze_editable_columns",

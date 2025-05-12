@@ -3,7 +3,7 @@
         "PYTHON38",
         "PYTHON39"
     ],
-    "corePackagesSet": "PANDAS15",
+    "corePackagesSet": "PANDAS13",
     "installCorePackages": true,
     "installJupyterSupport": false,
     "basePackagesInstallMethod": "PRE_BUILT",

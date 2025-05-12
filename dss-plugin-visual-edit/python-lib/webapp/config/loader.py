@@ -39,6 +39,7 @@ class WebAppConfig:
         self.notes_column_name = typed_config.notes_column_name
         self.validation_column_required = typed_config.validation_column_required
         self.validation_column_name = typed_config.validation_column_name
+        self.show_header_filter = typed_config.show_header_filter
         self.freeze_editable_columns = typed_config.freeze_editable_columns
         self.group_column_names = typed_config.group_column_names
         self.linked_records_count = typed_config.linked_records_count

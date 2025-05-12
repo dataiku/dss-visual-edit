@@ -1,6 +1,19 @@
-/* define SourceSansPro */
 @font-face {
-    src: url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,500,600');
+    font-family: 'dataiku';
+    src: url('themes/default/assets/fonts/SourceSansPro-Bold.woff');
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: 'dataiku';
+    src: url('themes/default/assets/fonts/SourceSansPro-Semibold.woff');
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: 'dataiku';
+    src: url('themes/default/assets/fonts/SourceSansPro-Regular.woff');
+    font-weight: 400;
 }
 
 body {
@@ -8,8 +21,12 @@ body {
     background-color: rgb(242, 242, 242);
 }
 
-body, button, select.tabulator-page-size, input[type=search] {
-    font-family: 'Source Sans Pro' !important;
+body,
+button,
+select.tabulator-page-size,
+input[type=search] {
+    font-family: 'dataiku' !important;
+    font-size: 13px;
 }
 
 .tabulator {
@@ -24,8 +41,8 @@ body, button, select.tabulator-page-size, input[type=search] {
     position: absolute;
 }
 
-.tabulator-col-title{
-    font-weight: 600;
+.tabulator-col-title {
+    font-weight: 500;
 }
 
 .tabulator-row {
@@ -42,11 +59,13 @@ body, button, select.tabulator-page-size, input[type=search] {
     font-weight: 500;
 }
 
-.tabulator .tabulator-footer, .tabulator .tabulator-header .tabulator-col {
+.tabulator .tabulator-footer,
+.tabulator .tabulator-header .tabulator-col {
     background-color: white;
 }
 
-.tabulator .tabulator-footer, .tabulator .tabulator-header .tabulator-col:hover {
+.tabulator .tabulator-footer,
+.tabulator .tabulator-header .tabulator-col:hover {
     background-color: rgb(245, 245, 245) !important;
 }
 
@@ -92,6 +111,9 @@ body, button, select.tabulator-page-size, input[type=search] {
     background-color: hsl(214, 89%, 82%) !important;
     /* background-color: rgb(76, 175, 80) !important;
     color: white !important; */
+}
+.tabulator-cell.tabulator-editable.tabulator-editing > textarea {
+    background-color: hsl(214, 89%, 82%) !important;
 }
 
 .linked-record {

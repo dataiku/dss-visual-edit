@@ -17,6 +17,7 @@ from datetime import datetime
 from pandas.api.types import is_integer_dtype, is_float_dtype
 from commons import get_last_build_date, try_get_user_identifier
 from dash import Dash, Input, Output, State, dcc, html
+from dataiku.core.schema_handling import CASTERS
 from dataiku_utils import get_dataframe_filtered, client as dss_client
 from DataEditor import (
     EditSuccess,
@@ -63,7 +64,9 @@ de = DataEditor(
 )
 
 
-columns = get_columns_tabulator(de, webapp_config.freeze_editable_columns)
+columns = get_columns_tabulator(
+    de, webapp_config.show_header_filter, webapp_config.freeze_editable_columns
+)
 
 last_build_date_initial = ""
 last_build_date_ok = False
@@ -388,20 +391,19 @@ def label_endpoint(linked_ds_name):
             break
 
     if linked_record is None:
-        return "Unnknown linked dataset.", 404
+        return "Unknown linked dataset.", 404
 
     # Return data only when it's a linked dataset
     linked_ds_key = linked_record.ds_key
     linked_ds_label = linked_record.ds_label
 
     # Cast provided key value into appropriate type, necessary for integers for example.
-    original_df, primary_keys, display_columns, editable_columns = de.get_original_df()
-
-    key_dtype = original_df[linked_record.name].dtype
+    linked_key_type = de.schema_columns_df.loc[linked_record.name, "type"]
+    linked_key_dtype = CASTERS.get(linked_key_type)
     try:
-        if is_integer_dtype(key_dtype):
+        if linked_key_dtype and is_integer_dtype(linked_key_dtype):
             key = int(key)
-        if is_float_dtype(key_dtype):
+        if linked_key_dtype and is_float_dtype(linked_key_dtype):
             key = float(key)
     except Exception:
         return "Invalid key type.", 400
@@ -416,11 +418,9 @@ def label_endpoint(linked_ds_name):
             except Exception:
                 return "Something went wrong fetching label of linked value.", 500
         else:
-            linked_record_df = linked_record.df
-            if linked_record_df is None:
+            linked_df = linked_record.df
+            if linked_df is None:
                 return "Something went wrong. Try restarting the backend.", 500
-
-            linked_df = linked_record_df.set_index(linked_ds_key)
             try:
                 label = linked_df.loc[key, linked_ds_label]
             except Exception:
@@ -453,18 +453,18 @@ def lookup_endpoint(linked_ds_name):
     else:
         n_results = 1000  # show more options if no search term is provided
 
+    # Find the linked record whose linked dataset is requested
     linked_record: LinkedRecord | None = None
     for lr in de.linked_records:
         if linked_ds_name == lr.ds_name:
             linked_record = lr
             break
-
     if linked_record is None:
         return "Unknown linked dataset.", 404
-
     linked_ds_key = linked_record.ds_key
     linked_ds_label = linked_record.ds_label
     linked_ds_lookup_columns = linked_record.ds_lookup_columns
+
     if linked_record.ds:
         # Use the Dataiku API to filter the dataset
         linked_df_filtered = get_dataframe_filtered(
@@ -479,11 +479,11 @@ def lookup_endpoint(linked_ds_name):
         if linked_df is None:
             return "Something went wrong. Try restarting the backend.", 500
         if term == "":
-            linked_df_filtered = linked_df
+            linked_df_filtered = linked_df.head(n_results)
         else:
-            # Filter linked_df for rows whose label contains the search term
+            # Filter linked_df for rows whose label starts with the search term
             linked_df_filtered = linked_df[
-                linked_df[linked_ds_label].str.lower().str.contains(term)
+                linked_df[linked_ds_label].str.lower().str.startswith(term)
             ].head(n_results)
 
     logging.debug(f"Found {linked_df_filtered.size} entries")

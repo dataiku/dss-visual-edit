@@ -1,0 +1,11 @@
+dash>=2.4.0
+dash_extensions
+pydantic
+pandas==2.2.3
+dataiku-api-client
+ipykernel
+flask
+mkdocstrings-python
+mkdocs-material
+dataiku-internal-client @ https://design.solutions.dataiku-dss.io/public/packages/dataiku-internal-client.tar.gz
+pytest==8.3.4

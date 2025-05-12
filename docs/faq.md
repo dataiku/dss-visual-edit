@@ -1,8 +1,16 @@
 # FAQ
 
-## Can the webapp be used by several users at the same time?
+## Can I use Visual Edit if my data is on connection X?
 
-Several users can view and edit data at the same time, but they won't see each other's edits in real-time; if 2 or more users try to edit the same cell at the same time, all their edits will be logged but only the last edit will make its way to the _edits_ dataset.
+Visual Edit can load your original data regardless of the underlying connection. When using it for the first time, the `editlog`, `edits`, and `edited` datasets will be created on the same connection.
+
+We strongly recommend using a [compatible SQL connection](compatibility) for the `editlog`, as motivated in the [deployment guide](deploy). The `edits` and `edited` datasets can be on a different connection.
+
+If [linked records](linked-records) are needed, and if the linked dataset has more than 10,000 rows or if lookup columns are needed, then the linked dataset must also be on an SQL connection.
+
+## Can the webapp be used by several users simultaneously?
+
+Several users can view and edit data at the same time, but they won't see each other's edits in real time; if two or more users try to edit the same cell at the same time, all their edits will be logged, but only the last edit will make its way to the _edits_ dataset.
 
 ## What happens if I change primary keys or editable columns in the webapp settings?
 
@@ -16,4 +24,3 @@ Several users can view and edit data at the same time, but they won't see each o
 * Editable column:
   * Add: no impact.
   * Remove: previous edits on this column won't be taken into account by the webapp / the recipes, and they won't appear in _edits_ (but they will still be in the editlog).
-

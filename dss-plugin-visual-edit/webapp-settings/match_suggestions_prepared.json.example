@@ -4,7 +4,7 @@
     ],
     "editable_column_names": [
         "Matched Entity",
-        "Reviewed",
+        "Validated",
         "Comments"
     ],
     "freeze_editable_columns": false,
@@ -12,15 +12,13 @@
     "linked_records_count": 1,
     "linked_record_name_1": "Matched Entity",
     "linked_record_ds_name_1": "entities_ext",
-    "linked_record_key_1": "EntityId",
-    "linked_record_label_column_1": "EntityName",
+    "linked_record_key_1": "ID",
+    "linked_record_label_column_1": "Name",
     "linked_record_lookup_columns_1": [
         "Country",
-        "Industry Group"
+        "Industry"
     ],
-    "authorized_users": [
-        "louis.dorard@dataiku.com"
-    ],
+    "authorized_users": [],
     "editschema": [
         {
             "name": "Reviewed",
