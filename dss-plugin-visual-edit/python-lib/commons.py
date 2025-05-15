@@ -109,7 +109,7 @@ def replay_edits(
     notes_column_name = "notes"
     if validation_column_required:
         feedback_columns.append(validation_column_name)
-    if notes_column_name_required:
+    if notes_column_required:
         feedback_columns.append(notes_column_name)
 
     metadata_columns = ["last_edit_date", "last_action", "first_action"]
@@ -123,11 +123,12 @@ def replay_edits(
     )
     all_columns_df = DataFrame(columns=cols)
 
+    editlog_df = get_dataframe(editlog_ds)
+    
     if not editlog_df.size:  # i.e. if empty editlog
         edits_df = all_columns_df
 
     else:
-        editlog_df = get_dataframe(editlog_ds)
         editlog_df.rename(columns={"date": "edit_date"}, inplace=True)
         editlog_df = __unpack_keys__(editlog_df, primary_keys).sort_values("edit_date")
 
@@ -135,23 +136,7 @@ def replay_edits(
         if "action" not in editlog_df.columns:
             editlog_df["action"] = "update"
 
-        # create metadata columns
-        editlog_grouped_last = (
-            editlog_df[primary_keys + ["edit_date", "action"]]
-            .groupby(primary_keys)
-            .last()
-            .add_prefix("last_")
-        )
-        editlog_grouped_first = (
-            editlog_df[primary_keys + ["action"]]
-            .groupby(primary_keys)
-            .first()
-            .add_prefix("first_")
-        )
-        editlog_grouped_df = editlog_grouped_last.join(
-            editlog_grouped_first, on=primary_keys
-        )
-
+        # apply edits, i.e. pivot and keep the last value for each column
         edits_df = pivot_table(
             editlog_df,
             index=primary_keys,
@@ -159,7 +144,7 @@ def replay_edits(
             values="value",
             # for each named column, we only keep the last value
             aggfunc=lambda values: values.iloc[-1] if not values.empty else None,
-        ).join(editlog_grouped_df, on=primary_keys)
+        )
 
         # Drop any columns from the pivot that may not be one of the expected columns
         for col in edits_df.columns:
@@ -185,6 +170,24 @@ def replay_edits(
                 validation_column_name
             ].fillna(False)
 
+        # create metadata columns
+        editlog_grouped_last = (
+            editlog_df[primary_keys + ["edit_date", "action"]]
+            .groupby(primary_keys)
+            .last()
+            .add_prefix("last_")
+        )
+        editlog_grouped_first = (
+            editlog_df[primary_keys + ["action"]]
+            .groupby(primary_keys)
+            .first()
+            .add_prefix("first_")
+        )
+        editlog_grouped_df = editlog_grouped_last.join(
+            editlog_grouped_first, on=primary_keys
+        )
+        edits_df = edits_df.join(editlog_grouped_df, on=primary_keys)
+        
         edits_df.reset_index(inplace=True)
 
         # Make sure that all columns are here and in the right order
@@ -215,6 +218,9 @@ def get_original_df(original_ds):
     :return: a tuple containing the original dataframe, the primary keys, display columns and editable columns.
     """
 
+    # Get the original dataset as a dataframe 
+    original_df = get_dataframe(original_ds)
+
     # Read the dataset configuration
     original_ds_config = original_ds.get_config()
     primary_keys = original_ds_config["customFields"]["primary_keys"]
@@ -226,12 +232,14 @@ def get_original_df(original_ds):
     validation_column_required = original_ds_config["customFields"]["validation_column_required"]
     notes_column_required = original_ds_config["customFields"]["notes_column_required"]
 
-    # Get the original dataset as a dataframe and add the validation and notes columns if required
-    original_df = get_dataframe(original_ds)
-    if notes_column_required:
-        original_df[self.notes] = ""
+    # Add the validation and notes columns if required
+    feedback_columns = []
     if validation_column_required:
-        original_df[self.validated] = False
+        original_df["validated"] = False
+        feedback_columns.append("validated")
+    if notes_column_required:
+        original_df["notes"] = ""
+        feedback_columns.append("notes")
 
     # Get the display column names
     schema = original_ds_config.get("schema").get("columns")
@@ -241,7 +249,7 @@ def get_original_df(original_ds):
 
     # make sure that primary keys will be in the same order for original_df and edits_df, and that we'll return a dataframe where editable columns are last
     return (
-        original_df[primary_keys + display_column_names + editable_column_names],
+        original_df[primary_keys + display_column_names + editable_column_names + feedback_columns],
         primary_keys,
         display_column_names,
         editable_column_names,
@@ -255,6 +263,8 @@ def apply_edits_from_df(original_ds, edits_df):
     )
     # this will contain the list of new columns coming from edits dataset but not found in the original dataset's schema
     editable_columns_new = []
+
+    feedback_columns = []
 
     if not edits_df.size:  # i.e. if empty editlog
         edited_df = original_df
@@ -278,8 +288,8 @@ def apply_edits_from_df(original_ds, edits_df):
 
         # Change types to match those of original_df
         for col in edits_df.columns:
-            original_dtype = original_df[col].dtypes.name
             if col in primary_keys + display_columns + editable_columns:
+                original_dtype = original_df[col].dtypes.name
                 if is_integer_dtype(original_dtype):
                     # there may be missing values so choose a dtype supporting them.
                     # Cast as float first to work around issue with pandas 1.3 https://stackoverflow.com/a/60024263
@@ -288,22 +298,29 @@ def apply_edits_from_df(original_ds, edits_df):
                     edits_df[col] = edits_df[col].astype(float)
                 else:
                     edits_df[col] = edits_df[col].astype(original_dtype)
+            elif col == "validated":
+                edits_df[col] = edits_df[col].astype(bool)
+                feedback_columns.append(col)
+            elif col == "notes":
+                edits_df[col] = edits_df[col].astype(str)
+                feedback_columns.append(col)
             else:
                 editable_columns_new.append(col)
 
+        # Join and "Merge"
+        ###
+
+        # Set the index to primary keys
         original_df.set_index(primary_keys, inplace=True)
         if not edits_df.index.name:  # if index has no name, i.e. it's a range index
             edits_df.set_index(primary_keys, inplace=True)
-
-        # Join and "Merge"
-        ###
 
         # Join -> this adds _value_last columns
         edited_df = original_df.join(edits_df, rsuffix="_value_last")
 
         # "Merge" -> this creates _original columns
         # all last_ and first_ columns have already been dropped
-        for col in editable_columns:
+        for col in editable_columns + feedback_columns:
             # copy col to a new column whose name is suffixed by "_original"
             edited_df[col + "_original"] = edited_df[col]
             # merge original and last edited values
@@ -321,7 +338,7 @@ def apply_edits_from_df(original_ds, edits_df):
 
         # Drop the _original and _value_last columns
         edited_df = edited_df[
-            primary_keys + display_columns + editable_columns + editable_columns_new
+            primary_keys + display_columns + editable_columns + editable_columns_new + feedback_columns
         ]
 
     return edited_df
