@@ -150,8 +150,8 @@
         },
         {
             "name": "notes_column_required",
-            "label": "Include a column for end-user notes",
-            "description": "Values will be empty by default",
+            "label": "Notes",
+            "description": "For end-user notes. Values will be empty by default.",
             "type": "BOOLEAN",
             "defaultValue": false
         },
@@ -159,14 +159,14 @@
             "name": "notes_column_display_name",
             "label": "↳ Display name",
             "description": "Column name used in the webapp interface (underlying storage will use 'notes')",
-            "type": "TEXT",
+            "type": "STRING",
             "visibilityCondition": "model.notes_column_required",
-            "defaultValue": "Notes"
+            "defaultValue": "notes"
         },
         {
             "name": "validation_column_required",
-            "label": "Include a column to mark rows as validated",
-            "description": "Values will be false by default",
+            "label": "Validation",
+            "description": "To mark rows as validated. Values will be False by default",
             "type": "BOOLEAN",
             "defaultValue": false
         },
@@ -174,9 +174,9 @@
             "name": "validation_column_display_name",
             "label": "↳ Display name",
             "description": "Column name used in the webapp interface (underlying storage will use 'validated')",
-            "type": "TEXT",
+            "type": "STRING",
             "visibilityCondition": "model.validation_column_required",
-            "defaultValue": "Validated"
+            "defaultValue": "validated"
         },
         {
             "name": "sep-layout",
