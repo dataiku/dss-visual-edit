@@ -72,7 +72,9 @@ class DataEditor:
             )
             self.webapp_url_public = f"/public-webapps/{self.project_key}/{webapp_id}/"
         except Exception:
-            logging.exception("Failed to retrieve webapp url.")
+            running_in_dss = getenv("DKU_CUSTOM_WEBAPP_CONFIG") is not None
+            if running_in_dss:
+                logging.exception("Failed to retrieve webapp url.")
             self.webapp_url = None
             self.webapp_url_public = "/"
 
