@@ -171,7 +171,7 @@ def replay_edits(
                 validation_column_name
             ].fillna(False)
             # Make sure that the validation column is boolean
-            edits_df[validation_column_name] = edits_df[validation_column_name].astype('boolean')
+            edits_df[validation_column_name] = edits_df[validation_column_name].astype('bool').astype('boolean')
 
         # create metadata columns
         editlog_grouped_last = (
@@ -294,7 +294,7 @@ def apply_edits_from_df(original_ds, edits_df):
                 else:
                     edits_df[col] = edits_df[col].astype(original_dtype)
             elif col == "validated":
-                edits_df[col] = edits_df[col].astype('boolean')
+                edits_df[col] = edits_df[col].astype('bool').astype('boolean')
                 feedback_columns.append(col)
             elif col == "notes":
                 edits_df[col] = edits_df[col].astype(str)
