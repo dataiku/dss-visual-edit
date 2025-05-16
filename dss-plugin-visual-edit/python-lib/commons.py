@@ -62,12 +62,15 @@ def get_dataframe(mydataset):
 
     # Get the right column types: this would be given by the dataset's schema, except when dealing with integers where we want to enforce the use of Pandas' Int64 type (see https://pandas.pydata.org/pandas-docs/stable/user_guide/integer_na.html).
     myschema = mydataset.read_schema()
+    # Get the names, dtypes and parse_date_columns from the schema, with bool_as_str=True to deal with potentially missing boolean values.
     [names, dtypes, parse_date_columns] = dataiku.Dataset.get_dataframe_schema_st(
         myschema, bool_as_str=True
     )
     for col in myschema:
         n = col["name"]
         t = col["type"]
+        if n == "validated":
+            dtypes[n] = "bool" # we know that there won't be any missing values in the validated column, so we can use the standard bool type
         if t in ["tinyint", "smallint", "int", "bigint"]:
             dtypes[n] = "Int64"
 
