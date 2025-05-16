@@ -14,6 +14,8 @@ from commons import (
     apply_edits_from_df,
     replay_edits,
     get_key_values_from_dict,
+    VALIDATION_COLUMN_NAME,
+    NOTES_COLUMN_NAME
 )
 from webapp.db.editlogs import EditLog, EditLogAppenderFactory
 from webapp_utils import find_webapp_id, get_webapp_json
@@ -238,13 +240,13 @@ class DataEditor:
             if notes_column_display_name:
                 self.notes_column_display_name = notes_column_display_name
             else:
-                self.notes_column_display_name = "notes"
+                self.notes_column_display_name = NOTES_COLUMN_NAME
         self.validation_column_required = validation_column_required
         if self.validation_column_required:
             if validation_column_display_name:
                 self.validation_column_display_name = validation_column_display_name
             else:
-                self.validation_column_display_name = "validated"
+                self.validation_column_display_name = VALIDATION_COLUMN_NAME
 
         # For each linked record, add linked dataset/dataframe as attribute
         self.linked_records = linked_records if linked_records is not None else []
@@ -479,8 +481,8 @@ class DataEditor:
         else:
             if (
                 column in self.editable_column_names
-                or self.notes_column_required and column == "notes"
-                or self.validation_column_required and column == "validated"
+                or self.notes_column_required and column == NOTES_COLUMN_NAME
+                or self.validation_column_required and column == VALIDATION_COLUMN_NAME
                 or action == "delete"
             ):
                 # add to the editlog
@@ -557,7 +559,7 @@ class DataEditor:
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
 
-        if column_name == "validated":
+        if column_name == VALIDATION_COLUMN_NAME:
             results = []
 
             # When setting the validation column to True, start by logging the values of other editable columns

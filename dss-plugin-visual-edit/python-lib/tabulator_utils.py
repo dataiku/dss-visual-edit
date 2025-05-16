@@ -7,6 +7,7 @@ from pandas import DataFrame
 from dash_extensions.javascript import Namespace
 import logging
 from dash_extensions.javascript import assign
+from commons import VALIDATION_COLUMN_NAME, NOTES_COLUMN_NAME
 
 # used to reference javascript functions in custom_tabulator.js
 __ns__ = Namespace("myNamespace", "tabulator")
@@ -326,7 +327,7 @@ def get_columns_tabulator(de, show_header_filter=True, freeze_editable_columns=F
 
     if de.validation_column_required:
         t_col = {
-            "field": "validated",
+            "field": VALIDATION_COLUMN_NAME,
             "title": de.validation_column_display_name,
             "sorter": "exists",
             "formatter": "tickCross",
@@ -345,7 +346,7 @@ def get_columns_tabulator(de, show_header_filter=True, freeze_editable_columns=F
 
     if de.notes_column_required:
         t_col = {
-            "field": "notes",
+            "field": NOTES_COLUMN_NAME,
             "title": de.notes_column_display_name,
             "formatter": "textarea",
             "editor": "textarea",

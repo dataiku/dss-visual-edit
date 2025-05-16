@@ -5,6 +5,8 @@ from pandas.api.types import is_integer_dtype, is_float_dtype
 from flask import request
 import logging
 
+VALIDATION_COLUMN_NAME = "validated"
+NOTES_COLUMN_NAME = "notes"
 
 # Editlog utils - used by Empty Editlog step and by DataEditor for initialization of editlog
 
@@ -106,12 +108,10 @@ def replay_edits(
     """
 
     feedback_columns = []
-    validation_column_name = "validated"
-    notes_column_name = "notes"
     if validation_column_required:
-        feedback_columns.append(validation_column_name)
+        feedback_columns.append(VALIDATION_COLUMN_NAME)
     if notes_column_required:
-        feedback_columns.append(notes_column_name)
+        feedback_columns.append(NOTES_COLUMN_NAME)
 
     metadata_columns = ["last_edit_date", "last_edited_by", "last_action", "first_action"]
 
@@ -155,23 +155,23 @@ def replay_edits(
 
         if notes_column_required:
             # Make sure that there is a notes column
-            if notes_column_name not in edits_df.columns:
-                edits_df[notes_column_name] = ""
+            if NOTES_COLUMN_NAME not in edits_df.columns:
+                edits_df[NOTES_COLUMN_NAME] = ""
             # Fill its missing values with the default value: empty string
-            edits_df[notes_column_name] = edits_df[notes_column_name].fillna("")
+            edits_df[NOTES_COLUMN_NAME] = edits_df[NOTES_COLUMN_NAME].fillna("")
             # Make sure that the notes column is string
-            edits_df[notes_column_name] = edits_df[notes_column_name].astype(str)
+            edits_df[NOTES_COLUMN_NAME] = edits_df[NOTES_COLUMN_NAME].astype(str)
 
         if validation_column_required:
             # Make sure that there is a validation column
-            if validation_column_name not in edits_df.columns:
-                edits_df[validation_column_name] = False
+            if VALIDATION_COLUMN_NAME not in edits_df.columns:
+                edits_df[VALIDATION_COLUMN_NAME] = False
             # Fill its missing values with the default value: False
-            edits_df[validation_column_name] = edits_df[
-                validation_column_name
+            edits_df[VALIDATION_COLUMN_NAME] = edits_df[
+                VALIDATION_COLUMN_NAME
             ].fillna(False)
             # Make sure that the validation column is boolean
-            edits_df[validation_column_name] = edits_df[validation_column_name].astype('bool').astype('boolean')
+            edits_df[VALIDATION_COLUMN_NAME] = edits_df[VALIDATION_COLUMN_NAME].astype('bool').astype('boolean')
 
         # create metadata columns
         editlog_grouped_last = (
@@ -237,11 +237,11 @@ def get_original_df(original_ds):
     # Add the validation and notes columns if required
     feedback_columns = []
     if validation_column_required:
-        original_df["validated"] = False
-        feedback_columns.append("validated")
+        original_df[VALIDATION_COLUMN_NAME] = False
+        feedback_columns.append(VALIDATION_COLUMN_NAME)
     if notes_column_required:
-        original_df["notes"] = ""
-        feedback_columns.append("notes")
+        original_df[NOTES_COLUMN_NAME] = ""
+        feedback_columns.append(NOTES_COLUMN_NAME)
 
     # Get the display column names
     schema = original_ds_config.get("schema").get("columns")
@@ -293,10 +293,10 @@ def apply_edits_from_df(original_ds, edits_df):
                     edits_df[col] = edits_df[col].astype(float)
                 else:
                     edits_df[col] = edits_df[col].astype(original_dtype)
-            elif col == "validated":
+            elif col == VALIDATION_COLUMN_NAME:
                 edits_df[col] = edits_df[col].astype('bool').astype('boolean')
                 feedback_columns.append(col)
-            elif col == "notes":
+            elif col == NOTES_COLUMN_NAME:
                 edits_df[col] = edits_df[col].astype(str)
                 feedback_columns.append(col)
             elif col not in metadata_columns:
