@@ -326,10 +326,6 @@ def apply_edits_from_df(original_ds, edits_df):
             edited_df.loc[:, col] = edited_df[col + "_value_last"].where(
                 edited_df[col + "_value_last"].notnull(), edited_df[col + "_original"]
             )
-        
-        # Fix column types (the join and the "merge" above may have changed the types of some columns)
-        for col in editable_columns + feedback_columns:
-            edited_df[col] = edited_df[col].astype(original_df[col].dtypes.name)
 
         # Stack created rows
         ###
