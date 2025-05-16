@@ -112,7 +112,7 @@ def replay_edits(
     if notes_column_required:
         feedback_columns.append(notes_column_name)
 
-    metadata_columns = ["last_edit_date", "last_action", "first_action"]
+    metadata_columns = ["last_edit_date", "last_edited_by", "last_action", "first_action"]
 
     # Create empty dataframe with the expected columns. This helps ensure that the dataframe we return always has the right schema, even if some columns of the input dataset were never edited.
     cols = (
@@ -129,7 +129,7 @@ def replay_edits(
         edits_df = all_columns_df
 
     else:
-        editlog_df.rename(columns={"date": "edit_date"}, inplace=True)
+        editlog_df.rename(columns={"date": "edit_date", "user": "edited_by"}, inplace=True)
         editlog_df = __unpack_keys__(editlog_df, primary_keys).sort_values("edit_date")
 
         # make sure "action" column is present
@@ -172,7 +172,7 @@ def replay_edits(
 
         # create metadata columns
         editlog_grouped_last = (
-            editlog_df[primary_keys + ["edit_date", "action"]]
+            editlog_df[primary_keys + ["edit_date", "edited_by", "action"]]
             .groupby(primary_keys)
             .last()
             .add_prefix("last_")
@@ -258,35 +258,28 @@ def get_original_df(original_ds):
 
 # Used by Apply recipe and by DataEditor for getting edited data
 def apply_edits_from_df(original_ds, edits_df):
-    original_df, primary_keys, display_columns, editable_columns = get_original_df(
-        original_ds
-    )
-    # this will contain the list of new columns coming from edits dataset but not found in the original dataset's schema
-    editable_columns_new = []
+    """
+    Get an edited DataFrame from an original dataset and a DataFrame of edits to apply.
 
-    feedback_columns = []
+    :param original_ds: the original dataset.
+    :param edits_df: a DataFrame containing the edits to apply, with columns for primary keys, editable columns, and feedback columns (if any).
+    :return: an edited DataFrame containing the original dataset with the edits applied. It will contain the following columns: primary keys, display-only columns, editable columns, feedback columns ("validated" and "notes", if present in the edits DataFrame).
+    """
+
+    original_df, primary_keys, display_columns, editable_columns = get_original_df(original_ds)
+
+    metadata_columns = ["last_edit_date", "last_edited_by", "last_action", "first_action"]
+    feedback_columns = [] # placeholder for feedback columns found in the edits dataframe
+    editable_columns_new = [] # placeholder for columns found in the edits dataframe but not in the original dataset
 
     if not edits_df.size:  # i.e. if empty editlog
         edited_df = original_df
-    else:
-        created = edits_df["first_action"] == "create"
-        not_deleted = edits_df["last_action"] != "delete"
-        created_df = edits_df[not_deleted & created]
 
+    else:
         # Prepare edits_df
         ###
-        edits_df = edits_df[not_deleted & ~created]
 
-        # Drop columns which are not primary keys nor editable columns
-        options.mode.chained_assignment = None  # this helps prevent SettingWithCopyWarnings that are triggered by the drops below
-        if "last_edit_date" in edits_df.columns:
-            edits_df.drop(columns=["last_edit_date"], inplace=True)
-        if "last_action" in edits_df.columns:
-            edits_df.drop(columns=["last_action"], inplace=True)
-        if "first_action" in edits_df.columns:
-            edits_df.drop(columns=["first_action"], inplace=True)
-
-        # Change types to match those of original_df
+        # Change column types to match those of original_df
         for col in edits_df.columns:
             if col in primary_keys + display_columns + editable_columns:
                 original_dtype = original_df[col].dtypes.name
@@ -304,22 +297,26 @@ def apply_edits_from_df(original_ds, edits_df):
             elif col == "notes":
                 edits_df[col] = edits_df[col].astype(str)
                 feedback_columns.append(col)
-            else:
+            elif col not in metadata_columns:
                 editable_columns_new.append(col)
 
-        # Join and "Merge"
-        ###
-
-        # Set the index to primary keys
+        # Now that the types are correct (including primary keys), we set the index
         original_df.set_index(primary_keys, inplace=True)
         if not edits_df.index.name:  # if index has no name, i.e. it's a range index
             edits_df.set_index(primary_keys, inplace=True)
 
-        # Join -> this adds _value_last columns
-        edited_df = original_df.join(edits_df, rsuffix="_value_last")
+        # Identify rows that were deleted or created
+        deleted = edits_df["last_action"] == "delete"
+        created = edits_df["first_action"] == "create"
 
-        # "Merge" -> this creates _original columns
-        # all last_ and first_ columns have already been dropped
+
+        # Apply edits to previously existing rows, i.e. those that were not deleted or created.
+        ###
+
+        # Add _value_last suffix to editable columns.
+        edited_df = original_df.join(edits_df[~deleted & ~created], rsuffix="_value_last")
+
+        # Merge values of editable columns: if a column was edited, the last value is kept, otherwise the original value is kept.
         for col in editable_columns + feedback_columns:
             # copy col to a new column whose name is suffixed by "_original"
             edited_df[col + "_original"] = edited_df[col]
@@ -328,18 +325,19 @@ def apply_edits_from_df(original_ds, edits_df):
                 edited_df[col + "_value_last"].notnull(), edited_df[col + "_original"]
             )
 
-        edited_df.reset_index(inplace=True)
-
         # Stack created rows
         ###
 
+        created_df = edits_df[~deleted & created]
         if created_df.size:
             edited_df = concat([created_df, edited_df])
 
         # Drop the _original and _value_last columns
         edited_df = edited_df[
-            primary_keys + display_columns + editable_columns + editable_columns_new + feedback_columns
+            display_columns + editable_columns + editable_columns_new + feedback_columns + metadata_columns
         ]
+
+        edited_df.reset_index(inplace=True)
 
     return edited_df
 

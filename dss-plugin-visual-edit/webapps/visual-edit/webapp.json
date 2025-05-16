@@ -158,7 +158,7 @@
         {
             "name": "notes_column_display_name",
             "label": "↳ Display name",
-            "description": "Column name used in the webapp interface (underlying storage will use 'notes')",
+            "description": "For usage in the webapp (underlying storage will use 'notes')",
             "type": "STRING",
             "visibilityCondition": "model.notes_column_required",
             "defaultValue": "notes"
@@ -173,7 +173,7 @@
         {
             "name": "validation_column_display_name",
             "label": "↳ Display name",
-            "description": "Column name used in the webapp interface (underlying storage will use 'validated')",
+            "description": "For usage in the webapp (underlying storage will use 'validated')",
             "type": "STRING",
             "visibilityCondition": "model.validation_column_required",
             "defaultValue": "validated"
