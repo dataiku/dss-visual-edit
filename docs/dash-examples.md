@@ -2,12 +2,13 @@
 
 As seen in the [Introduction to Visual Edit's CRUD Python API](https://github.com/dataiku/dss-visual-edit/blob/master/docs/CRUD_example_usage.ipynb), one can use the Visual Edit API to add a data persistence layer to any webapp.
 
-The plugin's Visual Webapp consists of a single data table component.  In this guide, we show how to customize the layout of a data editing and validation webapp in Dash, based on such a component. This can be to:
+The plugin's Visual Webapp consists of a single data table component. In this guide, we show how to customize the layout of a data editing and validation webapp in Dash, based on such a component. This can be to:
 
-* **Add other components to the layout**. The first section of this guide shows the minimal Dash code to use in order to get the same data table as in the Visual Webapp. This is based on the plugin's [`dash_tabulator` component](https://github.com/dataiku/dss-visual-edit/blob/master/dash_tabulator/README.md). You can then add other components to the Dash layout.
-* **Customize the settings of the data table**. `dash_tabulator` is based on the [Tabulator](https://tabulator.info/) JavaScript library. The second section gives an example of how to leverage some of its advanced features by customizing column definitions.
-* **Use a different data table component**. The third section shows how to use a different data table component in Dash, such as [AG Grid](https://dash.plotly.com/dash-ag-grid).
+- **Add other components to the layout**. The first section of this guide shows the minimal Dash code to use in order to get the same data table as in the Visual Webapp. This is based on the plugin's [`dash_tabulator` component](https://github.com/dataiku/dss-visual-edit/blob/master/dash_tabulator/README.md). You can then add other components to the Dash layout.
+- **Customize the settings of the data table**. `dash_tabulator` is based on the [Tabulator](https://tabulator.info/) JavaScript library. The second section gives an example of how to leverage some of its advanced features by customizing column definitions.
+- **Use a different data table component**. The third section shows how to use a different data table component in Dash, such as [AG Grid](https://dash.plotly.com/dash-ag-grid).
 
+Note that these customizations don't need modifying the plugin nor converting to development mode.
 
 ## Basic usage of `dash_tabulator`
 

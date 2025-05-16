@@ -1,4 +1,4 @@
-# Setting up Linked Records
+# Set up dropdown editing via "Linked Records"
 
 Define linked records to enforce a specific set of values for an editable column. The cell editor will be a dropdown widget.
 
@@ -30,19 +30,20 @@ See [here](data-table-features) for more information on the editing experience.
 
 Given a dataset named PRODUCTS containing a list of products and another dataset named COMPANIES containing a list of companies, we want users of the web app to link products to a specific company.
 
-***Original dataset***
+**_Original dataset_**
 
-| product_name  | company_name |
-| ------------- | ------------- |
-| DSS  |   |
+| product_name | company_name |
+| ------------ | ------------ |
+| DSS          |              |
 
-***Dataset with linked records***
+**_Dataset with linked records_**
 
 | company_name | industry |
-| ------------- | ------------- |
-| dataiku  | tech  |
+| ------------ | -------- |
+| dataiku      | tech     |
 
 The configuration could look like this:
+
 - **Linked Dataset:** COMPANIES
 - **Column:** company_id
 - **Primary Key:** company_name
@@ -51,14 +52,14 @@ The configuration could look like this:
 
 resulting in the following edited dataset one DSS is linked to dataiku.
 
-***Original dataset edited (after building the flow)***
+**_Original dataset edited (after building the flow)_**
 
-| product_name  | company_name |
-| ------------- | ------------- |
-| DSS  | dataiku   |
+| product_name | company_name |
+| ------------ | ------------ |
+| DSS          | dataiku      |
 
-***Dataset with linked records***
+**_Dataset with linked records_**
 
 | company_name | industry |
-| ------------- | ------------- |
-| dataiku  | tech  |
+| ------------ | -------- |
+| dataiku      | tech     |
