@@ -316,6 +316,7 @@ def apply_edits_from_df(original_ds, edits_df):
         ###
 
         # For each editable column of the original dataset, a new column with "_value_last" suffix is added. For each row, it holds the last edited value (if any), or None if the column was never edited.
+        # The dtypes of these columns should be the same as the original columns (this is why it was  important to use dtypes that allow for missing values for integers and booleans, which are common in edits dataframes).
         edited_df = original_df.join(edits_df[~deleted & ~created], rsuffix="_value_last")
 
         # Merge values of editable columns: if a column was edited, the last value is kept, otherwise the original value is kept.
