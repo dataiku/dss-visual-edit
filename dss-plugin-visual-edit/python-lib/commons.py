@@ -171,7 +171,7 @@ def replay_edits(
                 validation_column_name
             ].fillna(False)
             # Make sure that the validation column is boolean
-            edits_df[validation_column_name] = edits_df[validation_column_name].astype(bool)
+            edits_df[validation_column_name] = edits_df[validation_column_name].astype('boolean')
 
         # create metadata columns
         editlog_grouped_last = (
