@@ -15,7 +15,7 @@ from commons import (
     replay_edits,
     get_key_values_from_dict,
     VALIDATION_COLUMN_NAME,
-    NOTES_COLUMN_NAME
+    NOTES_COLUMN_NAME,
 )
 from webapp.db.editlogs import EditLog, EditLogAppenderFactory
 from webapp_utils import find_webapp_id, get_webapp_json
@@ -42,6 +42,7 @@ class EditFailure:
 class EditUnauthorized:
     pass
 
+
 class EditFreezed:
     pass
 
@@ -57,7 +58,9 @@ class DataEditor:
         settings.custom_fields["editlog_ds"] = self.editlog_ds_name
         settings.custom_fields["primary_keys"] = self.primary_keys
         settings.custom_fields["editable_column_names"] = self.editable_column_names
-        settings.custom_fields["validation_column_required"] = self.validation_column_required
+        settings.custom_fields["validation_column_required"] = (
+            self.validation_column_required
+        )
         settings.custom_fields["notes_column_required"] = self.notes_column_required
         if self.webapp_url:
             settings.custom_fields["webapp_url"] = self.webapp_url
@@ -319,7 +322,7 @@ class DataEditor:
             )  # this will be an empty dataframe
 
         self.authorized_users = authorized_users
-        
+
         self.freeze_edits = freeze_edits
 
         self.display_column_names = get_display_column_names(
@@ -400,7 +403,7 @@ class DataEditor:
             self.primary_keys,
             self.editable_column_names,
             self.validation_column_required,
-            self.notes_column_required
+            self.notes_column_required,
         )
 
     def get_row(self, primary_keys):
@@ -481,8 +484,10 @@ class DataEditor:
         else:
             if (
                 column in self.editable_column_names
-                or self.notes_column_required and column == NOTES_COLUMN_NAME
-                or self.validation_column_required and column == VALIDATION_COLUMN_NAME
+                or self.notes_column_required
+                and column == NOTES_COLUMN_NAME
+                or self.validation_column_required
+                and column == VALIDATION_COLUMN_NAME
                 or action == "delete"
             ):
                 # add to the editlog
@@ -531,7 +536,7 @@ class DataEditor:
         """
         if self.freeze_edits:
             return "Edits are disabled."
-        
+
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         for col in column_values.keys():
             self.__append_to_editlog__(
@@ -559,18 +564,22 @@ class DataEditor:
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
 
-        if column_name == VALIDATION_COLUMN_NAME:
+        if column == VALIDATION_COLUMN_NAME:
             results = []
 
             # When setting the validation column to True, start by logging the values of other editable columns
             for col in self.editable_column_names:
-                results.append(self.__append_to_editlog__(key, col, primary_keys[col])) # contains values for primary keys — and other columns too, but they'll be discarded
-            
+                results.append(
+                    self.__append_to_editlog__(key, col, primary_keys[col])
+                )  # contains values for primary keys — and other columns too, but they'll be discarded
+
             # End by logging that validation is True
-            results.append(self.__append_to_editlog__(key, column, primary_keys[column]))
-            
+            results.append(
+                self.__append_to_editlog__(key, column, primary_keys[column])
+            )
+
             # Note: To improve this, it would be best to group all the inserts in the same transaction
-            
+
             return results
 
         else:
