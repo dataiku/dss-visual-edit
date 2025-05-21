@@ -74,23 +74,12 @@ pip install -r code-env/python/spec/requirements.txt
 pip install -r code-env/python/spec/requirements.dev.39.txt
 ```
 
-- Install Dataiku internal client (this would be done automatically when creating a code environment within Dataiku):
+- Add Dataiku internal client to the environment. This can be done by linking to the `dataiku` and `dataikuapi` packages that already exist in your Dataiku installation:
 
-  - Bash:
-
-    ```bash
-    instance_name=$(jq -r '.default_instance' ~/.dataiku/config.json)
-    DKU_DSS_URL=$(jq -r --arg instance $instance_name '.dss_instances[$instance].url' ~/.dataiku/config.json)
-    pip install $DKU_DSS_URL/public/packages/dataiku-internal-client.tar.gz
-    ```
-
-  - Fish:
-
-    ```fish
-    set instance_name (jq -r '.default_instance' ~/.dataiku/config.json)
-    set DKU_DSS_URL (jq -r --arg instance $instance_name '.dss_instances[$instance].url' ~/.dataiku/config.json)
-    pip install $DKU_DSS_URL/public/packages/dataiku-internal-client.tar.gz
-    ```
+```bash
+ln -s PATH_TO_PACKAGES/dataiku ~/.pyenv/versions/3.9.19/envs/visual-edit/lib/python3.9/site-packages/dataiku
+ln -s PATH_TO_PACKAGES/dataikuapi ~/.pyenv/versions/3.9.19/envs/visual-edit/lib/python3.9/site-packages/dataikuapi
+```
 
 #### Debugging tips
 

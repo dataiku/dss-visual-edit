@@ -1,11 +1,19 @@
 # How to use the data table
 
-* Right-clicking on the column name will show a menu with an option to hide the column, and an option to group rows by value.
-* Sorting is done by clicking on the arrow next to column name.
-* Filtering widgets are located below each column name.
-* All of this can be reset by clicking on the "Reset View" button in the bottom-left corner.
-* Linked records are edited via dropdowns which include the ability to search through all options: when there are many of them, only options that start with the search term are presented.
-* Changes in the original dataset are automatically detected and signaled. The user needs to refresh the webpage in order to see them.
+- At the top of the data table is a header with, for each column...
+  - Its name. Right-clicking on a column name will show a menu with options to hide the column, and to group rows by value.
+  - A sorting arrow next to the column's name.
+  - Its type. This can be "Number", "Text", "Date", "Checkbox", or "Linked Record" (see explanations below).
+  - Filtering widgets for each column.
+- The above options can be reset by clicking on the "Reset View" button in the bottom-left corner of the table.
+- Changes in the original dataset are automatically detected and signaled. The user needs to refresh the webpage in order to see them.
+
+## About Linked Records
+
+- Linked Records are used for categorical data, to avoid free-text input errors.
+- They correspond to records found in another dataset, the "Linked Dataset".
+- They are edited via dropdowns which present all valid options, found in the Linked Dataset.
+- The dropdowns include the ability to search through all options: when there are many of them, only options that start with the search term are presented.
 
 ## Troubleshooting
 
