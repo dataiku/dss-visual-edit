@@ -1,12 +1,17 @@
 from __future__ import annotations
 import dataiku
-from pandas import DataFrame, concat, pivot_table, options, Int64Dtype
+from pandas import DataFrame, concat, pivot_table, options, Int64Dtype, NA
 from pandas.api.types import is_integer_dtype, is_float_dtype, is_bool_dtype
 from flask import request
 import logging
 
 VALIDATION_COLUMN_NAME = "validated"
 NOTES_COLUMN_NAME = "notes"
+
+
+def __as_boolean__(c):
+    return c.map({"True": True, "False": False, NA: NA}).astype("boolean")
+
 
 # Editlog utils - used by Empty Editlog step and by DataEditor for initialization of editlog
 
@@ -174,8 +179,8 @@ def replay_edits(
                 False
             )
             # Make sure that the validation column is boolean
-            edits_df[VALIDATION_COLUMN_NAME] = (
-                edits_df[VALIDATION_COLUMN_NAME].astype("bool").astype("boolean")
+            edits_df[VALIDATION_COLUMN_NAME] = __as_boolean__(
+                edits_df[VALIDATION_COLUMN_NAME]
             )
 
         # create metadata columns
@@ -317,11 +322,11 @@ def apply_edits_from_df(original_ds, edits_df):
                 elif is_float_dtype(original_dtype):
                     edits_df[col] = edits_df[col].astype(float)
                 elif is_bool_dtype(original_dtype):
-                    edits_df[col] = edits_df[col].astype("bool").astype("boolean")
+                    edits_df[col] = __as_boolean__(edits_df[col])
                 else:
                     edits_df[col] = edits_df[col].astype(original_dtype)
             elif col == VALIDATION_COLUMN_NAME:
-                edits_df[col] = edits_df[col].astype("bool").astype("boolean")
+                edits_df[col] = __as_boolean__(edits_df[col])
                 feedback_columns.append(col)
             elif col == NOTES_COLUMN_NAME:
                 edits_df[col] = edits_df[col].astype(str)
@@ -342,7 +347,7 @@ def apply_edits_from_df(original_ds, edits_df):
         ###
 
         # For each editable column of the original dataset, a new column with "_value_last" suffix is added. For each row, it holds the last edited value (if any), or None if the column was never edited.
-        # The dtypes of these columns should be the same as the original columns (this is why it was  important to use dtypes that allow for missing values for integers and booleans, which are common in edits dataframes).
+        # The dtypes of these columns should be the same as the original columns (this is why it was important to use dtypes that allow for missing values for integers and booleans, which are common in edits dataframes).
         edited_df = original_df.join(
             edits_df[~deleted & ~created], rsuffix="_value_last"
         )
