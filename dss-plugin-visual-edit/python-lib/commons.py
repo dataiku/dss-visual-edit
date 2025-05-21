@@ -10,7 +10,18 @@ NOTES_COLUMN_NAME = "notes"
 
 
 def __as_boolean__(c):
-    return c.map({"True": True, "False": False, NA: NA}).astype("boolean")
+    return c.map(
+        {
+            True: True,
+            "True": True,
+            "true": True,
+            False: False,
+            "False": False,
+            "false": False,
+            "": NA,
+            NA: NA,
+        }
+    ).astype("boolean")
 
 
 # Editlog utils - used by Empty Editlog step and by DataEditor for initialization of editlog
