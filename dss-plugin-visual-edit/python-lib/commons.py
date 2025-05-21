@@ -1,7 +1,7 @@
 from __future__ import annotations
 import dataiku
 from pandas import DataFrame, concat, pivot_table, options, Int64Dtype
-from pandas.api.types import is_integer_dtype, is_float_dtype
+from pandas.api.types import is_integer_dtype, is_float_dtype, is_bool_dtype
 from flask import request
 import logging
 
@@ -91,8 +91,8 @@ def replay_edits(
     editlog_ds,
     primary_keys,
     editable_column_names,
-    validation_column_required = False,
-    notes_column_required = False,
+    validation_column_required=False,
+    notes_column_required=False,
 ):
     """
     Get the edited cells from an editlog dataset.
@@ -113,22 +113,25 @@ def replay_edits(
     if notes_column_required:
         feedback_columns.append(NOTES_COLUMN_NAME)
 
-    metadata_columns = ["last_edit_date", "last_edited_by", "last_action", "first_action"]
+    metadata_columns = [
+        "last_edit_date",
+        "last_edited_by",
+        "last_action",
+        "first_action",
+    ]
 
     # Fix expected columns. This helps ensure that the dataframe we return always has the right schema, even if some columns of the input dataset were never edited.
-    cols = (
-        editable_column_names
-        + feedback_columns
-        + metadata_columns
-    )
+    cols = editable_column_names + feedback_columns + metadata_columns
 
     editlog_df = get_dataframe(editlog_ds)
-    
+
     if not editlog_df.size:  # i.e. if empty editlog
         edits_df = DataFrame(columns=(primary_keys + cols))
 
     else:
-        editlog_df.rename(columns={"date": "edit_date", "user": "edited_by"}, inplace=True)
+        editlog_df.rename(
+            columns={"date": "edit_date", "user": "edited_by"}, inplace=True
+        )
         editlog_df = __unpack_keys__(editlog_df, primary_keys).sort_values("edit_date")
 
         # Make sure "action" column is present
@@ -167,11 +170,13 @@ def replay_edits(
             if VALIDATION_COLUMN_NAME not in edits_df.columns:
                 edits_df[VALIDATION_COLUMN_NAME] = False
             # Fill its missing values with the default value: False
-            edits_df[VALIDATION_COLUMN_NAME] = edits_df[
-                VALIDATION_COLUMN_NAME
-            ].fillna(False)
+            edits_df[VALIDATION_COLUMN_NAME] = edits_df[VALIDATION_COLUMN_NAME].fillna(
+                False
+            )
             # Make sure that the validation column is boolean
-            edits_df[VALIDATION_COLUMN_NAME] = edits_df[VALIDATION_COLUMN_NAME].astype('bool').astype('boolean')
+            edits_df[VALIDATION_COLUMN_NAME] = (
+                edits_df[VALIDATION_COLUMN_NAME].astype("bool").astype("boolean")
+            )
 
         # create metadata columns
         editlog_grouped_last = (
@@ -211,7 +216,7 @@ def get_display_column_names(schema, primary_keys, editable_column_names):
 def get_original_df(original_ds):
     """
     Get the original dataset as a dataframe
-    
+
     Columns ordered as follows: primary keys, display columns, editable columns, plus validation and notes columns if required (with default values set to empty string and False respectively).
 
     The dataset's configuration specifies the primary keys, editable columns, and whether validation and notes columns are required. The display columns are all other columns in the dataset.
@@ -220,18 +225,22 @@ def get_original_df(original_ds):
     :return: a tuple containing the original dataframe, the primary keys, display columns and editable columns.
     """
 
-    # Get the original dataset as a dataframe 
+    # Get the original dataset as a dataframe
     original_df = get_dataframe(original_ds)
 
     # Read the dataset configuration
     original_ds_config = original_ds.get_config()
     primary_keys = original_ds_config["customFields"]["primary_keys"]
-    editable_column_names = [ # filter out column names that are not in the original dataset
-        col
-        for col in original_ds_config["customFields"]["editable_column_names"]
-        if col in original_df.columns
+    editable_column_names = (
+        [  # filter out column names that are not in the original dataset
+            col
+            for col in original_ds_config["customFields"]["editable_column_names"]
+            if col in original_df.columns
+        ]
+    )
+    validation_column_required = original_ds_config["customFields"][
+        "validation_column_required"
     ]
-    validation_column_required = original_ds_config["customFields"]["validation_column_required"]
     notes_column_required = original_ds_config["customFields"]["notes_column_required"]
 
     # Add the validation and notes columns if required
@@ -251,7 +260,12 @@ def get_original_df(original_ds):
 
     # make sure that primary keys will be in the same order for original_df and edits_df, and that we'll return a dataframe where editable columns are last
     return (
-        original_df[primary_keys + display_column_names + editable_column_names + feedback_columns],
+        original_df[
+            primary_keys
+            + display_column_names
+            + editable_column_names
+            + feedback_columns
+        ],
         primary_keys,
         display_column_names,
         editable_column_names,
@@ -268,11 +282,22 @@ def apply_edits_from_df(original_ds, edits_df):
     :return: an edited DataFrame containing the original dataset with the edits applied. It will contain the following columns: primary keys, display-only columns, editable columns, feedback columns ("validated" and "notes", if present in the edits DataFrame).
     """
 
-    original_df, primary_keys, display_columns, editable_columns = get_original_df(original_ds)
+    original_df, primary_keys, display_columns, editable_columns = get_original_df(
+        original_ds
+    )
 
-    metadata_columns = ["last_edit_date", "last_edited_by", "last_action", "first_action"]
-    feedback_columns = [] # placeholder for feedback columns found in the edits dataframe
-    editable_columns_new = [] # placeholder for columns found in the edits dataframe but not in the original dataset
+    metadata_columns = [
+        "last_edit_date",
+        "last_edited_by",
+        "last_action",
+        "first_action",
+    ]
+    feedback_columns = (
+        []
+    )  # placeholder for feedback columns found in the edits dataframe
+    editable_columns_new = (
+        []
+    )  # placeholder for columns found in the edits dataframe but not in the original dataset
 
     if not edits_df.size:  # i.e. if empty editlog
         edited_df = original_df
@@ -291,10 +316,12 @@ def apply_edits_from_df(original_ds, edits_df):
                     edits_df[col] = edits_df[col].astype(float).astype(Int64Dtype())
                 elif is_float_dtype(original_dtype):
                     edits_df[col] = edits_df[col].astype(float)
+                elif is_bool_dtype(original_dtype):
+                    edits_df[col] = edits_df[col].astype("bool").astype("boolean")
                 else:
                     edits_df[col] = edits_df[col].astype(original_dtype)
             elif col == VALIDATION_COLUMN_NAME:
-                edits_df[col] = edits_df[col].astype('bool').astype('boolean')
+                edits_df[col] = edits_df[col].astype("bool").astype("boolean")
                 feedback_columns.append(col)
             elif col == NOTES_COLUMN_NAME:
                 edits_df[col] = edits_df[col].astype(str)
@@ -311,13 +338,14 @@ def apply_edits_from_df(original_ds, edits_df):
         deleted = edits_df["last_action"] == "delete"
         created = edits_df["first_action"] == "create"
 
-
         # Apply edits to previously existing rows, i.e. those that were not deleted or created.
         ###
 
         # For each editable column of the original dataset, a new column with "_value_last" suffix is added. For each row, it holds the last edited value (if any), or None if the column was never edited.
         # The dtypes of these columns should be the same as the original columns (this is why it was  important to use dtypes that allow for missing values for integers and booleans, which are common in edits dataframes).
-        edited_df = original_df.join(edits_df[~deleted & ~created], rsuffix="_value_last")
+        edited_df = original_df.join(
+            edits_df[~deleted & ~created], rsuffix="_value_last"
+        )
 
         # Merge values of editable columns: if a column was edited, the last value is kept, otherwise the original value is kept.
         for col in editable_columns + feedback_columns:
@@ -337,7 +365,11 @@ def apply_edits_from_df(original_ds, edits_df):
 
         # Drop the _original and _value_last columns
         edited_df = edited_df[
-            display_columns + editable_columns + editable_columns_new + feedback_columns + metadata_columns
+            display_columns
+            + editable_columns
+            + editable_columns_new
+            + feedback_columns
+            + metadata_columns
         ]
 
         edited_df.reset_index(inplace=True)
