@@ -568,14 +568,18 @@ class DataEditor:
             results = []
 
             # When setting the validation column to True, start by logging the values of other editable columns
-            for col in self.editable_column_names:
+            for editable_col in self.editable_column_names:
                 results.append(
-                    self.__append_to_editlog__(key, col, primary_keys[col])
+                    self.__append_to_editlog__(
+                        key, editable_col, primary_keys[editable_col]
+                    )
                 )  # contains values for primary keys — and other columns too, but they'll be discarded
 
             # End by logging that validation is True
             results.append(
-                self.__append_to_editlog__(key, column, primary_keys[column])
+                self.__append_to_editlog__(
+                    key, VALIDATION_COLUMN_NAME, primary_keys[VALIDATION_COLUMN_NAME]
+                )
             )
 
             # Note: To improve this, it would be best to group all the inserts in the same transaction
