@@ -36,13 +36,13 @@ class Config(BaseModel):
     original_dataset: str = ""  # may be set by an environment variable
     primary_keys: List[str]
     editable_column_names: List[str]
-    notes_column_required: bool
-    notes_column_display_name: str
-    validation_column_required: bool
-    validation_column_display_name: str
+    notes_column_required: bool = False
+    notes_column_display_name: str = "notes"
+    validation_column_required: bool = False
+    validation_column_display_name: str = "validated"
     show_header_filter: bool = True
-    freeze_editable_columns: bool
-    group_column_names: List[str]
+    freeze_editable_columns: bool = False
+    group_column_names: List[str] = []
     linked_records_count: int = 0
     authorized_users: List[str] = []
     freeze_edits: bool = False
