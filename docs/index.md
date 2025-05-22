@@ -13,7 +13,7 @@ This plugin helps spin up visual apps to validate and edit data. Learn more abou
     - [Validating machine-generated data](validate)
     - [Building a complete application to test with end-users](build-complete-application)
     - [Deploying to production](deploy)
-  - Case study: Entity Resolution (coming soon)
+  - Case study: [Entity Resolution](https://blog.dataiku.com/accelerating-entity-resolution)
   - Advanced features:
     - [Dropdown editing via "Linked Records"](linked-records)
     - [Customizing editing widgets via the "Editschema"](editschema)
