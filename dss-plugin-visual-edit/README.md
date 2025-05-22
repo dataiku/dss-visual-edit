@@ -127,9 +127,12 @@ python backend.py
 
 ## Integration tests
 
-Visual Edit is validated against an integration test suite located in `dss-plugin-visual-edit/tests` and run on a ["test" Dataiku instance managed by the Business Solutions](https://tests-integration.solutions.dataiku-dss.io/home/).
+Visual Edit is validated against an integration test suite located in `dss-plugin-visual-edit/tests` and run on a ["test" Dataiku instance managed by the Business Solutions](https://tests-integration.solutions.dataiku-dss.io/home/). 
 
-- Tests are run automatically upon committing to the master branch (the plugin is automatically updated on the "test" Dataiku instance beforehand).
+- Tests are run automatically upon committing to the master branch or creating a Pull Request (the plugin is automatically updated on the "test" Dataiku instance beforehand). 
 - Tests can also be triggered from the "Actions" tab of this repository, by clicking "Run Gherkin tests" in the side bar, then clicking on "Run workflow" and choosing the branch that contains the test suite to run.
+- Results can be found on the Action's run page, e.g., https://github.com/dataiku/dss-visual-edit/actions/runs/RUN_ID/job/JOB_ID
+  - Click on the "Upload test results to workflow artifacts" step to open details
+  - Look for "Artifact download URL", download and open ZIP.
 
 Head over to `tests`' [README](tests/README.md) for more information on how tests are implemented, what is being tested, and how to run tests locally.
