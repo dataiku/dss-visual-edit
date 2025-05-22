@@ -7,6 +7,7 @@ from pandas import DataFrame
 from dash_extensions.javascript import Namespace
 import logging
 from dash_extensions.javascript import assign
+from commons import VALIDATION_COLUMN_NAME, NOTES_COLUMN_NAME
 
 # used to reference javascript functions in custom_tabulator.js
 __ns__ = Namespace("myNamespace", "tabulator")
@@ -277,6 +278,7 @@ def get_columns_tabulator(de, show_header_filter=True, freeze_editable_columns=F
             logging.exception("Failed to get linked record names.")
 
     t_cols = []
+
     for col_name in (
         de.primary_keys + de.display_column_names + de.editable_column_names
     ):
@@ -308,7 +310,7 @@ def get_columns_tabulator(de, show_header_filter=True, freeze_editable_columns=F
         pretty_types = {
             "number": "Number",
             "string": "Text",
-            "textarea": "Text",
+            "textarea": "Long Text",
             "boolean": "Checkbox",
             "boolean_tick": "Checkbox",
             "date": "Date",
@@ -322,6 +324,50 @@ def get_columns_tabulator(de, show_header_filter=True, freeze_editable_columns=F
             """
         )
 
+        t_cols.append(t_col)
+
+    if de.validation_column_required:
+        t_col = {
+            "field": VALIDATION_COLUMN_NAME,
+            "title": de.validation_column_display_name,
+            "sorter": "exists",
+            "formatter": "tickCross",
+            "formatterParams": {
+                "allowEmpty": False,
+                "crossElement": " ",
+            },  # by definition of the validation column (see replay_edits method), it cannot have missing values, and we want to make sure that there are only 2 possible statuses: valid or invalid
+            "hozAlign": "center",
+            "headerFilter": "tickCross",
+            "headerFilterParams": {},
+            "editor": "tickCross",
+        }
+        if freeze_editable_columns:
+            t_col["frozen"] = True  # freeze to the right
+        t_col["titleFormatter"] = assign(
+            f"""
+            function(cell){{
+                return cell.getValue() + "<br><span class='column-type'>Checkbox</span>"
+            }}
+            """
+        )
+        t_cols.append(t_col)
+
+    if de.notes_column_required:
+        t_col = {
+            "field": NOTES_COLUMN_NAME,
+            "title": de.notes_column_display_name,
+            "formatter": "textarea",
+            "editor": "textarea",
+        }
+        if freeze_editable_columns:
+            t_col["frozen"] = True
+        t_col["titleFormatter"] = assign(
+            f"""
+            function(cell){{
+                return cell.getValue() + "<br><span class='column-type'>Long Text</span>"
+            }}
+            """
+        )
         t_cols.append(t_col)
 
     return t_cols

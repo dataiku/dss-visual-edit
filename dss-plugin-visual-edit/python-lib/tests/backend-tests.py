@@ -1,7 +1,7 @@
 #%%
 from os import getenv, environ
-environ["ORIGINAL_DATASET"] = "matches_uncertain"
-environ["DKU_CURRENT_PROJECT_KEY"] = "COMPANY_RECONCILIATION"
+environ["DKU_CURRENT_PROJECT_KEY"] = "EX_ENTITY_RESOLUTION"
+environ["ORIGINAL_DATASET"] = "match_suggestions_prepared"
 
 #%%
 from dataiku import Dataset
