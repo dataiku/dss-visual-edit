@@ -49,7 +49,9 @@ class EditFreezed:
 
 class DataEditor:
     """
-    This class provides CRUD methods to edit data from a Dataiku Dataset using the Event Sourcing pattern: edits are stored in a separate Dataset called the editlog. The original Dataset is never changed. Both Datasets are used to compute the edited state of the data.
+    This class provides CRUD methods to edit data from a Dataiku Dataset, and to validate and add notes to its rows.
+
+    It uses the Event Sourcing pattern: edits are stored in a separate Dataset called the editlog. The original Dataset is never changed. Both Datasets are used to compute the edited state of the data.
     """
 
     def __save_custom_fields__(self, dataset_name):

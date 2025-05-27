@@ -9,7 +9,12 @@ from pandas import DataFrame
 # import sys
 # sys.path.append('../../python-lib')
 
-from commons import apply_edits_from_df, get_dataframe, VALIDATION_COLUMN_NAME, NOTES_COLUMN_NAME
+from commons import (
+    apply_edits_from_df,
+    get_dataframe,
+    VALIDATION_COLUMN_NAME,
+    NOTES_COLUMN_NAME,
+)
 
 
 # %% Get recipe parameters
@@ -37,7 +42,7 @@ edits_df = get_dataframe(
     edits_ds
 )  # this dataframe was written by the replay-edits recipe which inferred the schema upon writing: let's use this schema when reading this dataset (default behavior of get_dataframe)
 
-# let's fill in missing values in the "notes" column, before passing to apply_edits_from_df
+# let's fill in missing values in the notes column, before passing to apply_edits_from_df
 # this happens for rows where the user did not edit notes: the value is "", and in the replay-edits recipe, the call to write_dataframe with infer_schema set to True interprets these values as missing
 if NOTES_COLUMN_NAME in edits_df.columns:
     edits_df[NOTES_COLUMN_NAME] = edits_df[NOTES_COLUMN_NAME].fillna("")
