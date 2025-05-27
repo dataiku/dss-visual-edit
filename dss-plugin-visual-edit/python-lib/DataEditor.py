@@ -536,7 +536,7 @@ class DataEditor:
         self, primary_keys: dict, column: str, value: str
     ) -> List[EditSuccess | EditFailure | EditUnauthorized | EditFreezed]:
         """
-        Updates a row.
+        Updates a row by logging its new value.
 
         Args:
             primary_keys (dict): A dictionary containing primary key(s) value(s) that identify the row to update.
@@ -547,27 +547,42 @@ class DataEditor:
             list: A list of objects indicating the success or failure to insert an editlog.
 
         Note:
-            - No data validation: this method does not check that the value is allowed for the specified column.
+            - This method does not check that the value is allowed for the specified column.
             - Attribution of the 'update' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
 
         if column == VALIDATION_COLUMN_NAME:
-            results = []
-
-            # When setting the validation column to True, start by logging the values of other editable columns
-            for editable_col in self.editable_column_names:
-                results.append(
-                    self.__append_to_editlog__(
-                        key, editable_col, primary_keys[editable_col]
+            if not self.validation_column_required:
+                return [
+                    EditFailure(
+                        "Trying to set a value of the validation column, but the column doesn't exist."
                     )
-                )  # contains values for primary keys — and other columns too, but they'll be discarded
+                ]
+            if value_string is None:
+                return [EditFailure("Validation cannot be set to None.")]
 
-            # End by logging that validation is True
+            # Turn value into a lower case string
+            value_string = str(loads(value.lower())).capitalize()
+
+            if value_string not in ["True", "False"]:
+                return [
+                    EditFailure("Validation column must be set to 'True' or 'False'.")
+                ]
+
+            results = []
+            if value_string == "True":
+                # When setting the validation column to True, start by logging the values of other editable columns
+                for editable_col in self.editable_column_names:
+                    results.append(
+                        self.__append_to_editlog__(
+                            key, editable_col, primary_keys[editable_col]
+                        )
+                    )  # contains values for primary keys — and other columns too, but they'll be discarded
+
+            # End by logging the validation column
             results.append(
-                self.__append_to_editlog__(
-                    key, VALIDATION_COLUMN_NAME, primary_keys[VALIDATION_COLUMN_NAME]
-                )
+                self.__append_to_editlog__(key, VALIDATION_COLUMN_NAME, value_string)
             )
 
             # Note: To improve this, it would be best to group all the inserts in the same transaction
