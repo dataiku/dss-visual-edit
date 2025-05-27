@@ -5,8 +5,8 @@ from pandas.api.types import is_integer_dtype, is_float_dtype, is_bool_dtype
 from flask import request
 import logging
 
-VALIDATION_COLUMN_NAME = "validated"
-NOTES_COLUMN_NAME = "notes"
+VALIDATION_COLUMN_NAME = "_visual_edit_validated"
+NOTES_COLUMN_NAME = "_visual_edit_notes"
 
 
 def __as_boolean__(c):
@@ -119,7 +119,7 @@ def replay_edits(
     :param validation_column_required: whether the validation column is required
     :param notes_column_required: whether the notes column is required
     :return: a DataFrame containing only the edited rows and editable columns.
-    - The DataFrame will contain the following columns: primary keys, editable columns, feedback columns ("validated" and "notes", if required), metadata columns ("last_edit_date", "last_action", "first_action").
+    - The DataFrame will contain the following columns: primary keys, editable columns, feedback columns (validation and notes, if required), metadata columns ("last_edit_date", "last_action", "first_action").
     - When the same cell was edited multiple times, the last edit is kept.
     """
 
@@ -295,7 +295,7 @@ def apply_edits_from_df(original_ds, edits_df):
 
     :param original_ds: the original dataset.
     :param edits_df: a DataFrame containing the edits to apply, with columns for primary keys, editable columns, and feedback columns (if any).
-    :return: an edited DataFrame containing the original dataset with the edits applied. It will contain the following columns: primary keys, display-only columns, editable columns, feedback columns ("validated" and "notes", if present in the edits DataFrame).
+    :return: an edited DataFrame containing the original dataset with the edits applied. It will contain the following columns: primary keys, display-only columns, editable columns, feedback columns (validation and notes, if present in the edits DataFrame).
     """
 
     original_df, primary_keys, display_columns, editable_columns = get_original_df(

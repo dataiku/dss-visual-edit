@@ -73,7 +73,7 @@ export default class DashTabulator extends React.Component {
             edited.value = cell.getValue()
             edited.row = cell.getData()
             this.props.setProps({ cellEdited: edited })
-            if (edited.field == "validated" | edited.field == "notes") {
+            if (edited.field == "_visual_edit_validated" | edited.field == "_visual_edit_notes") {
                 column_name_hash = edited.field
             } else {
                 column_name_hash = md5(edited.field)
