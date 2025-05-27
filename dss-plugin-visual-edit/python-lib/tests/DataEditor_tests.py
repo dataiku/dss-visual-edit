@@ -19,7 +19,7 @@ de = DataEditor(
     primary_keys=["ID"],
     editable_column_names=["Matched Entity"],
     notes_column_required=True,
-    notes_column_display_name="Comments",
+    notes_column_display_name="Notes",
     validation_column_required=True,
     validation_column_display_name="Validated",
 )

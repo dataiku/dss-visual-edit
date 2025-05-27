@@ -161,7 +161,7 @@
             "description": "For usage in the webapp (underlying storage will use 'notes')",
             "type": "STRING",
             "visibilityCondition": "model.notes_column_required",
-            "defaultValue": "notes"
+            "defaultValue": "Notes"
         },
         {
             "name": "validation_column_required",
@@ -176,7 +176,7 @@
             "description": "For usage in the webapp (underlying storage will use 'validated')",
             "type": "STRING",
             "visibilityCondition": "model.validation_column_required",
-            "defaultValue": "validated"
+            "defaultValue": "Validated"
         },
         {
             "name": "sep-layout",
