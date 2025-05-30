@@ -25,6 +25,7 @@ Feature: Visual Edit works with a single FLOAT primary key.
             | id             | string |
             | company        | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id"
@@ -32,9 +33,13 @@ Feature: Visual Edit works with a single FLOAT primary key.
             | 10.1 | dataiku | update      | update       |
             | 10.2 | dataiku | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name    | type   |
-            | id      | double |
-            | company | string |
+            | name           | type   |
+            | id             | double |
+            | company        | string |
+            | last_edit_date | string |
+            | last_edited_by | string |
+            | last_action    | string |
+            | first_action   | string |
         And the dataset "products_edited" contains the following using compound key "id"
             | id   | company |
             | 10.1 | dataiku |
@@ -69,6 +74,7 @@ Feature: Visual Edit works with a single FLOAT primary key.
             | id             | string |
             | company        | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id"
@@ -76,9 +82,13 @@ Feature: Visual Edit works with a single FLOAT primary key.
             | 10.1 | 42      | update      | update       |
             | 10.2 | 42      | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name    | type   |
-            | id      | double |
-            | company | bigint |
+            | name           | type   |
+            | id             | double |
+            | company        | bigint |
+            | last_edit_date | string |
+            | last_edited_by | string |
+            | last_action    | string |
+            | first_action   | string |
         And the dataset "products_edited" contains the following using compound key "id"
             | id   | company |
             | 10.1 | 42      |
@@ -113,6 +123,7 @@ Feature: Visual Edit works with a single FLOAT primary key.
             | id             | string |
             | company        | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id"
@@ -120,9 +131,13 @@ Feature: Visual Edit works with a single FLOAT primary key.
             | 10.1 | 42.0    | update      | update       |
             | 10.2 | 42.0    | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name    | type   |
-            | id      | double |
-            | company | double |
+            | name           | type   |
+            | id             | double |
+            | company        | double |
+            | last_edit_date | string |
+            | last_edited_by | string |
+            | last_action    | string |
+            | first_action   | string |
         And the dataset "products_edited" contains the following using compound key "id"
             | id   | company |
             | 10.1 | 42.0    |
@@ -157,6 +172,7 @@ Feature: Visual Edit works with a single FLOAT primary key.
             | id             | string |
             | company        | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id"
@@ -164,9 +180,13 @@ Feature: Visual Edit works with a single FLOAT primary key.
             | 10.1 | True    | update      | update       |
             | 10.2 | True    | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name    | type    |
-            | id      | double  |
-            | company | boolean |
+            | name           | type    |
+            | id             | double  |
+            | company        | boolean |
+            | last_edit_date | string  |
+            | last_edited_by | string  |
+            | last_action    | string  |
+            | first_action   | string  |
         And the dataset "products_edited" contains the following using compound key "id"
             | id   | company |
             | 10.1 | True    |

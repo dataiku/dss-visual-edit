@@ -25,6 +25,7 @@ Feature: Visual Edit works with a single INTEGER primary key.
             | id             | string |
             | company        | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id"
@@ -32,9 +33,13 @@ Feature: Visual Edit works with a single INTEGER primary key.
             | 10 | dataiku | update      | update       |
             | 12 | dataiku | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name    | type   |
-            | id      | bigint |
-            | company | string |
+            | name           | type   |
+            | id             | bigint |
+            | company        | string |
+            | last_edit_date | string |
+            | last_edited_by | string |
+            | last_action    | string |
+            | first_action   | string |
         And the dataset "products_edited" contains the following using compound key "id"
             | id | company |
             | 10 | dataiku |
@@ -69,6 +74,7 @@ Feature: Visual Edit works with a single INTEGER primary key.
             | id             | string |
             | company        | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id"
@@ -76,9 +82,13 @@ Feature: Visual Edit works with a single INTEGER primary key.
             | 10 | 42      | update      | update       |
             | 12 | 42      | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name    | type   |
-            | id      | bigint |
-            | company | bigint |
+            | name           | type   |
+            | id             | bigint |
+            | company        | bigint |
+            | last_edit_date | string |
+            | last_edited_by | string |
+            | last_action    | string |
+            | first_action   | string |
         And the dataset "products_edited" contains the following using compound key "id"
             | id | company |
             | 10 | 42      |
@@ -114,6 +124,7 @@ Feature: Visual Edit works with a single INTEGER primary key.
             | id             | string |
             | company        | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id"
@@ -121,9 +132,13 @@ Feature: Visual Edit works with a single INTEGER primary key.
             | 10 | 42.0    | update      | update       |
             | 12 | 42.0    | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name    | type   |
-            | id      | bigint |
-            | company | double |
+            | name           | type   |
+            | id             | bigint |
+            | company        | double |
+            | last_edit_date | string |
+            | last_edited_by | string |
+            | last_action    | string |
+            | first_action   | string |
         And the dataset "products_edited" contains the following using compound key "id"
             | id | company |
             | 10 | 42.0    |
@@ -158,6 +173,7 @@ Feature: Visual Edit works with a single INTEGER primary key.
             | id             | string |
             | company        | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id"
@@ -165,9 +181,13 @@ Feature: Visual Edit works with a single INTEGER primary key.
             | 10 | True    | update      | update       |
             | 12 | True    | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name    | type    |
-            | id      | bigint  |
-            | company | boolean |
+            | name           | type    |
+            | id             | bigint  |
+            | company        | boolean |
+            | last_edit_date | string  |
+            | last_edited_by | string  |
+            | last_action    | string  |
+            | first_action   | string  |
         And the dataset "products_edited" contains the following using compound key "id"
             | id | company |
             | 10 | True    |
