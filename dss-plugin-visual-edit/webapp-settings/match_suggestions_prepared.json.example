@@ -3,12 +3,8 @@
         "ID"
     ],
     "editable_column_names": [
-        "Matched Entity",
-        "Validated",
-        "Comments"
+        "Matched Entity"
     ],
-    "freeze_editable_columns": false,
-    "group_column_names": [],
     "linked_records_count": 1,
     "linked_record_name_1": "Matched Entity",
     "linked_record_ds_name_1": "entities_ext",
@@ -18,11 +14,15 @@
         "Country",
         "Industry"
     ],
+    "notes_column_required": true,
+    "notes_column_display_name": "Comments",
+    "validation_column_required": true,
+    "validation_column_display_name": "Validated",
+    "freeze_editable_columns": false,
+    "group_column_names": [
+        "Country",
+        "Industry"
+    ],
     "authorized_users": [],
-    "editschema": [
-        {
-            "name": "Reviewed",
-            "type": "boolean_tick"
-        }
-    ]
+    "editschema": []
 }

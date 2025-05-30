@@ -25,6 +25,7 @@ Feature: Visual Edit works with a single STRING primary key.
             | id             | string |
             | company        | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id"
@@ -32,9 +33,13 @@ Feature: Visual Edit works with a single STRING primary key.
             | Answers | dataiku | update      | update       |
             | DSS     | dataiku | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name    | type   |
-            | id      | string |
-            | company | string |
+            | name           | type   |
+            | id             | string |
+            | company        | string |
+            | last_edit_date | string |
+            | last_edited_by | string |
+            | last_action    | string |
+            | first_action   | string |
         And the dataset "products_edited" contains the following using compound key "id"
             | id      | company |
             | Answers | dataiku |
@@ -68,6 +73,7 @@ Feature: Visual Edit works with a single STRING primary key.
             | id             | string |
             | company        | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id"
@@ -75,9 +81,13 @@ Feature: Visual Edit works with a single STRING primary key.
             | Answers | 42      | update      | update       |
             | DSS     | 42      | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name    | type   |
-            | id      | string |
-            | company | bigint |
+            | name           | type   |
+            | id             | string |
+            | company        | bigint |
+            | last_edit_date | string |
+            | last_edited_by | string |
+            | last_action    | string |
+            | first_action   | string |
         And the dataset "products_edited" contains the following using compound key "id"
             | id      | company |
             | Answers | 42      |
@@ -111,6 +121,7 @@ Feature: Visual Edit works with a single STRING primary key.
             | id             | string |
             | company        | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id"
@@ -118,9 +129,13 @@ Feature: Visual Edit works with a single STRING primary key.
             | Answers | 42.0    | update      | update       |
             | DSS     | 42.0    | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name    | type   |
-            | id      | string |
-            | company | double |
+            | name           | type   |
+            | id             | string |
+            | company        | double |
+            | last_edit_date | string |
+            | last_edited_by | string |
+            | last_action    | string |
+            | first_action   | string |
         And the dataset "products_edited" contains the following using compound key "id"
             | id      | company |
             | Answers | 42.0    |
@@ -154,6 +169,7 @@ Feature: Visual Edit works with a single STRING primary key.
             | id             | string |
             | company        | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id"
@@ -161,9 +177,13 @@ Feature: Visual Edit works with a single STRING primary key.
             | Answers | True    | update      | update       |
             | DSS     | True    | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name    | type    |
-            | id      | string  |
-            | company | boolean |
+            | name           | type    |
+            | id             | string  |
+            | company        | boolean |
+            | last_edit_date | string  |
+            | last_edited_by | string  |
+            | last_action    | string  |
+            | first_action   | string  |
         And the dataset "products_edited" contains the following using compound key "id"
             | id      | company |
             | Answers | True    |

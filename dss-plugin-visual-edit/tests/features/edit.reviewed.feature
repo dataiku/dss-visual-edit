@@ -27,17 +27,22 @@ Feature: Visual Edit has special behavior for reviewed column.
             | location       | string |
             | reviewed       | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id"
             | id      | company   | location | reviewed | last_action | first_action |
             | Answers | BS plugin | fr       | True     | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name     | type    |
-            | id       | string  |
-            | company  | string  |
-            | location | string  |
-            | reviewed | boolean |
+            | name           | type    |
+            | id             | string  |
+            | company        | string  |
+            | location       | string  |
+            | reviewed       | boolean |
+            | last_edit_date | string  |
+            | last_edited_by | string  |
+            | last_action    | string  |
+            | first_action   | string  |
         And the dataset "products_edited" contains the following using compound key "id"
             | id      | company   | location | reviewed |
             | Answers | BS plugin | fr       | true     |

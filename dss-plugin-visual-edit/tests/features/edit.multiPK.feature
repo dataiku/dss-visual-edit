@@ -26,6 +26,7 @@ Feature: Visual Edit works with a composite key.
             | name           | string |
             | company        | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id,name"
@@ -33,10 +34,14 @@ Feature: Visual Edit works with a composite key.
             | 10.1 | Answers | dataiku | update      | update       |
             | 10.2 | DSS     | dataiku | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name    | type   |
-            | id      | double |
-            | name    | string |
-            | company | string |
+            | name           | type   |
+            | id             | double |
+            | name           | string |
+            | company        | string |
+            | last_edit_date | string |
+            | last_edited_by | string |
+            | last_action    | string |
+            | first_action   | string |
         And the dataset "products_edited" contains the following using compound key "id,name"
             | id   | name    | company |
             | 10.1 | Answers | dataiku |

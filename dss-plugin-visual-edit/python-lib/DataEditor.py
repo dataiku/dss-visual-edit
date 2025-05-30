@@ -14,6 +14,8 @@ from commons import (
     apply_edits_from_df,
     replay_edits,
     get_key_values_from_dict,
+    VALIDATION_COLUMN_NAME,
+    NOTES_COLUMN_NAME,
 )
 from webapp.db.editlogs import EditLog, EditLogAppenderFactory
 from webapp_utils import find_webapp_id, get_webapp_json
@@ -40,13 +42,16 @@ class EditFailure:
 class EditUnauthorized:
     pass
 
+
 class EditFreezed:
     pass
 
 
 class DataEditor:
     """
-    This class provides CRUD methods to edit data from a Dataiku Dataset using the Event Sourcing pattern: edits are stored in a separate Dataset called the editlog. The original Dataset is never changed. Both Datasets are used to compute the edited state of the data.
+    This class provides CRUD methods to edit data from a Dataiku Dataset, and to validate and add notes to its rows.
+
+    It uses the Event Sourcing pattern: edits are stored in a separate Dataset called the editlog. The original Dataset is never changed. Both Datasets are used to compute the edited state of the data.
     """
 
     def __save_custom_fields__(self, dataset_name):
@@ -55,6 +60,10 @@ class DataEditor:
         settings.custom_fields["editlog_ds"] = self.editlog_ds_name
         settings.custom_fields["primary_keys"] = self.primary_keys
         settings.custom_fields["editable_column_names"] = self.editable_column_names
+        settings.custom_fields["validation_column_required"] = (
+            self.validation_column_required
+        )
+        settings.custom_fields["notes_column_required"] = self.notes_column_required
         if self.webapp_url:
             settings.custom_fields["webapp_url"] = self.webapp_url
         settings.save()
@@ -70,7 +79,9 @@ class DataEditor:
             )
             self.webapp_url_public = f"/public-webapps/{self.project_key}/{webapp_id}/"
         except Exception:
-            logging.exception("Failed to retrieve webapp url.")
+            running_in_dss = getenv("DKU_CUSTOM_WEBAPP_CONFIG") is not None
+            if running_in_dss:
+                logging.exception("Failed to retrieve webapp url.")
             self.webapp_url = None
             self.webapp_url_public = "/"
 
@@ -95,7 +106,7 @@ class DataEditor:
                 # not using date type, in case the editlog is CSV
                 {"name": "date", "type": "string", "meaning": "DateSource"},
                 {"name": "user", "type": "string", "meaning": "Text"},
-                # action can be "update", "create", or "delete"; currently it's ignored by the pivot method
+                # action can be "update", "create", or "delete"
                 {"name": "action", "type": "string", "meaning": "Text"},
                 {"name": "key", "type": "string", "meaning": "Text"},
                 {"name": "column_name", "type": "string", "meaning": "Text"},
@@ -173,6 +184,10 @@ class DataEditor:
         original_ds_name: str,
         primary_keys: List[str],
         editable_column_names: List[str] | None = None,
+        notes_column_required: bool = False,
+        notes_column_display_name: str = "Notes",
+        validation_column_required: bool = False,
+        validation_column_display_name: str = "Validated",
         linked_records: List[LinkedRecord] | None = None,
         editschema_manual: List[EditSchema] | None = None,
         project_key: str | None = None,
@@ -223,6 +238,10 @@ class DataEditor:
         self.primary_keys = primary_keys
         if editable_column_names:
             self.editable_column_names = editable_column_names
+        self.notes_column_required = notes_column_required
+        self.notes_column_display_name = notes_column_display_name
+        self.validation_column_required = validation_column_required
+        self.validation_column_display_name = validation_column_display_name
 
         # For each linked record, add linked dataset/dataframe as attribute
         self.linked_records = linked_records if linked_records is not None else []
@@ -295,7 +314,7 @@ class DataEditor:
             )  # this will be an empty dataframe
 
         self.authorized_users = authorized_users
-        
+
         self.freeze_edits = freeze_edits
 
         self.display_column_names = get_display_column_names(
@@ -312,7 +331,7 @@ class DataEditor:
 
     def get_original_df(self):
         """
-        Returns the original dataframe without any edits.
+        Returns the original dataframe without any edits, plus default notes and validation columns if required.
 
         Returns:
             pandas.DataFrame: The original data.
@@ -372,7 +391,11 @@ class DataEditor:
                 A DataFrame containing only the edited rows and editable columns.
         """
         return replay_edits(
-            self.editlog_ds, self.primary_keys, self.editable_column_names
+            self.editlog_ds,
+            self.primary_keys,
+            self.editable_column_names,
+            self.validation_column_required,
+            self.notes_column_required,
         )
 
     def get_row(self, primary_keys):
@@ -403,12 +426,29 @@ class DataEditor:
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         return self.get_edited_cells_df_indexed().loc[key]
 
-    def __log_edit__(
+    def __append_to_editlog__(
         self, key, column, value, action="update"
     ) -> EditSuccess | EditFailure | EditUnauthorized | EditFreezed:
+        """
+        Append an edit action to the editlog.
+
+        Actions can be "update", "create", or "delete".
+        - When the action is "update" or "create", the column is one of the editable columns.
+        - When the action is "delete", the column and value are ignored.
+
+        Args:
+            key (tuple): A tuple containing primary key(s) value(s) that identify the row on which the action is performed.
+            column (str): The name of a column to create/validate/update. This would be None when the action is "delete".
+            value (str): The value to set for the cell identified by key and column.
+            action (str): The type of action to log.
+
+        Returns:
+            EditSuccess | EditFailure | EditUnauthorized | EditFreezed: An object indicating the success or failure to insert an editlog.
+        """
+
         if self.freeze_edits:
             return EditFreezed()
-        
+
         # if the type of column_name is a boolean, make sure we read it correctly
         for col in self.schema_columns:
             if col["name"] == column:
@@ -419,7 +459,7 @@ class DataEditor:
                         value = str(loads(value.lower()))
                 break
 
-        # store value as a string, unless it's None
+        # turn value into a string, unless it's None
         if value is not None:
             value_string = str(value)
         else:
@@ -434,7 +474,14 @@ class DataEditor:
             )
             return EditUnauthorized()
         else:
-            if column in self.editable_column_names or action == "delete":
+            if (
+                column in self.editable_column_names
+                or self.notes_column_required
+                and column == NOTES_COLUMN_NAME
+                or self.validation_column_required
+                and column == VALIDATION_COLUMN_NAME
+                or action == "delete"
+            ):
                 # add to the editlog
                 try:
                     self.editlog_appender.append(
@@ -481,10 +528,10 @@ class DataEditor:
         """
         if self.freeze_edits:
             return "Edits are disabled."
-        
+
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         for col in column_values.keys():
-            self.__log_edit__(
+            self.__append_to_editlog__(
                 key=key, column=col, value=column_values.get(col), action="create"
             )
         return "Row successfully created"
@@ -493,7 +540,7 @@ class DataEditor:
         self, primary_keys: dict, column: str, value: str
     ) -> List[EditSuccess | EditFailure | EditUnauthorized | EditFreezed]:
         """
-        Updates a row.
+        Updates a row by logging its new value.
 
         Args:
             primary_keys (dict): A dictionary containing primary key(s) value(s) that identify the row to update.
@@ -504,32 +551,50 @@ class DataEditor:
             list: A list of objects indicating the success or failure to insert an editlog.
 
         Note:
-            - No data validation: this method does not check that the value is allowed for the specified column.
+            - This method does not check that the value is allowed for the specified column.
             - Attribution of the 'update' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
 
-        def is_validation_column(column_name: str):
-            return (
-                column_name.lower() == "reviewed" or column_name.lower() == "validated"
+        if column == VALIDATION_COLUMN_NAME:
+            if not self.validation_column_required:
+                return [
+                    EditFailure(
+                        "Trying to set a value of the validation column, but the column doesn't exist."
+                    )
+                ]
+            if value_string is None:
+                return [EditFailure("Validation cannot be set to None.")]
+
+            # Turn value into a lower case string
+            value_string = str(loads(value.lower())).capitalize()
+
+            if value_string not in ["True", "False"]:
+                return [
+                    EditFailure("Validation column must be set to 'True' or 'False'.")
+                ]
+
+            results = []
+            if value_string == "True":
+                # When setting the validation column to True, start by logging the values of other editable columns
+                for editable_col in self.editable_column_names:
+                    results.append(
+                        self.__append_to_editlog__(
+                            key, editable_col, primary_keys[editable_col]
+                        )
+                    )  # contains values for primary keys — and other columns too, but they'll be discarded
+
+            # End by logging the validation column
+            results.append(
+                self.__append_to_editlog__(key, VALIDATION_COLUMN_NAME, value_string)
             )
 
-        def is_comments_column(column_name: str):
-            return column_name == "Comments" or column_name == "comments"
+            # Note: To improve this, it would be best to group all the inserts in the same transaction
 
-        # When updating the validation column, we first create a log entry for each editable column, to enforce values even after a change in the original.
-        # We then log the new value of the validation column.
-        # To improve this, the best would be to do all the inserts in the same transaction.
-        if is_validation_column(column):
-            results = []
-            for col in self.editable_column_names:
-                if not is_comments_column(col) and not is_validation_column(col):
-                    # contains values for primary keys — and other columns too, but they'll be discarded
-                    results.append(self.__log_edit__(key, col, primary_keys[col]))
-            results.append(self.__log_edit__(key, column, primary_keys[column]))
             return results
+
         else:
-            return [self.__log_edit__(key, column, value, action="update")]
+            return [self.__append_to_editlog__(key, column, value, action="update")]
 
     def delete_row(
         self, primary_keys: dict
@@ -547,4 +612,4 @@ class DataEditor:
             Attribution of the 'delete' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
         """
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
-        return self.__log_edit__(key, None, None, action="delete")
+        return self.__append_to_editlog__(key, None, None, action="delete")

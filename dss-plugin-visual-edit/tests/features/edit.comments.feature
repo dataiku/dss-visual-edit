@@ -26,18 +26,23 @@ Feature: Visual Edit has special behavior for comments column.
             | reviewed       | string |
             | comments       | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id"
             | id      | company | location | reviewed | comments   | last_action | first_action |
             | Answers |         |          |          | my comment | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name     | type    |
-            | id       | string  |
-            | company  | string  |
-            | location | string  |
-            | reviewed | boolean |
-            | comments | string  |
+            | name           | type    |
+            | id             | string  |
+            | company        | string  |
+            | location       | string  |
+            | reviewed       | boolean |
+            | comments       | string  |
+            | last_edit_date | string  |
+            | last_edited_by | string  |
+            | last_action    | string  |
+            | first_action   | string  |
         And the dataset "products_edited" contains the following using compound key "id"
             | id      | company   | location | reviewed | comments   |
             | Answers | BS plugin | fr       | false    | my comment |
@@ -75,18 +80,23 @@ Feature: Visual Edit has special behavior for comments column.
             | reviewed       | string |
             | comments       | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id"
             | id      | company   | location | reviewed | comments | last_action | first_action |
             | Answers | BS plugin | fr       | True     |          | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name     | type    |
-            | id       | string  |
-            | company  | string  |
-            | location | string  |
-            | reviewed | boolean |
-            | comments | string  |
+            | name           | type    |
+            | id             | string  |
+            | company        | string  |
+            | location       | string  |
+            | reviewed       | boolean |
+            | comments       | string  |
+            | last_edit_date | string  |
+            | last_edited_by | string  |
+            | last_action    | string  |
+            | first_action   | string  |
         And the dataset "products_edited" contains the following using compound key "id"
             | id      | company   | location | reviewed | comments |
             | Answers | BS plugin | fr       | true     |          |

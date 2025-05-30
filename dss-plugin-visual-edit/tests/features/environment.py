@@ -1,9 +1,10 @@
 import os
+import locale
 from pathlib import Path
 import re
 from behave import use_fixture
 from behave.configuration import Configuration
-from behave.model import Scenario
+from behave.model import Scenario, Status
 from dssgherkin.fixtures.cleanup_managed_folders import cleanup_managed_folders
 from dssgherkin.fixtures.cleanup_projects_fixture import cleanup_projects
 from dssgherkin.fixtures.delete_datasets import delete_datasets
@@ -70,3 +71,17 @@ def before_scenario(context: AugmentedBehaveContext, scenario: Scenario):
         }
     )
     project.set_permissions(project_permissions)
+
+
+def after_scenario(context: AugmentedBehaveContext, scenario: Scenario):
+    webapp = context.current_webapp
+    if scenario.status is Status.failed and webapp:
+        if hasattr(context, "evidence_path"):
+            logs = webapp.get_state().state["currentLogTail"]
+            with open(
+                os.path.join(context.evidence_path, f"webapp_{webapp.webapp_id}.log"),
+                "w",
+                encoding=locale.getpreferredencoding(False),
+            ) as f:
+                for line in logs["lines"]:
+                    f.write(f"{line}\n")

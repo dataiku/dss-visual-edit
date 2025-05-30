@@ -25,7 +25,7 @@ tabulator_utils = dataiku.import_from_plugin("visual-edit", "tabulator_utils")
 dash_tabulator = dataiku.import_from_plugin("visual-edit", "dash_tabulator")
 ```
 
-Instantiate `DataEditor`, which will later be used to define the data to load into the table:
+Instantiate `DataEditor`, which will be used to get the edited data and load it when rendering the table, and to persist edits:
 
 ```python
 ORIGINAL_DATASET = "orders"

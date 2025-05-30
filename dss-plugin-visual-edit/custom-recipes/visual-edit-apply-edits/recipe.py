@@ -9,7 +9,12 @@ from pandas import DataFrame
 # import sys
 # sys.path.append('../../python-lib')
 
-from commons import apply_edits_from_df, get_dataframe
+from commons import (
+    apply_edits_from_df,
+    get_dataframe,
+    VALIDATION_COLUMN_NAME,
+    NOTES_COLUMN_NAME,
+)
 
 
 # %% Get recipe parameters
@@ -35,8 +40,14 @@ edited_ds = edited_datasets[0]
 
 edits_df = get_dataframe(
     edits_ds
-)  # this dataframe was written by the replay-edits recipe which inferred the schema upon writing: let's use this schema when reading this dataset
+)  # this dataframe was written by the replay-edits recipe which inferred the schema upon writing: let's use this schema when reading this dataset (default behavior of get_dataframe)
 
+# let's fill in missing values in the notes column, before passing to apply_edits_from_df
+# this happens for rows where the user did not edit notes: the value is "", and in the replay-edits recipe, the call to write_dataframe with infer_schema set to True interprets these values as missing
+if NOTES_COLUMN_NAME in edits_df.columns:
+    edits_df[NOTES_COLUMN_NAME] = edits_df[NOTES_COLUMN_NAME].fillna("")
+
+# note: the replay-edits method guarantees that the validation column has no missing values
 
 # %% Compute output data
 ###
@@ -50,8 +61,15 @@ edited_df = apply_edits_from_df(original_ds, edits_df)
 edited_ds.write_with_schema(
     edited_df, drop_and_create=True
 )  # the dataframe's types were set explicitly, so let's use them to write this dataset's schema
+
 edited_schema = edited_ds.read_schema()
 # for each item of edited_schema, make sure its type is the same as the one given by original_schema
 for item in edited_schema:
-    item["type"] = original_schema_df.loc[item["name"]]["type"]
+    if item["name"] in original_schema_df.index:
+        # if the name exists in the original schema, set the type to the original type
+        item["type"] = original_schema_df.loc[item["name"]]["type"]
+    if item["name"] == NOTES_COLUMN_NAME:
+        item["type"] = "string"
+    if item["name"] == VALIDATION_COLUMN_NAME:
+        item["type"] = "boolean"
 edited_ds.write_schema(edited_schema)
