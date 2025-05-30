@@ -4,6 +4,7 @@ This file contains functions used to generate the Tabulator columns configuratio
 
 from typing import Union
 from pandas import DataFrame
+from DataEditor import DataEditor
 from dash_extensions.javascript import Namespace
 import logging
 from dash_extensions.javascript import assign
@@ -266,7 +267,7 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
     return t_col
 
 
-def get_columns_tabulator(de, show_header_filter=True, freeze_editable_columns=False):
+def get_columns_tabulator(de: DataEditor, show_header_filter=True, freeze_editable_columns=False):
     """Prepare column settings to pass to Tabulator"""
 
     linked_record_names = []

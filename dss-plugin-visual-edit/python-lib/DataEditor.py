@@ -185,7 +185,9 @@ class DataEditor:
         primary_keys: List[str],
         editable_column_names: List[str] | None = None,
         notes_column_required: bool = False,
+        notes_column_display_name: str = "Notes",
         validation_column_required: bool = False,
+        validation_column_display_name: str = "Validated",
         linked_records: List[LinkedRecord] | None = None,
         editschema_manual: List[EditSchema] | None = None,
         project_key: str | None = None,
@@ -237,7 +239,9 @@ class DataEditor:
         if editable_column_names:
             self.editable_column_names = editable_column_names
         self.notes_column_required = notes_column_required
+        self.notes_column_display_name = notes_column_display_name
         self.validation_column_required = validation_column_required
+        self.validation_column_display_name = validation_column_display_name
 
         # For each linked record, add linked dataset/dataframe as attribute
         self.linked_records = linked_records if linked_records is not None else []
