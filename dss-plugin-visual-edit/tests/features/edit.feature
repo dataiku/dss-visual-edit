@@ -26,16 +26,21 @@ Feature: Visual Edit generic edition.
             | company        | string |
             | location       | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id"
             | id      | company | location | last_action | first_action |
             | Answers | dataiku | france   | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name     | type   |
-            | id       | string |
-            | company  | string |
-            | location | string |
+            | name           | type   |
+            | id             | string |
+            | company        | string |
+            | location       | string |
+            | last_edit_date | string |
+            | last_edited_by | string |
+            | last_action    | string |
+            | first_action   | string |
         And the dataset "products_edited" contains the following using compound key "id"
             | id      | company | location |
             | Answers | dataiku | france   |
@@ -73,16 +78,21 @@ Feature: Visual Edit generic edition.
             | company        | string |
             | location       | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id"
             | id      | company | location | last_action | first_action |
             | Answers | dataiku |          | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name     | type   |
-            | id       | string |
-            | company  | string |
-            | location | string |
+            | name           | type   |
+            | id             | string |
+            | company        | string |
+            | location       | string |
+            | last_edit_date | string |
+            | last_edited_by | string |
+            | last_action    | string |
+            | first_action   | string |
         And the dataset "products_edited" contains the following using compound key "id"
             | id      | company | location |
             | Answers | dataiku | fr       |
@@ -115,16 +125,21 @@ Feature: Visual Edit generic edition.
             | company        | string |
             | location       | string |
             | last_edit_date | string |
+            | last_edited_by | string |
             | last_action    | string |
             | first_action   | string |
         And the dataset "products_edits" contains the following using compound key "id"
             | id | company         | location | last_action | first_action |
             | 0  | integrationtest |          | update      | update       |
         And the dataset "products_edited" has the following schema
-            | name     | type   |
-            | id       | bigint |
-            | company  | string |
-            | location | string |
+            | name           | type   |
+            | id             | bigint |
+            | company        | string |
+            | location       | string |
+            | last_edit_date | string |
+            | last_edited_by | string |
+            | last_action    | string |
+            | first_action   | string |
 
         Examples:
             | connection         |

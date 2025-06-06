@@ -29,7 +29,15 @@ edits_ds = edits_datasets[0]
 
 primary_keys = editlog_ds.get_config()["customFields"]["primary_keys"]
 editable_column_names = editlog_ds.get_config()["customFields"]["editable_column_names"]
-edits_df = replay_edits(editlog_ds, primary_keys, editable_column_names)
+validation_column_required = editlog_ds.get_config()["customFields"]["validation_column_required"]
+notes_column_required = editlog_ds.get_config()["customFields"]["notes_column_required"]
+edits_df = replay_edits(
+    editlog_ds,
+    primary_keys,
+    editable_column_names,
+    validation_column_required,
+    notes_column_required,
+)
 
 
 # %% Write output data
@@ -37,4 +45,4 @@ edits_df = replay_edits(editlog_ds, primary_keys, editable_column_names)
 
 edits_ds.write_dataframe(
     edits_df, infer_schema=True, dropAndCreate=True
-)  # the schema is inferred upon writing and might be different from that of the original dataset: this will be reconciled by the apply-edits recipe/method
+)  # the schema is inferred upon writing and column types might be different from that of the original dataset: this will be reconciled by the apply-edits recipe/method

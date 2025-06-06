@@ -24,7 +24,7 @@
         {
             "name": "primary_keys",
             "label": "Primary Keys",
-            "description": "Columns used to identify a record.\n\nIMPORTANT: make sure that the type and meaning of these columns is set correctly before starting the webapp.",
+            "description": "Columns used to identify a record.\n\nIMPORTANT:\n- Make sure that the type and meaning of these columns is set correctly before starting the webapp.\n- Reset the editlog if you change the primary keys.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset",
             "mandatory": true
@@ -144,6 +144,41 @@
             "visibilityCondition": "model.linked_records_count > 1"
         },
         {
+            "name": "sep-feedback",
+            "label": "Feedback columns",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "notes_column_required",
+            "label": "Notes",
+            "description": "For end-user notes. Values will be empty by default.",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "name": "notes_column_display_name",
+            "label": "↳ Display name",
+            "description": "For usage in the webapp (underlying storage will use 'notes')",
+            "type": "STRING",
+            "visibilityCondition": "model.notes_column_required",
+            "defaultValue": "Notes"
+        },
+        {
+            "name": "validation_column_required",
+            "label": "Validation",
+            "description": "To mark rows as validated. Values will be False by default",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "name": "validation_column_display_name",
+            "label": "↳ Display name",
+            "description": "For usage in the webapp (underlying storage will use 'validated')",
+            "type": "STRING",
+            "visibilityCondition": "model.validation_column_required",
+            "defaultValue": "Validated"
+        },
+        {
             "name": "sep-layout",
             "label": "Layout",
             "type": "SEPARATOR"
@@ -183,7 +218,8 @@
             "name": "freeze_edits",
             "label": "Freeze edits",
             "description": "If set to true, the webapp will not allow any edits to be made.",
-            "type": "BOOLEAN"
+            "type": "BOOLEAN",
+            "defaultValue": false
         },
         {
             "name": "debug_mode",

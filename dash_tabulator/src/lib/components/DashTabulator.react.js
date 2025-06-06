@@ -14,7 +14,7 @@ import { extractFilterValues } from '../helpers/dashboardFilters.js'
 
 const crypto = require('crypto');
 
-const plugin_version = "2.0.8";
+const plugin_version = "2.1.0";
 
 function md5(string) {
     return crypto.createHash('md5').update(string).digest('hex');
@@ -73,10 +73,15 @@ export default class DashTabulator extends React.Component {
             edited.value = cell.getValue()
             edited.row = cell.getData()
             this.props.setProps({ cellEdited: edited })
+            if (edited.field == "_visual_edit_validated" | edited.field == "_visual_edit_notes") {
+                column_name_hash = edited.field
+            } else {
+                column_name_hash = md5(edited.field)
+            }
             try {
                 window.parent.WT1SVC.event("visualedit-edit-cell", {
                     "dataset_name_hash": md5(datasetName),
-                    "column_name_hash": md5(edited.field),
+                    "column_name_hash": column_name_hash,
                     "column_type": edited.type,
                     "plugin_version": plugin_version
                 });
@@ -98,24 +103,24 @@ export default class DashTabulator extends React.Component {
     handleFilterEvent = (event) => {
         const data = event.data;
         if (!data || data.type !== 'filters') return;
-    
+
         const filters = data.filters;
         if (filters.length === 0) {
             this.tabulator.clearFilter();
             return;
         }
-    
+
         const filter = filters[0];
         if (!filter.active || filter.filterType !== 'ALPHANUM_FACET') {
             this.tabulator.clearFilter();
             return;
         }
-    
+
         const columnFields = this.props.columns.map(col => col.field);
         if (!columnFields.includes(filter.column)) {
             return;
         }
-    
+
         const { includedValues, excludedValues } = extractFilterValues(filter);
         this.applyTableFilter(filter, includedValues, excludedValues);
     }

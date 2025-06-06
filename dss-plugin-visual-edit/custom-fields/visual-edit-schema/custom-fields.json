@@ -76,6 +76,65 @@
                 "type": "COLUMNS",
                 "datasetParamName": "original_ds"
             }
+        },
+        {
+            "applyToObjects": {
+                "mode": "SOME",
+                "includedObjectTypes": [
+                    "DATASET"
+                ]
+            },
+            "field": {
+                "name": "validation_column_required",
+                "label": "Validation Column",
+                "description": "",
+                "type": "BOOLEAN",
+                "defaultValue": false
+            }
+        },
+        {
+            "applyToObjects": {
+                "mode": "SOME",
+                "includedObjectTypes": [
+                    "DATASET"
+                ]
+            },
+            "field": {
+                "name": "notes_column_required",
+                "label": "Notes Column",
+                "description": "",
+                "type": "BOOLEAN",
+                "defaultValue": false
+            }
+        },
+        {
+            "applyToObjects": {
+                "mode": "SOME",
+                "includedObjectTypes": [
+                    "DATASET"
+                ]
+            },
+            "field": {
+                "name": "linked_record_name_1",
+                "label": "Column",
+                "description": "",
+                "type": "COLUMN",
+                "datasetParamName": "original_ds"
+            }
+        },
+        {
+            "applyToObjects": {
+                "mode": "SOME",
+                "includedObjectTypes": [
+                    "DATASET"
+                ]
+            },
+            "field": {
+                "name": "linked_record_ds_name_1",
+                "label": "Linked Dataset",
+                "description": "",
+                "type": "DATASET"
+            }
         }
     ]
 }
