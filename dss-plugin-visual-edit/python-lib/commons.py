@@ -138,11 +138,12 @@ def replay_edits(
 
     # Fix expected columns. This helps ensure that the dataframe we return always has the right schema, even if some columns of the input dataset were never edited.
     cols = editable_column_names + feedback_columns + metadata_columns
+    empty_df = DataFrame(columns=primary_keys + cols)
 
     editlog_df = get_dataframe(editlog_ds)
 
     if not editlog_df.size:  # i.e. if empty editlog
-        edits_df = DataFrame(columns=(primary_keys + cols))
+        edits_df = empty_df
 
     else:
         editlog_df.rename(
@@ -212,9 +213,11 @@ def replay_edits(
         )
         edits_df = edits_df.join(editlog_grouped_df, on=primary_keys)
 
-        edits_df = edits_df[cols]
-
+        edits_df = edits_df[cols]  # keep only the expected columns
         edits_df.reset_index(inplace=True)
+        edits_df = concat(
+            [empty_df, edits_df]
+        )  # ensure all editable columns are present, even if they were never edited
 
     return edits_df
 
