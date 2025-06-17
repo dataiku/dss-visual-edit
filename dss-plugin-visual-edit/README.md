@@ -14,9 +14,11 @@ The code was developed in Python (environment specs are in `code-env/`) and is o
 
 ### Data persistence layer
 
-* **`python-lib/DataEditor.py`** provides a CRUD Python API with methods to log and replay edits; these can be run in real-time mode within a webapp, or in batch mode within a data pipeline.
+* **`python-lib/DataEditor.py`**
+  * Provides a CRUD Python API with methods to edit and validate data from a Dataiku dataset.
+  * Maintains a timestamped log of edits and of the usernames behind them, so that the history of edits can be viewed.
 * The [API reference documentation](https://dataiku.github.io/dss-visual-edit/backend/) was generated from docstrings by Mkdocs (following [this tutorial](https://realpython.com/python-project-documentation-with-mkdocs/)). Updates to the documentation website are manual, they require running `mkdocs build` from `python-lib/` and moving the output (in `site/`) to `../docs/backend/`.
-* **`python-lib/commons.py`** provides the core replay logic.
+* **`python-lib/commons.py`** provides the core logic to replay and apply edits, based on a pivot of the editlog and a join with the original data. This can be run in real-time mode within a webapp, or in batch mode within a data pipeline.
 
 ### Integration of edits within a Dataiku Flow
 
