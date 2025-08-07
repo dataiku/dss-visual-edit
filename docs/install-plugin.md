@@ -1,6 +1,6 @@
 # Installation
 
-Visual Edit's open-source code is hosted in a GitHub repository. As a result, the plugin can be installed via Git or as a ZIP file (installation via Git is recommended as it allows to easily [update the plugin](update-plugin.md) when new versions are released). In this guide, we provide details to the steps found in the [Dataiku Documentation: Installing plugins](https://doc.dataiku.com/dss/latest/plugins/installing.html).
+Visual Edit's open-source code is hosted in a [GitHub repository](https://github.com/dataiku/dss-visual-edit/tree/master/dss-plugin-visual-edit). As a result, the plugin can be installed via Git or as a ZIP file (installation via Git is recommended as it allows to easily [update the plugin](update-plugin.md) when new versions are released). In this guide, we provide details to the steps found in the [Dataiku Documentation: Installing plugins](https://doc.dataiku.com/dss/latest/plugins/installing.html).
 
 ## Requirements
 
