@@ -40,7 +40,7 @@
         {
             "name": "sep-linked-record",
             "label": "Linked Records",
-            "description": "A linked record (aka foreign key) is an editable column whose values correspond to primary key values of another dataset, referred to as the linked dataset.",
+            "description": "Use for dropdown editing. Store available options in a 'linked dataset'. When editing, the dropdown allows searching for options by values of the label and lookup columns of the linked dataset.",
             "type": "SEPARATOR"
         },
         {
@@ -77,7 +77,7 @@
         {
             "name": "linked_record_key_1",
             "label": "↳ Primary Key",
-            "description": "Column used to identify a record.",
+            "description": "Column used to identify records in the backend.",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
             "mandatory": true,
@@ -86,7 +86,7 @@
         {
             "name": "linked_record_label_column_1",
             "label": "↳ Label",
-            "description": "Column used for display purposes, instead of the primary key. Always searchable.",
+            "description": "Column used to present records in the frontend, when Primary Key isn't user-friendly. Always searchable.",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
             "visibilityCondition": "model.linked_records_count > 0"
@@ -94,7 +94,7 @@
         {
             "name": "linked_record_lookup_columns_searchable_1",
             "label": "↳ Lookups — Searchable",
-            "description": "Additional information for display and search purposes.",
+            "description": "Columns providing additional information to include when presenting options in the dropdown. This information is searchable when typing in the dropdown widget.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "linked_record_ds_name_1",
             "visibilityCondition": "model.linked_records_count > 0"
@@ -102,7 +102,7 @@
         {
             "name": "linked_record_lookup_columns_display_1",
             "label": "↳ Lookups — Display Only",
-            "description": "Additional information for display purposes only",
+            "description": "Columns providing additional information to include when presenting options in the dropdown. This information is not searchable.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "linked_record_ds_name_1",
             "visibilityCondition": "model.linked_records_count > 0"
@@ -111,7 +111,7 @@
             "name": "linked_record_search_mode_1",
             "label": "↳ Search Mode",
             "type": "SELECT",
-            "description": "Across labels and searchable lookups.",
+            "description": "When entering the dropdown and typing, it filters for options whose label or searchable lookup values match the term that has been typed.",
             "options": [
                 {
                     "value": "starts_with",
