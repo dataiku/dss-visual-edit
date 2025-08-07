@@ -40,12 +40,12 @@
         {
             "name": "sep-linked-record",
             "label": "Linked Records",
-            "description": "Use for dropdown editing. Store available options in a 'linked dataset'. When editing, the dropdown allows searching for options by values of the label and lookup columns of the linked dataset.",
+            "description": "Use for dropdown editing and store available options in a 'linked dataset' (must be on a SQL connection or contain less than 10,000 records). When editing, the dropdown allows searching for options by values of the label and lookup columns of the linked dataset.",
             "type": "SEPARATOR"
         },
         {
             "name": "linked_records_count",
-            "label": "How many are there?",
+            "label": "How many columns?",
             "description": "For now this is capped at 2",
             "type": "INT",
             "minI": 0,
@@ -69,7 +69,7 @@
         {
             "name": "linked_record_ds_name_1",
             "label": "Linked Dataset",
-            "description": "Must be on a SQL connection or contain less than 10,000 records.",
+            "description": "",
             "type": "DATASET",
             "mandatory": true,
             "visibilityCondition": "model.linked_records_count > 0"
@@ -77,7 +77,7 @@
         {
             "name": "linked_record_key_1",
             "label": "↳ Primary Key",
-            "description": "Column used to identify records in the backend.",
+            "description": "Column used by the backend to identify available options.",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
             "mandatory": true,
@@ -86,7 +86,7 @@
         {
             "name": "linked_record_label_column_1",
             "label": "↳ Label",
-            "description": "Column used to present records in the frontend, when Primary Key isn't user-friendly. Always searchable.",
+            "description": "Column used by the frontend to present available options, when Primary Key isn't user-friendly. Always searchable.",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
             "visibilityCondition": "model.linked_records_count > 0"
@@ -112,7 +112,7 @@
             "label": "↳ Search Mode",
             "type": "SELECT",
             "description": "When entering the dropdown and typing, it filters for options whose label or searchable lookup values match the term that has been typed.",
-            "options": [
+            "selectChoices": [
                 {
                     "value": "starts_with",
                     "label": "Starts With"
@@ -142,7 +142,7 @@
         {
             "name": "linked_record_ds_name_2",
             "label": "Linked Dataset",
-            "description": "Must be on a SQL connection or contain less than 10,000 records.",
+            "description": "",
             "type": "DATASET",
             "mandatory": true,
             "visibilityCondition": "model.linked_records_count > 1"
