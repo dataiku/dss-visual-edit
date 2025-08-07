@@ -536,6 +536,38 @@ class DataEditor:
             )
         return "Row successfully created"
 
+    def validate_row(self, primary_keys: dict):
+        if not self.validation_column_required:
+            return [
+                EditFailure(
+                    "Trying to validate a row, but no validation column was configured."
+                )
+            ]
+        key = get_key_values_from_dict(primary_keys, self.primary_keys)
+        results = []
+        # When setting the validation column to True, start by logging the values of other editable columns
+        for editable_col in self.editable_column_names:
+            results.append(
+                self.__append_to_editlog__(
+                    key, editable_col, primary_keys[editable_col]
+                )
+            )
+
+        # End by logging the validation column
+        # Note: To improve this, it would be best to group all the inserts in the same transaction
+        results.append(self.__append_to_editlog__(key, VALIDATION_COLUMN_NAME, "True"))
+        return results
+
+    def invalidate_row(self, primary_keys: dict):
+        if not self.validation_column_required:
+            return [
+                EditFailure(
+                    "Trying to validate a row, but no validation column was configured."
+                )
+            ]
+        key = get_key_values_from_dict(primary_keys, self.primary_keys)
+        return self.__append_to_editlog__(key, VALIDATION_COLUMN_NAME, "False")
+
     def update_row(
         self, primary_keys: dict, column: str, value: str
     ) -> List[EditSuccess | EditFailure | EditUnauthorized | EditFreezed]:
@@ -573,25 +605,10 @@ class DataEditor:
                 return [
                     EditFailure("Validation column must be set to 'True' or 'False'.")
                 ]
-
-            results = []
             if value_string == "True":
-                # When setting the validation column to True, start by logging the values of other editable columns
-                for editable_col in self.editable_column_names:
-                    results.append(
-                        self.__append_to_editlog__(
-                            key, editable_col, primary_keys[editable_col]
-                        )
-                    )  # contains values for primary keys — and other columns too, but they'll be discarded
-
-            # End by logging the validation column
-            results.append(
-                self.__append_to_editlog__(key, VALIDATION_COLUMN_NAME, value_string)
-            )
-
-            # Note: To improve this, it would be best to group all the inserts in the same transaction
-
-            return results
+                return self.validate_row(primary_keys)
+            if value_string == "False":
+                return [self.invalidate_row(primary_keys)]
 
         else:
             return [self.__append_to_editlog__(key, column, value, action="update")]
