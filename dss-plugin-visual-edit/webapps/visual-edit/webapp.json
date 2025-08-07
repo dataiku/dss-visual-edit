@@ -92,17 +92,17 @@
             "visibilityCondition": "model.linked_records_count > 0"
         },
         {
-            "name": "linked_record_lookup_columns_searchable_1",
-            "label": "↳ Lookups — Searchable",
-            "description": "Columns providing additional information to include when presenting options in the dropdown. This information is searchable when typing in the dropdown widget.",
+            "name": "linked_record_lookup_columns_display_1",
+            "label": "↳ Lookups — Display Only",
+            "description": "Columns providing additional information to include when presenting options in the dropdown. This information is not searchable.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "linked_record_ds_name_1",
             "visibilityCondition": "model.linked_records_count > 0"
         },
         {
-            "name": "linked_record_lookup_columns_display_1",
-            "label": "↳ Lookups — Display Only",
-            "description": "Columns providing additional information to include when presenting options in the dropdown. This information is not searchable.",
+            "name": "linked_record_lookup_columns_searchable_1",
+            "label": "↳ Lookups — Searchable",
+            "description": "Columns providing additional information to include when presenting options in the dropdown. This information is searchable when typing in the dropdown widget.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "linked_record_ds_name_1",
             "visibilityCondition": "model.linked_records_count > 0"
