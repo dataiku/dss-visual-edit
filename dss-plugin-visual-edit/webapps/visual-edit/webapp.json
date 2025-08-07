@@ -86,17 +86,43 @@
         {
             "name": "linked_record_label_column_1",
             "label": "↳ Label",
-            "description": "Column used for display purposes, instead of the primary key.",
+            "description": "Column used for display purposes, instead of the primary key. Always searchable.",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
             "visibilityCondition": "model.linked_records_count > 0"
         },
         {
-            "name": "linked_record_lookup_columns_1",
-            "label": "↳ Additional Lookups",
-            "description": "",
+            "name": "linked_record_lookup_columns_searchable_1",
+            "label": "↳ Lookups — Searchable",
+            "description": "Additional information for display and search purposes.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "linked_record_ds_name_1",
+            "visibilityCondition": "model.linked_records_count > 0"
+        },
+        {
+            "name": "linked_record_lookup_columns_display_1",
+            "label": "↳ Lookups — Display Only",
+            "description": "Additional information for display purposes only",
+            "type": "DATASET_COLUMNS",
+            "datasetParamName": "linked_record_ds_name_1",
+            "visibilityCondition": "model.linked_records_count > 0"
+        },
+        {
+            "name": "linked_record_search_mode_1",
+            "label": "↳ Search Mode",
+            "type": "SELECT",
+            "description": "Across labels and searchable lookups.",
+            "options": [
+                {
+                    "value": "starts_with",
+                    "label": "Starts With"
+                },
+                {
+                    "value": "contains",
+                    "label": "Contains"
+                }
+            ],
+            "defaultValue": "starts_with",
             "visibilityCondition": "model.linked_records_count > 0"
         },
         {
@@ -138,7 +164,7 @@
         },
         {
             "name": "linked_record_lookup_columns_2",
-            "label": "↳ Additional Lookups",
+            "label": "↳ Lookups",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "linked_record_ds_name_2",
             "visibilityCondition": "model.linked_records_count > 1"
