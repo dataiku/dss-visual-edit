@@ -18,13 +18,17 @@ See [here](data-table-features) for more information on the editing experience.
 
 ## Known limitations
 
-- The linked dataset must have less than 10,000 records OR the linked dataset must be on an SQL connection.
-- If the linked dataset is not on a SQL connection and gets updated, the Visual Edit Webapp should be restarted in order to see those changes.
-- The storage type of the linked data set primary key must be of storage type **string** or **integer**.
-- The maximum number of lookup columns is two.
-- The linked dataset primary key and lookup columns values should not be empty.
-- The linked dataset lookup columns should be different from the label column.
-- If a lookup column is the same as the primary key column, then the lookup value will not be shown in the dropdown widget. Otherwise it will work as expected.
+- Linked dataset, if not on an SQL connection:
+  - Only the first 10,000 records will be used.
+  - If changes are made to the values in this dataset, the Visual Edit Webapp will need to be restarted in order to see the new values.
+- Primary key column:
+  - Must be unique within the linked dataset and not empty.
+  - Storage type must be **string** or **integer**.
+- When using lookup columns:
+  - Label column should be different from primary key column.
+  - Lookup columns should be different from the label column and from the primary key column.
+  - Values should not be empty.
+  - The maximum number of lookup columns is two.
 
 ## Example
 
