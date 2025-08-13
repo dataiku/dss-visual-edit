@@ -215,7 +215,7 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
     t_col = {}
     t_col["sorter"] = "string"
 
-    # If a label column was provided, use a lookup formatter
+    # Formatter: if a label column was provided, get the label value corresponding to the cell's value as primary key
     if linked_ds_label_column != "" and linked_ds_label_column != linked_ds_key_column:
         t_col["formatter"] = assign(
             f"""
@@ -223,7 +223,8 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
                 url_base = "label/{linked_ds_name}"
                 key = cell.getValue()
                 label = ""
-                // Assign value returned by GET request to url_base with parameter key, to label variable; in case connection fails, assign empty value to label
+                // Send GET request to `url_base`, with parameter `key`
+                // Assign returned value to the `label` variable; in case connection fails, assign empty value to label
                 $.ajax({{
                     url: url_base + "?key=" + key,
                     async: false,
@@ -247,18 +248,20 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
             """
         )
 
-    # Use a list editor
+    # Editor: use "list"
     t_col["editor"] = "list"
     t_col["editorParams"] = {
+        "valuesURL": "lookup/" + linked_ds_name,
+        "clearable": True,
+        "maxWidth": True,
         "autocomplete": True,
         "filterRemote": True,
-        "valuesURL": "lookup/" + linked_ds_name,
         "filterDelay": 300,
+        "allowEmpty": False,
         "listOnEmpty": True,
-        "clearable": False,
-        "valuesLookupField": linked_record_name,
+        "freetext": False,
     }
-    # If lookup columns were provided, use an item formatter in the editor
+    # Editor item formatter: define if lookup columns were provided
     if linked_ds_lookup_columns != []:
         t_col["editorParams"]["itemFormatter"] = __ns__("itemFormatter")
 
