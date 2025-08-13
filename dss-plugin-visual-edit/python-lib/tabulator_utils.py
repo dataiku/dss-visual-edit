@@ -267,7 +267,9 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
     return t_col
 
 
-def get_columns_tabulator(de: DataEditor, show_header_filter=True, freeze_editable_columns=False):
+def get_columns_tabulator(
+    de: DataEditor, show_header_filter=True, freeze_editable_columns=False
+):
     """Prepare column settings to pass to Tabulator"""
 
     linked_record_names = []
@@ -357,6 +359,7 @@ def get_columns_tabulator(de: DataEditor, show_header_filter=True, freeze_editab
         t_col = {
             "field": NOTES_COLUMN_NAME,
             "title": de.notes_column_display_name,
+            "minWidth": 300,
             "formatter": "textarea",
             "editor": "textarea",
         }
