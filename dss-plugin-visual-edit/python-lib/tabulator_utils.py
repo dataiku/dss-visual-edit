@@ -236,8 +236,6 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
                         console.log("Could not retrieve label from server")
                     }}
                 }});
-                d = {{}}
-                d[key] = label
                 // if label is empty, return empty string
                 if (label == "") {{
                     return label
