@@ -261,6 +261,30 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
         "listOnEmpty": True,
         "freetext": False,
     }
+    # Editor: get values from the `lookup` endpoint
+    t_col["editorParams"]["valuesLookup"] = assign(
+        f"""
+            function(cell, filterTerm){{
+                url_base = "lookup/{linked_ds_name}"
+                key = cell.getValue()
+                optionsList = []
+                // Send GET request to `url_base`, with parameter `key`
+                // Assign returned value to the `label` variable; in case connection fails, assign empty value to label
+                $.ajax({{
+                    url: url_base + "?key=" + key + "&term=" + filterTerm,
+                    async: false,
+                    success: function(result){{
+                        optionsList = result
+                    }},
+                    error: function(result){{
+                        optionsList = []
+                        console.log("Could not retrieve options from server")
+                    }}
+                }});
+                return optionsList
+            }}
+            """
+    )
     # Editor: format items in the list if lookup columns were provided (in which case items are structured)
     if linked_ds_lookup_columns != []:
         t_col["editorParams"]["itemFormatter"] = __ns__("itemFormatter")
