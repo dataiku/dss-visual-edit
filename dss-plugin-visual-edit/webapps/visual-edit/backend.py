@@ -412,26 +412,7 @@ def label_endpoint(linked_ds_name):
     except Exception:
         return "Invalid key type.", 400
 
-    # Return label only if a label column is defined (and different from the key column)
-    if key != "" and linked_ds_label and linked_ds_label != linked_ds_key:
-        if linked_record.ds:
-            try:
-                label = linked_record.ds.get_cell_value_sql_query(
-                    linked_ds_key, key, linked_ds_label
-                )
-            except Exception:
-                return "Something went wrong fetching label of linked value.", 500
-        else:
-            linked_df = linked_record.df
-            if linked_df is None:
-                return "Something went wrong. Try restarting the backend.", 500
-            try:
-                label = linked_df.loc[key, linked_ds_label]
-            except Exception:
-                return label
-    else:
-        label = key
-    return label
+    return get_linked_label(linked_record, key)
 
 
 @server.route("/lookup/<linked_ds_name>", methods=["GET", "POST"])

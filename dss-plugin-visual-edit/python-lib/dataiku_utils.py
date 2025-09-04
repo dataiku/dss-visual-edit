@@ -78,6 +78,31 @@ def get_dataframe_filtered(ds_name, project_key, filter_column, filter_term, n_r
     return DataFrame(columns=rows[0], data=rows[1:]) if len(rows) > 0 else DataFrame()
 
 
+def get_linked_label(linked_record, key):
+    linked_ds_key = linked_record.ds_key
+    linked_ds_label = linked_record.ds_label
+    # Return label only if a label column is defined (and different from the key column)
+    if key != "" and linked_ds_label and linked_ds_label != linked_ds_key:
+        if linked_record.ds:
+            try:
+                label = linked_record.ds.get_cell_value_sql_query(
+                    linked_ds_key, key, linked_ds_label
+                )
+            except Exception:
+                return "Something went wrong fetching label of linked value.", 500
+        else:
+            linked_df = linked_record.df
+            if linked_df is None:
+                return "Something went wrong. Try restarting the backend.", 500
+            try:
+                label = linked_df.loc[key, linked_ds_label]
+            except Exception:
+                return label
+    else:
+        label = key
+    return label
+
+
 def is_sql_dataset(ds: Dataset) -> bool:
     # locationInfoType may not exist, for example for editable dataset.
     return ds.get_location_info().get("locationInfoType", "") == "SQL"
