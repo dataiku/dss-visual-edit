@@ -248,12 +248,14 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
             """
         )
 
-    # Editor: use "list"
+    # Editor: use "list" for a dropdown
     t_col["editor"] = "list"
     t_col["editorParams"] = {
-        "valuesURL": "lookup/" + linked_ds_name,
         "clearable": True,
-        "maxWidth": True,
+        "elementAttributes": {"maxlength": "20"},
+        "emptyValue": None,
+        "placeholderLoading": "Loading List...",
+        "placeholderEmpty": "No Results Found",
         "autocomplete": True,
         "filterRemote": True,
         "filterDelay": 300,
@@ -261,7 +263,7 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
         "listOnEmpty": True,
         "freetext": False,
     }
-    # Editor item formatter: define if lookup columns were provided
+    # Editor: format items in the list if lookup columns were provided (in which case items are structured)
     if linked_ds_lookup_columns != []:
         t_col["editorParams"]["itemFormatter"] = __ns__("itemFormatter")
 
