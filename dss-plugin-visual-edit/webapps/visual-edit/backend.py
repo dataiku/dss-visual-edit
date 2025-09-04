@@ -382,26 +382,28 @@ def label_endpoint(linked_ds_name):
     Returns: the value of the column defined as label in the linked dataset
     """
 
+    # Get request parameters
     if request.method == "POST":
         key = request.get_json().get("key")
     else:
         key = request.args.get("key", "")
     label = ""
 
+    # Find the linked record whose linked dataset is requested
     linked_record: LinkedRecord | None = None
     for lr in de.linked_records:
         if linked_ds_name == lr.ds_name:
             linked_record = lr
             break
-
     if linked_record is None:
         return "Unknown linked dataset.", 404
 
-    # Return data only when it's a linked dataset
+    # Return data only when linked_ds_name corresponds to a linked dataset; if we've reached this point in the code, it means that this is the case
+
     linked_ds_key = linked_record.ds_key
     linked_ds_label = linked_record.ds_label
 
-    # Cast provided key value into appropriate type, necessary for integers for example.
+    # Cast provided key value into appropriate type (necessary for integers for example)
     linked_key_type = de.schema_columns_df.loc[linked_record.name, "type"]
     linked_key_dtype = CASTERS.get(linked_key_type)
     try:
@@ -460,20 +462,11 @@ def lookup_endpoint(linked_ds_name):
             n_results,
         )
     else:
-        linked_df = linked_record.df  # note: this is already capped to 1000 rows
-        if linked_df is None:
-            return "Something went wrong. Try restarting the backend.", 500
-        if term == "":
-            linked_df_filtered = linked_df.head(n_results)
-        else:
-            # Filter linked_df for rows whose label starts with the search term
-            linked_df_filtered = linked_df[
-                linked_df[linked_ds_label].str.lower().str.startswith(term)
-            ].head(n_results)
-
-    logging.debug(f"Found {linked_df_filtered.size} entries")
-    editor_values_param = get_values_from_df(
-        linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns
+    editor_values_param = get_formatted_items_from_linked_df(
+        linked_df=linked_df_filtered,
+        key_col=linked_ds_key,
+        label_col=linked_ds_label,
+        lookup_cols=linked_ds_lookup_columns,
     )
     return jsonify(editor_values_param)
 

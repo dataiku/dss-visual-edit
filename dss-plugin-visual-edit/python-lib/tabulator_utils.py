@@ -123,7 +123,7 @@ def __get_column_tabulator_editor__(t_type):
 ### Linked records
 
 
-def get_values_from_df(
+def get_formatted_items_from_linked_df(
     linked_df: DataFrame,
     key_col: str,
     label_col: str,
@@ -215,7 +215,7 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
     t_col = {}
     t_col["sorter"] = "string"
 
-    # Formatter: if a label column was provided, get the label value corresponding to the cell's value as primary key
+    # Formatter: if a label column was specified, get labels from the `label` endpoint and show them as user-friendly alternatives to the actual values (corresponding to primary keys of the linked dataset)
     if linked_ds_label_column != "" and linked_ds_label_column != linked_ds_key_column:
         t_col["formatter"] = assign(
             f"""

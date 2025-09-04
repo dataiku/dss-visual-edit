@@ -107,6 +107,7 @@ def is_sql_dataset(ds: Dataset) -> bool:
     # locationInfoType may not exist, for example for editable dataset.
     return ds.get_location_info().get("locationInfoType", "") == "SQL"
 
+
 def is_bigquery_dataset(ds: Dataset) -> bool:
     location_info = ds.get_location_info()
     databaseType = location_info.get("info", "").get("databaseType", "")
