@@ -104,7 +104,8 @@ def get_linked_dataframe_filtered(linked_record, project_key, filter_term, n_res
         )
     else:
         # The linked dataframe is already available in memory (and capped to 1000 rows); it can be filtered by Pandas
-        linked_df = linked_record.df
+        # This dataframe is indexed by the linked dataset's key column: we reset the index to stay consistent with the rest of this method
+        linked_df = linked_record.df.reset_index()
         if linked_df is None:
             return "Something went wrong. Try restarting the backend.", 500
         if filter_term == "":
