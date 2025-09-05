@@ -8,10 +8,13 @@
         "Comments"
     ],
     "freeze_editable_columns": false,
-    "group_column_names": [],
+    "group_column_names": [
+        "Country",
+        "Industry"
+    ],
     "linked_records_count": 1,
     "linked_record_name_1": "Matched Entity",
-    "linked_record_ds_name_1": "entities_ext",
+    "linked_record_ds_name_1": "entities_ext_stacked",
     "linked_record_key_1": "ID",
     "linked_record_label_column_1": "Name",
     "linked_record_lookup_columns_1": [
@@ -21,8 +24,12 @@
     "authorized_users": [],
     "editschema": [
         {
-            "name": "Reviewed",
+            "name": "Validated",
             "type": "boolean_tick"
+        },
+        {
+            "name": "Comments",
+            "type": "textarea"
         }
     ]
 }
