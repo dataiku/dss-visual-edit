@@ -74,11 +74,18 @@ pip install -r code-env/python/spec/requirements.txt
 pip install -r code-env/python/spec/requirements.dev.39.txt
 ```
 
-* Add Dataiku internal client to the environment. This can be done by linking to the `dataiku` and `dataikuapi` packages that already exist in your Dataiku installation:
+* Add Dataiku API client to the virtual environment:
 
 ```bash
-ln -s PATH_TO_PACKAGES/dataiku ~/.pyenv/versions/3.9.19/envs/visual-edit/lib/python3.9/site-packages/dataiku
-ln -s PATH_TO_PACKAGES/dataikuapi ~/.pyenv/versions/3.9.19/envs/visual-edit/lib/python3.9/site-packages/dataikuapi
+pip install dataiku-api-client
+```
+
+* Add Dataiku internal client to the virtual environment.
+   * Copy the `dataiku` folder found in the `python` directory of your Dataiku installation to your local development machine. In the following, we assume that this folder is available in `PATH_TO_PACKAGE`.
+   * Link `PATH_TO_PACKAGE/dataiku` to the virtual environment:
+
+```bash
+ln -s PATH_TO_PACKAGE/dataiku ~/.pyenv/versions/3.9.19/envs/visual-edit/lib/python3.9/site-packages/dataiku
 ```
 
 ### Store webapp settings in a JSON file
