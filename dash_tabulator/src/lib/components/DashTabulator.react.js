@@ -10,15 +10,15 @@ import "../../../assets/jquery-3.5.1.min.js";
 import "../../../assets/luxon.min.js";
 import "../../../assets/semantic-ui-react.min.js";
 import "../../../assets/semantic.min.css";
-
-const plugin_version = "2.0.3";
+import { extractFilterValues } from '../helpers/dashboardFilters.js'
 
 /**
  * We define a function to hash a string using the MD5 algorithm.
  * This is used to hash the dataset name and column names before sending them to WT1.
  */
-
 const crypto = require('crypto');
+
+const plugin_version = "2.0.8";
 
 function md5(string) {
     return crypto.createHash('md5').update(string).digest('hex');
@@ -106,6 +106,8 @@ export default class DashTabulator extends React.Component {
                 });
             } catch (e) { }
         })
+
+        window.addEventListener('message', this.handleFilterEvent);
     }
 
     /**
@@ -115,6 +117,104 @@ export default class DashTabulator extends React.Component {
     constructor(props) {
         super(props);
         this.ref = null;
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('message', this.handleFilterEvent);
+    }
+
+    handleFilterEvent = (event) => {
+        const data = event.data;
+        if (!data || data.type !== 'filters') return;
+
+        const filters = data.filters;
+        if (filters.length === 0) {
+            this.tabulator.clearFilter();
+            return;
+        }
+
+        const filter = filters[0];
+        if (!filter.active || filter.filterType !== 'ALPHANUM_FACET') {
+            this.tabulator.clearFilter();
+            return;
+        }
+
+        const columnFields = this.props.columns.map(col => col.field);
+        if (!columnFields.includes(filter.column)) {
+            return;
+        }
+
+        const { includedValues, excludedValues } = extractFilterValues(filter);
+        this.applyTableFilter(filter, includedValues, excludedValues);
+    }
+
+    applyTableFilter = (filter, includedValues, excludedValues) => {
+        if (includedValues.length > 0) {
+            const includeFilters = includedValues.map(value => ({
+                field: filter.column,
+                type: "=",
+                value: value
+            }));
+            this.tabulator.setFilter(includeFilters, "OR");
+        } else if (excludedValues.length > 0) {
+            const excludeFilters = excludedValues.map(value => ({
+                field: filter.column,
+                type: "!=",
+                value: value
+            }));
+            this.tabulator.setFilter(excludeFilters);
+        } else {
+            this.tabulator.clearFilter();
+        }
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('message', this.handleFilterEvent);
+    }
+
+    handleFilterEvent = (event) => {
+        const data = event.data;
+        if (!data || data.type !== 'filters') return;
+
+        const filters = data.filters;
+        if (filters.length === 0) {
+            this.tabulator.clearFilter();
+            return;
+        }
+
+        const filter = filters[0];
+        if (!filter.active || filter.filterType !== 'ALPHANUM_FACET') {
+            this.tabulator.clearFilter();
+            return;
+        }
+
+        const columnFields = this.props.columns.map(col => col.field);
+        if (!columnFields.includes(filter.column)) {
+            return;
+        }
+
+        const { includedValues, excludedValues } = extractFilterValues(filter);
+        this.applyTableFilter(filter, includedValues, excludedValues);
+    }
+
+    applyTableFilter = (filter, includedValues, excludedValues) => {
+        if (includedValues.length > 0) {
+            const includeFilters = includedValues.map(value => ({
+                field: filter.column,
+                type: "=",
+                value: value
+            }));
+            this.tabulator.setFilter(includeFilters, "OR");
+        } else if (excludedValues.length > 0) {
+            const excludeFilters = excludedValues.map(value => ({
+                field: filter.column,
+                type: "!=",
+                value: value
+            }));
+            this.tabulator.setFilter(excludeFilters);
+        } else {
+            this.tabulator.clearFilter();
+        }
     }
 
     /**

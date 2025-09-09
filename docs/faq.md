@@ -2,11 +2,11 @@
 
 ## Can I use Visual Edit if my data is on connection X?
 
-Visual Edit can load your original data regardless of the underlying connection. When using it for the first time, the editlog, edits, and edited datasets will be created on the same connection.
+Visual Edit can load your original data regardless of the underlying connection. When using it for the first time, the `editlog`, `edits`, and `edited` datasets will be created on the same connection.
 
-We strongly recommend using an SQL connection for the editlog, as explained in the [deployment guide](deploy). The edits and edited datasets can be on a different connection.
+We strongly recommend using a [compatible SQL connection](compatibility) for the `editlog`, as motivated in the [deployment guide](deploy). The `edits` and `edited` datasets can be on a different connection.
 
-If [linked records](linked-records) are needed, and if the linked dataset has more than 1,000 rows or if lookup columns are needed, then the linked dataset must also be on an SQL connection.
+If [linked records](linked-records) are needed, and if the linked dataset has more than 10,000 rows or if lookup columns are needed, then the linked dataset must also be on an SQL connection.
 
 ## Can the webapp be used by several users simultaneously?
 

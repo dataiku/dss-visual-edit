@@ -1,33 +1,43 @@
 # Installation
 
-## How to install the plugin
+Visual Edit's open-source code is hosted in a [GitHub repository](https://github.com/dataiku/dss-visual-edit/tree/master/dss-plugin-visual-edit). As a result, the plugin can be installed via Git or as a ZIP file (installation via Git is recommended as it allows to easily [update the plugin](update-plugin.md) when new versions are released). In this guide, we provide details to the steps found in the [Dataiku Documentation: Installing plugins](https://doc.dataiku.com/dss/latest/plugins/installing.html).
 
-The plugin can be installed via Git (it is not yet available through the plugin store).
+## Requirements
 
-### Dataiku Cloud
+- Compatible version of Dataiku, Python, and compatible SQL data connection. See [Compatibility](compatibility.md).
+- Ability to install plugins on your Dataiku instance.
+- Ability to create a code environment.
 
-* Enable maintenance access
-* Share this URL with Dataiku Support and ask them to install the plugin for you
+## Option 1: Git
 
-### Dataiku self-managed
+### Pre-requisite: GitHub remote repository setup
 
-#### Requirements
+To connect from Dataiku to this repository, you must add your Dataiku user’s public SSH key to the list of accepted SSH keys in your GitHub account.
 
-* **Dataiku V9+**
-* Ability to install plugins on your Dataiku instance and to create an associated code env based on **Python 3.8 or 3.9** and **pandas 1.5**.
+- Follow the steps provided in the [Dataiku Documentation: Working with Git > Working with remotes > Setup](https://doc.dataiku.com/dss/latest/collaboration/git.html#setup).
+- See a more detailed [illustration with Dataiku Cloud](dataiku-cloud-github-setup.md).
 
-#### Instructions
+### Repository settings
 
-* From the Plugins page of your Dataiku instance, click on the "Add Plugin" button in the top right corner and choose "Fetch from Git repository":
-  * Repository URL: `git@github.com:dataiku/dss-visual-edit.git`
-  * Development mode: leave unticked
-  * Checkout: choose `master` under "Branch", to install the latest version of the plugin; alternatively, choose a version number under "Tag"
-  * Path in repository: `dss-plugin-visual-edit`
-* Create the code environment for this plugin. Select the version of Python you want to use and the types of containers you plan to use as backend for Visual Edit webapps or for running recipes provided by the plugin (the easiest is to choose All).
-* The plugin is installed! ![](plugin_installed.png) We'll see how to use each of its components in the next guide.
+From the Plugins page of your Dataiku instance, once you have clicked on the "Add Plugin" button in the top right corner and chosen "Fetch from Git repository", use the following settings:
 
-## How to update the plugin
+- Repository URL: `git@github.com:dataiku/dss-visual-edit.git`
+- Development mode: leave unticked
+- Checkout: choose `master` under "Branch", to install the latest version of the plugin; alternatively, choose a version number under "Tag"
+- Path in repository: `dss-plugin-visual-edit`
 
-From the Plugins page of your Dataiku instance, go to the "Installed" tab, find "Visual Edit" in the list and click on the "Update from repository" link. ![](update_plugin_git.png)
+## Option 2: ZIP file
 
-Release notes for all versions are available at [https://github.com/dataiku/dss-visual-edit/releases](https://github.com/dataiku/dss-visual-edit/releases).
+Prepare the plugin ZIP file to upload to your Dataiku instance:
+
+- Find the latest release of the plugin at <https://github.com/dataiku/dss-visual-edit/releases>. Under **Assets**, click **Source code (zip)** to download `dss-visual-edit-X.Y.Z.zip` (where `X.Y.Z` is the version number of the release).
+- Open the zip file and find the folder `dss-plugin-visual-edit`.
+- Create a zip archive of this folder and name it `dss-plugin-visual-edit.zip`
+
+From the Plugins page of your Dataiku instance, once you have clicked on the "Add Plugin" button in the top right corner and chosen "Upload", make sure to choose the `dss-plugin-visual-edit.zip` archive you just created (do NOT use `dss-visual-edit-X.Y.Z.zip`).
+
+## Creating the code environment
+
+When prompted during the installation procedure, select Python 3.9 and the types of containers you plan to use as backend for Visual Edit webapps or for running recipes provided by the plugin (the easiest is to choose All).
+
+The plugin is installed! ![](plugin_installed.png) You can now follow the guides from the [plugin documentation](index.md).

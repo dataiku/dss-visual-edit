@@ -1,4 +1,4 @@
-# Setting up Linked Records
+# Set up dropdown editing via "Linked Records"
 
 Define linked records to enforce a specific set of values for an editable column. The cell editor will be a dropdown widget.
 
@@ -18,30 +18,36 @@ See [here](data-table-features) for more information on the editing experience.
 
 ## Known limitations
 
-- The linked dataset must have less than 1,000 records OR the linked dataset must be on an SQL connection.
-- The storage type of the linked data set primary key must be of storage type **string** or **integer**.
-- The maximum number of lookup columns is two.
-- The linked dataset primary key and lookup columns values should not be empty.
-- The linked dataset lookup columns should be different from the label column.
-- If a lookup column is the same as the primary key column, then the lookup value will not be shown in the dropdown widget. Otherwise it will work as expected.
+- Linked dataset, if not on an SQL connection:
+  - Only the first 10,000 records will be used.
+  - If changes are made to the values in this dataset, the Visual Edit Webapp will need to be restarted in order to see the new values.
+- Primary key column:
+  - Must be unique within the linked dataset and not empty.
+  - Storage type must be **string** or **integer**.
+- When using lookup columns:
+  - Label column should be different from primary key column.
+  - Lookup columns should be different from the label column and from the primary key column.
+  - Values should not be empty.
+  - The maximum number of lookup columns is two.
 
 ## Example
 
 Given a dataset named PRODUCTS containing a list of products and another dataset named COMPANIES containing a list of companies, we want users of the web app to link products to a specific company.
 
-***Original dataset***
+**_Original dataset_**
 
-| product_name  | company_name |
-| ------------- | ------------- |
-| DSS  |   |
+| product_name | company_name |
+| ------------ | ------------ |
+| DSS          |              |
 
-***Dataset with linked records***
+**_Dataset with linked records_**
 
 | company_name | industry |
-| ------------- | ------------- |
-| dataiku  | tech  |
+| ------------ | -------- |
+| dataiku      | tech     |
 
 The configuration could look like this:
+
 - **Linked Dataset:** COMPANIES
 - **Column:** company_id
 - **Primary Key:** company_name
@@ -50,14 +56,14 @@ The configuration could look like this:
 
 resulting in the following edited dataset one DSS is linked to dataiku.
 
-***Original dataset edited (after building the flow)***
+**_Original dataset edited (after building the flow)_**
 
-| product_name  | company_name |
-| ------------- | ------------- |
-| DSS  | dataiku   |
+| product_name | company_name |
+| ------------ | ------------ |
+| DSS          | dataiku      |
 
-***Dataset with linked records***
+**_Dataset with linked records_**
 
 | company_name | industry |
-| ------------- | ------------- |
-| dataiku  | tech  |
+| ------------ | -------- |
+| dataiku      | tech     |

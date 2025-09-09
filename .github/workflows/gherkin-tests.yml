@@ -13,6 +13,10 @@ permissions:
   checks: write
   pull-requests: write
 
+concurrency:
+  group: test_environment
+  cancel-in-progress: false
+
 jobs:
   gherkin-tests:
     runs-on: ubuntu-latest

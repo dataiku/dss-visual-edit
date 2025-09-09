@@ -2,10 +2,9 @@
 
 ## Use case description
 
-We want business users (aka end-users) to validate machine-generated data and make corrections as needed, based on their domain expertise. From a business perspective, there are two sub use cases: we may use the human-reviewed, machine-generated data...
+While the initial [How to Use guide](https://www.dataiku.com/product/plugins/visual-edit/#how-to-use) explains how to use the Visual Edit plugin for tactical corrections of source data, this guide focuses on validating machine-generated data.
 
-* for mass corrections or enrichment of source data;
-* as input to an operational process.
+We want business users to validate and make corrections as needed, based on their domain expertise. The human-reviewed, machine-generated data would typically be used for mass corrections or enrichment of source data, or as input to an operational process.
 
 Machine-generated data would be stored in the output dataset of an existing data pipeline. Each row would correspond to an item to validate. Columns would include:
 
@@ -30,10 +29,8 @@ You must be familiar with the initial [How to Use guide](https://www.dataiku.com
 * **Add feedback columns to the dataset to review**: this can be done via code in the existing data pipeline, or with an additional Prepare recipe, as columns with missing values to serve as placeholders in the webapp.
 * **When creating a Visual Edit webapp**: make sure to select all machine-generated columns and feedback columns as editable.
 * **When using the webapp**: you would review values in generated columns (mark as valid, or edit values and add notes when necessary) and fill in missing values.
-* **When building the Flow and defining the _update source_ scenario**: you would typically want to notify end-users via email if there is new data to review.
-* **Test with IT**: share the _edits_ dataset with IT for them to propagate or leverage edits in other IT systems; columns of this dataset include primary keys, machine-generated and human-reviewed columns, a boolean validation column, and additional human feedback columns.
 
 ## Next
 
-* [Building a complete application to test with end-users](build-complete-application)
-* [Deploying to production](deploy)
+* [Build a complete application to test with end-users](build-complete-application)
+* [Deploy to production](deploy): this will require collaboration and testing with IT, to propagate the contents of the _edits_ dataset to other systems (columns of this dataset include primary keys, human-reviewed values, a boolean validation column, and additional human feedback columns).

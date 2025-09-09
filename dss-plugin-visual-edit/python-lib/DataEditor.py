@@ -40,6 +40,9 @@ class EditFailure:
 class EditUnauthorized:
     pass
 
+class EditFreezed:
+    pass
+
 
 class DataEditor:
     """
@@ -175,6 +178,7 @@ class DataEditor:
         project_key: str | None = None,
         editschema=None,
         authorized_users: List[str] | None = None,
+        freeze_edits: bool = False,
     ):
         """
         Initializes Datasets (original and editlog) and properties used for data editing.
@@ -185,6 +189,7 @@ class DataEditor:
             editable_column_names (list): A list of column names that can be edited. If None, all columns are editable.
             project_key (str): The key of the project where the dataset is located. If None, the current project is used.
             authorized_users (list): A list of user identifiers who are authorized to make edits. If None, all users are authorized.
+            freeze_edits (bool): If True, it won't be possible to make any edits.
             linked_records (list): (Optional) A list of LinkedRecord objects that represent linked datasets or dataframes.
             editschema_manual (list): (Optional) A list of EditSchema objects that define the primary keys and editable columns.
             editschema (list): (Optional) A list of EditSchema objects that define the primary keys and editable columns.
@@ -203,6 +208,7 @@ class DataEditor:
         self.project = client.get_project(self.project_key)
         self.original_ds = Dataset(self.original_ds_name, self.project_key)
         self.schema_columns = self.original_ds.get_config().get("schema").get("columns")
+        self.schema_columns_df = DataFrame(data=self.schema_columns).set_index("name")
 
         self.editlog_ds_name = self.original_ds_name + "_editlog"
         self.edits_ds_name = self.original_ds_name + "_edits"
@@ -226,6 +232,7 @@ class DataEditor:
             ).set_index("name")
             for linked_record in self.linked_records:
                 linked_ds_name = linked_record.ds_name
+                linked_ds_key = linked_record.ds_key
                 linked_ds = Dataset(linked_ds_name, self.project_key)
                 # Get the number of records in the linked dataset
                 count_records = None
@@ -239,16 +246,19 @@ class DataEditor:
                 except Exception:
                     pass
 
-                # If the linked dataset is on an SQL connection and if it has more than 1000 records, load it as a DatasetSQL object
+                MIN_SQL_ROWS = 1000
+                MAX_IN_MEMORY_ROWS = 10000
                 if is_sql_dataset(linked_ds):
-                    if count_records is not None and count_records <= 1000:
+                    if count_records is not None and count_records <= MIN_SQL_ROWS:
                         logging.debug(
-                            f"""Loading linked dataset "{linked_ds_name}" in memory since it has less than 1000 records"""
+                            f"""Loading linked dataset "{linked_ds_name}" in memory since it has less than {MIN_SQL_ROWS} records"""
                         )
-                        linked_record.df = linked_ds.get_dataframe()
+                        linked_record.df = get_dataframe(linked_ds).set_index(
+                            linked_ds_key
+                        )
                     else:
                         logging.debug(
-                            f"""Loading linked dataset "{linked_ds_name}" as a DatasetSQL object since it has more than 1000 records or an unknown number of records"""
+                            f"""Loading linked dataset "{linked_ds_name}" as a DatasetSQL object since it has more than {MIN_SQL_ROWS} records or an unknown number of records"""
                         )
                         linked_record.ds = DatasetSQL(linked_ds_name, self.project_key)
                 else:
@@ -259,13 +269,14 @@ class DataEditor:
                         logging.warning(
                             f"Unknown number of records for linked dataset {linked_ds_name}"
                         )
-                    elif count_records > 1000:
+                    elif count_records > MAX_IN_MEMORY_ROWS:
                         logging.warning(
-                            f"Linked dataset {linked_ds_name} has {count_records} records — capping at 1,000 rows to avoid memory issues"
+                            f"Linked dataset {linked_ds_name} has {count_records} records — capping at {MAX_IN_MEMORY_ROWS} rows to avoid memory issues"
                         )
-                    # get the first 1000 rows of the dataset
-                    linked_record.df = linked_ds.get_dataframe(
-                        sampling="head", limit=1000
+                    linked_record.df = (
+                        get_dataframe(linked_ds)
+                        .set_index(linked_ds_key)
+                        .head(MAX_IN_MEMORY_ROWS)
                     )
 
         self.editschema_manual = editschema_manual
@@ -284,6 +295,8 @@ class DataEditor:
             )  # this will be an empty dataframe
 
         self.authorized_users = authorized_users
+        
+        self.freeze_edits = freeze_edits
 
         self.display_column_names = get_display_column_names(
             self.schema_columns, self.primary_keys, self.editable_column_names
@@ -392,7 +405,10 @@ class DataEditor:
 
     def __log_edit__(
         self, key, column, value, action="update"
-    ) -> EditSuccess | EditFailure | EditUnauthorized:
+    ) -> EditSuccess | EditFailure | EditUnauthorized | EditFreezed:
+        if self.freeze_edits:
+            return EditFreezed()
+        
         # if the type of column_name is a boolean, make sure we read it correctly
         for col in self.schema_columns:
             if col["name"] == column:
@@ -463,6 +479,9 @@ class DataEditor:
             - No data validation: this method does not check that the values are allowed for the specified columns.
             - Attribution of the 'create' action in the editlog: the user identifier is only logged when this method is called in the context of a webapp served by Dataiku (which allows retrieving the identifier from the HTTP request headers sent by the user's web browser).
         """
+        if self.freeze_edits:
+            return "Edits are disabled."
+        
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         for col in column_values.keys():
             self.__log_edit__(
@@ -472,7 +491,7 @@ class DataEditor:
 
     def update_row(
         self, primary_keys: dict, column: str, value: str
-    ) -> List[EditSuccess | EditFailure | EditUnauthorized]:
+    ) -> List[EditSuccess | EditFailure | EditUnauthorized | EditFreezed]:
         """
         Updates a row.
 

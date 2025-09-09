@@ -14,9 +14,11 @@ The code was developed in Python (environment specs are in `code-env/`) and is o
 
 ### Data persistence layer
 
-* **`python-lib/DataEditor.py`** provides a CRUD Python API with methods to log and replay edits; these can be run in real-time mode within a webapp, or in batch mode within a data pipeline.
+* **`python-lib/DataEditor.py`**
+  * Provides a CRUD Python API with methods to edit and validate data from a Dataiku dataset.
+  * Maintains a timestamped log of edits and of the usernames behind them, so that the history of edits can be viewed.
 * The [API reference documentation](https://dataiku.github.io/dss-visual-edit/backend/) was generated from docstrings by Mkdocs (following [this tutorial](https://realpython.com/python-project-documentation-with-mkdocs/)). Updates to the documentation website are manual, they require running `mkdocs build` from `python-lib/` and moving the output (in `site/`) to `../docs/backend/`.
-* **`python-lib/commons.py`** provides the core replay logic.
+* **`python-lib/commons.py`** provides the core logic to replay and apply edits, based on a pivot of the editlog and a join with the original data. This can be run in real-time mode within a webapp, or in batch mode within a data pipeline.
 
 ### Integration of edits within a Dataiku Flow
 
@@ -72,22 +74,12 @@ pip install -r code-env/python/spec/requirements.txt
 pip install -r code-env/python/spec/requirements.dev.39.txt
 ```
 
-* Install Dataiku internal client (this would be done automatically when creating a code environment within Dataiku):
-  * Bash:
+* Add Dataiku internal client to the environment. This can be done by linking to the `dataiku` and `dataikuapi` packages that already exist in your Dataiku installation:
 
-    ```bash
-    instance_name=$(jq -r '.default_instance' ~/.dataiku/config.json)
-    DKU_DSS_URL=$(jq -r --arg instance $instance_name '.dss_instances[$instance].url' ~/.dataiku/config.json)
-    pip install $DKU_DSS_URL/public/packages/dataiku-internal-client.tar.gz
-    ```
-
-  * Fish:
-
-    ```fish
-    set instance_name (jq -r '.default_instance' ~/.dataiku/config.json)
-    set DKU_DSS_URL (jq -r --arg instance $instance_name '.dss_instances[$instance].url' ~/.dataiku/config.json)
-    pip install $DKU_DSS_URL/public/packages/dataiku-internal-client.tar.gz
-    ```
+```bash
+ln -s PATH_TO_PACKAGES/dataiku ~/.pyenv/versions/3.9.19/envs/visual-edit/lib/python3.9/site-packages/dataiku
+ln -s PATH_TO_PACKAGES/dataikuapi ~/.pyenv/versions/3.9.19/envs/visual-edit/lib/python3.9/site-packages/dataikuapi
+```
 
 ### Store webapp settings in a JSON file
 
@@ -121,7 +113,10 @@ python backend.py
 ## Integration tests
 
 Visual Edit is validated against an integration test suite located in `dss-plugin-visual-edit/tests` and run on a ["test" Dataiku instance managed by the Business Solutions](https://tests-integration.solutions.dataiku-dss.io/home/). 
-* Tests are run automatically upon committing to the master branch (the plugin is automatically updated on the "test" Dataiku instance beforehand). 
+* Tests are run automatically upon committing to the master branch or creating a Pull Request (the plugin is automatically updated on the "test" Dataiku instance beforehand). 
 * Tests can also be triggered from the "Actions" tab of this repository, by clicking "Run Gherkin tests" in the side bar, then clicking on "Run workflow" and choosing the branch that contains the test suite to run.
+* Results can be found on the Action's run page, e.g., https://github.com/dataiku/dss-visual-edit/actions/runs/RUN_ID/job/JOB_ID
+  * Click on the "Upload test results to workflow artifacts" step to open details
+  * Look for "Artifact download URL", download and open ZIP.
 
 Head over to `tests`' [README](tests/README.md) for more information on how tests are implemented, what is being tested, and how to run tests locally.

@@ -35,6 +35,7 @@ class WebAppConfig:
         self.original_ds_name = typed_config.original_dataset
         self.primary_keys = typed_config.primary_keys
         self.editable_column_names = typed_config.editable_column_names
+        self.show_header_filter = typed_config.show_header_filter
         self.freeze_editable_columns = typed_config.freeze_editable_columns
         self.group_column_names = typed_config.group_column_names
         self.linked_records_count = typed_config.linked_records_count
@@ -45,6 +46,8 @@ class WebAppConfig:
         self.editschema_manual = self.__cast_editschema__(typed_config)
 
         self.authorized_users = typed_config.authorized_users
+
+        self.freeze_edits = typed_config.freeze_edits
 
         self.project_key = self.__get_project_key__()
 
