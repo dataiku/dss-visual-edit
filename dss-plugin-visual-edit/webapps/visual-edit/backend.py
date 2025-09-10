@@ -392,7 +392,6 @@ def label_endpoint(linked_ds_name):
         key = request.get_json().get("key")
     else:
         key = request.args.get("key", "")
-    label = ""
 
     # Find the linked record whose linked dataset is requested
     linked_record: LinkedRecord | None = None
@@ -404,9 +403,6 @@ def label_endpoint(linked_ds_name):
         return "Unknown linked dataset.", 404
 
     # Return data only when linked_ds_name corresponds to a linked dataset; if we've reached this point in the code, it means that this is the case
-
-    linked_ds_key = linked_record.ds_key
-    linked_ds_label = linked_record.ds_label
 
     # Cast provided key value into appropriate type (necessary for integers for example)
     linked_key_type = de.schema_columns_df.loc[linked_record.name, "type"]
