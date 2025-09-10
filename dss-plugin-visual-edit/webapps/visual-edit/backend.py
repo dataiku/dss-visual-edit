@@ -479,16 +479,16 @@ def lookup_endpoint(linked_ds_name):
     # when a key is provided, make sure to include an option corresponding to this key
     # if not already the case, get the label for this key and use it as search term to filter the linked dataframe
     if key != "" and key != "null":
-        linked_row = linked_df_filtered[linked_df_filtered[linked_ds_key] == key]
-        if linked_row.empty:
+        linked_label_rows = linked_df_filtered[linked_df_filtered[linked_ds_key] == key]
+        if linked_label_rows.empty:
             label = get_linked_label(linked_record, key).lower()
-            linked_row = get_linked_dataframe_filtered(
+            linked_label_rows = get_linked_dataframe_filtered(
                 linked_record=linked_record,
                 project_key=project_key,
                 filter_term=label,
-                n_results=1,
+                n_results=n_options,
             )
-            linked_df_filtered = concat([linked_row, linked_df_filtered])
+            linked_df_filtered = concat([linked_label_rows, linked_df_filtered])
 
     editor_values_param = get_formatted_items_from_linked_df(
         linked_df=linked_df_filtered,
