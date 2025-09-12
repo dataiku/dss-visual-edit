@@ -478,6 +478,8 @@ def lookup_endpoint(linked_ds_name):
 
     # when a key is provided, make sure to include an option corresponding to this key
     # if not already the case, get the label for this key and use it as search term to filter the linked dataframe
+    # this ensures that when editing a linked record, the current value is always present in the dropdown list of options
+    # note that this could result in more than 1 option being returned (if several rows of the linked dataset share the same label), but we cap to n_options
     if key != "" and key != "null":
         linked_label_rows = linked_df_filtered[linked_df_filtered[linked_ds_key] == key]
         if linked_label_rows.empty:
