@@ -14,11 +14,16 @@ import logging
 from webapp.config.models import LinkedRecord
 import webapp.logging.setup  # noqa: F401 necessary to setup logging basicconfig before dataiku module sets a default config
 from datetime import datetime
+from pandas import concat
 from pandas.api.types import is_integer_dtype, is_float_dtype
 from commons import get_last_build_date, try_get_user_identifier
 from dash import Dash, Input, Output, State, dcc, html
 from dataiku.core.schema_handling import CASTERS
-from dataiku_utils import get_dataframe_filtered, client as dss_client
+from dataiku_utils import (
+    get_linked_dataframe_filtered,
+    get_linked_label,
+    client as dss_client,
+)
 from DataEditor import (
     EditFreezed,
     EditSuccess,
@@ -27,7 +32,7 @@ from DataEditor import (
     DataEditor,
 )
 from flask import Flask, jsonify, make_response, request
-from tabulator_utils import get_columns_tabulator, get_values_from_df
+from tabulator_utils import get_columns_tabulator, get_formatted_items_from_linked_df
 
 from webapp.config.loader import WebAppConfig
 
@@ -60,7 +65,7 @@ de = DataEditor(
     linked_records=webapp_config.linked_records,
     editschema_manual=webapp_config.editschema_manual,
     authorized_users=authorized_users,
-    freeze_edits=freeze_edits
+    freeze_edits=freeze_edits,
 )
 
 
@@ -382,26 +387,24 @@ def label_endpoint(linked_ds_name):
     Returns: the value of the column defined as label in the linked dataset
     """
 
+    # Get request parameters
     if request.method == "POST":
         key = request.get_json().get("key")
     else:
         key = request.args.get("key", "")
-    label = ""
 
+    # Find the linked record whose linked dataset is requested
     linked_record: LinkedRecord | None = None
     for lr in de.linked_records:
         if linked_ds_name == lr.ds_name:
             linked_record = lr
             break
-
     if linked_record is None:
         return "Unknown linked dataset.", 404
 
-    # Return data only when it's a linked dataset
-    linked_ds_key = linked_record.ds_key
-    linked_ds_label = linked_record.ds_label
+    # Return data only when linked_ds_name corresponds to a linked dataset; if we've reached this point in the code, it means that this is the case
 
-    # Cast provided key value into appropriate type, necessary for integers for example.
+    # Cast provided key value into appropriate type (necessary for integers for example)
     linked_key_type = de.schema_columns_df.loc[linked_record.name, "type"]
     linked_key_dtype = CASTERS.get(linked_key_type)
     try:
@@ -412,50 +415,36 @@ def label_endpoint(linked_ds_name):
     except Exception:
         return "Invalid key type.", 400
 
-    # Return label only if a label column is defined (and different from the key column)
-    if key != "" and linked_ds_label and linked_ds_label != linked_ds_key:
-        if linked_record.ds:
-            try:
-                label = linked_record.ds.get_cell_value_sql_query(
-                    linked_ds_key, key, linked_ds_label
-                )
-            except Exception:
-                return "Something went wrong fetching label of linked value.", 500
-        else:
-            linked_df = linked_record.df
-            if linked_df is None:
-                return "Something went wrong. Try restarting the backend.", 500
-            try:
-                label = linked_df.loc[key, linked_ds_label]
-            except Exception:
-                return label
-    else:
-        label = key
-    return label
+    return get_linked_label(linked_record, key)
 
 
 @server.route("/lookup/<linked_ds_name>", methods=["GET", "POST"])
 def lookup_endpoint(linked_ds_name):
     """
-    Get label and lookup values in a linked dataset, matching a search term.
+    Get label and lookup values in a linked dataset
 
     This endpoint is used by Tabulator when editing a linked record. The values it returns are read by the `itemFormatter` function of the Tabulator table, which displays a dropdown list of linked records whose labels match the search term.
+
+    If a search term is provided, return a list of options that match this term. Otherwise, return a single option corresponding to the provided key.
+
+    Params:
+    - key: the primary key for the current linked record
+    - term: the search term to filter linked records
+
+    Returns: a list of matching options
     """
+
+    # Get request parameters
     if request.method == "POST":
+        key = request.get_json().get("key")
         term = request.get_json().get("term")
     else:
+        key = request.args.get("key", "")
         term = request.args.get("term", "")
-    logging.info(
-        f"""Received a request for dataset "{linked_ds_name}", term "{term}" ({len(term)} characters)"""
-    )
-
     term = term.strip().lower()
-    if term != "":
-        n_results = (
-            10  # show a limited number of options when a search term is provided
-        )
-    else:
-        n_results = 1000  # show more options if no search term is provided
+    logging.info(
+        f"""Received a request to get options from linked dataset "{linked_ds_name}" matching key "{key}" or search term "{term}" ({len(term)} characters)"""
+    )
 
     # Find the linked record whose linked dataset is requested
     linked_record: LinkedRecord | None = None
@@ -465,34 +454,49 @@ def lookup_endpoint(linked_ds_name):
             break
     if linked_record is None:
         return "Unknown linked dataset.", 404
+
+    # Return data only when it's a linked dataset; if we've reached this point, it means that this is the case
+
     linked_ds_key = linked_record.ds_key
     linked_ds_label = linked_record.ds_label
     linked_ds_lookup_columns = linked_record.ds_lookup_columns
 
-    if linked_record.ds:
-        # Use the Dataiku API to filter the dataset
-        linked_df_filtered = get_dataframe_filtered(
-            linked_ds_name,
-            project_key,
-            linked_ds_label,
-            term,
-            n_results,
-        )
+    if term != "":
+        # when a search term is provided, show a limited number of options matching this term
+        n_options = 10
     else:
-        linked_df = linked_record.df  # note: this is already capped to 1000 rows
-        if linked_df is None:
-            return "Something went wrong. Try restarting the backend.", 500
-        if term == "":
-            linked_df_filtered = linked_df.head(n_results)
-        else:
-            # Filter linked_df for rows whose label starts with the search term
-            linked_df_filtered = linked_df[
-                linked_df[linked_ds_label].str.lower().str.startswith(term)
-            ].head(n_results)
+        # otherwise, show many options to choose from
+        n_options = 1000
 
-    logging.debug(f"Found {linked_df_filtered.size} entries")
-    editor_values_param = get_values_from_df(
-        linked_df_filtered, linked_ds_key, linked_ds_label, linked_ds_lookup_columns
+    # Get a dataframe of the linked dataset filtered by the search term or the key
+    linked_df_filtered = get_linked_dataframe_filtered(
+        linked_record=linked_record,
+        project_key=project_key,
+        filter_term=term,
+        n_results=n_options,
+    )
+
+    # when a key is provided, make sure to include an option corresponding to this key
+    # if not already the case, get the label for this key and use it as search term to filter the linked dataframe
+    # this ensures that when editing a linked record, the current value is always present in the dropdown list of options
+    # note that this could result in more than 1 option being returned (if several rows of the linked dataset share the same label), but we cap to n_options
+    if key != "" and key != "null":
+        linked_label_rows = linked_df_filtered[linked_df_filtered[linked_ds_key] == key]
+        if linked_label_rows.empty:
+            label = get_linked_label(linked_record, key).lower()
+            linked_label_rows = get_linked_dataframe_filtered(
+                linked_record=linked_record,
+                project_key=project_key,
+                filter_term=label,
+                n_results=n_options,
+            )
+            linked_df_filtered = concat([linked_label_rows, linked_df_filtered])
+
+    editor_values_param = get_formatted_items_from_linked_df(
+        linked_df=linked_df_filtered,
+        key_col=linked_ds_key,
+        label_col=linked_ds_label,
+        lookup_cols=linked_ds_lookup_columns,
     )
     return jsonify(editor_values_param)
 

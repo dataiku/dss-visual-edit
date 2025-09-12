@@ -123,7 +123,7 @@ def __get_column_tabulator_editor__(t_type):
 ### Linked records
 
 
-def get_values_from_df(
+def get_formatted_items_from_linked_df(
     linked_df: DataFrame,
     key_col: str,
     label_col: str,
@@ -215,7 +215,7 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
     t_col = {}
     t_col["sorter"] = "string"
 
-    # If a label column was provided, use a lookup formatter
+    # Formatter: if a label column was specified, get labels from the `label` endpoint and show them as user-friendly alternatives to the actual values (corresponding to primary keys of the linked dataset)
     if linked_ds_label_column != "" and linked_ds_label_column != linked_ds_key_column:
         t_col["formatter"] = assign(
             f"""
@@ -223,7 +223,8 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
                 url_base = "label/{linked_ds_name}"
                 key = cell.getValue()
                 label = ""
-                // Assign value returned by GET request to url_base with parameter key, to label variable; in case connection fails, assign empty value to label
+                // Send GET request to `url_base`, with parameter `key`
+                // Assign returned value to the `label` variable; in case connection fails, assign empty value to label
                 $.ajax({{
                     url: url_base + "?key=" + key,
                     async: false,
@@ -235,8 +236,6 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
                         console.log("Could not retrieve label from server")
                     }}
                 }});
-                d = {{}}
-                d[key] = label
                 // if label is empty, return empty string
                 if (label == "") {{
                     return label
@@ -247,18 +246,46 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
             """
         )
 
-    # Use a list editor
+    # Editor: use "list" for a dropdown
     t_col["editor"] = "list"
     t_col["editorParams"] = {
+        "clearable": True,
+        "elementAttributes": {"maxlength": "20"},
+        "emptyValue": None,
+        "placeholderLoading": "Loading List...",
+        "placeholderEmpty": "No Results Found",
         "autocomplete": True,
         "filterRemote": True,
-        "valuesURL": "lookup/" + linked_ds_name,
         "filterDelay": 300,
+        "allowEmpty": False,
         "listOnEmpty": True,
-        "clearable": False,
-        "valuesLookupField": linked_record_name,
+        "freetext": False,
     }
-    # If lookup columns were provided, use an item formatter in the editor
+    # Editor: get values from the `lookup` endpoint
+    t_col["editorParams"]["valuesLookup"] = assign(
+        f"""
+            function(cell, filterTerm){{
+                url_base = "lookup/{linked_ds_name}"
+                key = cell.getValue()
+                optionsList = []
+                // Send GET request to `url_base`, with parameter `key`
+                // Assign returned value to the `label` variable; in case connection fails, assign empty value to label
+                $.ajax({{
+                    url: url_base + "?key=" + key + "&term=" + filterTerm,
+                    async: false,
+                    success: function(result){{
+                        optionsList = result
+                    }},
+                    error: function(result){{
+                        optionsList = []
+                        console.log("Could not retrieve options from server")
+                    }}
+                }});
+                return optionsList
+            }}
+            """
+    )
+    # Editor: format items in the list if lookup columns were provided (in which case items are structured)
     if linked_ds_lookup_columns != []:
         t_col["editorParams"]["itemFormatter"] = __ns__("itemFormatter")
 

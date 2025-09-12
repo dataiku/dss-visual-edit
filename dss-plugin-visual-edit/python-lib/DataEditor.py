@@ -40,6 +40,7 @@ class EditFailure:
 class EditUnauthorized:
     pass
 
+
 class EditFreezed:
     pass
 
@@ -253,8 +254,10 @@ class DataEditor:
                         logging.debug(
                             f"""Loading linked dataset "{linked_ds_name}" in memory since it has less than {MIN_SQL_ROWS} records"""
                         )
-                        linked_record.df = get_dataframe(linked_ds).set_index(
-                            linked_ds_key
+                        linked_record.df = (
+                            get_dataframe(linked_ds)
+                            .set_index(linked_ds_key)
+                            .head(MAX_IN_MEMORY_ROWS)
                         )
                     else:
                         logging.debug(
@@ -295,7 +298,7 @@ class DataEditor:
             )  # this will be an empty dataframe
 
         self.authorized_users = authorized_users
-        
+
         self.freeze_edits = freeze_edits
 
         self.display_column_names = get_display_column_names(
@@ -408,7 +411,7 @@ class DataEditor:
     ) -> EditSuccess | EditFailure | EditUnauthorized | EditFreezed:
         if self.freeze_edits:
             return EditFreezed()
-        
+
         # if the type of column_name is a boolean, make sure we read it correctly
         for col in self.schema_columns:
             if col["name"] == column:
@@ -481,7 +484,7 @@ class DataEditor:
         """
         if self.freeze_edits:
             return "Edits are disabled."
-        
+
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         for col in column_values.keys():
             self.__log_edit__(

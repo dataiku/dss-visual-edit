@@ -28,12 +28,12 @@ module.exports = (env, argv) => {
     }
 
     let filename = (overrides.output || {}).filename;
-    if(!filename) {
+    if (!filename) {
         const modeSuffix = mode === 'development' ? 'dev' : 'min';
         filename = `${dashLibraryName}.${modeSuffix}.js`;
     }
 
-    const entry = overrides.entry || {main: './src/lib/index.js'};
+    const entry = overrides.entry || { main: './src/lib/index.js' };
 
     const devtool = overrides.devtool || 'source-map';
 
@@ -58,6 +58,17 @@ module.exports = (env, argv) => {
         externals,
         module: {
             rules: [
+                {
+                    test: /\.mjs$/,
+                    include: /node_modules/,
+                    type: "javascript/auto",
+                    use: {
+                        loader: "babel-loader",
+                        options: {
+                            presets: ["@babel/preset-env"]
+                        }
+                    }
+                },
                 {
                     test: /\.jsx?$/,
                     exclude: /node_modules/,

@@ -78,9 +78,75 @@ def get_dataframe_filtered(ds_name, project_key, filter_column, filter_term, n_r
     return DataFrame(columns=rows[0], data=rows[1:]) if len(rows) > 0 else DataFrame()
 
 
+def get_linked_dataframe_filtered(linked_record, project_key, filter_term, n_results):
+    """
+    Get the first rows of a linked dataset filtered by a column and a term
+
+    Params:
+    - linked_record
+    - project_key
+    - filter_term: term to filter on
+    - n_results: number of results to return
+
+    Returns: DataFrame with default index
+    """
+
+    linked_ds_label = linked_record.ds_label
+    if linked_record.ds:
+        # The linked dataset is SQL-based; we use the Dataiku API to filter it (but we could also use a SQL query)
+        linked_ds_name = linked_record.ds_name
+        linked_df_filtered = get_dataframe_filtered(
+            ds_name=linked_ds_name,
+            project_key=project_key,
+            filter_column=linked_ds_label,
+            filter_term=filter_term,
+            n_results=n_results,
+        )
+    else:
+        # The linked dataframe is already available in memory (and capped to 1000 rows); it can be filtered by Pandas
+        # This dataframe is indexed by the linked dataset's key column: we reset the index to stay consistent with the rest of this method
+        if linked_record.df is None:
+            return "Something went wrong. Try restarting the backend.", 500
+        linked_df = linked_record.df.reset_index()
+        if filter_term == "":
+            linked_df_filtered = linked_df.head(n_results)
+        else:
+            # Filter linked_df for rows whose label starts with the search term
+            linked_df_filtered = linked_df[
+                linked_df[linked_ds_label].str.lower().str.startswith(filter_term)
+            ].head(n_results)
+    return linked_df_filtered
+
+
+def get_linked_label(linked_record, key):
+    linked_ds_key = linked_record.ds_key
+    linked_ds_label = linked_record.ds_label
+    # Return label only if a label column is defined (and different from the key column)
+    if key != "" and linked_ds_label and linked_ds_label != linked_ds_key:
+        if linked_record.ds:
+            try:
+                label = linked_record.ds.get_cell_value_sql_query(
+                    linked_ds_key, key, linked_ds_label
+                )
+            except Exception:
+                return "Something went wrong fetching label of linked value.", 500
+        else:
+            linked_df = linked_record.df
+            if linked_df is None:
+                return "Something went wrong. Try restarting the backend.", 500
+            try:
+                label = linked_df.loc[key, linked_ds_label]
+            except Exception:
+                return label
+    else:
+        label = key
+    return label
+
+
 def is_sql_dataset(ds: Dataset) -> bool:
     # locationInfoType may not exist, for example for editable dataset.
     return ds.get_location_info().get("locationInfoType", "") == "SQL"
+
 
 def is_bigquery_dataset(ds: Dataset) -> bool:
     location_info = ds.get_location_info()
