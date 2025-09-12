@@ -32,7 +32,10 @@ from DataEditor import (
     DataEditor,
 )
 from flask import Flask, jsonify, make_response, request
-from tabulator_utils import get_columns_tabulator, get_formatted_items_from_linked_df
+
+# Use abstraction layer for table columns
+from python_lib.table_component_factory import get_table_columns
+from tabulator_utils import get_formatted_items_from_linked_df
 
 from webapp.config.loader import WebAppConfig
 
@@ -69,8 +72,11 @@ de = DataEditor(
 )
 
 
-columns = get_columns_tabulator(
-    de, webapp_config.show_header_filter, webapp_config.freeze_editable_columns
+columns = get_table_columns(
+    de,
+    table_type="tabulator",
+    show_header_filter=webapp_config.show_header_filter,
+    freeze_editable_columns=webapp_config.freeze_editable_columns,
 )
 
 last_build_date_initial = ""
