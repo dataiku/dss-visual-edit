@@ -34,8 +34,9 @@ from DataEditor import (
 from flask import Flask, jsonify, make_response, request
 
 # Use abstraction layer for table columns
-from python_lib.table_component_factory import get_table_columns
-from tabulator_utils import get_formatted_items_from_linked_df
+from table_component_factory import get_table_columns
+from linked_fields import get_formatted_items_from_linked_df
+
 
 from webapp.config.loader import WebAppConfig
 

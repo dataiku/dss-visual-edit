@@ -1,5 +1,13 @@
 ### Linked Fields
 
+from typing import Union
+from pandas import DataFrame
+from dash_extensions.javascript import Namespace
+from dash_extensions.javascript import assign
+
+# used to reference javascript functions in custom_tabulator.js
+__ns__ = Namespace("myNamespace", "tabulator")
+
 
 def get_formatted_items_from_linked_df(
     linked_df: DataFrame,
@@ -79,7 +87,7 @@ def get_formatted_items_from_linked_df(
     )
 
 
-def __get_column_tabulator_linked_record__(de, linked_record_name):
+def __get_column_linked_record__(de, linked_record_name):
     """Define Tabulator formatter and editor settings for a column whose type is linked record"""
 
     linked_records_df = de.linked_records_df
@@ -168,67 +176,3 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
         t_col["editorParams"]["itemFormatter"] = __ns__("itemFormatter")
 
     return t_col
-
-
-def get_columns_tabulator(de, show_header_filter=True, freeze_editable_columns=False):
-    """Prepare column settings to pass to Tabulator"""
-
-    linked_record_names = []
-    if de.linked_records:
-        try:
-            linked_records_df = de.linked_records_df
-            linked_record_names = linked_records_df.index.values.tolist()
-        except Exception:
-            logging.exception("Failed to get linked record names.")
-
-    t_cols = []
-    for col_name in (
-        de.primary_keys + de.display_column_names + de.editable_column_names
-    ):
-        # Properties to be shared by all columns: enable header filters, column resizing, and a special menu on right-click of column header
-        t_col = {
-            "field": col_name,
-            "title": col_name,
-            "headerFilter": show_header_filter,
-            "resizable": True,
-            "headerContextMenu": __ns__("headerMenu"),
-        }
-
-        # Define formatter and header filters based on type
-        t_type = __get_column_tabulator_type__(de, col_name)
-        if col_name not in linked_record_names:
-            t_col.update(__get_column_tabulator_formatter__(t_type))
-        if col_name in de.primary_keys or (
-            col_name in de.editable_column_names and freeze_editable_columns
-        ):
-            t_col["frozen"] = True
-
-        # Define the column's "title formatter" to show the column type below its name
-        pretty_types = {
-            "number": "Number",
-            "string": "Text",
-            "textarea": "Text",
-            "boolean": "Checkbox",
-            "boolean_tick": "Checkbox",
-            "date": "Date",
-            "linked_record": "Linked Record",
-        }
-        t_col["titleFormatter"] = assign(
-            f"""
-            function(cell){{
-                return cell.getValue() + "<br><span class='column-type'>{pretty_types[t_type]}</span>"
-            }}
-            """
-        )
-
-        # Define the column's formatter, header filters, and editor (if editable)
-        t_col.update(__get_column_tabulator_formatter__(t_type))
-        if col_name in de.editable_column_names:
-            if t_type == "linked_record":
-                t_col.update(__get_column_tabulator_linked_record__(de, col_name))
-            else:
-                t_col.update(__get_column_tabulator_editor__(t_type))
-
-        t_cols.append(t_col)
-
-    return t_cols

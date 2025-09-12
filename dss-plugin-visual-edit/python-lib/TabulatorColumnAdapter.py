@@ -3,77 +3,24 @@ Tabulator adapter for generating columns configuration for Tabulator data table 
 All Tabulator-specific logic is encapsulated here.
 """
 
-from typing import Union
+import logging
 from pandas import DataFrame
 from dash_extensions.javascript import Namespace
-import logging
 from dash_extensions.javascript import assign
+from tabulator_linked_fields import __get_column_linked_record__
 
 # used to reference javascript functions in custom_tabulator.js
 __ns__ = Namespace("myNamespace", "tabulator")
 
 
-class TabulatorColumnAdapter:
+from BaseColumnAdapter import BaseColumnAdapter
+
+
+class TabulatorColumnAdapter(BaseColumnAdapter):
     @staticmethod
     def get_column_type(de, col_name):
-        linked_record_names = []
-        if de.linked_records:
-            try:
-                linked_records_df = de.linked_records_df
-                linked_record_names = linked_records_df.index.values.tolist()
-            except Exception:
-                logging.exception("Failed to get linked record names.")
-        if col_name in linked_record_names:
-            t_type = "linked_record"
-        else:
-            t_type = "string"  # default type
-            if (
-                not de.editschema_manual_df.empty
-                and "type" in de.editschema_manual_df.columns
-                and col_name in de.editschema_manual_df.index
-            ):
-                editschema_manual_type = de.editschema_manual_df.loc[col_name, "type"]
-            else:
-                editschema_manual_type = None
-
-            if (
-                editschema_manual_type
-                and editschema_manual_type == editschema_manual_type
-            ):
-                t_type = editschema_manual_type
-            else:
-                schema_df = DataFrame(data=de.schema_columns).set_index("name")
-                if "meaning" in schema_df.columns.to_list():
-                    schema_meaning = schema_df.loc[col_name, "meaning"]
-                else:
-                    schema_meaning = None
-                if schema_meaning and schema_meaning == schema_meaning:
-                    if schema_meaning == "Boolean":
-                        t_type = "boolean"
-                    if (
-                        schema_meaning == "DoubleMeaning"
-                        or schema_meaning == "LongMeaning"
-                        or schema_meaning == "IntMeaning"
-                    ):
-                        t_type = "number"
-                    if schema_meaning == "Date":
-                        t_type = "date"
-                else:
-                    schema_type = schema_df.loc[col_name, "type"]
-                    if schema_type == "boolean":
-                        t_type = "boolean"
-                    if schema_type in [
-                        "tinyint",
-                        "smallint",
-                        "int",
-                        "bigint",
-                        "float",
-                        "double",
-                    ]:
-                        t_type = "number"
-                    if schema_type == "date":
-                        t_type = "date"
-        return t_type
+        # Delegate to shared logic in BaseColumnAdapter
+        return BaseColumnAdapter.get_column_type(de, col_name)
 
     @staticmethod
     def get_column_formatter(t_type):
@@ -133,8 +80,6 @@ def get_columns_tabulator(de, show_header_filter=True, freeze_editable_columns=F
     """
     Prepare column settings to pass to Tabulator
     """
-    # ...existing code...
-    from linked_fields import get_formatted_items_from_linked_df
 
     linked_record_names = []
     if de.linked_records:
@@ -148,6 +93,7 @@ def get_columns_tabulator(de, show_header_filter=True, freeze_editable_columns=F
     for col_name in (
         de.primary_keys + de.display_column_names + de.editable_column_names
     ):
+        # Properties to be shared by all columns: enable header filters, column resizing, and a special menu on right-click of column header
         t_col = {
             "field": col_name,
             "title": col_name,
@@ -155,6 +101,8 @@ def get_columns_tabulator(de, show_header_filter=True, freeze_editable_columns=F
             "resizable": True,
             "headerContextMenu": __ns__("headerMenu"),
         }
+
+        # Define formatter and header filters based on type
         t_type = TabulatorColumnAdapter.get_column_type(de, col_name)
         if col_name not in linked_record_names:
             t_col.update(TabulatorColumnAdapter.get_column_formatter(t_type))
@@ -163,29 +111,20 @@ def get_columns_tabulator(de, show_header_filter=True, freeze_editable_columns=F
         ):
             t_col["frozen"] = True
 
-        pretty_types = {
-            "number": "Number",
-            "string": "Text",
-            "textarea": "Text",
-            "boolean": "Checkbox",
-            "boolean_tick": "Checkbox",
-            "date": "Date",
-            "linked_record": "Linked Record",
-        }
+        # Define the column's "title formatter" to show the column type below its name
         t_col["titleFormatter"] = assign(
             f"""
             function(cell){{
-                return cell.getValue() + "<br><span class='column-type'>{pretty_types[t_type]}</span>"
+                return cell.getValue() + "<br><span class='column-type'>{TabulatorColumnAdapter.get_pretty_type(t_type)}</span>"
             }}
             """
         )
 
+        # Define the column's formatter, header filters, and editor (if editable)
         t_col.update(TabulatorColumnAdapter.get_column_formatter(t_type))
         if col_name in de.editable_column_names:
             if t_type == "linked_record":
-                from linked_fields import __get_column_tabulator_linked_record__
-
-                t_col.update(__get_column_tabulator_linked_record__(de, col_name))
+                t_col.update(__get_column_linked_record__(de, col_name))
             else:
                 t_col.update(TabulatorColumnAdapter.get_column_editor(t_type))
 

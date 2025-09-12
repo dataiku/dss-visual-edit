@@ -5,7 +5,7 @@ Abstraction layer for generating data table column definitions for different com
 from typing import Any, Dict, List
 
 # Import Tabulator-specific logic
-from tabulator_utils import get_columns_tabulator
+from TabulatorColumnAdapter import get_columns_tabulator
 
 # Future: import AgGrid-specific logic here
 # from aggrid_utils import get_columns_aggrid
