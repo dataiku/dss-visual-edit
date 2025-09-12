@@ -1,6 +1,3 @@
-filterFuncResultCount = 0
-addEventListener('keyup', (event) => { filterFuncResultCount = 0 });
-
 window.myNamespace = Object.assign({}, window.myNamespace, {
 
     tabulator: {
@@ -22,85 +19,9 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
             },
         ],
 
-        // headerMenu: function() {
-        //     var menu = [];
-        //     var columns = this.getColumns();
-
-        //     for(let column of columns){
-
-        //         //create checkbox element using font awesome icons
-        //         let icon = document.createElement("i");
-        //         icon.classList.add("fas");
-        //         icon.classList.add(column.isVisible() ? "fa-check-square" : "fa-square");
-
-        //         //build label
-        //         let label = document.createElement("span");
-        //         let title = document.createElement("span");
-
-        //         title.textContent = " " + column.getDefinition().title;
-
-        //         label.appendChild(icon);
-        //         label.appendChild(title);
-
-        //         //create menu item
-        //         menu.push({
-        //             label:label,
-        //             action:function(e){
-        //                 //prevent menu closing
-        //                 e.stopPropagation();
-
-        //                 //toggle current column visibility
-        //                 column.toggle();
-
-        //                 //change menu item icon
-        //                 if(column.isVisible()){
-        //                     icon.classList.remove("fa-square");
-        //                     icon.classList.add("fa-check-square");
-        //                 }else{
-        //                     icon.classList.remove("fa-check-square");
-        //                     icon.classList.add("fa-square");
-        //                 }
-        //             }
-        //         });
-        //     }
-
-        //    return menu;
-        // },
-
-        searchFunc: function (term, values) { //search for exact matches
-            var matches = [];
-            if (term && term.length > 2) {
-                values.forEach(function (value) {
-                    //value - one of the values from the value property
-                    if (value.toString().startsWith(term)) {
-                        matches.push(value);
-                    }
-                });
-            }
-            return matches;
-        },
-
-        filterFunc: function (term, label, value, item) {
-            if (filterFuncResultCount >= 100) {
-                return false;
-            } else {
-                if (term !== null) {
-                    term = String(term).toLowerCase();
-                    if (term.length > 2 && label !== null && typeof label !== "undefined") {
-                        label = String(label).toLowerCase();
-                        if (label.startsWith(term)) {
-                            filterFuncResultCount += 1
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-        },
-
         itemFormatter: function (label, value, item, element) {
-            //label - the text label for the item -> this would be the value of linked_ds_label
-            //value - the value for the item -> this would be the value of linked_ds_key -> we don't display it
+            //label - the text label for the item -> this would be the value of the linked dataset's label column
+            //value - the value for the item -> this would be the value of the linked dataset's primary key -> we don't display it
             //item - the original value object for the item
             //element - the DOM element for the item
 
@@ -198,25 +119,6 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
             return container;
         },
 
-        paramLookup: function (cell, url_base) {
-            key = cell.getValue()
-            label = ""
-            // Assign value returned by GET request to url_base with parameter key, to label variable; in case connection fails, assign empty value to label
-            $.ajax({
-                url: url_base + "?key=" + key,
-                async: false,
-                success: function (result) {
-                    label = result
-                },
-                error: function (result) {
-                    label = ""
-                    console.log("Could not retrieve label from server")
-                }
-            });
-            d = {}
-            d[key] = label
-            return d
-        }
     }
 
 });
