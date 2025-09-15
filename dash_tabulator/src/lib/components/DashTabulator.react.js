@@ -13,32 +13,35 @@ import "../../../assets/semantic.min.css";
 import { extractFilterValues } from '../helpers/dashboardFilters.js'
 
 /**
- * We define a function to hash a string using the MD5 algorithm.
+ * Hash a string using MD5.
  * This is used to hash the dataset name and column names before sending them to WT1.
+ * @param {string} string
+ * @returns {string}
  */
 const crypto = require('crypto');
-
 const plugin_version = "2.0.8";
-
 function md5(string) {
     return crypto.createHash('md5').update(string).digest('hex');
 }
 
 /**
- * We define a wrapper around the Tabulator library as a React component.
- * We also define the properties that can be passed to this component, their types, and default values.
+ * DashTabulator is a wrapper for a data table library (e.g. Tabulator).
+ * All table operations are abstracted for easier migration to another library.
  */
-
 export default class DashTabulator extends React.Component {
     el = React.createRef(); // ref to the DOM element that will contain the table
-    tabulator = null; // variable to hold the Tabulator instance
+    tableInstance = null; // holds the table instance (Tabulator or other)
+
+    constructor(props) {
+        super(props);
+    }
 
     /**
-     * Create the Tabulator instance when the React component mounts.
+     * Initialize the data table instance.
+     * This is the only place Tabulator-specific code should exist.
      */
-    componentDidMount() {
-        const { id, datasetName, data, columns, groupBy, cellEdited } = this.props;
-
+    initTable() {
+        const { datasetName, data, columns, groupBy } = this.props;
         /**
          * Resolve column properties as functions when relevant.
          */
@@ -61,171 +64,193 @@ export default class DashTabulator extends React.Component {
                 }
             }
         }
-
         /**
-         * Create the Tabulator instance:
+         * Create the data table instance:
          * Pass the DOM element that will contain the table.
          * Pass fixed data table options, and options from props.
          */
-        this.tabulator = new Tabulator(this.el, {
-            "datasetName": datasetName,
-            "data": data,
-            "columns": columns,
-            "groupBy": groupBy,
-            "reactiveData": true,
+        this.tableInstance = new Tabulator(this.el, this.getTableOptions(datasetName, data, columns, groupBy));
+        this.tableInstance.on("cellEdited", this.handleCellEdited);
+    }
 
-            // Fixed options
-            "selectable": 1,
-            "layout": "fitDataTable",
-            "pagination": "local",
-            "paginationSize": 20,
-            "paginationSizeSelector": [10, 20, 50, 100],
-            "movableColumns": true,
-            "persistence": true,
-            "footerElement": "<button class='tabulator-page' onclick='localStorage.clear(); window.location.reload();'>Reset View</button>"
-        });
+    /**
+     * Return table options for Tabulator.
+     * Replace this method when switching to another table library.
+     */
+    getTableOptions(datasetName, data, columns, groupBy) {
+        return {
+            datasetName,
+            data,
+            columns,
+            groupBy,
+            reactiveData: true,
+            selectable: 1,
+            layout: "fitDataTable",
+            pagination: "local",
+            paginationSize: 20,
+            paginationSizeSelector: [10, 20, 50, 100],
+            movableColumns: true,
+            persistence: true,
+            footerElement: "<button class='tabulator-page' onclick='localStorage.clear(); window.location.reload();'>Reset View</button>"
+        };
+    }
 
-        /**
-         * Tabulator event listener for cell editing
-         */
-        this.tabulator.on("cellEdited", (cell) => {
-            var edited = new Object()
-            edited.field = cell.getField()
-            edited.type = cell.getColumn().getDefinition()["editor"]
-            edited.initialValue = cell.getInitialValue()
-            edited.oldValue = cell.getOldValue()
-            edited.value = cell.getValue()
-            edited.row = cell.getData()
-            this.props.setProps({ cellEdited: edited })
-            try {
-                window.parent.WT1SVC.event("visualedit-edit-cell", {
-                    "dataset_name_hash": md5(datasetName),
-                    "column_name_hash": md5(edited.field),
-                    "column_type": edited.type,
-                    "plugin_version": plugin_version
-                });
-            } catch (e) { }
-        })
+    /**
+     * Destroy the table instance.
+     */
+    destroyTable() {
+        if (this.tableInstance) {
+            this.tableInstance.destroy();
+            this.tableInstance = null;
+        }
+    }
 
+    /**
+     * Set table data.
+     * @param {Array} data
+     */
+    setTableData(data) {
+        if (this.tableInstance) {
+            this.tableInstance.replaceData(data);
+        }
+    }
+
+    /**
+     * Set table columns.
+     * @param {Array} columns
+     */
+    setTableColumns(columns) {
+        if (this.tableInstance) {
+            this.tableInstance.setColumns(columns);
+        }
+    }
+
+    /**
+     * Set table filters.
+     * @param {Array} filters
+     * @param {String} type
+     */
+    setTableFilter(filters, type) {
+        if (this.tableInstance) {
+            this.tableInstance.setFilter(filters, type);
+        }
+    }
+
+    /**
+     * Clear all table filters.
+     */
+    clearTableFilter() {
+        if (this.tableInstance) {
+            this.tableInstance.clearFilter();
+        }
+    }
+
+    /**
+     * Handle cell edit event.
+     * @param {Object} cell
+     */
+    handleCellEdited = (cell) => {
+        const edited = {
+            field: cell.getField(),
+            type: cell.getColumn().getDefinition()["editor"],
+            initialValue: cell.getInitialValue(),
+            oldValue: cell.getOldValue(),
+            value: cell.getValue(),
+            row: cell.getData()
+        };
+        this.props.setProps({ cellEdited: edited });
+        try {
+            window.parent.WT1SVC.event("visualedit-edit-cell", {
+                "dataset_name_hash": md5(this.props.datasetName),
+                "column_name_hash": md5(edited.field),
+                "column_type": edited.type,
+                "plugin_version": plugin_version
+            });
+        } catch (e) { }
+    }
+
+    /**
+     * Handle external filter events.
+     * @param {Event} event
+     */
+    handleFilterEvent = (event) => {
+        const data = event.data;
+        if (!data || data.type !== 'filters') return;
+
+        const filters = data.filters;
+        if (filters.length === 0) {
+            this.clearTableFilter();
+            return;
+        }
+
+        const filter = filters[0];
+        if (!filter.active || filter.filterType !== 'ALPHANUM_FACET') {
+            this.clearTableFilter();
+            return;
+        }
+
+        const columnFields = this.props.columns.map(col => col.field);
+        if (!columnFields.includes(filter.column)) {
+            return;
+        }
+
+        const { includedValues, excludedValues } = extractFilterValues(filter);
+        if (includedValues.length > 0) {
+            const includeFilters = includedValues.map(value => ({
+                field: filter.column,
+                type: "=",
+                value: value
+            }));
+            this.setTableFilter(includeFilters, "OR");
+        } else if (excludedValues.length > 0) {
+            const excludeFilters = excludedValues.map(value => ({
+                field: filter.column,
+                type: "!=",
+                value: value
+            }));
+            this.setTableFilter(excludeFilters);
+        } else {
+            this.clearTableFilter();
+        }
+    }
+
+    /**
+     * React lifecycle: componentDidMount
+     */
+    componentDidMount() {
+        this.initTable();
         window.addEventListener('message', this.handleFilterEvent);
     }
 
     /**
-     * 
-     * @param {*} props 
+     * React lifecycle: componentWillUnmount
      */
-    constructor(props) {
-        super(props);
-        this.ref = null;
-    }
-
     componentWillUnmount() {
         window.removeEventListener('message', this.handleFilterEvent);
+        this.destroyTable();
     }
 
-    handleFilterEvent = (event) => {
-        const data = event.data;
-        if (!data || data.type !== 'filters') return;
-
-        const filters = data.filters;
-        if (filters.length === 0) {
-            this.tabulator.clearFilter();
-            return;
+    /**
+     * React lifecycle: componentDidUpdate
+     * Update table data/columns if props change.
+     */
+    componentDidUpdate(prevProps) {
+        if (prevProps.data !== this.props.data) {
+            this.setTableData(this.props.data);
         }
-
-        const filter = filters[0];
-        if (!filter.active || filter.filterType !== 'ALPHANUM_FACET') {
-            this.tabulator.clearFilter();
-            return;
-        }
-
-        const columnFields = this.props.columns.map(col => col.field);
-        if (!columnFields.includes(filter.column)) {
-            return;
-        }
-
-        const { includedValues, excludedValues } = extractFilterValues(filter);
-        this.applyTableFilter(filter, includedValues, excludedValues);
-    }
-
-    applyTableFilter = (filter, includedValues, excludedValues) => {
-        if (includedValues.length > 0) {
-            const includeFilters = includedValues.map(value => ({
-                field: filter.column,
-                type: "=",
-                value: value
-            }));
-            this.tabulator.setFilter(includeFilters, "OR");
-        } else if (excludedValues.length > 0) {
-            const excludeFilters = excludedValues.map(value => ({
-                field: filter.column,
-                type: "!=",
-                value: value
-            }));
-            this.tabulator.setFilter(excludeFilters);
-        } else {
-            this.tabulator.clearFilter();
-        }
-    }
-
-    componentWillUnmount() {
-        window.removeEventListener('message', this.handleFilterEvent);
-    }
-
-    handleFilterEvent = (event) => {
-        const data = event.data;
-        if (!data || data.type !== 'filters') return;
-
-        const filters = data.filters;
-        if (filters.length === 0) {
-            this.tabulator.clearFilter();
-            return;
-        }
-
-        const filter = filters[0];
-        if (!filter.active || filter.filterType !== 'ALPHANUM_FACET') {
-            this.tabulator.clearFilter();
-            return;
-        }
-
-        const columnFields = this.props.columns.map(col => col.field);
-        if (!columnFields.includes(filter.column)) {
-            return;
-        }
-
-        const { includedValues, excludedValues } = extractFilterValues(filter);
-        this.applyTableFilter(filter, includedValues, excludedValues);
-    }
-
-    applyTableFilter = (filter, includedValues, excludedValues) => {
-        if (includedValues.length > 0) {
-            const includeFilters = includedValues.map(value => ({
-                field: filter.column,
-                type: "=",
-                value: value
-            }));
-            this.tabulator.setFilter(includeFilters, "OR");
-        } else if (excludedValues.length > 0) {
-            const excludeFilters = excludedValues.map(value => ({
-                field: filter.column,
-                type: "!=",
-                value: value
-            }));
-            this.tabulator.setFilter(excludeFilters);
-        } else {
-            this.tabulator.clearFilter();
+        if (prevProps.columns !== this.props.columns) {
+            this.setTableColumns(this.props.columns);
         }
     }
 
     /**
-     * Update table data when component receives new props
+     * Render the table container. This is run when the component receives new props.
      */
     render() {
-        // Send event to parent window to log the display of the table
+        // Log display event
         try {
             window.parent.WT1SVC.event("visualedit-display-table", {
                 "dataset_name_hash": md5(this.props.datasetName),
-                // create columns_hashed as a copy of the columns array where each item's "field" property has been hashed and other properties have been kept as they were
                 "rows_count": this.props.data.length,
                 "columns_hashed": this.props.columns.map((item) => {
                     let item_hashed = Object.assign({}, item);
@@ -257,33 +282,27 @@ DashTabulator.propTypes = {
      * ID used to identify this component in Dash callbacks.
      */
     id: PropTypes.string,
-
     /**
      * Data to display in the table.
      */
     data: PropTypes.array,
-
     /**
      * Column definitions.
      */
     columns: PropTypes.array,
-
     /**
      * Name of the corresponding Dataiku dataset.
      */
     datasetName: PropTypes.string,
-
     /**
      * Columns to group by.
      */
     groupBy: PropTypes.array,
-
     /**
      * Dash-assigned callback that should be called to report property changes
      * to Dash, to make them available for callbacks.
      */
     setProps: PropTypes.func,
-
     /**
      * cellEdited captures the cell that was clicked on
      */
