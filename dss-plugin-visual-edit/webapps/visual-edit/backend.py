@@ -10,37 +10,28 @@
 # 2. Instantiate editable event-sourced dataset.
 # 3. Define Dash webapp layout and components.
 from __future__ import annotations
+
 import logging
-from webapp.config.models import LinkedRecord
-import webapp.logging.setup  # noqa: F401 necessary to setup logging basicconfig before dataiku module sets a default config
 from datetime import datetime
-from pandas import concat
-from pandas.api.types import is_integer_dtype, is_float_dtype
-from commons import get_last_build_date, try_get_user_identifier
-from dash import Dash, Input, Output, State, dcc, html
-from dataiku.core.schema_handling import CASTERS
-from dataiku_utils import (
-    get_linked_dataframe_filtered,
-    get_linked_label,
-    client as dss_client,
-)
-from DataEditor import (
-    EditFreezed,
-    EditSuccess,
-    EditFailure,
-    EditUnauthorized,
-    DataEditor,
-)
-from flask import Flask, jsonify, make_response, request
-
-# Use abstraction layer for table columns
-from table_component_factory import get_table_columns
-from linked_fields import get_formatted_items_from_linked_df
-
-
-from webapp.config.loader import WebAppConfig
 
 import dash_tabulator
+from commons import get_last_build_date, try_get_user_identifier
+from dash import Dash, Input, Output, State, dcc, html
+from DataEditor import (
+    DataEditor,
+    EditFailure,
+    EditFreezed,
+    EditSuccess,
+    EditUnauthorized,
+)
+from dataiku.core.schema_handling import CASTERS
+from dataiku_utils import client as dss_client
+from linked_df_utils import get_linked_label, get_linked_options
+from flask import Flask, jsonify, make_response, request
+from pandas.api.types import is_float_dtype, is_integer_dtype
+from table_component_factory import get_table_columns
+from webapp.config.loader import WebAppConfig
+from webapp.config.models import LinkedRecord
 
 webapp_config = WebAppConfig()
 
@@ -379,11 +370,11 @@ def delete_endpoint():
     return response
 
 
-# Label and lookup endpoints used by Tabulator when formatting or editing linked records
+# Backend methods for Linked Records: label and lookup endpoints used by Tabulator when formatting or editing linked records
 ###
 
 
-@server.route("/label/<linked_ds_name>", methods=["GET", "POST"])
+@server.route("/linked-label/<linked_ds_name>", methods=["GET", "POST"])
 def label_endpoint(linked_ds_name):
     """
     Return the label of a row in a linked dataset
@@ -425,12 +416,12 @@ def label_endpoint(linked_ds_name):
     return get_linked_label(linked_record, key)
 
 
-@server.route("/lookup/<linked_ds_name>", methods=["GET", "POST"])
-def lookup_endpoint(linked_ds_name):
+@server.route("/linked-options/<linked_ds_name>", methods=["GET", "POST"])
+def linked_options_endpoint(linked_ds_name):
     """
     Get label and lookup values in a linked dataset
 
-    This endpoint is used by Tabulator when editing a linked record. The values it returns are read by the `itemFormatter` function of the Tabulator table, which displays a dropdown list of linked records whose labels match the search term.
+    This endpoint is used by Tabulator when editing a linked record. The values it returns are read by the `listItemFormatter` function of the Tabulator table, which displays a dropdown list of linked records whose labels match the search term.
 
     If a search term is provided, return a list of options that match this term. Otherwise, return a single option corresponding to the provided key.
 
@@ -463,49 +454,7 @@ def lookup_endpoint(linked_ds_name):
         return "Unknown linked dataset.", 404
 
     # Return data only when it's a linked dataset; if we've reached this point, it means that this is the case
-
-    linked_ds_key = linked_record.ds_key
-    linked_ds_label = linked_record.ds_label
-    linked_ds_lookup_columns = linked_record.ds_lookup_columns
-
-    if term != "":
-        # when a search term is provided, show a limited number of options matching this term
-        n_options = 10
-    else:
-        # otherwise, show many options to choose from
-        n_options = 1000
-
-    # Get a dataframe of the linked dataset filtered by the search term or the key
-    linked_df_filtered = get_linked_dataframe_filtered(
-        linked_record=linked_record,
-        project_key=project_key,
-        filter_term=term,
-        n_results=n_options,
-    )
-
-    # when a key is provided, make sure to include an option corresponding to this key
-    # if not already the case, get the label for this key and use it as search term to filter the linked dataframe
-    # this ensures that when editing a linked record, the current value is always present in the dropdown list of options
-    # note that this could result in more than 1 option being returned (if several rows of the linked dataset share the same label), but we cap to n_options
-    if key != "" and key != "null":
-        linked_label_rows = linked_df_filtered[linked_df_filtered[linked_ds_key] == key]
-        if linked_label_rows.empty:
-            label = get_linked_label(linked_record, key).lower()
-            linked_label_rows = get_linked_dataframe_filtered(
-                linked_record=linked_record,
-                project_key=project_key,
-                filter_term=label,
-                n_results=n_options,
-            )
-            linked_df_filtered = concat([linked_label_rows, linked_df_filtered])
-
-    editor_values_param = get_formatted_items_from_linked_df(
-        linked_df=linked_df_filtered,
-        key_col=linked_ds_key,
-        label_col=linked_ds_label,
-        lookup_cols=linked_ds_lookup_columns,
-    )
-    return jsonify(editor_values_param)
+    return jsonify(get_linked_options(linked_record, term, key))
 
 
 logging.info("Webapp OK")

@@ -45,7 +45,7 @@ def assert_label(ctx: AugmentedBehaveContext, key: str, ds_name: str, label: str
     webapp = get_webapp(ctx, None, None)
     assert webapp
 
-    url = create_api_url(ctx, f"label/{ds_name}?key={key}")
+    url = create_api_url(ctx, f"linked-label/{ds_name}?key={key}")
 
     response = get(url, cookies=get_cookie_as_dict(ctx))
 

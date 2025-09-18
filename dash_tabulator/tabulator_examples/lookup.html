@@ -17,7 +17,7 @@
     function paramLookup(cell, url_base){
         key = cell.getValue()
         label = ""
-        // Assign value returned by GET request to http://localhost:8000/label/companies_ext with parameter key, to label variable; in case connection fails, assign empty value to label
+        // Assign value returned by GET request to http://localhost:8000/linked-label/companies_ext with parameter key, to label variable; in case connection fails, assign empty value to label
         $.ajax({
             url: url_base + "?key=" + key,
             async: false,
@@ -44,9 +44,9 @@
             title:"Favourite Color",
             field:"col",
             formatter:"lookup",
-            // define formatterParams as a function with cell as parameter, which calls paramLookup function with cell and url_base set to "http://localhost:8000/label/companies_ext"
+            // define formatterParams as a function with cell as parameter, which calls paramLookup function with cell and url_base set to "http://localhost:8000/linked-label/companies_ext"
             formatterParams:function(cell){
-                return paramLookup(cell, "http://localhost:8000/label/companies_ext")
+                return paramLookup(cell, "http://localhost:8000/linked-label/companies_ext")
             }
         },
         {

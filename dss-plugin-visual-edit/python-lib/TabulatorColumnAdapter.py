@@ -1,29 +1,38 @@
 """
-Tabulator adapter for generating columns configuration for Tabulator data table component.
-All Tabulator-specific logic is encapsulated here.
+TabulatorColumnAdapter: Generates column configuration for Tabulator data table component.
+All Tabulator-specific logic is encapsulated here. Inherits shared logic from BaseColumnAdapter.
 """
 
 import logging
 from pandas import DataFrame
 from dash_extensions.javascript import Namespace
 from dash_extensions.javascript import assign
-from tabulator_linked_fields import __get_column_linked_record__
 
 # used to reference javascript functions in custom_tabulator.js
 __ns__ = Namespace("myNamespace", "tabulator")
-
 
 from BaseColumnAdapter import BaseColumnAdapter
 
 
 class TabulatorColumnAdapter(BaseColumnAdapter):
+    """
+    Adapter to generate Tabulator-specific column configuration from DataEditor schema info.
+    """
+
     @staticmethod
     def get_column_type(de, col_name):
         # Delegate to shared logic in BaseColumnAdapter
         return BaseColumnAdapter.get_column_type(de, col_name)
 
     @staticmethod
-    def get_column_formatter(t_type):
+    def get_column_configuration(t_type):
+        """
+        Returns Tabulator-specific formatting options for the given column type.
+        Args:
+            t_type (str): The inferred type of the column.
+        Returns:
+            dict: Tabulator formatting options for the column.
+        """
         t_col = {}
         if t_type == "boolean":
             t_col["sorter"] = "boolean"
@@ -52,7 +61,14 @@ class TabulatorColumnAdapter(BaseColumnAdapter):
         return t_col
 
     @staticmethod
-    def get_column_editor(t_type):
+    def get_column_editor_configuration(t_type):
+        """
+        Returns Tabulator-specific editor options for the given column type.
+        Args:
+            t_type (str): The inferred type of the column.
+        Returns:
+            dict: Tabulator editor options for the column.
+        """
         t_col = {}
         if t_type == "boolean":
             t_col["editor"] = "list"
@@ -75,44 +91,16 @@ class TabulatorColumnAdapter(BaseColumnAdapter):
             t_col["editor"] = "input"
         return t_col
 
-
-def get_columns_tabulator(de, show_header_filter=True, freeze_editable_columns=False):
-    """
-    Prepare column settings to pass to Tabulator
-    """
-
-    linked_record_names = []
-    if de.linked_records:
-        try:
-            linked_records_df = de.linked_records_df
-            linked_record_names = linked_records_df.index.values.tolist()
-        except Exception:
-            logging.exception("Failed to get linked record names.")
-
-    t_cols = []
-    for col_name in (
-        de.primary_keys + de.display_column_names + de.editable_column_names
-    ):
-        # Properties to be shared by all columns: enable header filters, column resizing, and a special menu on right-click of column header
-        t_col = {
-            "field": col_name,
-            "title": col_name,
-            "headerFilter": show_header_filter,
-            "resizable": True,
-            "headerContextMenu": __ns__("headerMenu"),
-        }
-
-        # Define formatter and header filters based on type
-        t_type = TabulatorColumnAdapter.get_column_type(de, col_name)
-        if col_name not in linked_record_names:
-            t_col.update(TabulatorColumnAdapter.get_column_formatter(t_type))
-        if col_name in de.primary_keys or (
-            col_name in de.editable_column_names and freeze_editable_columns
-        ):
-            t_col["frozen"] = True
-
-        # Define the column's "title formatter" to show the column type below its name
-        t_col["titleFormatter"] = assign(
+    @staticmethod
+    def get_title_formatter(t_type):
+        """
+        Returns a Tabulator JS function to format the column title, showing the pretty type below the name.
+        Args:
+            t_type (str): The inferred type of the column.
+        Returns:
+            assign: JS function for Tabulator's titleFormatter.
+        """
+        return assign(
             f"""
             function(cell){{
                 return cell.getValue() + "<br><span class='column-type'>{TabulatorColumnAdapter.get_pretty_type(t_type)}</span>"
@@ -120,14 +108,124 @@ def get_columns_tabulator(de, show_header_filter=True, freeze_editable_columns=F
             """
         )
 
-        # Define the column's formatter, header filters, and editor (if editable)
-        t_col.update(TabulatorColumnAdapter.get_column_formatter(t_type))
-        if col_name in de.editable_column_names:
-            if t_type == "linked_record":
-                t_col.update(__get_column_linked_record__(de, col_name))
-            else:
-                t_col.update(TabulatorColumnAdapter.get_column_editor(t_type))
+    @staticmethod
+    def get_linked_record_configuration(de, col_name):
+        """
+        Returns Tabulator-specific formatter and editor settings for a column whose type is linked record.
 
-        t_cols.append(t_col)
+        Args:
+            de: DataEditor instance or similar object with schema info.
+            col_name (str): Name of the linked record column.
+        Returns:
+            dict: Tabulator formatter and editor options for the linked record column.
 
-    return t_cols
+        This method wires up Tabulator-specific JS hooks:
+        - Uses Tabulator list editor and editorParams (valuesLookup, filterRemote, itemFormatter).
+        - Embeds JS Ajax calls and references to Namespace-based JS helpers.
+        """
+        linked_records_df = de.linked_records_df
+        linked_ds_name = linked_records_df.loc[col_name, "ds_name"]
+        linked_ds_key_column = linked_records_df.loc[col_name, "ds_key"]
+        linked_ds_label_column = linked_records_df.loc[col_name, "ds_label"]
+        linked_ds_lookup_columns = linked_records_df.loc[col_name, "ds_lookup_columns"]
+
+        t_col = {}
+        t_col["sorter"] = "string"
+
+        # Formatter: if a label column was specified, get labels from the `label` endpoint and show them as user-friendly alternatives to the actual values (corresponding to primary keys of the linked dataset)
+        if (
+            linked_ds_label_column != ""
+            and linked_ds_label_column != linked_ds_key_column
+        ):
+            t_col["formatter"] = assign(
+                f"""
+                function(cell){{
+                    url_base = "linked-label/{linked_ds_name}"
+                    key = cell.getValue()
+                    label = ""
+                    // Send GET request to `url_base`, with parameter `key`
+                    // Assign returned value to the `label` variable; in case connection fails, assign empty value to label
+                    $.ajax({{
+                        url: url_base + "?key=" + key,
+                        async: false,
+                        success: function(result){{
+                            label = result
+                        }},
+                        error: function(result){{
+                            label = ""
+                            console.log("Could not retrieve label from server")
+                        }}
+                    }});
+                    // if label is empty, return empty string
+                    if (label == "") {{
+                        return label
+                    }} else {{
+                        return "<span class='linked-record'>" + label + "</span>"
+                    }}
+                }}
+                """
+            )
+
+        # Editor: use "list" for a dropdown
+        t_col["editor"] = "list"
+        t_col["editorParams"] = {
+            "clearable": True,
+            "elementAttributes": {"maxlength": "20"},
+            "emptyValue": None,
+            "placeholderLoading": "Loading List...",
+            "placeholderEmpty": "No Results Found",
+            "autocomplete": True,
+            "filterRemote": True,
+            "filterDelay": 300,
+            "allowEmpty": False,
+            "listOnEmpty": True,
+            "freetext": False,
+        }
+        # Editor: get values from the `lookup` endpoint
+        t_col["editorParams"]["valuesLookup"] = assign(
+            f"""
+                function(cell, filterTerm){{
+                    url_base = "linked-options/{linked_ds_name}"
+                    key = cell.getValue()
+                    optionsList = []
+                    // Send GET request to `url_base`, with parameter `key`
+                    // Assign returned value to the `label` variable; in case connection fails, assign empty value to label
+                    $.ajax({{
+                        url: url_base + "?key=" + key + "&term=" + filterTerm,
+                        async: false,
+                        success: function(result){{
+                            optionsList = result
+                        }},
+                        error: function(result){{
+                            optionsList = []
+                            console.log("Could not retrieve options from server")
+                        }}
+                    }});
+                    return optionsList
+                }}
+                """
+        )
+        # Editor: format items in the list if lookup columns were provided (in which case items are structured)
+        if linked_ds_lookup_columns != []:
+            t_col["editorParams"]["itemFormatter"] = __ns__("listItemFormatter")
+
+        return t_col
+
+
+def get_columns_tabulator(de, show_header_filter=True, freeze_editable_columns=False):
+    """
+    Generate Tabulator column configuration using TabulatorColumnAdapter and add Tabulator-specific options.
+    Args:
+        de: DataEditor instance or similar object with schema info.
+        show_header_filter (bool): Whether to show header filters.
+        freeze_editable_columns (bool): Whether to freeze editable columns.
+    Returns:
+        list: List of Tabulator column configuration dictionaries.
+    """
+    cols = TabulatorColumnAdapter.get_columns(
+        de, show_header_filter, freeze_editable_columns
+    )
+    # Because the definition of column header menu is common to all columns, we implement it here
+    for col in cols:
+        col["headerContextMenu"] = __ns__("columnHeaderMenu")
+    return cols

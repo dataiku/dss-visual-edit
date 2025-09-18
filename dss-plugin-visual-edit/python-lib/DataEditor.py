@@ -247,8 +247,8 @@ class DataEditor:
                 except Exception:
                     pass
 
-                MIN_SQL_ROWS = 1000
-                MAX_IN_MEMORY_ROWS = 10000
+                MIN_SQL_ROWS = 1000  # minimum number of rows to use a DatasetSQL object rather than loading the linked dataset in memory
+                MAX_IN_MEMORY_ROWS = 10000  # maximum number of rows to load in memory, for non-SQL linked datasets
                 if is_sql_dataset(linked_ds):
                     if count_records is not None and count_records <= MIN_SQL_ROWS:
                         logging.debug(

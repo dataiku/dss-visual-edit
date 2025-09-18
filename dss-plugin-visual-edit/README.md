@@ -10,7 +10,7 @@ The code was developed in Python (environment specs are in `code-env/`) and is o
 
 * **Data persistence layer** based on the [Event Sourcing pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing): we don't store the edited data directly, but instead, we use an append-only store to record the full series of actions on that data (the "editlog"); we then use it to recreate the edited state.
 * **Integration of edits within a Dataiku Flow**: this is where Recipes and other Dataiku-specific components are specified and implemented, based on the above.
-* **Dash Webapp**: provides an interface for end-users to edit data; the front-end is powered by the [`dash_tabulator`](../dash_tabulator/README.md) component and the backend is powered by the data persistence layer. The webapp is also packaged as a Dataiku Visual Webapp.
+* **Dash Webapp packaged as a Dataiku Visual Webapp**: allows end-users to edit data, and provides an interface for administrators to configure the Dataiku dataset to edit and which columns are editable (in _Visual Webapp > Edit_).
 
 ### Data persistence layer
 
@@ -36,6 +36,18 @@ We recommend reading the components' descriptions, available on your Dataiku ins
 
 ### Dash Webapp
 
+The front-end's data table is powered by the [`dash_tabulator`](../dash_tabulator/README.md) component (Dash/React). The backend provides a rich set of additional features on top of this component:
+
+* **Infers column configurations** from the specified Dataiku dataset's schema, editable columns, and other settings from the admin interface, to be passed to `dash_tabulator`.
+* **Connects `dash_tabulator` to the data persistence layer** via the `DataEditor` class:
+  * Reads the original data and the editlog to recreate the edited state of the data, and pass it to `dash_tabulator`.
+  * Listens to ‘cell edited’ events fired by `dash_tabulator` and writes edits to the editlog.
+* **Monitors changes in the original dataset** and signals them to the front-end.
+* **Supports Linked Record columns**:
+  * Fetches options from Linked Datasets, with server-side filtering and paging to support search over hundreds of thousands of options.
+  * Leverages `dash_tabulator`'s `listItemRichFormatter` feature to display rich dropdown items with bold labels and additional lookup values.
+  * Learn more in the [dedicated user guide](../docs/linked-records.md) and in the [dedicated developer guide](linked-records.md).
+
 Structure of `webapps/visual-edit/backend.py`:
 
 * Dataiku-specific logic
@@ -43,10 +55,10 @@ Structure of `webapps/visual-edit/backend.py`:
 * Add a `dash_tabulator` component to the layout, for the data table, with data coming from `DataEditor`
 * Add a callback triggered upon edits, using `DataEditor` to log edits.
 
-See below for how to run the webapp locally and have access to Dash dev tools in the browser, including the callback graph: it provides a visual overview of the components and callbacks, which helps understand the logic behind the automatic detection of changes in the original dataset.
+See the [Development guide](DEVELOPMENT.md) for how to run the webapp locally and have access to Dash dev tools in the browser, including the callback graph: it provides a visual overview of the components and callbacks, which helps understand the logic behind the automatic detection of changes in the original dataset.
 
 ### Data table
 
 ## Modifying the plugin
 
-See [DEVELOPMENT.md](DEVELOPMENT.md).
+See the [Development guide](DEVELOPMENT.md).
