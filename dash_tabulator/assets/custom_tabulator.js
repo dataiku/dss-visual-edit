@@ -1,10 +1,17 @@
+// Custom Formatters, Filter Editors and Functions, and Header Menu options for columns in Tabulator tables.
+// Can be referenced in column definitions passed to the Dash Tabulator component.
+
 window.myNamespace = Object.assign({}, window.myNamespace, {
 
     tabulator: {
 
-        labels: {},
+        //
+        // Header Menu options
+        //
+        // "Hide" and "Group by" (right-click on column header)
 
-        headerMenu: [
+        labels: {},
+        columnHeaderMenu: [
             {
                 label: "Hide Column",
                 action: function (e, column) {
@@ -19,7 +26,12 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
             },
         ],
 
-        itemFormatter: function (label, value, item, element) {
+        //
+        // Formatters
+        // 
+
+        // Rich formatting of items in `list` editor: when items are objects with multiple properties, show the label in bold and other properties below it.
+        listItemRichFormatter: function (label, value, item, element) {
             //label - the text label for the item -> this would be the value of the linked dataset's label column
             //value - the value for the item -> this would be the value of the linked dataset's primary key -> we don't display it
             //item - the original value object for the item
@@ -36,36 +48,14 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
             return o;
         },
 
-        //custom max min filter function
-        minMaxFilterFunction: function (headerValue, rowValue, rowData, filterParams) {
-            //headerValue - the value of the header filter element
-            //rowValue - the value of the column in this row
-            //rowData - the data for the row being filtered
-            //filterParams - params object passed to the headerFilterFuncParams property
+        //
+        // Filter Editors and Functions
+        //
 
-            // No filter set, all values pass.
-            if (headerValue.start === "" && headerValue.end === "") {
-                return true
-            }
+        //// Min/Max for numerical columns
+        ////
 
-            // Filter set, empty or NaN values fail.
-            if (rowValue == null || rowValue === "" || isNaN(Number(rowValue))) {
-                return false;
-            }
-
-            if (headerValue.start != "") {
-                if (headerValue.end != "") {
-                    return rowValue >= headerValue.start && rowValue <= headerValue.end;
-                } else {
-                    return rowValue >= headerValue.start;
-                }
-            } else {
-                if (headerValue.end != "") {
-                    return rowValue <= headerValue.end;
-                }
-            }
-        },
-
+        ////// Editor: widget with one input for min value and one input for max value
         minMaxFilterEditor: function (cell, onRendered, success, cancel, editorParams) {
 
             var end;
@@ -117,6 +107,36 @@ window.myNamespace = Object.assign({}, window.myNamespace, {
             container.appendChild(end);
 
             return container;
+        },
+
+        ////// Filter function: filters rows to those with values between min and max (if set)
+        minMaxFilterFunction: function (headerValue, rowValue, rowData, filterParams) {
+            // headerValue - the value of the header filter element
+            // rowValue - the value of the column in this row
+            // rowData - the data for the row being filtered
+            // filterParams - params object passed to the headerFilterFuncParams property
+
+            // No filter set, all values pass.
+            if (headerValue.start === "" && headerValue.end === "") {
+                return true
+            }
+
+            // Filter set, empty or NaN values fail.
+            if (rowValue == null || rowValue === "" || isNaN(Number(rowValue))) {
+                return false;
+            }
+
+            if (headerValue.start != "") {
+                if (headerValue.end != "") {
+                    return rowValue >= headerValue.start && rowValue <= headerValue.end;
+                } else {
+                    return rowValue >= headerValue.start;
+                }
+            } else {
+                if (headerValue.end != "") {
+                    return rowValue <= headerValue.end;
+                }
+            }
         },
 
     }

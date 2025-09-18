@@ -83,15 +83,15 @@ export default class DashTabulator extends React.Component {
             data,
             columns,
             groupBy,
-            reactiveData: true,
-            selectable: 1,
-            layout: "fitDataTable",
-            pagination: "local",
+            reactiveData: true, // enable the table to update when the data array is replaced
+            selectable: 1, // allow to keep one row highlighted
+            layout: "fitDataTable", // columns width fit data, but table width fits container
+            pagination: "local", // client-side pagination, meaning all data is loaded in the browser
             paginationSize: 20,
             paginationSizeSelector: [10, 20, 50, 100],
-            movableColumns: true,
-            persistence: true,
-            footerElement: "<button class='tabulator-page' onclick='localStorage.clear(); window.location.reload();'>Reset View</button>"
+            movableColumns: true, // allow column reordering
+            persistence: true, // persist table state (column order, visibility, width, sorting, filtering, grouping) in localStorage
+            footerElement: "<button class='tabulator-page' onclick='localStorage.clear(); window.location.reload();'>Reset View</button>" // button to reset table state and reset to default view; useful to revert changes such as column hiding
         };
     }
 
@@ -291,7 +291,7 @@ DashTabulator.propTypes = {
      */
     columns: PropTypes.array,
     /**
-     * Name of the corresponding Dataiku dataset.
+     * Name of the corresponding Dataiku dataset. Used for analytics purposes only, as a hash (not the actual name).
      */
     datasetName: PropTypes.string,
     /**

@@ -20,7 +20,8 @@ NumberType = typing.Union[
 
 class DashTabulator(Component):
     """A DashTabulator component.
-
+DashTabulator is a wrapper for a data table library (e.g. Tabulator).
+All table operations are abstracted for easier migration to another library.
 
 Keyword arguments:
 
@@ -37,7 +38,8 @@ Keyword arguments:
     Data to display in the table.
 
 - datasetName (string; default ""):
-    Name of the corresponding Dataiku dataset.
+    Name of the corresponding Dataiku dataset. Used for analytics
+    purposes only, as a hash (not the actual name).
 
 - groupBy (list; optional):
     Columns to group by."""
