@@ -222,6 +222,11 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
             function(cell){{
                 url_base = "label/{linked_ds_name}"
                 key = cell.getValue()
+                if (!key) {{
+                    // As the current value is not in the options list to avoid issue with autocomplete, we need to set the old value to prevent an empty label in the UI.
+                    key = cell.getOldValue()
+                    cell.setValue(key)
+                }}
                 label = ""
                 // Send GET request to `url_base`, with parameter `key`
                 // Assign returned value to the `label` variable; in case connection fails, assign empty value to label

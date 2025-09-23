@@ -482,15 +482,11 @@ def lookup_endpoint(linked_ds_name):
     # note that this could result in more than 1 option being returned (if several rows of the linked dataset share the same label), but we cap to n_options
     if key != "" and key != "null":
         linked_label_rows = linked_df_filtered[linked_df_filtered[linked_ds_key] == key]
-        if linked_label_rows.empty:
-            label = get_linked_label(linked_record, key).lower()
-            linked_label_rows = get_linked_dataframe_filtered(
-                linked_record=linked_record,
-                project_key=project_key,
-                filter_term=label,
-                n_results=n_options,
-            )
-            linked_df_filtered = concat([linked_label_rows, linked_df_filtered])
+        if not linked_label_rows.empty:
+            # Remove current value from the option list as the autocomplete will cause issues when searching for another label.
+            linked_df_filtered = linked_df_filtered[
+                linked_df_filtered[linked_ds_key] != key
+            ]
 
     editor_values_param = get_formatted_items_from_linked_df(
         linked_df=linked_df_filtered,
