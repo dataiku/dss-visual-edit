@@ -1,0 +1,60 @@
+export DSS_VERSION := "14.0.0"
+LOG_LEVEL := env_var_or_default("LOG_LEVEL", "INFO")
+
+cd_infra := 'cd infra 2>/dev/null || cd .'
+
+[doc('Build plugin in root/dist folder & copy to infra/plugins')]
+build-plugin:
+    #!/bin/sh
+
+    {{cd_infra}}
+
+    echo "Current working directory: $(pwd)"
+
+    cd .. && \
+        echo "Building visual-edit plugin..." && \
+        rm -rf dist && mkdir dist && \
+        git archive -v -9 --format zip -o dist/dss-plugin-visual-edit-dev.zip HEAD dss-plugin-visual-edit && \
+        echo "Done building visual-edit plugin"
+
+    echo "Copy visual-edit plugin to ./infra/plugins/..." && \
+        cp ./dist/dss-plugin-visual-edit-*.zip ./infra/plugins/dss-plugin-visual-edit.zip && \
+        echo "Copied visual-edit plugin to ./infra/plugins/."
+
+[group('infra')]
+[doc('Start containers')]
+start:
+    #!/bin/sh
+
+    {{cd_infra}}
+
+    docker compose up --detach --no-recreate
+
+[group('infra')]
+[doc('Run setup profile to setup DSS instance')]
+setup:
+    #!/bin/sh
+
+    {{cd_infra}}
+
+    if [ -d .env.dss ]; then rm -rf .env.dss; fi
+    touch .env.dss
+    LOG_LEVEL={{LOG_LEVEL}} COMPOSE_PROFILES=setup docker compose up --attach setup
+
+[group('infra')]
+[doc('Down containers. Accepts docker compose down flags, e.g. --volumes to also remove volumes')]
+stop *FLAGS:
+    #!/bin/sh
+
+    {{cd_infra}}
+
+    echo "Stopping infra..."
+    docker compose -f ./docker-compose.yaml down {{FLAGS}}
+    COMPOSE_PROFILES=setup docker compose -f ./docker-compose.yaml down {{FLAGS}}
+    echo "Infra stopped."
+
+[group('infra')]
+[doc('Down containers and remove volumes')]
+clean:
+    just stop -v
+

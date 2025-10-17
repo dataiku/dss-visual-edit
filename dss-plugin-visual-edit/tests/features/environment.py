@@ -1,3 +1,4 @@
+import logging
 import os
 from pathlib import Path
 import re
@@ -9,6 +10,19 @@ from dssgherkin.fixtures.cleanup_projects_fixture import cleanup_projects
 from dssgherkin.fixtures.delete_datasets import delete_datasets
 from dssgherkin.fixtures.dss_client_fixture import create_dss_client
 from dssgherkin.typings.generic_context_type import AugmentedBehaveContext, Credentials
+
+from docker_helper import (
+    get_container_by_name,
+    restart_container,
+)
+from docker_memlimit import get_memlimit_strategy
+
+logger = logging.getLogger(__name__)
+
+memlimit_strategy = get_memlimit_strategy()
+logger.info(f"Using memory limit strategy: {type(memlimit_strategy).__name__}.")
+
+dss_container = get_container_by_name("dss")
 
 
 def before_all(context: AugmentedBehaveContext):
@@ -27,6 +41,9 @@ def before_all(context: AugmentedBehaveContext):
 
 
 def before_scenario(context: AugmentedBehaveContext, scenario: Scenario):
+    if memlimit_strategy.should_restart_dss(scenario, dss_container):
+        restart_container(dss_container)
+
     for tag in scenario.tags:
         if tag == "cleanup_projects":
             use_fixture(cleanup_projects, context)

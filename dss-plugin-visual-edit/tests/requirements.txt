@@ -3,8 +3,9 @@ behave-pandas
 behavex
 dataiku-internal-client @ https://design.solutions.dataiku-dss.io/public/packages/dataiku-internal-client.tar.gz
 dataiku-api-client
+docker
 pandas==1.5.3
 python-socketio==5.11.2
 numpy==1.26.4
 websocket-client
-dssgherkin @ https://bs-public-artefacts.s3.eu-west-3.amazonaws.com/python/dssgherkin/dssgherkin-0.0.18.tar.gz
+dssgherkin @ https://bs-public-artefacts.s3.eu-west-3.amazonaws.com/python/dssgherkin/dssgherkin-0.0.20.tar.gz

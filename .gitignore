@@ -1,4 +1,3 @@
-.gitignore
 .journal
 .mainlock
 .wlock
@@ -23,3 +22,5 @@ dss-plugin-visual-edit/tests/.vscode/*
 !dss-plugin-visual-edit/tests/.vscode/settings.json.example
 !dss-plugin-visual-edit/tests/.vscode/launch.json.example
 .venv
+venv
+tests-results/
