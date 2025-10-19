@@ -1,4 +1,4 @@
-export DSS_VERSION := "14.0.0"
+export DSS_VERSION := env_var_or_default("DSS_VERSION", "14.0.0")
 LOG_LEVEL := env_var_or_default("LOG_LEVEL", "INFO")
 
 cd_infra := 'cd infra 2>/dev/null || cd .'
@@ -28,7 +28,7 @@ start:
 
     {{cd_infra}}
 
-    docker compose up --detach --no-recreate
+    DSS_VERSION={{DSS_VERSION}} docker compose up --detach --no-recreate
 
 [group('infra')]
 [doc('Run setup profile to setup DSS instance')]

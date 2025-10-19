@@ -42,7 +42,7 @@ test *FLAGS:
     pip install -r requirements.txt
 
     # Preparing tests output folder
-    OUTPUT_FOLDER=./tests-results
+    OUTPUT_FOLDER=./tests-results/{{DSS_VERSION}}
     if [ -d "$OUTPUT_FOLDER" ]; then
         rm -rf "$OUTPUT_FOLDER"
     fi
