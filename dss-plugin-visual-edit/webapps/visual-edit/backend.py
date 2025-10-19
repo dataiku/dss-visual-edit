@@ -9,34 +9,37 @@
 #    In case we start the app outside DSS, we start a flask web server.
 # 2. Instantiate editable event-sourced dataset.
 # 3. Define Dash webapp layout and components.
-from __future__ import annotations
+from __future__ import annotations  # noqa: I001
+
 import logging
-from webapp.config.models import LinkedRecord
 import webapp.logging.setup  # noqa: F401 necessary to setup logging basicconfig before dataiku module sets a default config
 from datetime import datetime
-from pandas import concat
-from pandas.api.types import is_integer_dtype, is_float_dtype
-from commons import get_last_build_date, try_get_user_identifier
+
 from dash import Dash, Input, Output, State, dcc, html
 from dataiku.core.schema_handling import CASTERS
+from flask import Flask, jsonify, make_response, request
+from pandas import concat
+from pandas.api.types import is_float_dtype, is_integer_dtype
+
+import dash_tabulator
+from commons import get_last_build_date, try_get_user_identifier
+from DataEditor import (
+    DataEditor,
+    EditFailure,
+    EditFreezed,
+    EditSuccess,
+    EditUnauthorized,
+)
+from dataiku_utils import (
+    client as dss_client,
+)
 from dataiku_utils import (
     get_linked_dataframe_filtered,
     get_linked_label,
-    client as dss_client,
 )
-from DataEditor import (
-    EditFreezed,
-    EditSuccess,
-    EditFailure,
-    EditUnauthorized,
-    DataEditor,
-)
-from flask import Flask, jsonify, make_response, request
 from tabulator_utils import get_columns_tabulator, get_formatted_items_from_linked_df
-
 from webapp.config.loader import WebAppConfig
-
-import dash_tabulator
+from webapp.config.models import LinkedRecord
 
 webapp_config = WebAppConfig()
 
@@ -69,9 +72,7 @@ de = DataEditor(
 )
 
 
-columns = get_columns_tabulator(
-    de, webapp_config.show_header_filter, webapp_config.freeze_editable_columns
-)
+columns = get_columns_tabulator(de, webapp_config.show_header_filter, webapp_config.freeze_editable_columns)
 
 last_build_date_initial = ""
 last_build_date_ok = False
@@ -138,25 +139,19 @@ def serve_layout():  # This function is called upon loading/refreshing the page 
                     id="datatable",
                     datasetName=original_ds_name,
                     columns=columns,
-                    data=de.get_edited_df().to_dict(
-                        "records"
-                    ),  # this gets the most up-to-date edited data
+                    data=de.get_edited_df().to_dict("records"),  # this gets the most up-to-date edited data
                     groupBy=webapp_config.group_column_names,
                 ),
                 html.Div(
                     id="edit-info",
                     children="Info zone for tabulator",
-                    style={
-                        "display": "none" if webapp_config.running_in_dss else "block"
-                    },
+                    style={"display": "none" if webapp_config.running_in_dss else "block"},
                 ),
             ]
         )
     # specific authorized users configured but failure to get current user info.
     elif authorized_users and user_id is None:
-        return html.Div(
-            "Failed to fetch your user information. Try refreshing the page."
-        )
+        return html.Div("Failed to fetch your user information. Try refreshing the page.")
     else:
         return html.Div("Unauthorized")
 
@@ -185,12 +180,8 @@ def toggle_refresh_div_visibility(n_intervals, refresh_div_style, last_build_dat
         last_build_date_new = str(get_last_build_date(original_ds_name, project))
         if int(last_build_date_new) > int(last_build_date):
             logging.info("The original dataset has changed.")
-            last_build_date_new_fmtd = datetime.utcfromtimestamp(
-                int(last_build_date_new) / 1000
-            ).isoformat()
-            last_build_date_fmtd = datetime.utcfromtimestamp(
-                int(last_build_date) / 1000
-            ).isoformat()
+            last_build_date_new_fmtd = datetime.utcfromtimestamp(int(last_build_date_new) / 1000).isoformat()
+            last_build_date_fmtd = datetime.utcfromtimestamp(int(last_build_date) / 1000).isoformat()
             logging.info(
                 f"""Last build date: {last_build_date_new} ({last_build_date_new_fmtd}) — previously {last_build_date} ({last_build_date_fmtd})"""
             )
@@ -307,9 +298,7 @@ def read_all_edits_endpoint():
     Returns: CSV-formatted dataset with rows that were created or edited, and values of primary key and editable columns. See remarks of the `read` endpoint.
     """
     response = make_response(de.get_edited_cells_df_indexed().to_csv())
-    response.headers["Content-Disposition"] = (
-        "attachment; filename=" + original_ds_name + "_edits.csv"
-    )
+    response.headers["Content-Disposition"] = "attachment; filename=" + original_ds_name + "_edits.csv"
     response.headers["Content-Type"] = "text/csv"
     response.headers["Cache-Control"] = "no-store"
     return response
@@ -484,9 +473,7 @@ def lookup_endpoint(linked_ds_name):
         linked_label_rows = linked_df_filtered[linked_df_filtered[linked_ds_key] == key]
         if not linked_label_rows.empty:
             # Remove current value from the option list as the autocomplete will cause issues when searching for another label.
-            linked_df_filtered = linked_df_filtered[
-                linked_df_filtered[linked_ds_key] != key
-            ]
+            linked_df_filtered = linked_df_filtered[linked_df_filtered[linked_ds_key] != key]
 
     editor_values_param = get_formatted_items_from_linked_df(
         linked_df=linked_df_filtered,

@@ -1,8 +1,8 @@
 import logging
 import time
 from typing import Any
-import docker
 
+import docker
 
 logger = logging.getLogger(__name__)
 
@@ -17,9 +17,7 @@ def get_container_by_name(container_name):
     return containers[0]
 
 
-def get_container_memory_percentage(
-    container: Any = None, container_name: str | None = None
-) -> float:
+def get_container_memory_percentage(container: Any = None, container_name: str | None = None) -> float:
     if container is None and container_name is None:
         raise ValueError("Either container or container_name must be provided.")
 
@@ -36,9 +34,7 @@ def get_container_memory_percentage(
         limit = mem_stats.get("limit", 0)
         actual_usage = usage - cache
         if limit == 0:
-            logger.warning(
-                f"Memory limit is not set for container '{container_name}', cannot calculate percentage."
-            )
+            logger.warning(f"Memory limit is not set for container '{container_name}', cannot calculate percentage.")
             return 0
         return (actual_usage / limit) * 100
     else:
@@ -60,13 +56,9 @@ def restart_container(container: Any = None, container_name: str | None = None) 
         health_status = container.attrs["State"].get("Health", {}).get("Status")
 
         if health_status == "healthy":
-            logger.info(
-                f"Container '{container_name}' is healthy, proceeding with tests."
-            )
+            logger.info(f"Container '{container_name}' is healthy, proceeding with tests.")
             break
         else:
-            logger.info(
-                f"Waiting for container '{container_name}' to become healthy (status={health_status})..."
-            )
+            logger.info(f"Waiting for container '{container_name}' to become healthy (status={health_status})...")
 
         time.sleep(2)

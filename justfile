@@ -51,8 +51,8 @@ test *FLAGS:
     echo "Starting tests run..."
 
     DKU_DSS_URL=$DKU_DSS_URL DKU_API_KEY=$DKU_API_KEY DSS_USERNAME=reader DSS_PASSWORD=reader TMPDIR=/tmp/ \
-        MEMLIMIT_STRATEGY=percentage MEMLIMIT_PERCENTAGE_THRESHOLD=80 \
-        behavex --output-folder="$OUTPUT_FOLDER" --show-progress-bar \
+        LIMITED_CONTAINER_NAME=dss MEM_LIMITER=percentage MEM_LIMITER_PERCENTAGE_THRESHOLD=80 \
+        behavex --output-folder="$OUTPUT_FOLDER" --show-progress-bar --stop \
         | sed $'s/^/\033[1;34m/;s/$/\033[0m/'
 
     echo "Finished testing, check outputs at $(pwd)/$OUTPUT_FOLDER."

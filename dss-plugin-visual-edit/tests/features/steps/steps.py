@@ -1,12 +1,39 @@
-import behave
-from dssgherkin.typings.generic_context_type import AugmentedBehaveContext
-from requests import get, post
+import logging
+from typing import Dict
 
+import behave
+from dssgherkin.steps.helpers import get_webapp
+from dssgherkin.typings.generic_context_type import AugmentedBehaveContext
 from features.steps.url_builder import (
     create_api_url,
     get_cookie_as_dict,
 )
-from dssgherkin.steps.helpers import get_webapp
+from requests import Response, get, post
+from tenacity import retry, stop_after_attempt, wait_fixed
+
+logger = logging.getLogger(__name__)
+
+
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+def retry_get(url, cookies: Dict[str, str]) -> Response:
+    try:
+        response = get(url, cookies=cookies)
+        response.raise_for_status()
+        return response
+    except Exception as e:
+        logger.warning("Error during get request.", exc_info=e)
+        raise
+
+
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+def retry_post(url, json, cookies: Dict[str, str]) -> Response:
+    try:
+        response = post(url, json=json, cookies=cookies)
+        response.raise_for_status()
+        return response
+    except Exception as e:
+        logger.warning("Error during post request.", exc_info=e)
+        raise
 
 
 @behave.when("I edit rows as such")
@@ -35,7 +62,7 @@ def edit_rows(ctx: AugmentedBehaveContext):
         }
 
         url = create_api_url(ctx, "update")
-        response = post(url, json=body, cookies=get_cookie_as_dict(ctx))
+        response = retry_post(url, json=body, cookies=get_cookie_as_dict(ctx))
 
         response.raise_for_status()
 
@@ -47,7 +74,7 @@ def assert_label(ctx: AugmentedBehaveContext, key: str, ds_name: str, label: str
 
     url = create_api_url(ctx, f"label/{ds_name}?key={key}")
 
-    response = get(url, cookies=get_cookie_as_dict(ctx))
+    response = retry_get(url, get_cookie_as_dict(ctx))
 
     response.raise_for_status()
 
@@ -61,7 +88,7 @@ def assert_lookup(ctx: AugmentedBehaveContext, term: str, ds_name: str):
 
     url = create_api_url(ctx, f"lookup/{ds_name}?term={term}")
 
-    response = get(url, cookies=get_cookie_as_dict(ctx))
+    response = retry_get(url, get_cookie_as_dict(ctx))
 
     response.raise_for_status()
     result = response.json()
@@ -112,7 +139,7 @@ def unauthorized_edit_rows(ctx: AugmentedBehaveContext):
         }
 
         url = create_api_url(ctx, "update")
-        response = post(url, json=body, cookies=get_cookie_as_dict(ctx))
+        response = retry_post(url, json=body, cookies=get_cookie_as_dict(ctx))
 
         response.raise_for_status()
 

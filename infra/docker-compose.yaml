@@ -55,10 +55,9 @@ services:
         /config/scripts/cli.py create-user --login reader --password reader --profile FULL_DESIGNER
         /config/scripts/cli.py install-plugin --source archive --plugin-id visual-edit --archive-file /plugins/dss-plugin-visual-edit.zip --create-code-env
         /config/scripts/cli.py create-connection --type PostgreSQL --name local_dku_pg
+        /config/scripts/cli.py create-connection --type PostgreSQL --name bs-bigquery
         /config/scripts/cli.py create-connection --type MinIO --name devx-minio
         /config/scripts/cli.py set-general-setting --key webAppSecuritySettings.requiredAuthenticationMode --value LET_USER_DECIDE
-
-      # /config/scripts/cli.py create-connection --type PostgreSQL --name bs-bigquery
 
       # /config/scripts/cli.py set-general-setting --key jekSettings.numberOfReadyJEKs --value 1
       # /config/scripts/cli.py set-general-setting --key jekSettings.maxRunningJobs --value 30

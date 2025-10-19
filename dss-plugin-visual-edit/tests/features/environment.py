@@ -1,7 +1,9 @@
+import locale
 import logging
 import os
-from pathlib import Path
-import re
+import uuid
+from urllib.parse import urljoin
+
 from behave import use_fixture
 from behave.configuration import Configuration
 from behave.model import Scenario
@@ -10,19 +12,34 @@ from dssgherkin.fixtures.cleanup_projects_fixture import cleanup_projects
 from dssgherkin.fixtures.delete_datasets import delete_datasets
 from dssgherkin.fixtures.dss_client_fixture import create_dss_client
 from dssgherkin.typings.generic_context_type import AugmentedBehaveContext, Credentials
-
-from docker_helper import (
-    get_container_by_name,
-    restart_container,
+from features.docker.container_resources import NoopResourcesController, get_container_resources_controller
+from features.steps.url_builder import (
+    get_cookie_as_dict,
 )
-from docker_memlimit import get_memlimit_strategy
+from requests import get
 
 logger = logging.getLogger(__name__)
 
-memlimit_strategy = get_memlimit_strategy()
-logger.info(f"Using memory limit strategy: {type(memlimit_strategy).__name__}.")
+limited_container_name = os.getenv("LIMITED_CONTAINER_NAME", None)
 
-dss_container = get_container_by_name("dss")
+dss_container_resources_controller = (
+    get_container_resources_controller(limited_container_name) if limited_container_name else NoopResourcesController()
+)
+
+
+def login(context: AugmentedBehaveContext):
+    context.execute_steps("Given I login to DSS")
+
+
+def logout(context: AugmentedBehaveContext):
+    try:
+        url = urljoin(context.dss_client.host, "logged-out/")
+        response = get(url, cookies=get_cookie_as_dict(context))
+        response.raise_for_status()
+
+        logger.info(f"Logged out of DSS with status code {response.status_code}.")
+    except Exception as e:
+        logger.error(f"Error logging out of DSS: {e}")
 
 
 def before_all(context: AugmentedBehaveContext):
@@ -41,8 +58,7 @@ def before_all(context: AugmentedBehaveContext):
 
 
 def before_scenario(context: AugmentedBehaveContext, scenario: Scenario):
-    if memlimit_strategy.should_restart_dss(scenario, dss_container):
-        restart_container(dss_container)
+    dss_container_resources_controller.restart_if_needed(scenario)
 
     for tag in scenario.tags:
         if tag == "cleanup_projects":
@@ -52,15 +68,11 @@ def before_scenario(context: AugmentedBehaveContext, scenario: Scenario):
         if tag == "delete_datasets":
             use_fixture(delete_datasets, context)
 
-    project_key_suffix = re.sub(
-        r"[^A-Za-z0-9]", "", Path(scenario.filename).stem
-    ).upper()
-    project_key = f"VISUALEDIT{project_key_suffix}"
-
+    login(context)
+    project_key = uuid.uuid4().hex[:8]
     context.execute_steps(
         f"""
-            Given I login to DSS
-            And a project created from export file "./assets/VISUALEDITINTEGRATIONTESTS.zip" with key "{project_key}"
+            Given a project created from export file "./assets/VISUALEDITINTEGRATIONTESTS.zip" with key "{project_key}"
         """
     )
 
@@ -87,3 +99,19 @@ def before_scenario(context: AugmentedBehaveContext, scenario: Scenario):
         }
     )
     project.set_permissions(project_permissions)
+
+
+def after_scenario(context: AugmentedBehaveContext, scenario: Scenario):
+    logout(context)
+
+    webapp = context.current_webapp
+    if webapp:
+        if hasattr(context, "evidence_path"):
+            logs = webapp.get_state().state["currentLogTail"]
+            with open(
+                os.path.join(context.evidence_path, f"webapp_{webapp.webapp_id}.log"),
+                "w",
+                encoding=locale.getpreferredencoding(False),
+            ) as f:
+                for line in logs["lines"]:
+                    f.write(f"{line}\n")
