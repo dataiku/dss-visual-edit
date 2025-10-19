@@ -1,0 +1,180 @@
+[tool.ruff]
+# Folder to find local modules
+src = ["dss-plugin-visual-edit/python-lib", "dss-plugin-visual-edit/webapps"]
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv" ]
+
+# Same as DSS.
+line-length = 120
+indent-width = 4
+
+
+[tool.ruff.lint]
+preview = true
+
+select = [
+  "E4",
+  "E7",
+  "E9",
+  "I",  # isort
+  "D419",  # empty-docstring
+  "PLC0414",  # useless-import-alias,
+  "PLC2401",  # non-ascii-name,
+  "PLC2801",  # unnecessary-dunder-call,
+  "PLC3002",  # unnecessary-direct-lambda-call,
+  "PLE0101",  # return-in-init
+  "F706",  # return-outside-function
+  "F704",  # yield-outside-function
+  "PLE0115",  # nonlocal-and-global
+  "PLE0116",  # continue-in-finally
+  "PLE0117",  # nonlocal-without-binding
+  "PLE0241",  # duplicate-bases
+  "PLE0302",  # unexpected-special-method-signature
+  "PLE0604",  # invalid-all-object
+  "PLE0605",  # invalid-all-format
+  "PLE0643",  # potential-index-error
+  "PLE0704",  # misplaced-bare-raise
+  "PLE1141",  # dict-iter-missing-items
+  "PLE1142",  # await-outside-async
+  "PLE1205",  # logging-too-many-args
+  "PLE1206",  # logging-too-few-args
+  "PLE1307",  # bad-string-format-type
+  "PLE1310",  # bad-str-strip-call
+  "PLE1507",  # invalid-envvar-value
+  "PLE1519",  # singledispatch-method
+  "PLE1520",  # singledispatchmethod-function
+  "PLE2502",  # bidirectional-unicode
+  "PLE2510",  # invalid-character-backspace
+  "PLE2512",  # invalid-character-sub
+  "PLE2513",  # invalid-character-esc
+  "PLE2514",  # invalid-character-nul
+  "PLE2515",  # invalid-character-zero-width-space
+  "PLE4703",  # modified-iterating-set
+  "PLR0124",  # comparison-with-itself
+  "PLR0202",  # no-classmethod-decorator
+  "PLR0203",  # no-staticmethod-decorator
+  "UP004",  # useless-object-inheritance
+  "PLR0206",  # property-with-parameters
+  "PLR0911",  # too-many-return-statements
+  "PLR0916",  # too-many-boolean-expressions
+  "PLR1704",  # redefined-argument-from-local
+  "PLR1711",  # useless-return
+  "C416",  # unnecessary-comprehension
+  "PLR1733",  # unnecessary-dict-index-lookup
+  "PLR1736",  # unnecessary-list-index-lookup
+  "PLW0108",  # unnecessary-lambda
+  "PLW0120",  # useless-else-on-loop
+  "PLW0127",  # self-assigning-variable
+  "PLW0128",  # redeclared-assigned-name
+  "PLW0129",  # assert-on-string-literal
+  "B033",  # duplicate-value
+  "PLW0131",  # named-expr-without-context
+  "PLW0177",  # nan-comparison
+  "PLW0211",  # bad-staticmethod-argument
+  "PLW0245",  # super-without-brackets
+  "PLW0406",  # import-self
+  "PLW0602",  # global-variable-not-assigned
+  "PLW0604",  # global-at-module-level
+  "F401",  # unused-import
+  "PLW0711",  # binary-op-exception
+  "PLW1501",  # bad-open-mode
+  "PLW1508",  # invalid-envvar-default
+  "PLW1509",  # subprocess-popen-preexec-fn
+  "PLW1514",  # unspecified-encoding
+  "PLW2101",  # useless-with-lock
+  "PLW3301",  # nested-min-max
+  ]
+
+ignore = [
+  "E722" ]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+
+[tool.ruff.lint.pylint]
+
+# Maximum number of nested blocks for function / method body
+max-nested-blocks=5
+
+# Maximum number of arguments for function / method
+max-args=5
+
+# Maximum number of boolean expressions in a if statement
+max-bool-expr=5
+
+# Maximum number of branch for function / method body
+max-branches=12
+
+# Maximum number of locals for function / method body
+max-locals=15
+
+# Maximum number of public methods for a class (see R0904).
+max-public-methods=20
+
+# Maximum number of return / yield for function / method body
+max-returns=6
+
+# Maximum number of statements in function / method body
+max-statements=50
+
+
+[tool.mypy]
+warn_return_any = true
+warn_unused_configs = true
+mypy_path=["dss-plugin-visual-edit/python-lib", "dss-plugin-visual-edit/webapps"]
+
+[[tool.mypy.overrides]]
+module = [
+    'dataiku.*',
+    'dataikuapi.*',
+    'flask_socketio',
+    'llm_assist.*',
+    'diskcache',
+    'behave.*',
+    'dssgherkin.*' ]
+ignore_missing_imports = true
