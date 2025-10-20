@@ -1,0 +1,29 @@
+{
+    "git.ignoreLimitWarning": true,
+    "ruff.configuration": "pyproject.toml",
+    "eslint.options": {
+        "overrideConfigFile": "resource/frontend/.eslintrc.cjs"
+    },
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+
+    // Api tests related settings.
+    "cucumberautocomplete.steps": [
+        "dss-plugin-visual-edit/tests/features/**/*.py",
+        "dss-plugin-visual-edit/tests/venv/lib/python3.10/site-packages/dssgherkin/steps/**/*.py",
+        "venv/lib/python3.10/site-packages/dssgherkin/steps/**/*.py"
+    ],
+    "cucumberautocomplete.strictGherkinCompletion": true,
+    "editor.quickSuggestions": {
+        "comments": false,
+        "strings": true,
+        "other": true
+    },
+    "files.associations": {
+        "*.feature.template": "feature",
+        "*.json.template": "json"
+    }
+}

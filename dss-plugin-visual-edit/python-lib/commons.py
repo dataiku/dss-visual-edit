@@ -1,10 +1,12 @@
 from __future__ import annotations
-import dataiku
-from pandas import DataFrame, concat, pivot_table, options, Int64Dtype
-from pandas.api.types import is_integer_dtype, is_float_dtype
-from flask import request
-import logging
 
+import logging
+from typing import Union
+
+import dataiku
+from flask import request
+from pandas import DataFrame, Int64Dtype, concat, options, pivot_table
+from pandas.api.types import is_float_dtype, is_integer_dtype
 
 # Editlog utils - used by Empty Editlog step and by DataEditor for initialization of editlog
 
@@ -62,9 +64,7 @@ def get_dataframe(mydataset):
 
     # Get the right column types: this would be given by the dataset's schema, except when dealing with integers where we want to enforce the use of Pandas' Int64 type (see https://pandas.pydata.org/pandas-docs/stable/user_guide/integer_na.html).
     myschema = mydataset.read_schema()
-    [names, dtypes, parse_date_columns] = dataiku.Dataset.get_dataframe_schema_st(
-        myschema, bool_as_str=True
-    )
+    [names, dtypes, parse_date_columns] = dataiku.Dataset.get_dataframe_schema_st(myschema, bool_as_str=True)
     for col in myschema:
         n = col["name"]
         t = col["type"]
@@ -74,9 +74,7 @@ def get_dataframe(mydataset):
     # Get the dataframe, using iter_dataframes_forced_types to which we can pass our column types. This code was inspired from the example at https://developer.dataiku.com/latest/api-reference/python/datasets.html#dataiku.Dataset.iter_dataframes_forced_types
     mydataset_df = DataFrame({})
     chunksize = 1000
-    for df in mydataset.iter_dataframes_forced_types(
-        names, dtypes, parse_date_columns, chunksize=chunksize
-    ):
+    for df in mydataset.iter_dataframes_forced_types(names, dtypes, parse_date_columns, chunksize=chunksize):
         mydataset_df = concat([mydataset_df, df])
     return mydataset_df
 
@@ -88,11 +86,7 @@ def replay_edits(editlog_ds, primary_keys, editable_column_names):
     # Create empty dataframe with the proper edits dataset schema: all primary keys, all editable columns, and "date" column
     # This helps ensure that the dataframe we return always has the right schema
     # (even if some columns of the input dataset were never edited)
-    cols = (
-        primary_keys
-        + editable_column_names
-        + ["last_edit_date", "last_action", "first_action"]
-    )
+    cols = primary_keys + editable_column_names + ["last_edit_date", "last_action", "first_action"]
     all_columns_df = DataFrame(columns=cols)
 
     editlog_df = get_dataframe(editlog_ds)
@@ -108,20 +102,10 @@ def replay_edits(editlog_ds, primary_keys, editable_column_names):
 
         # for each key, compute last edit date, last action and first action
         editlog_grouped_last = (
-            editlog_df[primary_keys + ["edit_date", "action"]]
-            .groupby(primary_keys)
-            .last()
-            .add_prefix("last_")
+            editlog_df[primary_keys + ["edit_date", "action"]].groupby(primary_keys).last().add_prefix("last_")
         )
-        editlog_grouped_first = (
-            editlog_df[primary_keys + ["action"]]
-            .groupby(primary_keys)
-            .first()
-            .add_prefix("first_")
-        )
-        editlog_grouped_df = editlog_grouped_last.join(
-            editlog_grouped_first, on=primary_keys
-        )
+        editlog_grouped_first = editlog_df[primary_keys + ["action"]].groupby(primary_keys).first().add_prefix("first_")
+        editlog_grouped_df = editlog_grouped_last.join(editlog_grouped_first, on=primary_keys)
 
         edits_df = pivot_table(
             editlog_df,
@@ -146,11 +130,7 @@ def replay_edits(editlog_ds, primary_keys, editable_column_names):
 
 # Used by get_original_df below and by DataEditor for init
 def get_display_column_names(schema, primary_keys, editable_column_names):
-    return [
-        col.get("name")
-        for col in schema
-        if col.get("name") not in primary_keys + editable_column_names
-    ]
+    return [col.get("name") for col in schema if col.get("name") not in primary_keys + editable_column_names]
 
 
 # Used by DataEditor and by apply_edits_from_df method below
@@ -160,14 +140,10 @@ def get_original_df(original_ds):
     original_ds_config = original_ds.get_config()
     primary_keys = original_ds_config["customFields"]["primary_keys"]
     editable_column_names = [
-        col
-        for col in original_ds_config["customFields"]["editable_column_names"]
-        if col in original_df.columns
+        col for col in original_ds_config["customFields"]["editable_column_names"] if col in original_df.columns
     ]
     schema = original_ds_config.get("schema").get("columns")
-    display_column_names = get_display_column_names(
-        schema, primary_keys, editable_column_names
-    )
+    display_column_names = get_display_column_names(schema, primary_keys, editable_column_names)
 
     # make sure that primary keys will be in the same order for original_df and edits_df, and that we'll return a dataframe where editable columns are last
     return (
@@ -180,9 +156,7 @@ def get_original_df(original_ds):
 
 # Used by Apply recipe and by DataEditor for getting edited data
 def apply_edits_from_df(original_ds, edits_df):
-    original_df, primary_keys, display_columns, editable_columns = get_original_df(
-        original_ds
-    )
+    original_df, primary_keys, display_columns, editable_columns = get_original_df(original_ds)
     # this will contain the list of new columns coming from edits dataset but not found in the original dataset's schema
     editable_columns_new = []
 
@@ -198,7 +172,9 @@ def apply_edits_from_df(original_ds, edits_df):
         edits_df = edits_df[not_deleted & ~created]
 
         # Drop columns which are not primary keys nor editable columns
-        options.mode.chained_assignment = None  # this helps prevent SettingWithCopyWarnings that are triggered by the drops below
+        options.mode.chained_assignment = (
+            None  # this helps prevent SettingWithCopyWarnings that are triggered by the drops below
+        )
         if "last_edit_date" in edits_df.columns:
             edits_df.drop(columns=["last_edit_date"], inplace=True)
         if "last_action" in edits_df.columns:
@@ -250,9 +226,7 @@ def apply_edits_from_df(original_ds, edits_df):
             edited_df = concat([created_df, edited_df])
 
         # Drop the _original and _value_last columns
-        edited_df = edited_df[
-            primary_keys + display_columns + editable_columns + editable_columns_new
-        ]
+        edited_df = edited_df[primary_keys + display_columns + editable_columns + editable_columns_new]
 
     return edited_df
 
@@ -260,20 +234,32 @@ def apply_edits_from_df(original_ds, edits_df):
 # Utils for webapp backend
 
 
-def try_get_user_identifier() -> str | None:
+def get_user_identifier() -> Union[str, None]:
     client = dataiku.api_client()
+    # from https://doc.dataiku.com/dss/latest/webapps/security.html#identifying-users-from-within-a-webapp
+    # don't use client.get_own_user().get_settings().get_raw() as this would give the user who started the webapp
+    request_headers = dict(request.headers)
+    try:
+        auth_info_browser = client.get_auth_info_from_browser_headers(request_headers)
+        return auth_info_browser["authIdentifier"]
+    except Exception as e:
+        logging.warning(
+            "Failed to get user authentication info, headers req: %s",
+            request_headers,
+            exc_info=e,
+        )
+        return None
+
+
+def try_get_user_identifier() -> str | None:
     # from https://doc.dataiku.com/dss/latest/webapps/security.html#identifying-users-from-within-a-webapp
     # don't use client.get_own_user().get_settings().get_raw() as this would give the user who started the webapp
     user = None
     if request:
-        try:
-            request_headers = dict(request.headers)
-            auth_info_browser = client.get_auth_info_from_browser_headers(
-                request_headers
-            )
-            user = auth_info_browser["authIdentifier"]
-        except Exception:
-            logging.exception("Failed to get user authentication info.")
+        # Specifically with test container setup, this is more likely to fail the first time.
+        # Add a retry to increase robustness.
+        if not (user := get_user_identifier()):
+            user = get_user_identifier()
     return user
 
 

@@ -1,0 +1,129 @@
+services:
+  dss:
+    image: dataiku/dss:${DSS_VERSION}
+    platform: ${DSS_PLATFORM:-linux/amd64}
+    environment:
+      - SSH_AUTH_SOCK=/shared-ssh/agent.sock
+    volumes:
+      - devx:/home/dataiku/dss
+      - shared-ssh:/shared-ssh
+      - ~/.ssh/known_hosts:/home/dataiku/.ssh/known_hosts
+    ports:
+      - "10000:10000"
+    deploy:
+      resources:
+        limits:
+          memory: 16g
+    healthcheck:
+      test: curl --fail http://localhost:10000/dip/api/ping
+      interval: 3s
+      timeout: 3s
+      retries: 30
+      start_period: 45s
+
+  copy-config:
+    image: alpine
+    volumes:
+      - devx:/devx
+      - ./config:/source-config:ro
+    command:
+      - sh
+      - -c
+      - |
+          cp -a /source-config/. /devx/config/
+    user: "1000:1000"
+    depends_on:
+      dss:
+        condition: service_healthy
+
+  setup:
+    image: bs-tools/devx-tasks:latest
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - DKU_DSS_URL=http://dss:10000
+    volumes:
+      - ./plugins:/plugins:ro
+      - ${PWD}/.env.dss:/.env.dss
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        /config/scripts/cli.py register-license --license-file /config/license.json
+        /config/scripts/cli.py generate-api-key
+        /config/scripts/cli.py update-user --login admin --profile FULL_DESIGNER
+        /config/scripts/cli.py create-user --login reader --password reader --profile FULL_DESIGNER
+        /config/scripts/cli.py install-plugin --source archive --plugin-id visual-edit --archive-file /plugins/dss-plugin-visual-edit.zip --create-code-env
+        /config/scripts/cli.py create-connection --type PostgreSQL --name local_dku_pg
+        /config/scripts/cli.py create-connection --type PostgreSQL --name bs-bigquery
+        /config/scripts/cli.py create-connection --type MinIO --name devx-minio
+        /config/scripts/cli.py set-general-setting --key webAppSecuritySettings.requiredAuthenticationMode --value LET_USER_DECIDE
+
+      # /config/scripts/cli.py set-general-setting --key jekSettings.numberOfReadyJEKs --value 1
+      # /config/scripts/cli.py set-general-setting --key jekSettings.maxRunningJobs --value 30
+      # /config/scripts/cli.py set-general-setting --key maxRunningActivitiesPerJob --value 20
+      # /config/scripts/cli.py set-general-setting --key maxRunningActivities --value 5
+    profiles:
+      - setup
+    depends_on:
+      dss:
+        condition: service_healthy
+      copy-config:
+        condition: service_completed_successfully
+
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_DB=devx
+      - POSTGRES_USER=dataiku
+      - POSTGRES_PASSWORD=dataiku
+    volumes:
+      - ./db/postgres/init:/docker-entrypoint-initdb.d
+
+  minio:
+    image: minio/minio:latest
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Post minio start, create devx bucket.
+  create-minio-bucket:
+    image: minio/mc
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      echo 'Waiting for MinIO to be ready...';
+      /usr/bin/mc alias set devxminio http://minio:9000 minioadmin minioadmin;
+      echo 'Alias set.';
+      /usr/bin/mc mb devxminio/devx;
+      echo 'Bucket created.';
+      /usr/bin/mc policy set public devxminio/devx;
+      echo 'Bucket policy set to public.';
+      exit 0;
+      "
+
+volumes:
+  devx:
+  shared-ssh:
+    external: true
+
+x-mutagen:
+  sync:
+    defaults:
+      permissions:
+        defaultOwner: "id:1000"
+        defaultGroup: "id:1000"
+        defaultFileMode: 0644
+        defaultDirectoryMode: 0755
+    # Add Mutagen sync definitions here after init if needed.
