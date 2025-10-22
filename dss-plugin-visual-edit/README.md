@@ -30,7 +30,7 @@ We recommend reading the components' descriptions, available on your Dataiku ins
     * `primary_keys` is used by the Apply Edits function/recipe, which joins the original and edits datasets
     * `editable_columns` is used to present columns in a certain order
     * Note: both properties are returned by the `get_original_df()` method in `commons.py`.
-  * editlog dataset: 
+  * editlog dataset:
     * `primary_keys` is used by the Replay Edits function/recipe to unpack key values into 1 column per primary key and to figure out key names.
 * **`python-steps/visual-edit-empty-editlog/` (Dataiku plugin component: Scenario step)** empties the editlog by deleting all rows (this is only used for testing purposes on a design instance).
 
@@ -53,13 +53,16 @@ In the rest of this section, we explain how to run the webapp locally. As a pre-
 
 ### Create a Python environment
 
-* Pre-requisite: install pyenv-virtualenv. On a Mac:
+The commands below can be run from the `dss-plugin-visual-edit` directory, from a VS Code terminal.
+
+* Pre-requisite: install pyenv-virtualenv and Python 3.9.19 (to match the Python version used by the plugin, specified in `code-env/python/desc.json`). On a Mac:
 
 ```bash
 brew install pyenv pyenv-virtualenv
+pyenv install 3.9.19
 ```
 
-* Create and activate a Python 3.9 virtual environment (to match the Python version used by the plugin, specified in `code-env/python/desc.json`):
+* Create and activate a virtual environment:
 
 ```bash
 pyenv virtualenv 3.9.19 visual-edit
@@ -70,7 +73,6 @@ pyenv activate visual-edit
 
 ```bash
 pip install --upgrade pip
-pip install -r code-env/python/spec/requirements.txt
 pip install -r code-env/python/spec/requirements.dev.39.txt
 ```
 
@@ -81,8 +83,8 @@ pip install dataiku-api-client
 ```
 
 * Add Dataiku internal client to the virtual environment.
-   * Copy the `dataiku` folder found in the `python` directory of your Dataiku installation to your local development machine. In the following, we assume that this folder is available in `PATH_TO_PACKAGE`.
-   * Link `PATH_TO_PACKAGE/dataiku` to the virtual environment:
+  * Copy the `dataiku` folder found in the `python` directory of your Dataiku installation to your local development machine. In the following, we assume that this folder is available in `PATH_TO_PACKAGE`.
+  * Link `PATH_TO_PACKAGE/dataiku` to the virtual environment:
 
 ```bash
 ln -s PATH_TO_PACKAGE/dataiku ~/.pyenv/versions/3.9.19/envs/visual-edit/lib/python3.9/site-packages/dataiku
@@ -119,10 +121,11 @@ python backend.py
 
 ## Integration tests
 
-Visual Edit is validated against an integration test suite located in `dss-plugin-visual-edit/tests` and run on a ["test" Dataiku instance managed by the Business Solutions](https://tests-integration.solutions.dataiku-dss.io/home/). 
-* Tests are run automatically upon committing to the master branch or creating a Pull Request (the plugin is automatically updated on the "test" Dataiku instance beforehand). 
+Visual Edit is validated against an integration test suite located in `dss-plugin-visual-edit/tests` and run on a ["test" Dataiku instance managed by the Business Solutions](https://tests-integration.solutions.dataiku-dss.io/home/).
+
+* Tests are run automatically upon committing to the master branch or creating a Pull Request (the plugin is automatically updated on the "test" Dataiku instance beforehand).
 * Tests can also be triggered from the "Actions" tab of this repository, by clicking "Run Gherkin tests" in the side bar, then clicking on "Run workflow" and choosing the branch that contains the test suite to run.
-* Results can be found on the Action's run page, e.g., https://github.com/dataiku/dss-visual-edit/actions/runs/RUN_ID/job/JOB_ID
+* Results can be found on the Action's run page, e.g., <https://github.com/dataiku/dss-visual-edit/actions/runs/RUN_ID/job/JOB_ID>
   * Click on the "Upload test results to workflow artifacts" step to open details
   * Look for "Artifact download URL", download and open ZIP.
 
