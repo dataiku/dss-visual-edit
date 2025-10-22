@@ -12,11 +12,14 @@
 from __future__ import annotations  # noqa: I001
 
 import logging
+import os
+from shutil import copytree
 import webapp.logging.setup  # noqa: F401 necessary to setup logging basicconfig before dataiku module sets a default config
 from datetime import datetime
 
 from dash import Dash, Input, Output, State, dcc, html
 from dataiku.core.schema_handling import CASTERS
+from dataiku.customwebapp import get_webapp_resource
 from flask import Flask, jsonify, make_response, request
 from pandas import concat  # Removed unused import
 from pandas.api.types import is_float_dtype, is_integer_dtype
@@ -46,7 +49,15 @@ webapp_config = WebAppConfig()
 logging.info(f"Web app starting inside DSS:{webapp_config.running_in_dss}.")
 
 if webapp_config.running_in_dss:
-    server = app.server
+    server = app.server # type: ignore
+    app_dash: Dash = app # type: ignore
+    webapp_resource_path: str = get_webapp_resource() # type: ignore
+    webapp_plugin_assets = os.path.join(webapp_resource_path, "../webapps/visual-edit/assets")
+    dash_webapp_assets = app_dash.config.assets_folder
+    logging.info(
+        f"Copying Webapp assets from directory '{webapp_plugin_assets}' into directory '{dash_webapp_assets}'"
+    )
+    copytree(webapp_plugin_assets, dash_webapp_assets)
 else:
     server = Flask(__name__)
     app = Dash(__name__, server=server)

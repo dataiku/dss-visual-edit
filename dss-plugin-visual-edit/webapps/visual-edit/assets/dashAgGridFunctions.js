@@ -4,7 +4,7 @@ dagfuncs.visualEditGetLinkedRecords = function(params) {
     // debugger;
     // return { values: ['English', 'Spanish', 'French', 'Portuguese', '(other)']};
     const linkedDsName = params.colDef.linkedDatasetName;
-    const url = `/lookup/${linkedDsName}`;
+    const url = `${window.location.href}lookup/${linkedDsName}`;
 
     const request = new XMLHttpRequest();
     request.open("GET", url, false);
