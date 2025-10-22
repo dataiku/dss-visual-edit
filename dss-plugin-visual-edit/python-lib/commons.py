@@ -70,6 +70,8 @@ def get_dataframe(mydataset):
         t = col["type"]
         if t in ["tinyint", "smallint", "int", "bigint"]:
             dtypes[n] = "Int64"
+        elif t == "boolean":
+            dtypes[n] = "boolean"
 
     # Get the dataframe, using iter_dataframes_forced_types to which we can pass our column types. This code was inspired from the example at https://developer.dataiku.com/latest/api-reference/python/datasets.html#dataiku.Dataset.iter_dataframes_forced_types
     mydataset_df = DataFrame({})
@@ -192,6 +194,9 @@ def apply_edits_from_df(original_ds, edits_df):
                     edits_df[col] = edits_df[col].astype(float).astype(Int64Dtype())
                 elif is_float_dtype(original_dtype):
                     edits_df[col] = edits_df[col].astype(float)
+                elif original_dtype == "boolean":
+                    # Ensure booleans are properly inferred
+                    edits_df[col] = edits_df[col].map(lambda x: True if x in [True, "True", "true", 1] else (False if x in [False, "False", "false", 0] else None)).astype("bool")
                 else:
                     edits_df[col] = edits_df[col].astype(original_dtype)
             else:

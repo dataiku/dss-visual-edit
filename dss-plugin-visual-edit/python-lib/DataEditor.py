@@ -226,7 +226,7 @@ class DataEditor:
             self.editable_column_names = editable_column_names
 
         # For each linked record, add linked dataset/dataframe as attribute
-        self.linked_records = linked_records if linked_records is not None else []
+        self.linked_records: List[LinkedRecord] = linked_records if linked_records is not None else []
         if self.linked_records:
             self.linked_records_df = DataFrame(
                 data=[lr.info.__dict__ for lr in self.linked_records]
