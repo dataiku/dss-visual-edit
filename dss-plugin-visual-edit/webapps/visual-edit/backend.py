@@ -17,7 +17,7 @@ from shutil import copytree
 import webapp.logging.setup  # noqa: F401 necessary to setup logging basicconfig before dataiku module sets a default config
 from datetime import datetime
 
-from dash import Dash, Input, Output, State, dcc, html
+from dash import Dash, Input, Output, State, dcc, html, clientside_callback
 from dataiku.core.schema_handling import CASTERS
 from dataiku.customwebapp import get_webapp_resource
 from flask import Flask, jsonify, make_response, request
@@ -124,6 +124,7 @@ def serve_layout():  # This function is called upon loading/refreshing the page 
         logging.debug(f"User '{user_id}' is being served layout.")
         return html.Div(
             children=[
+                dcc.Store(id="flash-store"),
                 html.Div(
                     id="refresh-div",
                     children=[
@@ -220,7 +221,7 @@ def toggle_refresh_div_visibility(n_intervals, refresh_div_style, last_build_dat
 
 
 @app.callback(
-    Output("edit-info", "children"),
+    [Output("edit-info", "children"), Output("flash-store", "data")],
     Input("datatable", "cellValueChanged"),
     prevent_initial_call=True,
 )
@@ -243,7 +244,36 @@ def add_edit(cells):
     for res in results:
         info += __edit_result_to_message__(res) + "\n"
 
-    return info
+    dash_store_data = {"rowIndex": cell["rowIndex"], "colId": cell["colId"]} if isinstance(results[0], EditSuccess) else None
+
+    return info, dash_store_data
+
+# Flash edited cell in the grid after edit
+clientside_callback(
+    """
+    async function(flash_data) {
+        if (!flash_data) {
+            return window.dash_clientside.no_update;
+        }
+
+        const gridApi = await dash_ag_grid.getApiAsync("datatable");
+        const rowNode = gridApi.getDisplayedRowAtIndex(flash_data.rowIndex);
+        if (rowNode) {
+            gridApi.flashCells({
+                rowNodes: [rowNode],
+                columns: [flash_data.colId]
+            });
+        }
+
+        return window.dash_clientside.no_update;
+    }
+    """,
+    # A dummy output is required for a clientside_callback.
+    # We can target a non-existent property of the input component itself.
+    Output("flash-store", "id", allow_duplicate=True),
+    Input("flash-store", "data"),
+    prevent_initial_call=True
+)
 
 
 # CRUD endpoints
