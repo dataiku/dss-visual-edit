@@ -49,14 +49,12 @@ webapp_config = WebAppConfig()
 logging.info(f"Web app starting inside DSS:{webapp_config.running_in_dss}.")
 
 if webapp_config.running_in_dss:
-    server = app.server # type: ignore
-    app_dash: Dash = app # type: ignore
-    webapp_resource_path: str = get_webapp_resource() # type: ignore
+    server = app.server  # type: ignore
+    app_dash: Dash = app  # type: ignore
+    webapp_resource_path: str = get_webapp_resource()  # type: ignore
     webapp_plugin_assets = os.path.join(webapp_resource_path, "../webapps/visual-edit/assets")
     dash_webapp_assets = app_dash.config.assets_folder
-    logging.info(
-        f"Copying Webapp assets from directory '{webapp_plugin_assets}' into directory '{dash_webapp_assets}'"
-    )
+    logging.info(f"Copying Webapp assets from directory '{webapp_plugin_assets}' into directory '{dash_webapp_assets}'")
     copytree(webapp_plugin_assets, dash_webapp_assets)
 else:
     server = Flask(__name__)
@@ -154,7 +152,7 @@ def serve_layout():  # This function is called upon loading/refreshing the page 
                     columnDefs=columns,
                     # defaultColDef={"floatingFilter": True},
                     rowData=de.get_edited_df().to_dict("records"),
-                    # style={"height": "100vh", "width": "100%"},
+                    style={"height": "100vh", "width": "100%"},
                     dashGridOptions={
                         "columnHoverHighlight": True,
                         "sideBar": True,
@@ -163,8 +161,8 @@ def serve_layout():  # This function is called upon loading/refreshing the page 
                         "showNoRowsOverlay": True,
                         "statusBar": {
                             "statusPanels": [
-                                { "statusPanel": 'agTotalAndFilteredRowCountComponent' },
-                                { "statusPanel": 'agTotalRowCountComponent' },
+                                {"statusPanel": "agTotalAndFilteredRowCountComponent"},
+                                {"statusPanel": "agTotalRowCountComponent"},
                             ]
                         },
                     },
@@ -244,9 +242,12 @@ def add_edit(cells):
     for res in results:
         info += __edit_result_to_message__(res) + "\n"
 
-    dash_store_data = {"rowIndex": cell["rowIndex"], "colId": cell["colId"]} if isinstance(results[0], EditSuccess) else None
+    dash_store_data = (
+        {"rowIndex": cell["rowIndex"], "colId": cell["colId"]} if isinstance(results[0], EditSuccess) else None
+    )
 
     return info, dash_store_data
+
 
 # Flash edited cell in the grid after edit
 clientside_callback(
@@ -272,7 +273,7 @@ clientside_callback(
     # We can target a non-existent property of the input component itself.
     Output("flash-store", "id", allow_duplicate=True),
     Input("flash-store", "data"),
-    prevent_initial_call=True
+    prevent_initial_call=True,
 )
 
 
