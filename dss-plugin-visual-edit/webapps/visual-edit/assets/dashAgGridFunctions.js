@@ -1,6 +1,6 @@
 var dagfuncs = window.dashAgGridFunctions = window.dashAgGridFunctions || {};
 
-dagfuncs.visualEditGetLinkedRecords = function(params) {
+dagfuncs.dkuLinkedRecordsCellEditor = function(params) {
     const linkedDsName = params.colDef.linkedDatasetName;
     const url = `${window.location.href}lookup/${linkedDsName}`;
 
