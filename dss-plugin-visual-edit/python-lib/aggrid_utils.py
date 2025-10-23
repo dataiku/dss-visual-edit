@@ -1,16 +1,19 @@
-"""
-AG Grid utility functions to generate column configuration for Dash AG Grid.
-"""
-
-import logging
-from typing import Union
+from typing import List, Union
 
 from pandas import DataFrame
 
 from DataEditor import DataEditor
+from webapp.config.models import EditSchema
 
 
-def _get_column_aggrid_data_type(dku_col_type: str, dku_col_meaning: str) -> dict:
+def _get_user_column_def_override(col_name: str, edit_schema: List[EditSchema]) -> dict:
+    for col_def in edit_schema:
+        if col_def.name == col_name:
+            return col_def.aggrid_col_def
+    return {}
+
+
+def _to_aggrid_data_type(dku_col_type: str, dku_col_meaning: str) -> dict:
     if dku_col_type in ["int", "bigint", "double", "float"]:
         return {"cellDataType": "number"}
     elif dku_col_type == "boolean":
@@ -26,7 +29,7 @@ def _get_column_aggrid_data_type(dku_col_type: str, dku_col_meaning: str) -> dic
         return {"cellDataType": "text"}
 
 
-def _get_column_aggrid_cell_editor(dku_col_type: str, dku_col_meaning: str) -> dict:
+def _to_aggrid_cell_editor(dku_col_type: str, dku_col_meaning: str) -> dict:
     if dku_col_type in ["int", "bigint", "double", "float"]:
         return {"cellEditor": "agNumericCellEditor"}
     elif dku_col_type == "boolean":
@@ -37,8 +40,10 @@ def _get_column_aggrid_cell_editor(dku_col_type: str, dku_col_meaning: str) -> d
         return {"cellEditor": "agLargeTextCellEditor", "cellEditorPopup": True}
 
 
-def _get_pk_column_def_aggrid(col_name: str, dku_col_type: str, dku_col_meaning: str, show_header_filter: bool) -> dict:
-    ag_data_type = _get_column_aggrid_data_type(dku_col_type, dku_col_meaning)
+def _get_pk_column_def_aggrid(
+    col_name: str, dku_col_type: str, dku_col_meaning: str, show_header_filter: bool, edit_schema: List[EditSchema]
+) -> dict:
+    ag_data_type = _to_aggrid_data_type(dku_col_type, dku_col_meaning)
     col_def = {
         "field": col_name,
         "headerName": col_name,
@@ -47,13 +52,13 @@ def _get_pk_column_def_aggrid(col_name: str, dku_col_type: str, dku_col_meaning:
         "filter": show_header_filter,
         "filterParams": {"buttons": ["reset", "apply"], "closeOnApply": True},
     }
-    return col_def | ag_data_type
+    return col_def | ag_data_type | _get_user_column_def_override(col_name, edit_schema)
 
 
 def _get_display_column_def_aggrid(
-    col_name: str, dku_col_type: str, dku_col_meaning: str, show_header_filter: bool
+    col_name: str, dku_col_type: str, dku_col_meaning: str, show_header_filter: bool, edit_schema: List[EditSchema]
 ) -> dict:
-    ag_data_type = _get_column_aggrid_data_type(dku_col_type, dku_col_meaning)
+    ag_data_type = _to_aggrid_data_type(dku_col_type, dku_col_meaning)
     col_def = {
         "field": col_name,
         "headerName": col_name,
@@ -62,14 +67,19 @@ def _get_display_column_def_aggrid(
         "filter": show_header_filter,
         "filterParams": {"buttons": ["reset", "apply"], "closeOnApply": True},
     }
-    return col_def | ag_data_type
+    return col_def | ag_data_type | _get_user_column_def_override(col_name, edit_schema)
 
 
 def _get_editable_column_def_aggrid(
-    col_name: str, dku_col_type: str, dku_col_meaning: str, show_header_filter: bool, freeze_editable_columns: bool
+    col_name: str,
+    dku_col_type: str,
+    dku_col_meaning: str,
+    show_header_filter: bool,
+    freeze_editable_columns: bool,
+    edit_schema: List[EditSchema],
 ) -> dict:
-    ag_data_type = _get_column_aggrid_data_type(dku_col_type, dku_col_meaning)
-    ag_cell_editor = _get_column_aggrid_cell_editor(dku_col_type, dku_col_meaning)
+    ag_data_type = _to_aggrid_data_type(dku_col_type, dku_col_meaning)
+    ag_cell_editor = _to_aggrid_cell_editor(dku_col_type, dku_col_meaning)
     # Alternate red shades for editable columns (even: deep red, odd: light red)
     col_def = {
         "field": col_name,
@@ -79,25 +89,20 @@ def _get_editable_column_def_aggrid(
         "filter": show_header_filter,
         "filterParams": {"buttons": ["reset", "apply"], "closeOnApply": True},
     }
-    return col_def | ag_data_type | ag_cell_editor
+    return col_def | ag_data_type | ag_cell_editor | _get_user_column_def_override(col_name, edit_schema)
 
 
 def _get_linked_record_column_def_aggrid(
     col_name: str, dku_col_type: str, dku_col_meaning: str, linked_ds_name: str, show_header_filter: bool
 ) -> dict:
-    ag_data_type = _get_column_aggrid_data_type(dku_col_type, dku_col_meaning)
+    ag_data_type = _to_aggrid_data_type(dku_col_type, dku_col_meaning)
     return {
         "field": col_name,
         "headerName": col_name,
         "editable": True,
         "cellEditor": "agRichSelectCellEditor",
         "cellEditorParams": {
-            # "values": [0, 1, 2, 3, 4, 5],  # Placeholder values; in practice, this should be dynamically fetched
-            # "values": { "function": "dkuLinkedRecordsCellEditor(params)" },
             "function": "dkuLinkedRecordsCellEditor(params)",
-            # "allowTyping": True,
-            # "filterList": True,
-            # "highlightMatch": True
         },
         "linkedDatasetName": linked_ds_name,
         "filter": show_header_filter,
@@ -105,58 +110,104 @@ def _get_linked_record_column_def_aggrid(
     } | ag_data_type
 
 
-def get_columns_aggrid(de: DataEditor, show_header_filter=True, freeze_editable_columns=False):
-    # Similar logic to Tabulator, but adapted for AG Grid
-    linked_record_names = []
-    if de.linked_records:
-        try:
-            linked_records_df = de.linked_records_df
-            linked_record_names = linked_records_df.index.values.tolist()
-        except Exception:
-            logging.exception("Failed to get linked record names.")
-
-    ag_cols = []
-
+def _get_pk_column_defs(de: DataEditor, edit_schema: List[EditSchema], show_header_filter: bool) -> List[dict]:
     ag_pk_cols = []
-    for pk_col in de.primary_keys:
-        col_type: str = de.schema_columns_df.loc[pk_col, "type"]  # type: ignore
+    for col_name in de.primary_keys:
+        col_type: str = de.schema_columns_df.loc[col_name, "type"]  # type: ignore
         col_meaning: str = (
-            de.schema_columns_df.loc[pk_col, "meaning_id"] if "meaning_id" in de.schema_columns_df.columns else ""
+            de.schema_columns_df.loc[col_name, "meaning_id"] if "meaning_id" in de.schema_columns_df.columns else ""
         )  # type: ignore
-        col_def = _get_pk_column_def_aggrid(pk_col, col_type, col_meaning, show_header_filter)
+        col_def = _get_pk_column_def_aggrid(col_name, col_type, col_meaning, show_header_filter, edit_schema)
         ag_pk_cols.append(col_def)
+    return ag_pk_cols
 
-    ag_cols.append({"headerName": "Row identification", "children": ag_pk_cols, "marryChildren": True})
 
+def _get_display_column_defs(de: DataEditor, edit_schema: List[EditSchema], show_header_filter: bool) -> List[dict]:
     ag_display_cols = []
-    for display_col in de.display_column_names:
-        col_type: str = de.schema_columns_df.loc[display_col, "type"]  # type: ignore
-        col_meaning: str = (
-            de.schema_columns_df.loc[display_col, "meaning"] if "meaning" in de.schema_columns_df.columns else ""
-        )  # type: ignore
-        col_def = _get_display_column_def_aggrid(display_col, col_type, col_meaning, show_header_filter)
-        ag_display_cols.append(col_def)
-
-    ag_cols.append({"headerName": "Contextual information", "children": ag_display_cols, "marryChildren": True})
-
-    schema_df = de.schema_columns_df
-    for col_name in de.editable_column_names:
-        col_type = schema_df.loc[col_name, "type"]  # type: ignore
+    for col_name in de.display_column_names:
+        col_type: str = de.schema_columns_df.loc[col_name, "type"]  # type: ignore
         col_meaning: str = (
             de.schema_columns_df.loc[col_name, "meaning"] if "meaning" in de.schema_columns_df.columns else ""
         )  # type: ignore
-        if col_name in linked_record_names:
-            # Linked record column
+        col_def = _get_display_column_def_aggrid(col_name, col_type, col_meaning, show_header_filter, edit_schema)
+        ag_display_cols.append(col_def)
+    return ag_display_cols
+
+
+def _get_editable_column_defs(
+    de: DataEditor, edit_schema: List[EditSchema], show_header_filter: bool, freeze_editable_columns: bool
+) -> List[dict]:
+    ag_editable_cols = []
+    linked_record_names = de.linked_records_df.index.values.tolist()
+    editable_column_names = set(de.editable_column_names) - set(linked_record_names)
+    for col_name in editable_column_names:
+        col_type: str = de.schema_columns_df.loc[col_name, "type"]  # type: ignore
+        col_meaning: str = (
+            de.schema_columns_df.loc[col_name, "meaning"] if "meaning" in de.schema_columns_df.columns else ""
+        )  # type: ignore
+        col_def = _get_editable_column_def_aggrid(
+            col_name,
+            col_type,
+            col_meaning,
+            show_header_filter,
+            freeze_editable_columns,
+            edit_schema,
+        )
+        ag_editable_cols.append(col_def)
+    return ag_editable_cols
+
+
+def _get_linked_record_column_defs(
+    de: DataEditor, edit_schema: List[EditSchema], show_header_filter: bool
+) -> List[dict]:
+    ag_linked_record_cols = []
+    if de.linked_records:
+        linked_records_df = de.linked_records_df
+        linked_record_names = linked_records_df.index.values.tolist()
+        for col_name in linked_record_names:
+            col_type: str = de.schema_columns_df.loc[col_name, "type"]  # type: ignore
+            col_meaning: str = (
+                de.schema_columns_df.loc[col_name, "meaning"] if "meaning" in de.schema_columns_df.columns else ""
+            )  # type: ignore
             linked_ds_name: str = linked_records_df.loc[col_name, "ds_name"]  # type: ignore
             col_def = _get_linked_record_column_def_aggrid(
                 col_name, col_type, col_meaning, linked_ds_name, show_header_filter
             )
-            ag_cols.append(col_def)
-            continue
-        col_def = _get_editable_column_def_aggrid(
-            col_name, col_type, col_meaning, show_header_filter, freeze_editable_columns
-        )
-        ag_cols.append(col_def)
+            ag_linked_record_cols.append(col_def)
+    return ag_linked_record_cols
+
+
+def _get_extra_column_defs(de: DataEditor, edit_schema: List[EditSchema]) -> List[dict]:
+    ag_extra_cols = []
+    all_col_names = de.primary_keys + de.display_column_names + de.editable_column_names
+    extra_col_defs = set([col.name for col in edit_schema]) - set(all_col_names)
+    for extra_col_name in extra_col_defs:
+        col_def = next((col.aggrid_col_def for col in edit_schema if col.name == extra_col_name), None)
+        if col_def:
+            ag_extra_cols.append(col_def)
+    return ag_extra_cols
+
+
+def get_columns_aggrid(
+    de: DataEditor, edit_schema: List[EditSchema], show_header_filter=True, freeze_editable_columns=False
+) -> List[dict]:
+    ag_cols = []
+
+    pk_col_defs = _get_pk_column_defs(de, edit_schema, show_header_filter)
+    ag_cols.append({"headerName": "Row identification", "children": pk_col_defs, "marryChildren": True})
+
+    display_col_defs = _get_display_column_defs(de, edit_schema, show_header_filter)
+    ag_cols.append({"headerName": "Contextual information", "children": display_col_defs, "marryChildren": True})
+
+    editable_col_defs = _get_editable_column_defs(de, edit_schema, show_header_filter, freeze_editable_columns)
+    ag_cols.extend(editable_col_defs)
+
+    linked_record_col_defs = _get_linked_record_column_defs(de, edit_schema, show_header_filter)
+    ag_cols.extend(linked_record_col_defs)
+
+    extra_col_defs = _get_extra_column_defs(de, edit_schema)
+    ag_cols.extend(extra_col_defs)
+
     return ag_cols
 
 
