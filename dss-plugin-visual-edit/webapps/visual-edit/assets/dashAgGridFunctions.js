@@ -1,8 +1,6 @@
 var dagfuncs = window.dashAgGridFunctions = window.dashAgGridFunctions || {};
 
 dagfuncs.visualEditGetLinkedRecords = function(params) {
-    // debugger;
-    // return { values: ['English', 'Spanish', 'French', 'Portuguese', '(other)']};
     const linkedDsName = params.colDef.linkedDatasetName;
     const url = `${window.location.href}lookup/${linkedDsName}`;
 
@@ -10,7 +8,7 @@ dagfuncs.visualEditGetLinkedRecords = function(params) {
     request.open("GET", url, false);
     request.send(null);
 
-    console.log(request.responseText)
+    repeatedFetch(params.node.id, "");
 
     return {
         values: JSON.parse(request.responseText),
@@ -20,18 +18,36 @@ dagfuncs.visualEditGetLinkedRecords = function(params) {
         searchType: "matchAny"
     }
 }
-// const json = await result.json();
 
-// console.log("Fetched linked records:", json);
+async function fetchMatchingValuesAndUpdateEditorValues(cb, nodeId, previousSearchTerm) {
+    const gridApi = await dash_ag_grid.getApiAsync("datatable");
+    const cellEditors = gridApi.getCellEditorInstances();
+    const editor = cellEditors.find(inst => inst.params && inst.params.node && inst.params.node.id === nodeId && inst.richSelect);
+    if (editor) {
+        const currentSearchTerm = editor.richSelect.searchString;
+        if (currentSearchTerm !== previousSearchTerm) {
+            const response = await fetch(`${window.location.href}lookup/${editor.params.colDef.linkedDatasetName}?term=${encodeURIComponent(editor.richSelect.searchString)}`)
+            const newValues = await response.json()
+            editor.richSelect.setValueList({ valueList: [...newValues], refresh: true });
+            editor.richSelect.values = [...newValues]
+            editor.richSelect.searchTextFromString(currentSearchTerm)
+        }
+        
+        return true
+    }
 
-// debugger;
+    return false
+}
 
-// return {
-//     "values": json,
-//     // "allowTyping": true,
-//     // "filterList": true,
-//     // "highlightMatch": true
-// }
-// return new Promise((resolve) => {
-//     setTimeout(() => resolve(['English', 'Spanish', 'French', 'Portuguese', '(other)']), 1000);
-// });
+const debounceTimers = {};
+
+function repeatedFetch(nodeId, previousSearchTerm) {
+    if (debounceTimers[nodeId]) {
+        clearTimeout(debounceTimers[nodeId]);
+    }
+    debounceTimers[nodeId] = setTimeout(async () => {
+        if (await fetchMatchingValuesAndUpdateEditorValues(repeatedFetch, nodeId, previousSearchTerm)) {
+            repeatedFetch(nodeId, previousSearchTerm);
+        }
+    }, 200)
+}
