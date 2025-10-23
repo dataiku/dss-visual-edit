@@ -160,6 +160,12 @@ def serve_layout():  # This function is called upon loading/refreshing the page 
                         "stopEditingWhenCellsLoseFocus": True,
                         "singleClickEdit": True,
                         "showNoRowsOverlay": True,
+                        "statusBar": {
+                            "statusPanels": [
+                                { "statusPanel": 'agTotalAndFilteredRowCountComponent' },
+                                { "statusPanel": 'agTotalRowCountComponent' },
+                            ]
+                        },
                     },
                     # editable=True,
                     # groupBy=webapp_config.group_column_names,
