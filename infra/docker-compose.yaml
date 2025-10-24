@@ -43,6 +43,7 @@ services:
       - DKU_DSS_URL=http://dss:10000
     volumes:
       - ./plugins:/plugins:ro
+      - ./projects:/projects:ro
       - ${PWD}/.env.dss:/.env.dss
     command:
       - sh
@@ -58,6 +59,7 @@ services:
         /config/scripts/cli.py create-connection --type PostgreSQL --name bs-bigquery
         /config/scripts/cli.py create-connection --type MinIO --name devx-minio
         /config/scripts/cli.py set-general-setting --key webAppSecuritySettings.requiredAuthenticationMode --value LET_USER_DECIDE
+        /config/scripts/cli.py import-project --project-file /projects/TEST.zip --project-key TEST
 
       # /config/scripts/cli.py set-general-setting --key jekSettings.numberOfReadyJEKs --value 1
       # /config/scripts/cli.py set-general-setting --key jekSettings.maxRunningJobs --value 30
