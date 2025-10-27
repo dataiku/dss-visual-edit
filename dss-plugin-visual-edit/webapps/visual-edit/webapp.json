@@ -171,11 +171,12 @@
         {
             "name": "sep-advanced",
             "label": "Advanced",
+            "description": Restrict access to a list of authorized users, freeze edits, activate debug mode, or customize editing widgets via the [Editschema](https://dataiku.github.io/dss-visual-edit/editschema).
             "type": "SEPARATOR"
         },
         {
             "name": "authorized_users",
-            "label": "Authorized users",
+            "label": "Authorized users (optional)",
             "description": "List identifiers of users authorized to view the webapp and make edits, as Strings. Leave empty to give access to anyone who has project-level permission to read dashboards.",
             "type": "ARRAY"
         },
@@ -192,8 +193,8 @@
         },
         {
             "name": "editschema",
-            "label": "Editschema (optional) [link](https://dataiku.github.io/dss-visual-edit/editschema)",
-            "description": "Additional column settings to provide as an array of dictionaries in JSON format. [Read more >](https://dataiku.github.io/dss-visual-edit/editschema)",
+            "label": "Editschema (optional)",
+            "description": "Additional column settings to provide as an array of dictionaries in JSON format.",
             "type": "TEXTAREA"
         }
     ],
