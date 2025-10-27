@@ -24,7 +24,7 @@
         {
             "name": "primary_keys",
             "label": "Primary Keys",
-            "description": "Columns used to identify a record.<br>IMPORTANT: make sure that the type and meaning of these columns is set correctly before starting the webapp.",
+            "description": "Columns used to identify a record. IMPORTANT: make sure that the type and meaning of these columns is set correctly before starting the webapp.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset",
             "mandatory": true
@@ -32,7 +32,7 @@
         {
             "name": "editable_column_names",
             "label": "Editable Columns",
-            "description": "Columns that the webapp user will be able to edit.\n\nIMPORTANT: make sure that the type and meaning of these columns is set correctly before starting the webapp.",
+            "description": "Columns that the webapp user will be able to edit. IMPORTANT: make sure that the type and meaning of these columns is set correctly before starting the webapp.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset",
             "mandatory": true
@@ -177,7 +177,7 @@
         {
             "name": "authorized_users",
             "label": "Authorized users (optional)",
-            "description": "List identifiers of users authorized to view the webapp and make edits, as Strings.\n\nLeave empty to give access to anyone who has project-level permission to read dashboards.",
+            "description": "List identifiers of users authorized to view the webapp and make edits, as Strings. Leave empty to give access to anyone who has project-level permission to read dashboards.",
             "type": "ARRAY"
         },
         {
