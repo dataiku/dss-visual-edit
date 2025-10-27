@@ -192,8 +192,8 @@
         },
         {
             "name": "editschema",
-            "label": "Editschema (optional)",
-            "description": "Additional column settings to provide as an array of dictionaries in JSON format (example: [ {'name': 'col1'}, {'name': 'col2'} ]. [Read more >](https://dataiku.github.io/dss-visual-edit/editschema)",
+            "label": "Editschema (optional) [link](https://dataiku.github.io/dss-visual-edit/editschema)",
+            "description": "Additional column settings to provide as an array of dictionaries in JSON format. [Read more >](https://dataiku.github.io/dss-visual-edit/editschema)",
             "type": "TEXTAREA"
         }
     ],
