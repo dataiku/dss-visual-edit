@@ -194,7 +194,7 @@
         {
             "name": "editschema",
             "label": "Editschema (optional)",
-            "description": "Additional column settings to provide as an array of dictionaries in JSON format.",
+            "description": "See link above for more information.",
             "type": "TEXTAREA"
         }
     ],
