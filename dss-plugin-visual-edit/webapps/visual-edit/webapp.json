@@ -40,7 +40,7 @@
         {
             "name": "sep-linked-record",
             "label": "Linked Records",
-            "description": "A linked record (aka foreign key) is an editable column whose values correspond to primary key values of another dataset, referred to as the linked dataset.",
+            "description": "A Linked Record (aka foreign key) column is an editable column whose values correspond to primary key values of another dataset, referred to as the linked dataset. [Read more >](https://dataiku.github.io/dss-visual-edit/linked-records)",
             "type": "SEPARATOR"
         },
         {
