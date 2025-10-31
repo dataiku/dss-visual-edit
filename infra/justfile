@@ -14,7 +14,7 @@ build-plugin:
     cd .. && \
         echo "Building visual-edit plugin..." && \
         rm -rf dist && mkdir dist && \
-        git archive -v -9 --format zip -o dist/dss-plugin-visual-edit-dev.zip HEAD dss-plugin-visual-edit && \
+        git archive -v -9 --format zip -o dist/dss-plugin-visual-edit-dev.zip HEAD . && \
         echo "Done building visual-edit plugin"
 
     echo "Copy visual-edit plugin to ./infra/plugins/..." && \
