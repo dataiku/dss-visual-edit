@@ -1,4 +1,4 @@
-export DSS_VERSION := env_var_or_default("DSS_VERSION", "14.0.0")
+export DSS_VERSION := env_var_or_default("DSS_VERSION", "14.2.0")
 LOG_LEVEL := env_var_or_default("LOG_LEVEL", "INFO")
 
 cd_infra := 'cd infra 2>/dev/null || cd .'
