@@ -1,0 +1,10 @@
+pydantic
+pandas==2.2.3
+dataiku-api-client
+ipykernel
+flask
+mkdocstrings-python
+mkdocs-material
+dataiku-internal-client @ https://design.solutions.dataiku-dss.io/public/packages/dataiku-internal-client.tar.gz
+pytest==8.3.4
+ruff==0.8.0
