@@ -28,7 +28,7 @@ start:
 
     {{cd_infra}}
 
-    DSS_VERSION={{DSS_VERSION}} docker compose up --detach --no-recreate
+    docker compose up --detach --no-recreate
 
 [group('infra')]
 [doc('Run setup profile to setup DSS instance')]

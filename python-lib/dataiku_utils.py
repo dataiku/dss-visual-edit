@@ -1,7 +1,11 @@
 from json import dumps
+
 from dataiku import Dataset, api_client
 from dataikuapi.utils import DataikuStreamedHttpUTF8CSVReader
+from flask import Response
 from pandas import DataFrame
+
+from webapp.config.models import LinkedRecord
 
 client = api_client()
 
@@ -36,9 +40,7 @@ def get_rows(dataset_name, project_key, params):
     """
     project = client.get_project(project_key)
     schema_columns = project.get_dataset(dataset_name).get_schema()["columns"]
-    csv_stream = client._perform_raw(
-        "GET", f"/projects/{project_key}/datasets/{dataset_name}/data/", params=params
-    )
+    csv_stream = client._perform_raw("GET", f"/projects/{project_key}/datasets/{dataset_name}/data/", params=params)
     # CSV reader will cast all the cells in the type specified in the schema.
     # However, in the stream, the first row contains the name of the colums which should not be casted obviously.
     # We therefore skip the first row and reconstruct it according to the schema.
@@ -53,7 +55,7 @@ def get_rows(dataset_name, project_key, params):
     return rows
 
 
-def get_dataframe_filtered(ds_name, project_key, filter_column, filter_term, n_results):
+def get_dataframe_filtered(ds_name, project_key, filter_column, filter_term, n_results) -> DataFrame:
     """
     Get the first rows of a dataset filtered by a column and a term
 
@@ -70,15 +72,13 @@ def get_dataframe_filtered(ds_name, project_key, filter_column, filter_term, n_r
     params = {
         "format": "tsv-excel-header",
         "filter": f"""startsWith(toLowercase(strval("{filter_column}")), "{filter_term}")""",
-        "sampling": dumps(
-            {"samplingMethod": "HEAD_SEQUENTIAL", "maxRecords": n_results}
-        ),
+        "sampling": dumps({"samplingMethod": "HEAD_SEQUENTIAL", "maxRecords": n_results}),
     }
     rows = get_rows(ds_name, project_key, params)
     return DataFrame(columns=rows[0], data=rows[1:]) if len(rows) > 0 else DataFrame()
 
 
-def get_linked_dataframe_filtered(linked_record, project_key, filter_term, n_results):
+def get_linked_dataframe_filtered(linked_record: LinkedRecord, project_key, filter_term, n_results) -> DataFrame:
     """
     Get the first rows of a linked dataset filtered by a column and a term
 
@@ -106,41 +106,39 @@ def get_linked_dataframe_filtered(linked_record, project_key, filter_term, n_res
         # The linked dataframe is already available in memory (and capped to 1000 rows); it can be filtered by Pandas
         # This dataframe is indexed by the linked dataset's key column: we reset the index to stay consistent with the rest of this method
         if linked_record.df is None:
-            return "Something went wrong. Try restarting the backend.", 500
+            raise Exception("Something went wrong. Try restarting the backend.")
         linked_df = linked_record.df.reset_index()
         if filter_term == "":
             linked_df_filtered = linked_df.head(n_results)
         else:
             # Filter linked_df for rows whose label starts with the search term
-            linked_df_filtered = linked_df[
-                linked_df[linked_ds_label].str.lower().str.startswith(filter_term)
-            ].head(n_results)
+            linked_df_filtered = linked_df[linked_df[linked_ds_label].str.lower().str.startswith(filter_term)].head(
+                n_results
+            )
     return linked_df_filtered
 
 
-def get_linked_label(linked_record, key):
+def get_linked_label(linked_record, key) -> Response:
     linked_ds_key = linked_record.ds_key
     linked_ds_label = linked_record.ds_label
     # Return label only if a label column is defined (and different from the key column)
     if key != "" and linked_ds_label and linked_ds_label != linked_ds_key:
         if linked_record.ds:
             try:
-                label = linked_record.ds.get_cell_value_sql_query(
-                    linked_ds_key, key, linked_ds_label
-                )
+                label = linked_record.ds.get_cell_value_sql_query(linked_ds_key, key, linked_ds_label)
             except Exception:
-                return "Something went wrong fetching label of linked value.", 500
+                return Response("Something went wrong fetching label of linked value.", 500)
         else:
             linked_df = linked_record.df
             if linked_df is None:
-                return "Something went wrong. Try restarting the backend.", 500
+                return Response("Something went wrong. Try restarting the backend.", 500)
             try:
                 label = linked_df.loc[key, linked_ds_label]
             except Exception:
-                return label
+                return Response("Something went wrong fetching label of linked value.", 500)
     else:
         label = key
-    return label
+    return Response(label, 200)
 
 
 def is_sql_dataset(ds: Dataset) -> bool:

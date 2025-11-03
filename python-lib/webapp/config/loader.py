@@ -1,16 +1,19 @@
 from __future__ import annotations
+
 import json
 import logging
 import os
-from typing import Any, List
-from dataiku.customwebapp import get_webapp_config
 from json import load
 from os import getenv
+from typing import Any, List
+
+from dataiku.customwebapp import get_webapp_config
+
 from webapp.config.models import (
     Config,
     EditSchema,
-    LinkedRecordInfo,
     LinkedRecord,
+    LinkedRecordInfo,
 )
 
 
@@ -24,10 +27,8 @@ class WebAppConfig:
             self.__validate_original_dataset_name__(typed_config.original_dataset)
 
         else:
-            original_ds_name = self.__validate_original_dataset_name__(
-                getenv("ORIGINAL_DATASET")
-            )
-            with open(f"../../webapp-settings/{original_ds_name}.json") as fp:
+            original_ds_name = self.__validate_original_dataset_name__(getenv("ORIGINAL_DATASET"))
+            with open(f"./webapp-settings/{original_ds_name}.json", encoding="utf-8") as fp:
                 dic_config = load(fp)
             typed_config = Config(**dic_config)
             typed_config.original_dataset = original_ds_name
@@ -39,9 +40,7 @@ class WebAppConfig:
         self.freeze_editable_columns = typed_config.freeze_editable_columns
         self.group_column_names = typed_config.group_column_names
         self.linked_records_count = typed_config.linked_records_count
-        self.linked_records = self.__get_linked_records__(
-            dic_config, self.linked_records_count
-        )
+        self.linked_records = self.__get_linked_records__(dic_config, self.linked_records_count)
 
         self.editschema_manual = self.__cast_editschema__(typed_config)
 
@@ -82,9 +81,7 @@ class WebAppConfig:
             )
         return key
 
-    def __get_linked_records__(
-        self, params, linked_records_count: int
-    ) -> List[LinkedRecord]:
+    def __get_linked_records__(self, params, linked_records_count: int) -> List[LinkedRecord]:
         """
         Get linked records from webapp parameters, as a list of dictionaries
         """
@@ -102,10 +99,9 @@ class WebAppConfig:
                 if not ds_lookup_columns:
                     ds_lookup_columns = []
                 linked_records.append(
-                    LinkedRecord(
-                        LinkedRecordInfo(
-                            name, ds_name, ds_key, ds_label, ds_lookup_columns
-                        )
-                    )
+                    LinkedRecord(LinkedRecordInfo(name, ds_name, ds_key, ds_label, ds_lookup_columns))
                 )
         return linked_records
+
+
+webapp_config = WebAppConfig()

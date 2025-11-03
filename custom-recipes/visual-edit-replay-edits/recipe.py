@@ -7,9 +7,7 @@ from dataiku.customrecipe import get_input_names_for_role, get_output_names_for_
 # when using interactive execution:
 # import sys
 # sys.path.append('../../python-lib')
-
 from commons import replay_edits
-
 
 # %% Get recipe parameters
 ###

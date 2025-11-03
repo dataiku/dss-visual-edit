@@ -4,12 +4,13 @@ from typing import Dict
 import behave
 from dssgherkin.steps.helpers import get_webapp
 from dssgherkin.typings.generic_context_type import AugmentedBehaveContext
+from requests import Response, get, post
+from tenacity import retry, stop_after_attempt, wait_fixed
+
 from features.steps.url_builder import (
     create_api_url,
     get_cookie_as_dict,
 )
-from requests import Response, get, post
-from tenacity import retry, stop_after_attempt, wait_fixed
 
 logger = logging.getLogger(__name__)
 

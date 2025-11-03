@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Any, List
 
 from behave.model import Scenario
+
 from features.docker.utils import get_container_by_name, get_container_memory_percentage, restart_container
 
 logger = logging.getLogger(__name__)

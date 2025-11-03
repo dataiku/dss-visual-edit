@@ -1,6 +1,7 @@
 import logging
+
 from dataiku import Dataset, SQLExecutor2, api_client, get_custom_variables
-from dataiku.sql import SelectQuery, Column, toSQL
+from dataiku.sql import Column, SelectQuery, toSQL
 
 client = api_client()
 
@@ -18,9 +19,7 @@ class DatasetSQL:
         self.dataset = Dataset(name, project_key)
         self.connection_name = self.dataset.get_config()["params"]["connection"]
         self.executor = SQLExecutor2(connection=self.connection_name)
-        self.table_name = self.dataset.get_config()["params"]["table"].replace(
-            "${projectKey}", project_key
-        )
+        self.table_name = self.dataset.get_config()["params"]["table"].replace("${projectKey}", project_key)
         node = get_custom_variables(project_key).get("NODE")
         if node:
             self.table_name = self.table_name.replace("${NODE}", node)
@@ -50,9 +49,7 @@ class DatasetSQL:
         Returns: cell value
         """
         if key_value != "":
-            df = self.executor.query_to_df(
-                self.__get_safe_query__(key_column_name, key_value, column_name)
-            )
+            df = self.executor.query_to_df(self.__get_safe_query__(key_column_name, key_value, column_name))
             if df.size:
                 return df[column_name].values[0]
             else:

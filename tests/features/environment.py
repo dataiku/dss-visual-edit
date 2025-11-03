@@ -12,11 +12,12 @@ from dssgherkin.fixtures.cleanup_projects_fixture import cleanup_projects
 from dssgherkin.fixtures.delete_datasets import delete_datasets
 from dssgherkin.fixtures.dss_client_fixture import create_dss_client
 from dssgherkin.typings.generic_context_type import AugmentedBehaveContext, Credentials
+from requests import get
+
 from features.docker.container_resources import NoopResourcesController, get_container_resources_controller
 from features.steps.url_builder import (
     get_cookie_as_dict,
 )
-from requests import get
 
 logger = logging.getLogger(__name__)
 

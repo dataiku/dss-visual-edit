@@ -1,6 +1,8 @@
 from typing import List, Optional
+
 import dataiku
-from dataiku.sql import Column, toSQL, List as ListBuilder, Expression
+from dataiku.sql import Column, Expression, toSQL
+from dataiku.sql import List as ListBuilder
 
 
 def quote_identifier(string: str) -> str:
@@ -8,9 +10,7 @@ def quote_identifier(string: str) -> str:
     return sep + string.replace(sep, sep + sep) + sep
 
 
-def get_quoted_table_full_name(
-    catalog: Optional[str], schema: Optional[str], table: str
-) -> str:
+def get_quoted_table_full_name(catalog: Optional[str], schema: Optional[str], table: str) -> str:
     if not catalog:
         if not schema:
             return quote_identifier(table)
@@ -19,13 +19,7 @@ def get_quoted_table_full_name(
     else:
         if not schema:
             raise ValueError("schema cannot be empty when catalog is present")
-        return (
-            quote_identifier(catalog)
-            + "."
-            + quote_identifier(schema)
-            + "."
-            + quote_identifier(table)
-        )
+        return quote_identifier(catalog) + "." + quote_identifier(schema) + "." + quote_identifier(table)
 
 
 def get_table_name_from_dataset(dataset: dataiku.Dataset):
@@ -35,9 +29,8 @@ def get_table_name_from_dataset(dataset: dataiku.Dataset):
     table_name = loc.get("info").get("table")
     catalog_name = loc.get("info").get("catalog")
     schema_name = loc.get("info").get("schema")
-    return get_quoted_table_full_name(
-        catalog=catalog_name, schema=schema_name, table=table_name
-    )
+    return get_quoted_table_full_name(catalog=catalog_name, schema=schema_name, table=table_name)
+
 
 def get_table_name_from_bq_dataset(dataset: dataiku.Dataset):
     loc = dataset.get_location_info()
@@ -47,6 +40,7 @@ def get_table_name_from_bq_dataset(dataset: dataiku.Dataset):
     table_name = loc.get("info").get("table")
     schema_name = loc.get("info").get("schema")
     return schema_name + "." + table_name
+
 
 class InsertQueryBuilder:
     def __init__(self, dataset: dataiku.Dataset):
@@ -68,7 +62,7 @@ class InsertQueryBuilder:
     def add_value(self, value: List[Expression]):
         if len(value) != len(self.columns):
             raise ValueError("Cannot add values to insert query")
-        self.values.append([val for val in value])
+        self.values.append(list(value))
         return self
 
     def _query_start(self) -> str:
@@ -103,12 +97,8 @@ class InsertQueryBuilder:
     def build(self) -> str:
         if not self.columns:
             raise ValueError("No columns found for the insert query builder")
-        return (
-            self._query_start()
-            + " "
-            + self.get_wrapped_cols()
-            + self.parameterized_value()
-        )
+        return self._query_start() + " " + self.get_wrapped_cols() + self.parameterized_value()
+
 
 class BigQueryInsertQueryBuilder:
     def __init__(self, dataset: dataiku.Dataset):
@@ -167,9 +157,11 @@ class BigQueryInsertQueryBuilder:
         if not self.columns:
             raise ValueError("No columns defined for INSERT query.")
         query = (
-            self._query_start()                # INSERT INTO `project.dataset.table`
-            + " " + self.get_wrapped_cols()    # (`col1`,`col2`,...)
-            + " VALUES " + self.get_wrapped_values()  # VALUES (val1,val2,...),(val1,val2,...)
+            self._query_start()  # INSERT INTO `project.dataset.table`
+            + " "
+            + self.get_wrapped_cols()  # (`col1`,`col2`,...)
+            + " VALUES "
+            + self.get_wrapped_values()  # VALUES (val1,val2,...),(val1,val2,...)
             + ";"
         )
         return query

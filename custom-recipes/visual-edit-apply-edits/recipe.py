@@ -8,9 +8,7 @@ from pandas import DataFrame
 # when using interactive execution:
 # import sys
 # sys.path.append('../../python-lib')
-
 from commons import apply_edits_from_df, get_dataframe
-
 
 # %% Get recipe parameters
 ###

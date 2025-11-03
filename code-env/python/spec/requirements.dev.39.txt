@@ -1,8 +1,9 @@
 -r requirements.txt
 dataiku-api-client
+dataiku-internal-client @ https://design.solutions.dataiku-dss.io/public/packages/dataiku-internal-client.tar.gz
 ipykernel
 mkdocstrings-python
 mkdocs-material
-dataiku-internal-client @ https://design.solutions.dataiku-dss.io/public/packages/dataiku-internal-client.tar.gz
 pytest==8.3.4
 ruff==0.8.0
+types-flask-cors

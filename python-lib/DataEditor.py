@@ -1,31 +1,34 @@
 from __future__ import annotations
+
 import logging
+from datetime import datetime
+from json import loads
+from os import getenv
+from re import sub
+from typing import List
+
 from dataiku import Dataset, api_client
 from dataikuapi.dss.dataset import DSSManagedDatasetCreationHelper
 from dataikuapi.dss.recipe import DSSRecipeCreator
-from dataiku_utils import is_sql_dataset, recipe_already_exists
 from pandas import DataFrame
+from pytz import timezone
+
 from commons import (
-    try_get_user_identifier,
-    get_original_df,
-    get_dataframe,
-    write_empty_editlog,
-    get_display_column_names,
     apply_edits_from_df,
-    replay_edits,
+    get_dataframe,
+    get_display_column_names,
     get_key_values_from_dict,
+    get_original_df,
+    replay_edits,
+    try_get_user_identifier,
+    write_empty_editlog,
 )
+from dataiku_utils import is_sql_dataset, recipe_already_exists
+from DatasetSQL import DatasetSQL
+from editschema_utils import get_editable_column_names, get_primary_keys
+from webapp.config.models import EditSchema, LinkedRecord
 from webapp.db.editlogs import EditLog, EditLogAppenderFactory
 from webapp_utils import find_webapp_id, get_webapp_json
-from editschema_utils import get_primary_keys, get_editable_column_names
-from DatasetSQL import DatasetSQL
-from os import getenv
-from json import loads
-from datetime import datetime
-from pytz import timezone
-from re import sub
-from typing import List
-from webapp.config.models import LinkedRecord, EditSchema
 
 
 class EditSuccess:
@@ -63,12 +66,8 @@ class DataEditor:
     def __init_webapp_url__(self):
         try:
             webapp_id = find_webapp_id(self.original_ds_name)
-            webapp_name = sub(
-                r"[\W_]+", "-", get_webapp_json(webapp_id).get("name").lower()
-            )
-            self.webapp_url = (
-                f"/projects/{self.project_key}/webapps/{webapp_id}_{webapp_name}/edit"
-            )
+            webapp_name = sub(r"[\W_]+", "-", get_webapp_json(webapp_id).get("name").lower())
+            self.webapp_url = f"/projects/{self.project_key}/webapps/{webapp_id}_{webapp_name}/edit"
             self.webapp_url_public = f"/public-webapps/{self.project_key}/{webapp_id}/"
         except Exception:
             logging.exception("Failed to retrieve webapp url.")
@@ -76,9 +75,7 @@ class DataEditor:
             self.webapp_url_public = "/"
 
     def __setup_editlog__(self):
-        editlog_ds_creator = DSSManagedDatasetCreationHelper(
-            self.project, self.editlog_ds_name
-        )
+        editlog_ds_creator = DSSManagedDatasetCreationHelper(self.project, self.editlog_ds_name)
         if editlog_ds_creator.already_exists():
             logging.debug("Found editlog")
             self.editlog_ds = Dataset(self.editlog_ds_name, self.project_key)
@@ -109,9 +106,7 @@ class DataEditor:
         self.editlog_columns = self.editlog_ds.get_config().get("schema").get("columns")
 
     def __setup_editlog_downstream__(self):
-        edits_ds_creator = DSSManagedDatasetCreationHelper(
-            self.project, self.edits_ds_name
-        )
+        edits_ds_creator = DSSManagedDatasetCreationHelper(self.project, self.edits_ds_name)
         if edits_ds_creator.already_exists():
             logging.debug("Found edits dataset")
         else:
@@ -138,9 +133,7 @@ class DataEditor:
             replay_settings.save()
             logging.debug("Done.")
 
-        edited_ds_creator = DSSManagedDatasetCreationHelper(
-            self.project, self.edited_ds_name
-        )
+        edited_ds_creator = DSSManagedDatasetCreationHelper(self.project, self.edited_ds_name)
         if edited_ds_creator.already_exists():
             logging.debug("Found edited dataset")
             self.edited_ds = Dataset(self.edited_ds_name, self.project_key)
@@ -152,9 +145,7 @@ class DataEditor:
             logging.debug("Done.")
 
         apply_recipe_name = "compute_" + self.edited_ds_name
-        apply_recipe_creator = DSSRecipeCreator(
-            "CustomCode_visual-edit-apply-edits", apply_recipe_name, self.project
-        )
+        apply_recipe_creator = DSSRecipeCreator("CustomCode_visual-edit-apply-edits", apply_recipe_name, self.project)
         if recipe_already_exists(apply_recipe_name, self.project):
             logging.debug("Found recipe to create edited dataset")
             apply_recipe = self.project.get_recipe(apply_recipe_name)
@@ -215,9 +206,7 @@ class DataEditor:
         self.edits_ds_name = self.original_ds_name + "_edits"
         self.edited_ds_name = self.original_ds_name + "_edited"
 
-        self.__connection_name__ = (
-            self.original_ds.get_config().get("params").get("connection")
-        )
+        self.__connection_name__ = self.original_ds.get_config().get("params").get("connection")
         if self.__connection_name__ is None:
             self.__connection_name__ = "filesystem_managed"
 
@@ -228,9 +217,7 @@ class DataEditor:
         # For each linked record, add linked dataset/dataframe as attribute
         self.linked_records = linked_records if linked_records is not None else []
         if self.linked_records:
-            self.linked_records_df = DataFrame(
-                data=[lr.info.__dict__ for lr in self.linked_records]
-            ).set_index("name")
+            self.linked_records_df = DataFrame(data=[lr.info.__dict__ for lr in self.linked_records]).set_index("name")
             for linked_record in self.linked_records:
                 linked_ds_name = linked_record.ds_name
                 linked_ds_key = linked_record.ds_key
@@ -254,11 +241,7 @@ class DataEditor:
                         logging.debug(
                             f"""Loading linked dataset "{linked_ds_name}" in memory since it has less than {MIN_SQL_ROWS} records"""
                         )
-                        linked_record.df = (
-                            get_dataframe(linked_ds)
-                            .set_index(linked_ds_key)
-                            .head(MAX_IN_MEMORY_ROWS)
-                        )
+                        linked_record.df = get_dataframe(linked_ds).set_index(linked_ds_key).head(MAX_IN_MEMORY_ROWS)
                     else:
                         logging.debug(
                             f"""Loading linked dataset "{linked_ds_name}" as a DatasetSQL object since it has more than {MIN_SQL_ROWS} records or an unknown number of records"""
@@ -269,18 +252,12 @@ class DataEditor:
                         f"""Loading linked dataset "{linked_ds_name}" in memory since it isn't on an SQL connection"""
                     )
                     if count_records is None:
-                        logging.warning(
-                            f"Unknown number of records for linked dataset {linked_ds_name}"
-                        )
+                        logging.warning(f"Unknown number of records for linked dataset {linked_ds_name}")
                     elif count_records > MAX_IN_MEMORY_ROWS:
                         logging.warning(
                             f"Linked dataset {linked_ds_name} has {count_records} records — capping at {MAX_IN_MEMORY_ROWS} rows to avoid memory issues"
                         )
-                    linked_record.df = (
-                        get_dataframe(linked_ds)
-                        .set_index(linked_ds_key)
-                        .head(MAX_IN_MEMORY_ROWS)
-                    )
+                    linked_record.df = get_dataframe(linked_ds).set_index(linked_ds_key).head(MAX_IN_MEMORY_ROWS)
 
         self.editschema_manual = editschema_manual
 
@@ -289,13 +266,9 @@ class DataEditor:
             self.editable_column_names = get_editable_column_names(editschema)
             self.editschema_manual = editschema
         if self.editschema_manual:
-            self.editschema_manual_df = DataFrame(
-                data=[s.__dict__ for s in self.editschema_manual]
-            ).set_index("name")
+            self.editschema_manual_df = DataFrame(data=[s.__dict__ for s in self.editschema_manual]).set_index("name")
         else:
-            self.editschema_manual_df = DataFrame(
-                data={}
-            )  # this will be an empty dataframe
+            self.editschema_manual_df = DataFrame(data={})  # this will be an empty dataframe
 
         self.authorized_users = authorized_users
 
@@ -374,9 +347,7 @@ class DataEditor:
             pandas.DataFrame:
                 A DataFrame containing only the edited rows and editable columns.
         """
-        return replay_edits(
-            self.editlog_ds, self.primary_keys, self.editable_column_names
-        )
+        return replay_edits(self.editlog_ds, self.primary_keys, self.editable_column_names)
 
     def get_row(self, primary_keys):
         """
@@ -429,9 +400,7 @@ class DataEditor:
             value_string = value
 
         user_identifier = try_get_user_identifier()
-        if self.authorized_users and (
-            user_identifier is None or user_identifier not in self.authorized_users
-        ):
+        if self.authorized_users and (user_identifier is None or user_identifier not in self.authorized_users):
             logging.debug(
                 f"""Logging {action} action unauthorized ('{user_identifier}'): column {column} set to value {value} where {self.primary_keys} is {key}."""
             )
@@ -456,9 +425,7 @@ class DataEditor:
                     return EditSuccess()
                 except Exception:
                     logging.exception("Failed to append edit log.")
-                    return EditFailure(
-                        "Internal server error, failed to append edit log."
-                    )
+                    return EditFailure("Internal server error, failed to append edit log.")
             else:
                 logging.info(
                     f"""Logging {action} action failed: column {column} set to value {value} where {self.primary_keys} is {key}."""
@@ -487,9 +454,7 @@ class DataEditor:
 
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
         for col in column_values.keys():
-            self.__log_edit__(
-                key=key, column=col, value=column_values.get(col), action="create"
-            )
+            self.__log_edit__(key=key, column=col, value=column_values.get(col), action="create")
         return "Row successfully created"
 
     def update_row(
@@ -513,9 +478,7 @@ class DataEditor:
         key = get_key_values_from_dict(primary_keys, self.primary_keys)
 
         def is_validation_column(column_name: str):
-            return (
-                column_name.lower() == "reviewed" or column_name.lower() == "validated"
-            )
+            return column_name.lower() == "reviewed" or column_name.lower() == "validated"
 
         def is_comments_column(column_name: str):
             return column_name == "Comments" or column_name == "comments"
@@ -534,9 +497,7 @@ class DataEditor:
         else:
             return [self.__log_edit__(key, column, value, action="update")]
 
-    def delete_row(
-        self, primary_keys: dict
-    ) -> EditSuccess | EditFailure | EditUnauthorized:
+    def delete_row(self, primary_keys: dict) -> EditSuccess | EditFailure | EditUnauthorized:
         """
         Deletes a row identified by the given primary key(s).
 

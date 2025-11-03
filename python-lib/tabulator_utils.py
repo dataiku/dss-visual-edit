@@ -2,14 +2,10 @@
 This file contains functions used to generate the Tabulator columns configuration for a given dataset.
 """
 
-from typing import Union
-from pandas import DataFrame
-from dash_extensions.javascript import Namespace
 import logging
-from dash_extensions.javascript import assign
+from typing import Union
 
-# used to reference javascript functions in custom_tabulator.js
-__ns__ = Namespace("myNamespace", "tabulator")
+from pandas import DataFrame
 
 
 def __get_column_tabulator_type__(de, col_name):
@@ -29,7 +25,7 @@ def __get_column_tabulator_type__(de, col_name):
         editschema_manual_type = None
 
     # this tests that 1) editschema_manual_type isn't None, and 2) it isn't a nan
-    if editschema_manual_type and editschema_manual_type == editschema_manual_type:
+    if editschema_manual_type and editschema_manual_type == editschema_manual_type:  # noqa: PLR0124
         t_type = editschema_manual_type
     else:
         schema_df = DataFrame(data=de.schema_columns).set_index("name")
@@ -38,14 +34,10 @@ def __get_column_tabulator_type__(de, col_name):
         else:
             schema_meaning = None
         # If a meaning has been defined, we use it to infer t_type
-        if schema_meaning and schema_meaning == schema_meaning:
+        if schema_meaning and schema_meaning == schema_meaning:  # noqa: PLR0124
             if schema_meaning == "Boolean":
                 t_type = "boolean"
-            if (
-                schema_meaning == "DoubleMeaning"
-                or schema_meaning == "LongMeaning"
-                or schema_meaning == "IntMeaning"
-            ):
+            if schema_meaning == "DoubleMeaning" or schema_meaning == "LongMeaning" or schema_meaning == "IntMeaning":
                 t_type = "number"
             if schema_meaning == "Date":
                 t_type = "date"
@@ -100,9 +92,7 @@ def __get_column_tabulator_editor__(t_type):
     t_col = {}
     if t_type == "boolean":
         t_col["editor"] = "list"
-        t_col["editorParams"] = {
-            "values": {"true": "True", "false": "False", "": "(empty)"}
-        }
+        t_col["editorParams"] = {"values": {"true": "True", "false": "False", "": "(empty)"}}
         t_col["headerFilter"] = "input"
         t_col["headerFilterParams"] = {}
     elif t_type == "boolean_tick":
@@ -196,9 +186,7 @@ def get_formatted_items_from_linked_df(
     if len(selected_columns) == 1:
         return selected_df[selected_columns[0]].to_list()
 
-    return selected_df.rename(columns={key_col: "value", label_col: "label"}).to_dict(
-        "records"
-    )
+    return selected_df.rename(columns={key_col: "value", label_col: "label"}).to_dict("records")
 
 
 def __get_column_tabulator_linked_record__(de, linked_record_name):
@@ -208,9 +196,7 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
     linked_ds_name = linked_records_df.loc[linked_record_name, "ds_name"]
     linked_ds_key_column = linked_records_df.loc[linked_record_name, "ds_key"]
     linked_ds_label_column = linked_records_df.loc[linked_record_name, "ds_label"]
-    linked_ds_lookup_columns = linked_records_df.loc[
-        linked_record_name, "ds_lookup_columns"
-    ]
+    linked_ds_lookup_columns = linked_records_df.loc[linked_record_name, "ds_lookup_columns"]
 
     t_col = {}
     t_col["sorter"] = "string"
@@ -309,9 +295,7 @@ def get_columns_tabulator(de, show_header_filter=True, freeze_editable_columns=F
             logging.exception("Failed to get linked record names.")
 
     t_cols = []
-    for col_name in (
-        de.primary_keys + de.display_column_names + de.editable_column_names
-    ):
+    for col_name in de.primary_keys + de.display_column_names + de.editable_column_names:
         # Properties to be shared by all columns
         t_col = {
             "field": col_name,
