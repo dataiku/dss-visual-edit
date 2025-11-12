@@ -8,9 +8,21 @@ We strongly recommend using a [compatible SQL connection](compatibility) for the
 
 If [linked records](linked-records) are needed, and if the linked dataset has more than 10,000 rows or if lookup columns are needed, then the linked dataset must also be on an SQL connection.
 
-## Can the webapp be used by several users simultaneously?
+## Can the webapp be used by several end-users simultaneously?
 
-Several users can view and edit data at the same time, but they won't see each other's edits in real time; if two or more users try to edit the same cell at the same time, all their edits will be logged, but only the last edit will make its way to the _edits_ dataset.
+From a technical standpoint, **yes**: multiple end-users can view and edit data simultaneously. **However, they won't see each other's edits in real-time**. More specifically, if two or more end-users try to edit the same cell at the same time:
+
+* All edits will be recorded in the editlog.
+* Only the last edit will be taken into account.
+* End-users won't know that they're all editing the same cell simultaneously.
+* The only way to figure out that this happened, and who "won", is to look at the editlog.
+
+We recommend assessing the likelihood of simultaneous editing by considering the number of end-users, how often each is expected to use the webapp per day, and for how long.
+
+To address the above user experience issues, we recommend **assigning ownership of each row to a specific end-user**. This can be done by creating an extra column in the dataset to review/edit whose values are user names. This column can then be used in two ways:
+
+* In the webapp: have end-users filter for their name in that column.
+* In the flow: split the dataset according to that column, create one Visual Edit webapp per resulting dataset, and specify the corresponding user in the webapp's "authorized users" setting.
 
 ## What happens if I change primary keys or editable columns in the webapp settings?
 
