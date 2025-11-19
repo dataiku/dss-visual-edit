@@ -24,7 +24,7 @@
         {
             "name": "primary_keys",
             "label": "Primary Keys",
-            "description": "Columns used to identify a record.\n\nIMPORTANT: make sure that the type and meaning of these columns is set correctly before starting the webapp.",
+            "description": "Columns used to identify a record. IMPORTANT: make sure that the type and meaning of these columns is set correctly before starting the webapp.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset",
             "mandatory": true
@@ -32,7 +32,7 @@
         {
             "name": "editable_column_names",
             "label": "Editable Columns",
-            "description": "Columns that the webapp user will be able to edit.\n\nIMPORTANT: make sure that the type and meaning of these columns is set correctly before starting the webapp.",
+            "description": "Columns that the webapp user will be able to edit. IMPORTANT: make sure that the type and meaning of these columns is set correctly before starting the webapp.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset",
             "mandatory": true
@@ -40,7 +40,7 @@
         {
             "name": "sep-linked-record",
             "label": "Linked Records",
-            "description": "A linked record (aka foreign key) is an editable column whose values correspond to primary key values of another dataset, referred to as the linked dataset.",
+            "description": "A Linked Record (aka Foreign Key) column is an editable column whose values correspond to Primary Key values of another dataset, referred to as the Linked Dataset. [Read more >](https://dataiku.github.io/dss-visual-edit/linked-records)",
             "type": "SEPARATOR"
         },
         {
@@ -171,11 +171,12 @@
         {
             "name": "sep-advanced",
             "label": "Advanced",
+            "description": "Restrict access to a list of authorized users, freeze edits, activate debug mode, or customize editing widgets via the [Editschema](https://dataiku.github.io/dss-visual-edit/editschema).",
             "type": "SEPARATOR"
         },
         {
             "name": "authorized_users",
-            "label": "Authorized users",
+            "label": "Authorized users (optional)",
             "description": "List identifiers of users authorized to view the webapp and make edits, as Strings. Leave empty to give access to anyone who has project-level permission to read dashboards.",
             "type": "ARRAY"
         },
@@ -193,7 +194,7 @@
         {
             "name": "editschema",
             "label": "Editschema (optional)",
-            "description": "Additional column settings to provide as an array of dictionaries in JSON format (example: [ {'name': 'col1'}, {'name': 'col2'} ]",
+            "description": "See link above for more information.",
             "type": "TEXTAREA"
         }
     ],
