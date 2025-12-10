@@ -12,19 +12,19 @@
         {
             "name": "sep-data",
             "label": "Data",
-            "description": "Source dataset and core settings. Editlog auto-created as <dataset>_editlog on the same connection; edited dataset built by plugin recipe. Use a recommended connection. [Docs >](https://dataiku.github.io/dss-visual-edit/getting-started)",
+            "description": "Original dataset and core settings. Editlog auto-created on the same connection; edited dataset built by plugin recipe. Use a recommended connection. [Docs >](https://dataiku.github.io/dss-visual-edit/getting-started)",
             "type": "SEPARATOR"
         },
         {
             "name": "original_dataset",
-            "label": "Original dataset (required)",
-            "description": "Read-only source. Edits stored in <dataset>_editlog.",
+            "label": "Original dataset",
+            "description": "Read-only. Edits stored in <dataset>_editlog.",
             "type": "DATASET",
             "mandatory": true
         },
         {
             "name": "primary_keys",
-            "label": "Primary key(s) (required)",
+            "label": "Primary key(s)",
             "description": "Columns that uniquely identify each row (required to merge edits).",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset",
@@ -32,7 +32,7 @@
         },
         {
             "name": "editable_column_names",
-            "label": "Editable column(s) (required)",
+            "label": "Editable column(s)",
             "description": "Renders by column Type/Meaning. Primary keys cannot be editable.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset",
@@ -46,7 +46,7 @@
         },
         {
             "name": "linked_records_count",
-            "label": "Number of Dropdown columns",
+            "label": "Dropdown columns",
             "description": "",
             "type": "INT",
             "minI": 0,
@@ -54,8 +54,8 @@
         },
         {
             "name": "linked_record_name_1",
-            "label": "Dropdown column (1) (required)",
-            "description": "Should be in the Editable Column(s) list.",
+            "label": "Dropdown column (1)",
+            "description": "Should be in the Editable column(s) list.",
             "type": "DATASET_COLUMN",
             "datasetParamName": "original_dataset",
             "mandatory": true,
@@ -63,7 +63,7 @@
         },
         {
             "name": "linked_record_ds_name_1",
-            "label": "Options dataset (1) (required)",
+            "label": "Options dataset (1)",
             "description": "Provides dropdown options (SQL or <10k rows).",
             "type": "DATASET",
             "mandatory": true,
@@ -71,7 +71,7 @@
         },
         {
             "name": "linked_record_key_1",
-            "label": "↳ Matching column (1) (required)",
+            "label": "↳ Matching column (1)",
             "description": "Key column in Options dataset that matches Dropdown column (1) in Original dataset.",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
@@ -80,7 +80,7 @@
         },
         {
             "name": "linked_record_label_column_1",
-            "label": "↳ Display column (1) (required)",
+            "label": "↳ Display column (1)",
             "description": "Label shown in the dropdown. Can be the same as Matching column (1), but if it contains codes or IDs, choose another user-friendly column.",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
@@ -88,7 +88,7 @@
         },
         {
             "name": "linked_record_lookup_columns_1",
-            "label": "↳ Lookup columns (1)",
+            "label": "↳ Lookup columns (1) (optional)",
             "description": "Additional information shown in each dropdown item, to aid selection.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "linked_record_ds_name_1",
@@ -141,7 +141,7 @@
         },
         {
             "name": "sep-layout",
-            "label": "Layout",
+            "label": "Layout (optional)",
             "description": "Customize the data table with header filters and row grouping.",
             "type": "SEPARATOR"
         },
@@ -161,7 +161,7 @@
         },
         {
             "name": "sep-advanced",
-            "label": "Advanced",
+            "label": "Advanced (optional)",
             "description": "Access control, edit freezing, debug mode, and [column definition overrides](https://dataiku.github.io/dss-visual-edit/editschema).",
             "type": "SEPARATOR"
         },
@@ -174,7 +174,7 @@
         {
             "name": "freeze_edits",
             "label": "Freeze edits",
-            "description": "If enabled, editing is disabled.",
+            "description": "If checked, editing is disabled.",
             "type": "BOOLEAN"
         },
         {
