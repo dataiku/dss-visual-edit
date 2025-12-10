@@ -10,9 +10,14 @@
     "standardWebAppLibraries": null,
     "params": [
         {
-            "name": "sep-data",
+            "name": "sep-docs",
+            "label": "",
+            "description": "[Visual Edit Documentation](https://dataiku.github.io/dss-visual-edit/getting-started)",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "sep-core",
             "label": "Core settings",
-            "description": "[Docs >](https://dataiku.github.io/dss-visual-edit/getting-started)",
             "type": "SEPARATOR"
         },
         {
@@ -41,13 +46,12 @@
         {
             "name": "sep-linked-record",
             "label": "Dropdown columns",
-            "description": "Editable columns with predefined options presented in dropdowns.",
             "type": "SEPARATOR"
         },
         {
             "name": "linked_records_count",
             "label": "Dropdown columns",
-            "description": "",
+            "description": "Editable columns with predefined options presented in dropdowns.",
             "type": "INT",
             "minI": 0,
             "maxI": 2
@@ -55,7 +59,7 @@
         {
             "name": "linked_record_name_1",
             "label": "Dropdown column (1)",
-            "description": "Should be in the Editable column(s) list.",
+            "description": "Should be in 'Editable column(s)'.",
             "type": "DATASET_COLUMN",
             "datasetParamName": "original_dataset",
             "mandatory": true,
@@ -64,7 +68,7 @@
         {
             "name": "linked_record_ds_name_1",
             "label": "Options dataset (1)",
-            "description": "Provides dropdown options (SQL or <10k rows).",
+            "description": "Provides dropdown options. SQL or <10k rows.",
             "type": "DATASET",
             "mandatory": true,
             "visibilityCondition": "model.linked_records_count > 0"
