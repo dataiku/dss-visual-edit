@@ -11,21 +11,21 @@
     "params": [
         {
             "name": "sep-data",
-            "label": "Data",
-            "description": "Original dataset and core settings. Editlog auto-created on the same connection; edited dataset built by plugin recipe. Use a recommended connection. [Docs >](https://dataiku.github.io/dss-visual-edit/getting-started)",
+            "label": "Core settings",
+            "description": "[Docs >](https://dataiku.github.io/dss-visual-edit/getting-started)",
             "type": "SEPARATOR"
         },
         {
             "name": "original_dataset",
             "label": "Original dataset",
-            "description": "Read-only. Edits stored in <dataset>_editlog.",
+            "description": "Read-only. Edits stored in <dataset>_editlog and propagated to <dataset>_edited on the same connection. Use PostgreSQL, BigQuery or Snowflake for performance.",
             "type": "DATASET",
             "mandatory": true
         },
         {
             "name": "primary_keys",
             "label": "Primary key(s)",
-            "description": "Columns that uniquely identify each row (required to merge edits).",
+            "description": "Columns that uniquely identify each row. Required to merge edits.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset",
             "mandatory": true
@@ -41,7 +41,7 @@
         {
             "name": "sep-linked-record",
             "label": "Dropdown columns",
-            "description": "Editable columns with predefined options presented in dropdowns. [Learn more >](https://dataiku.github.io/dss-visual-edit/linked-records)",
+            "description": "Editable columns with predefined options presented in dropdowns.",
             "type": "SEPARATOR"
         },
         {
@@ -72,7 +72,7 @@
         {
             "name": "linked_record_key_1",
             "label": "↳ Matching column (1)",
-            "description": "Key column in Options dataset that matches Dropdown column (1) in Original dataset.",
+            "description": "Key column in 'Options dataset (1)' that matches 'Dropdown column (1)' in 'Original dataset'.",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
             "mandatory": true,
@@ -81,15 +81,15 @@
         {
             "name": "linked_record_label_column_1",
             "label": "↳ Display column (1)",
-            "description": "Label shown in the dropdown. Can be the same as Matching column (1), but if it contains codes or IDs, choose another user-friendly column.",
+            "description": "Label shown in the dropdown. Can be the same as 'Matching column (1)', but if it contains codes or IDs, choose another user-friendly column.",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
             "visibilityCondition": "model.linked_records_count > 0"
         },
         {
             "name": "linked_record_lookup_columns_1",
-            "label": "↳ Lookup columns (1) (optional)",
-            "description": "Additional information shown in each dropdown item, to aid selection.",
+            "label": "↳ Lookup columns (1)",
+            "description": "Optional. Additional information shown in each dropdown item, to aid selection.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "linked_record_ds_name_1",
             "visibilityCondition": "model.linked_records_count > 0"
@@ -142,7 +142,6 @@
         {
             "name": "sep-layout",
             "label": "Layout (optional)",
-            "description": "Customize the data table with header filters and row grouping.",
             "type": "SEPARATOR"
         },
         {
@@ -162,7 +161,6 @@
         {
             "name": "sep-advanced",
             "label": "Advanced (optional)",
-            "description": "Access control, edit freezing, debug mode, and [column definition overrides](https://dataiku.github.io/dss-visual-edit/editschema).",
             "type": "SEPARATOR"
         },
         {

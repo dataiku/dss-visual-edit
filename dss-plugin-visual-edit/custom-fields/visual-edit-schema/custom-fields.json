@@ -1,7 +1,7 @@
 {
     "meta": {
         "label": "Visual Edit",
-        "description": "Dataset fields used by the Visual Edit functionality: primary keys, editable columns, linked records (aka foreign keys). Do not modify directly.",
+        "description": "Dataset fields copied from Visual Edit's webapp settings and used by its recipes.",
         "icon": "icon-columns"
     },
     "customFields": [
