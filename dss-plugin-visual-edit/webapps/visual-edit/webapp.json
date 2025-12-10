@@ -12,57 +12,50 @@
         {
             "name": "sep-data",
             "label": "Data",
-            "description": "Visual Edit mandatory settings, including the dataset of records to review. Edits will be stored in a separate editlog dataset. Use a recommended data connection for better performance. [Documentation >](https://dataiku.github.io/dss-visual-edit/getting-started)",
+            "description": "Source dataset and core settings. Editlog auto-created as <dataset>_editlog on the same connection; edited dataset built by plugin recipe. Use a recommended connection. [Docs >](https://dataiku.github.io/dss-visual-edit/getting-started)",
             "type": "SEPARATOR"
         },
         {
             "name": "original_dataset",
-            "label": "Original dataset",
-            "description": "Never modified: edits are stored in the editlog dataset and propagated to a new dataset in the Flow.",
+            "label": "Original dataset (required)",
+            "description": "Read-only source. Edits stored in <dataset>_editlog.",
             "type": "DATASET",
             "mandatory": true
         },
         {
             "name": "primary_keys",
-            "label": "Primary key column(s)",
-            "description": "Uniquely identify a record. Required to merge original and editlog rows.",
+            "label": "Primary key(s) (required)",
+            "description": "Columns that uniquely identify each row (required to merge edits).",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset",
             "mandatory": true
         },
         {
             "name": "editable_column_names",
-            "label": "Editable column(s)",
-            "description": "Rendering and editing behavior follow the dataset column Types and Meanings.",
+            "label": "Editable column(s) (required)",
+            "description": "Renders by column Type/Meaning. Primary keys cannot be editable.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset",
             "mandatory": true
         },
         {
             "name": "sep-linked-record",
-            "label": "Linked Records",
-            "description": "Define Linked Record columns to limit editing to predefined options displayed in a dropdown. [Learn more >](https://dataiku.github.io/dss-visual-edit/linked-records)",
+            "label": "Dropdown columns",
+            "description": "Editable columns with predefined options presented in dropdowns. [Learn more >](https://dataiku.github.io/dss-visual-edit/linked-records)",
             "type": "SEPARATOR"
         },
         {
             "name": "linked_records_count",
-            "label": "Number of Linked Record columns",
-            "description": "Maximum supported is 2.",
+            "label": "Number of Dropdown columns",
+            "description": "",
             "type": "INT",
             "minI": 0,
             "maxI": 2
         },
         {
-            "name": "sep-linked-records-1",
-            "label": "Linked Record column #1",
-            "description": "Specify an Editable Column, a dataset providing allowed options, and map its columns.",
-            "type": "SEPARATOR",
-            "visibilityCondition": "model.linked_records_count > 0"
-        },
-        {
             "name": "linked_record_name_1",
-            "label": "Editable column",
-            "description": "Mandatory. Should be in the Editable Column(s) list.",
+            "label": "Dropdown column (1) (required)",
+            "description": "Should be in the Editable Column(s) list.",
             "type": "DATASET_COLUMN",
             "datasetParamName": "original_dataset",
             "mandatory": true,
@@ -70,16 +63,16 @@
         },
         {
             "name": "linked_record_ds_name_1",
-            "label": "Options dataset",
-            "description": "Mandatory. Should be on a SQL connection or contain < 10,000 rows.",
+            "label": "Options dataset (1) (required)",
+            "description": "Provides dropdown options (SQL or <10k rows).",
             "type": "DATASET",
             "mandatory": true,
             "visibilityCondition": "model.linked_records_count > 0"
         },
         {
             "name": "linked_record_key_1",
-            "label": "↳ Matching column",
-            "description": "Mandatory. Values should match those of the Editable column in the Original dataset.",
+            "label": "↳ Matching column (1) (required)",
+            "description": "Key column in Options dataset that matches Dropdown column (1) in Original dataset.",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
             "mandatory": true,
@@ -87,16 +80,16 @@
         },
         {
             "name": "linked_record_label_column_1",
-            "label": "↳ Display column",
-            "description": "Mandatory. Used to identify options in the dropdown. This can be the same as 'Matching Column', or another column providing user-friendly labels (e.g. when the former contains codes or IDs).",
+            "label": "↳ Display column (1) (required)",
+            "description": "Label shown in the dropdown. Can be the same as Matching column (1), but if it contains codes or IDs, choose another user-friendly column.",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
             "visibilityCondition": "model.linked_records_count > 0"
         },
         {
             "name": "linked_record_lookup_columns_1",
-            "label": "↳ Lookup columns",
-            "description": "Used to provide additional information about each option and aid selection in the dropdown.",
+            "label": "↳ Lookup columns (1)",
+            "description": "Additional information shown in each dropdown item, to aid selection.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "linked_record_ds_name_1",
             "visibilityCondition": "model.linked_records_count > 0"
@@ -149,51 +142,51 @@
         {
             "name": "sep-layout",
             "label": "Layout",
-            "description": "Customize the user interface with header filters and row grouping.",
+            "description": "Customize the data table with header filters and row grouping.",
             "type": "SEPARATOR"
         },
         {
             "name": "show_header_filter",
-            "label": "Show header filters",
-            "description": "Under column headers.",
+            "label": "Header filters",
+            "description": "Show per-column filters under headers.",
             "type": "BOOLEAN",
             "defaultValue": true
         },
         {
             "name": "group_column_names",
-            "label": "Group by Columns",
-            "description": "Used to group rows in the webapp's data table.",
+            "label": "Group by",
+            "description": "Columns used to group rows in the table.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset"
         },
         {
             "name": "sep-advanced",
             "label": "Advanced",
-            "description": "Access control, edit freezing, debug mode, and [advanced column definitions](https://dataiku.github.io/dss-visual-edit/editschema).",
+            "description": "Access control, edit freezing, debug mode, and [column definition overrides](https://dataiku.github.io/dss-visual-edit/editschema).",
             "type": "SEPARATOR"
         },
         {
             "name": "authorized_users",
-            "label": "Authorized Users",
-            "description": "List of user IDs allowed to use the webapp. Leave empty to permit anyone with project dashboard read access.",
+            "label": "Authorized users",
+            "description": "User IDs allowed to open the webapp. Leave empty = project dashboard readers.",
             "type": "ARRAY"
         },
         {
             "name": "freeze_edits",
-            "label": "Freeze Edits",
-            "description": "If true, editing is disabled in the webapp.",
+            "label": "Freeze edits",
+            "description": "If enabled, editing is disabled.",
             "type": "BOOLEAN"
         },
         {
             "name": "debug_mode",
-            "label": "Debug Mode",
-            "description": "Enable debug logging to help troubleshoot issues.",
+            "label": "Debug mode",
+            "description": "Enable verbose logging for troubleshooting.",
             "type": "BOOLEAN"
         },
         {
             "name": "editschema",
-            "label": "Advanced Column Definitions",
-            "description": "Array of dictionaries in JSON format to customize column rendering and behavior, following the AgGrid syntax. Example: [ {'name': 'col1', 'options': { 'filter': 'agSetColumnFilter'}}, {'name': 'col2', 'options': {...}} ].",
+            "label": "Column overrides (JSON)",
+            "description": "Advanced per-column options as JSON array (AgGrid syntax). Example: [ {'name': 'col1', 'options': { 'filter': 'agSetColumnFilter'}}, {'name': 'col2', 'options': {...}} ].",
             "type": "TEXTAREA"
         }
     ],
