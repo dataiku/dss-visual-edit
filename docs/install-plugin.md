@@ -1,12 +1,35 @@
 # Installation
 
-Visual Edit's open-source code is hosted in a [GitHub repository](https://github.com/dataiku/dss-visual-edit/tree/master/dss-plugin-visual-edit). As a result, the plugin can be installed via Git or as a ZIP file (installation via Git is recommended as it allows to easily [update the plugin](update-plugin.md) when new versions are released). In this guide, we provide details to the steps found in the [Dataiku Documentation: Installing plugins](https://doc.dataiku.com/dss/latest/plugins/installing.html).
+Visual Edit's open-source code is hosted in a [GitHub repository](https://github.com/dataiku/dss-visual-edit/tree/master/dss-plugin-visual-edit). As a result, the plugin can be installed via Git or as a ZIP file (installation via Git is recommended as it allows to easily [update the plugin](update-plugin.md) when new versions are released).
+
+In this guide, we provide details on the steps found in the [Dataiku Documentation: Installing plugins](https://doc.dataiku.com/dss/latest/plugins/installing.html). We also discuss requirements and tips to determine if Visual Edit is a good fit for you, before installation.
 
 ## Requirements
 
 - Compatible version of Dataiku, Python, and compatible SQL data connection. See [Compatibility](compatibility.md).
 - Ability to install plugins on your Dataiku instance.
 - Ability to create a code environment.
+
+## Is it a fit?
+
+Use this quick checklist to determine if Visual Edit meets your needs before installation.
+
+- **Audit trail / rebuilds**
+  - Good fit: datasets that are regularly rebuilt or require an audit trail. Here's why:
+    - Visual Edit stores edits in a separate _editlog_ dataset
+    - Plugin recipes turn this into an _edited_ dataset.
+    - As a result, edits survive rebuilds and are auditable.
+  - Not a fit: if you require direct in-place editing with no extra artifacts, Visual Edit adds unnecessary complexity to your Flow.
+
+- **Adding or removing rows**
+  - The no-code Visual Webapp does not support adding/removing rows.
+  - The Visual Edit API has experimental support for row addition/deletion; plan for UI work if you need this.
+
+- **Alternatives**
+  - For simple in-place editing or lightweight labeling, evaluate Dataiku core features like [Push to Editable](https://doc.dataiku.com/dss/latest/other_recipes/push-to-editable.html) or [Labeling](https://doc.dataiku.com/dss/latest/machine-learning/labeling.html) as alternatives.
+  - For additional customizability, consider low-code webapp frameworks such as Streamlit or Dash and DB drivers/ORM such as SQLAlchemy for direct database edits.
+
+If unsure, try the plugin in a test project first to validate the webapp and integration with your existing Flow.
 
 ## Option 1: Git
 
