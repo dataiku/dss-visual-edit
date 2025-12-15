@@ -16,14 +16,9 @@
             "type": "SEPARATOR"
         },
         {
-            "name": "sep-core",
-            "label": "Core settings",
-            "type": "SEPARATOR"
-        },
-        {
             "name": "original_dataset",
             "label": "Original dataset",
-            "description": "Read-only. Edits stored in <dataset>_editlog and propagated to <dataset>_edited on the same connection. Use PostgreSQL, BigQuery or Snowflake for performance.",
+            "description": "Read-only (edits stored in <dataset>_editlog on the same data connection). Use PostgreSQL, BigQuery or Snowflake for performance.",
             "type": "DATASET",
             "mandatory": true
         },
@@ -38,7 +33,7 @@
         {
             "name": "editable_column_names",
             "label": "Editable column(s)",
-            "description": "Renders by column Type/Meaning. Primary keys cannot be editable.",
+            "description": "Rendered by Type/Meaning. Primary keys cannot be editable.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset",
             "mandatory": true
@@ -85,7 +80,7 @@
         {
             "name": "linked_record_label_column_1",
             "label": "↳ Display column (1)",
-            "description": "Label shown in the dropdown. Can be the same as 'Matching column (1)', but if it contains codes or IDs, choose another user-friendly column.",
+            "description": "Displayed text for each dropdown option. Can be the same as 'Matching column (1)', but if it contains codes or IDs, choose a more user-friendly column.",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_1",
             "visibilityCondition": "model.linked_records_count > 0"
@@ -99,31 +94,23 @@
             "visibilityCondition": "model.linked_records_count > 0"
         },
         {
-            "name": "sep-linked-records-2",
-            "label": "Linked Record column #2",
-            "type": "SEPARATOR",
-            "visibilityCondition": "model.linked_records_count > 1"
-        },
-        {
             "name": "linked_record_name_2",
-            "label": "Editable Column",
-            "type": "DATASET_COLUMN",
-            "description": "The editable column to render as a second dropdown. Ensure it is included in the Editable column(s) list.",
+            "label": "Dropdown column (2)",
+            "description": "Should be in 'Editable column(s)'.",
             "datasetParamName": "original_dataset",
             "mandatory": true,
             "visibilityCondition": "model.linked_records_count > 1"
         },
         {
             "name": "linked_record_ds_name_2",
-            "label": "Options Dataset",
-            "description": "Dataset providing allowed values for the second dropdown. Should be on a SQL connection or contain < 10,000 rows.",
+            "label": "Options dataset (2)",
             "type": "DATASET",
             "mandatory": true,
             "visibilityCondition": "model.linked_records_count > 1"
         },
         {
             "name": "linked_record_key_2",
-            "label": "↳ Matching Column",
+            "label": "↳ Matching column (2)",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_2",
             "mandatory": true,
@@ -131,21 +118,21 @@
         },
         {
             "name": "linked_record_label_column_2",
-            "label": "↳ Display Column",
+            "label": "↳ Display column (2)",
             "type": "DATASET_COLUMN",
             "datasetParamName": "linked_record_ds_name_2",
             "visibilityCondition": "model.linked_records_count > 1"
         },
         {
             "name": "linked_record_lookup_columns_2",
-            "label": "↳ Additional Lookup Columns",
+            "label": "↳ Lookup columns (2)",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "linked_record_ds_name_2",
             "visibilityCondition": "model.linked_records_count > 1"
         },
         {
             "name": "sep-layout",
-            "label": "Layout (optional)",
+            "label": "User Interface settings (optional)",
             "type": "SEPARATOR"
         },
         {
@@ -164,13 +151,13 @@
         },
         {
             "name": "sep-advanced",
-            "label": "Advanced (optional)",
+            "label": "Advanced settings (optional)",
             "type": "SEPARATOR"
         },
         {
             "name": "authorized_users",
             "label": "Authorized users",
-            "description": "User IDs allowed to open the webapp. Leave empty = project dashboard readers.",
+            "description": "User IDs allowed to open the webapp. Leaving empty defaults to project dashboard readers.",
             "type": "ARRAY"
         },
         {
