@@ -12,20 +12,20 @@
         {
             "name": "sep-docs",
             "label": "",
-            "description": "[Visual Edit Documentation](https://dataiku.github.io/dss-visual-edit/getting-started)",
+            "description": "[Visual Edit Documentation](https://www.dataiku.com/product/plugins/visual-edit/)",
             "type": "SEPARATOR"
         },
         {
             "name": "original_dataset",
             "label": "Original dataset",
-            "description": "Read-only (edits stored in <dataset>_editlog on the same data connection). Use PostgreSQL, BigQuery or Snowflake for performance.",
+            "description": "Read-only; edits stored in <dataset>_editlog on the same connection. Use PostgreSQL, BigQuery or Snowflake for performance.",
             "type": "DATASET",
             "mandatory": true
         },
         {
             "name": "primary_keys",
             "label": "Primary key(s)",
-            "description": "Columns that uniquely identify each row. Required to merge edits.",
+            "description": "Columns that uniquely identify each row. Required to merge edits into original data.",
             "type": "DATASET_COLUMNS",
             "datasetParamName": "original_dataset",
             "mandatory": true
