@@ -1,14 +1,17 @@
 from __future__ import annotations
-from pydantic import BaseModel
+
 from dataclasses import dataclass
 from typing import Any, List
-from DatasetSQL import DatasetSQL
+
 from pandas import DataFrame
+from pydantic import BaseModel
+
+from DatasetSQL import DatasetSQL
 
 
 class EditSchema(BaseModel):
     name: str
-    type: str
+    aggrid_col_def: dict
 
 
 @dataclass(frozen=True)
