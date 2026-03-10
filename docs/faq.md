@@ -10,7 +10,9 @@ If [linked records](linked-records) are needed, and if the linked dataset has mo
 
 ## Can the webapp be used by several end-users simultaneously?
 
-From a technical standpoint, **yes**: multiple end-users can view and edit data simultaneously. **However, they won't see each other's edits in real-time**. More specifically, if two or more end-users try to edit the same cell at the same time:
+**Yes** if using an SQL connection: Visual Edit persists edits by inserting rows into the editlog table.
+
+As a result, multiple end-users can view and edit data simultaneously. **However, they won't see each other's edits in real-time**. More specifically, if two or more end-users try to edit the same cell at the same time:
 
 * All edits will be recorded in the editlog.
 * Only the last edit will be taken into account.
