@@ -2,14 +2,15 @@
 
 Welcome to the documentation website for Dataiku Visual Edit!
 
-This plugin helps spin up visual apps to validate and edit data. Learn more about use cases, features, how to install and how to use at [dataiku.com/product/plugins/visual-edit/](https://www.dataiku.com/product/plugins/visual-edit/).
+This plugin helps spin up visual apps to validate and edit data.
 
 ## Contents of this website
 
 - For Data Experts:
   - [Compatibility](compatibility)
   - User guides:
-    - [Getting started](https://www.dataiku.com/product/plugins/visual-edit/)
+    - [Installing the plugin](install-plugin)
+    - [Getting started](get-started): use cases, features, and how to use
     - [Validating machine-generated data](validate)
     - [Building a complete application to test with end-users](build-complete-application)
     - [Deploying to production](deploy)
