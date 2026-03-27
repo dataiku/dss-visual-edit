@@ -1,6 +1,6 @@
 [tool.ruff]
 # Folder to find local modules
-src = ["dss-plugin-visual-edit/python-lib", "dss-plugin-visual-edit/webapps"]
+src = ["python-lib", "webapps", "custom-recipes", "tests", "unit-tests"]
 
 # Exclude a variety of commonly ignored directories.
 exclude = [
@@ -166,7 +166,7 @@ max-statements=50
 [tool.mypy]
 warn_return_any = true
 warn_unused_configs = true
-mypy_path=["dss-plugin-visual-edit/python-lib", "dss-plugin-visual-edit/webapps"]
+mypy_path=["python-lib", "webapps", "custom-recipes"]
 
 [[tool.mypy.overrides]]
 module = [

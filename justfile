@@ -31,7 +31,7 @@ test *FLAGS:
     DKU_API_KEY=$(grep '^DKU_API_KEY=' ./infra/.env.dss | awk -F= '{print $2}')
 
     echo "Creating and activating virtual environment..."
-    cd ./dss-plugin-visual-edit/tests
+    cd ./tests
 
     # Setting up virtual environment
     if [ ! -d "./venv" ]; then
