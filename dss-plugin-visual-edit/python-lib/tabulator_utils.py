@@ -1,5 +1,5 @@
 """
-This file contains functions used to generate the Tabulator columns configuration for a given dataset.
+DEPRECATED: This file previously generated Tabulator columns configuration. Migrated to AG Grid (see aggrid_utils.py).
 """
 
 from typing import Union
@@ -41,11 +41,7 @@ def __get_column_tabulator_type__(de, col_name):
         if schema_meaning and schema_meaning == schema_meaning:
             if schema_meaning == "Boolean":
                 t_type = "boolean"
-            if (
-                schema_meaning == "DoubleMeaning"
-                or schema_meaning == "LongMeaning"
-                or schema_meaning == "IntMeaning"
-            ):
+            if schema_meaning == "DoubleMeaning" or schema_meaning == "LongMeaning" or schema_meaning == "IntMeaning":
                 t_type = "number"
             if schema_meaning == "Date":
                 t_type = "date"
@@ -100,9 +96,7 @@ def __get_column_tabulator_editor__(t_type):
     t_col = {}
     if t_type == "boolean":
         t_col["editor"] = "list"
-        t_col["editorParams"] = {
-            "values": {"true": "True", "false": "False", "": "(empty)"}
-        }
+        t_col["editorParams"] = {"values": {"true": "True", "false": "False", "": "(empty)"}}
         t_col["headerFilter"] = "input"
         t_col["headerFilterParams"] = {}
     elif t_type == "boolean_tick":
@@ -196,9 +190,7 @@ def get_formatted_items_from_linked_df(
     if len(selected_columns) == 1:
         return selected_df[selected_columns[0]].to_list()
 
-    return selected_df.rename(columns={key_col: "value", label_col: "label"}).to_dict(
-        "records"
-    )
+    return selected_df.rename(columns={key_col: "value", label_col: "label"}).to_dict("records")
 
 
 def __get_column_tabulator_linked_record__(de, linked_record_name):
@@ -208,9 +200,7 @@ def __get_column_tabulator_linked_record__(de, linked_record_name):
     linked_ds_name = linked_records_df.loc[linked_record_name, "ds_name"]
     linked_ds_key_column = linked_records_df.loc[linked_record_name, "ds_key"]
     linked_ds_label_column = linked_records_df.loc[linked_record_name, "ds_label"]
-    linked_ds_lookup_columns = linked_records_df.loc[
-        linked_record_name, "ds_lookup_columns"
-    ]
+    linked_ds_lookup_columns = linked_records_df.loc[linked_record_name, "ds_lookup_columns"]
 
     t_col = {}
     t_col["sorter"] = "string"
@@ -309,9 +299,7 @@ def get_columns_tabulator(de, show_header_filter=True, freeze_editable_columns=F
             logging.exception("Failed to get linked record names.")
 
     t_cols = []
-    for col_name in (
-        de.primary_keys + de.display_column_names + de.editable_column_names
-    ):
+    for col_name in de.primary_keys + de.display_column_names + de.editable_column_names:
         # Properties to be shared by all columns
         t_col = {
             "field": col_name,
