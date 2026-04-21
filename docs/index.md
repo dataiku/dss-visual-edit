@@ -1,8 +1,20 @@
 # Plugin: Visual Edit | Dataiku
 
-Welcome to the documentation website for Dataiku Visual Edit!
+Spin up visual apps to validate and edit data.
 
-This plugin helps spin up visual apps to validate and edit data.
+---
+
+**🚀 Now Available: Visual Edit 3.0**
+
+> Visual Edit 3.0 is a major evolution of the plugin, featuring a **complete Data Table UI Overhaul** powered by AgGrid. This update delivers a significantly faster, Excel-like experience with seamless infinite scrolling, keyboard navigation, and real-time collaboration indicators to prevent edit collisions. With powerful new features like column pinning, advanced filtering for blanks, and a streamlined configuration interface, v3.0 is designed for maximum editing productivity.
+>
+> Available on demand to all Dataiku customers. **Contact your CSM to upgrade!**
+
+**🔗 [Release Notes](https://docs.google.com/document/d/1_BAeE9cNQMFD2coCrvOkdaZCZcOEZpH0WAP8d70SC_Q/edit?usp=sharing) | 📺 [Demo](https://share.descript.com/view/W6EajKgrMx2)**
+
+---
+
+Welcome to the documentation website for Dataiku Visual Edit 2.0!
 
 ## Contents of this website
 
