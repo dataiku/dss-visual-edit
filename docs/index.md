@@ -12,6 +12,8 @@ Spin up visual apps to validate and edit data.
 
 **🔗 [Release Notes](https://docs.google.com/document/d/1_BAeE9cNQMFD2coCrvOkdaZCZcOEZpH0WAP8d70SC_Q/edit?usp=sharing) | 📺 [Demo](https://share.descript.com/view/W6EajKgrMx2)**
 
+<img src="demo_order_validation.gif" width="600" alt="Visual Edit 3.0 Demo">
+
 ---
 
 Welcome to the documentation website for Dataiku Visual Edit 2.0!
