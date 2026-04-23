@@ -12,16 +12,19 @@
 from __future__ import annotations  # noqa: I001
 
 import logging
+import os
+from shutil import copytree
 import webapp.logging.setup  # noqa: F401 necessary to setup logging basicconfig before dataiku module sets a default config
 from datetime import datetime
 
-from dash import Dash, Input, Output, State, dcc, html
+from dash import Dash, Input, Output, State, dcc, html, clientside_callback
 from dataiku.core.schema_handling import CASTERS
+from dataiku.customwebapp import get_webapp_resource
 from flask import Flask, jsonify, make_response, request
-from pandas import concat
+from pandas import concat  # Removed unused import
 from pandas.api.types import is_float_dtype, is_integer_dtype
 
-import dash_tabulator
+from dash_ag_grid import AgGrid
 from commons import get_last_build_date, try_get_user_identifier
 from DataEditor import (
     DataEditor,
@@ -37,7 +40,7 @@ from dataiku_utils import (
     get_linked_dataframe_filtered,
     get_linked_label,
 )
-from tabulator_utils import get_columns_tabulator, get_formatted_items_from_linked_df
+from aggrid_utils import get_columns_aggrid, get_formatted_items_from_linked_df
 from webapp.config.loader import WebAppConfig
 from webapp.config.models import LinkedRecord
 
@@ -46,7 +49,13 @@ webapp_config = WebAppConfig()
 logging.info(f"Web app starting inside DSS:{webapp_config.running_in_dss}.")
 
 if webapp_config.running_in_dss:
-    server = app.server
+    server = app.server  # type: ignore
+    app_dash: Dash = app  # type: ignore
+    webapp_resource_path: str = get_webapp_resource()  # type: ignore
+    webapp_plugin_assets = os.path.join(webapp_resource_path, "../webapps/visual-edit/assets")
+    dash_webapp_assets = app_dash.config.assets_folder
+    logging.info(f"Copying Webapp assets from directory '{webapp_plugin_assets}' into directory '{dash_webapp_assets}'")
+    copytree(webapp_plugin_assets, dash_webapp_assets)
 else:
     server = Flask(__name__)
     app = Dash(__name__, server=server)
@@ -72,7 +81,9 @@ de = DataEditor(
 )
 
 
-columns = get_columns_tabulator(de, webapp_config.show_header_filter, webapp_config.freeze_editable_columns)
+columns = get_columns_aggrid(
+    de, webapp_config.editschema_manual, webapp_config.show_header_filter, webapp_config.freeze_editable_columns
+)
 
 last_build_date_initial = ""
 last_build_date_ok = False
@@ -113,6 +124,7 @@ def serve_layout():  # This function is called upon loading/refreshing the page 
         logging.debug(f"User '{user_id}' is being served layout.")
         return html.Div(
             children=[
+                dcc.Store(id="flash-store"),
                 html.Div(
                     id="refresh-div",
                     children=[
@@ -135,12 +147,29 @@ def serve_layout():  # This function is called upon loading/refreshing the page 
                     interval=10 * 1000,  # in milliseconds
                     n_intervals=0,
                 ),
-                dash_tabulator.DashTabulator(
+                AgGrid(
                     id="datatable",
-                    datasetName=original_ds_name,
-                    columns=columns,
-                    data=de.get_edited_df().to_dict("records"),  # this gets the most up-to-date edited data
-                    groupBy=webapp_config.group_column_names,
+                    enableEnterpriseModules=True,
+                    className="ag-theme-alpine ag-theme-dataiku",
+                    columnDefs=columns,
+                    # defaultColDef={"floatingFilter": True},
+                    rowData=de.get_edited_df().to_dict("records"),
+                    style={"height": "100vh", "width": "100%"},
+                    dashGridOptions={
+                        "columnHoverHighlight": True,
+                        "sideBar": True,
+                        "stopEditingWhenCellsLoseFocus": True,
+                        "singleClickEdit": True,
+                        "showNoRowsOverlay": True,
+                        "statusBar": {
+                            "statusPanels": [
+                                {"statusPanel": "agTotalAndFilteredRowCountComponent"},
+                                {"statusPanel": "agTotalRowCountComponent"},
+                            ]
+                        },
+                    },
+                    # editable=True,
+                    # groupBy=webapp_config.group_column_names,
                 ),
                 html.Div(
                     id="edit-info",
@@ -174,7 +203,7 @@ def toggle_refresh_div_visibility(n_intervals, refresh_div_style, last_build_dat
     """
     Toggle visibility of refresh div, when the interval component fires: check last build date of original dataset and if it's more recent than what we had, display the refresh div
     """
-    global last_build_date_ok
+    # Removed unnecessary global statement
     style_new = refresh_div_style
     if last_build_date_ok:
         last_build_date_new = str(get_last_build_date(original_ds_name, project))
@@ -192,27 +221,62 @@ def toggle_refresh_div_visibility(n_intervals, refresh_div_style, last_build_dat
 
 
 @app.callback(
-    Output("edit-info", "children"),
-    Input("datatable", "cellEdited"),
+    [Output("edit-info", "children"), Output("flash-store", "data")],
+    Input("datatable", "cellValueChanged"),
     prevent_initial_call=True,
 )
-def add_edit(cell):
+def add_edit(cells):
     """
     Record edit in editlog, once a cell has been edited
 
     If the cell is in a validation column, we also update values for all other editable columns in the same row (except Comments). The values in these columns are generated by the upstream data flow and subject to change. We record them, in case the user didn't edit them before marking the row as valid.
     """
-
-    row_dic = cell["row"]
-    updated_field = cell["field"]
+    # Show loader while processing
+    assert len(cells) == 1, "Expected only one cell to be edited at a time."
+    cell = cells[0]
+    updated_column = cell["colId"]
     updated_value = cell["value"]
-    results = de.update_row(row_dic, updated_field, updated_value)
+    row_dic = cell["data"]
 
+    # Show loader
     info = ""
+    results = de.update_row(row_dic, updated_column, updated_value)
     for res in results:
         info += __edit_result_to_message__(res) + "\n"
 
-    return info
+    dash_store_data = (
+        {"rowIndex": cell["rowIndex"], "colId": cell["colId"]} if isinstance(results[0], EditSuccess) else None
+    )
+
+    return info, dash_store_data
+
+
+# Flash edited cell in the grid after edit
+clientside_callback(
+    """
+    async function(flash_data) {
+        if (!flash_data) {
+            return window.dash_clientside.no_update;
+        }
+
+        const gridApi = await dash_ag_grid.getApiAsync("datatable");
+        const rowNode = gridApi.getDisplayedRowAtIndex(flash_data.rowIndex);
+        if (rowNode) {
+            gridApi.flashCells({
+                rowNodes: [rowNode],
+                columns: [flash_data.colId]
+            });
+        }
+
+        return window.dash_clientside.no_update;
+    }
+    """,
+    # A dummy output is required for a clientside_callback.
+    # We can target a non-existent property of the input component itself.
+    Output("flash-store", "id", allow_duplicate=True),
+    Input("flash-store", "data"),
+    prevent_initial_call=True,
+)
 
 
 # CRUD endpoints
